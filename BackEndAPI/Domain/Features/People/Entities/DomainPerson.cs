@@ -1,0 +1,37 @@
+﻿namespace Domain.Features.People.Entities
+{
+    class DomainPerson
+    {
+        public Guid PersonId { get; set; }
+
+        public string? Login { get; set; }
+
+        public string? Logo { get; set; }
+
+        public string? Name { get; set; }
+
+        public string? Surname { get; set; }
+
+        public string? Description { get; set; }
+
+        public string? PhoneNum { get; set; }
+
+        public string? ContactEmail { get; set; }
+
+        public DateTime Created { get; set; }
+
+        public DateTime? Removed { get; set; }
+
+        public DateTime? Blocked { get; set; }
+
+        public DateOnly? BirthDate { get; set; }
+
+        public bool IsTwoFactorAuth { get; set; }
+
+        public bool IsStudent { get; set; }
+
+        public bool IsAdmin { get; set; }
+
+        public Guid? AddressId { get; set; }
+    }
+}

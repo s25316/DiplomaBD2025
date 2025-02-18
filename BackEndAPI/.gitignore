@@ -1,0 +1,62 @@
+#========================================================================================================================
+# FOR ASP .NET CORE API
+#========================================================================================================================
+
+# Visual Studio i VS Code
+.vscode/
+*.vs/
+
+# Pliki użytkownika i konfiguracji
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Kompilowane pliki binarne i katalogi
+bin/
+obj/
+out/
+debug/
+release/
+
+# Pliki zależności
+node_modules/
+bower_components/
+packages/
+*.nupkg
+*.snupkg
+
+# Pliki generowane przez narzędzia
+project.lock.json
+project.assets.json
+__pycache__/
+.DS_Store
+
+# Ustawienia systemowe
+Thumbs.db
+ehthumbs.db
+
+# Logi i diagnostyka
+logs/
+*.log
+*.tlog
+*.cache
+
+# ASP.NET Core
+appsettings*.json
+secrets.json
+.env
+*.db
+*.db-shm
+*.db-wal
+
+# Ef Core Migrations
+Migrations/
+
+# Pliki generowane przez Rider
+.idea/
+*.sln.iml
+
+# Pliki tymczasowe
+*.tmp
+*.bak

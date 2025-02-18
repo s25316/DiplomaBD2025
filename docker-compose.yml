@@ -1,0 +1,46 @@
+#version: '3.8'
+
+services:
+  Diploma_BackEnd_Api:
+    container_name: Diploma_BackEnd_Api
+    image: diploma_backend_api:latest
+    build:
+      context: .
+      dockerfile: BackEndAPI/BackEndAPI/Dockerfile
+    ports :
+      - "8080:8080"
+    restart: unless-stopped 
+    depends_on:
+      - Diploma_MsSQL
+      - Diploma_MongoDb
+    environment: 
+      ConnectionStrings__RelationalDatabase : "Data Source=Diploma_MsSQL,1433;Initial Catalog=DiplomaBD;Persist Security Info=True;User ID=sa;Password=YourStrong!Passw0rd;Trust Server Certificate=True" 
+
+  Diploma_MsSQL:
+    container_name: Diploma_MsSQL
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    ports:
+      - "1433:1433"
+    restart: unless-stopped 
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "YourStrong!Passw0rd"
+      MSSQL_PID: "Developer" # Wersja developerska MSSQL
+    
+    # MSMS : localhost,1433
+    # Copy File to Docker
+    # docker cp C:\Users\User\backup.bak MsSQL:/var/backups/backup-01.bak
+    # Copy File From Docker
+    # docker cp MsSQL:/var/opt/mssql/backup1.bak "C:\01Mine\b.bak"
+    # Remove file from docker
+    # docker exec MsSQL rm /var/opt/mssql/backup.bak
+
+  Diploma_MongoDb:
+    container_name: Diploma_MongoDb
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    restart: unless-stopped 
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: myuser
+      MONGO_INITDB_ROOT_PASSWORD: mypassword
