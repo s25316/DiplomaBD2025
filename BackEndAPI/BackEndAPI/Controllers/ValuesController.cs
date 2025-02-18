@@ -1,6 +1,6 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Caching.Distributed;
+using StackExchange.Redis;
 using System.Text;
 using System.Text.Json;
 
@@ -11,15 +11,18 @@ namespace BackEndAPI.Controllers
     public class ValuesController : ControllerBase
     {
         private readonly IMediator _mediator;
-        private readonly IDistributedCache _cache;
-
+        private readonly IConnectionMultiplexer _redis;
+        private readonly IConfiguration _configuration;
+        private static int _counter = 1;
 
         public ValuesController(
             IMediator mediator,
-            IDistributedCache cache)
+            IConnectionMultiplexer redis,
+            IConfiguration configuration)
         {
             _mediator = mediator;
-            _cache = cache;
+            _redis = redis;
+            _configuration = configuration;
         }
 
         [HttpGet]
@@ -32,14 +35,12 @@ namespace BackEndAPI.Controllers
         [HttpGet("set")]
         public async Task<IActionResult> SetCache()
         {
-            var person = new { Id = 1, Name = "John Doe" };
+            var db = _redis.GetDatabase();
+            var person = new { Id = _counter, Name = "John Doe" };
             var json = JsonSerializer.Serialize(person);
             var bytes = Encoding.UTF8.GetBytes(json);
 
-            await _cache.SetAsync("person:1", bytes, new DistributedCacheEntryOptions
-            {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10) // Cache na 10 minut
-            });
+            await db.StringSetAsync($"person:{_counter++}", bytes, TimeSpan.FromMinutes(10)); // Cache na 10 minut
 
             return Ok("Dane zapisane w Redis");
         }
@@ -47,15 +48,34 @@ namespace BackEndAPI.Controllers
         [HttpGet("get")]
         public async Task<IActionResult> GetCache()
         {
-            var bytes = await _cache.GetAsync("person:1");
+            var db = _redis.GetDatabase();
 
-            if (bytes == null)
+            // Pobranie serwera, na którym będziemy szukać kluczy
+            var server = _redis.GetServer("localhost", 6379); // Ustaw odpowiedni adres i port
+
+            // Pobranie wszystkich kluczy pasujących do wzorca "person:*"
+            var keys = server.Keys(pattern: "person:*").ToList();
+
+            if (!keys.Any())
                 return NotFound("Brak danych w Redis");
 
-            var json = Encoding.UTF8.GetString(bytes);
-            var person = JsonSerializer.Deserialize<object>(json);
+            var list = new List<object>();
 
-            return Ok(person);
+            // Iteracja po kluczach
+            foreach (var key in keys)
+            {
+                // Pobranie wartości skojarzonej z kluczem
+                var bytes = await db.StringGetAsync(key);
+
+                if (bytes.IsNullOrEmpty)
+                    continue; // Jeśli nie ma danych, przejdź do kolejnego klucza
+
+                var json = Encoding.UTF8.GetString(bytes); // Dekodowanie bajtów na JSON
+                var person = JsonSerializer.Deserialize<object>(json); // Deserializacja JSON do obiektu
+                list.Add(person);
+            }
+
+            return Ok(list);
         }
     }
 }
