@@ -14,6 +14,11 @@ namespace BackEndAPI
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
+            builder.Services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = builder.Configuration.GetSection("ConnectionStrings")["Redis"];
+                //options.InstanceName = "MyAppCache_"; // Prefiks kluczy w Redis
+            });
             builder.Services.DomainConfiguration(builder.Configuration);
             builder.Services.UseCaseConfiguration(builder.Configuration);
             builder.Services.InfrastructureConfiguration(builder.Configuration);

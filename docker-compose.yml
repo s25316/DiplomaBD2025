@@ -13,8 +13,10 @@ services:
     depends_on:
       - Diploma_MsSQL
       - Diploma_MongoDb
+      - Diploma_Redis
     environment: 
-      ConnectionStrings__RelationalDatabase : "Data Source=Diploma_MsSQL,1433;Initial Catalog=DiplomaBD;Persist Security Info=True;User ID=sa;Password=YourStrong!Passw0rd;Trust Server Certificate=True" 
+      ConnectionStrings__RelationalDatabase : "Data Source=Diploma_MsSQL,1433;Initial Catalog=DiplomaBD;Persist Security Info=True;User ID=sa;Password=YourStrong!Passw0rd;Trust Server Certificate=True"
+      ConnectionStrings__Redis : "Diploma_Redis:6379"  
 
   Diploma_MsSQL:
     container_name: Diploma_MsSQL
@@ -44,3 +46,17 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: myuser
       MONGO_INITDB_ROOT_PASSWORD: mypassword
+
+  Diploma_Redis:
+    container_name: Diploma_Redis
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    restart: unless-stopped 
+    command: ["redis-server", "--maxmemory", "100mb","--maxmemory-policy", "allkeys-lru"]
+    # noeviction      - Brak usuwania danych – jeśli limit pamięci zostanie osiągnięty, Redis zwróci błąd (domyślne zachowanie)
+    # allkeys-lru     - usuwa najmniej używane klucze
+    # volatile-lru	  - Usuwa najmniej używane klucze z czasem życia (TTL).
+    # allkeys-random	- Usuwa losowe klucze.
+    # volatile-random - Usuwa losowe klucze z TTL.
+    # volatile-ttl    - Usuwa klucze z najkrótszym czasem życia (TTL).
