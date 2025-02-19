@@ -16,7 +16,7 @@ services:
       - Diploma_Redis
     environment: 
       ConnectionStrings__RelationalDatabase : "Data Source=Diploma_MsSQL,1433;Initial Catalog=DiplomaBD;Persist Security Info=True;User ID=sa;Password=YourStrong!Passw0rd;Trust Server Certificate=True"
-      ConnectionStrings__Redis : "Diploma_Redis:6379"  
+      ConnectionStrings__Redis : "Diploma_Redis:6379,password=TwojeSuperHaslo"  
 
   Diploma_MsSQL:
     container_name: Diploma_MsSQL
@@ -53,7 +53,9 @@ services:
     ports:
       - "6379:6379"
     restart: unless-stopped 
-    command: ["redis-server", "--maxmemory", "100mb","--maxmemory-policy", "allkeys-lru"]
+    entrypoint: [ "sh", "-c", "redis-server --maxmemory 100mb --maxmemory-policy allkeys-lru --requirepass $$REDIS_PASSWORD" ]
+    environment:
+      - REDIS_PASSWORD=TwojeSuperHaslo
     # noeviction      - Brak usuwania danych – jeśli limit pamięci zostanie osiągnięty, Redis zwróci błąd (domyślne zachowanie)
     # allkeys-lru     - usuwa najmniej używane klucze
     # volatile-lru	  - Usuwa najmniej używane klucze z czasem życia (TTL).

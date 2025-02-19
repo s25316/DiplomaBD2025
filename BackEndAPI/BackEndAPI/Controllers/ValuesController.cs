@@ -48,10 +48,14 @@ namespace BackEndAPI.Controllers
         [HttpGet("get")]
         public async Task<IActionResult> GetCache()
         {
+            var redisString = _configuration.GetSection("ConnectionStrings")["Redis"];
+            var host = redisString.Split(",")[0].Split(":")[0];
+            var port = int.Parse(redisString.Split(",")[0].Split(":")[1]);
+
             var db = _redis.GetDatabase();
 
             // Pobranie serwera, na którym będziemy szukać kluczy
-            var server = _redis.GetServer("localhost", 6379); // Ustaw odpowiedni adres i port
+            var server = _redis.GetServer(host, port); // Ustaw odpowiedni adres i port
 
             // Pobranie wszystkich kluczy pasujących do wzorca "person:*"
             var keys = server.Keys(pattern: "person:*").ToList();
