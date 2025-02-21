@@ -1,6 +1,26 @@
 #version: '3.8'
+#docker-compose up --build
 
-services:
+services:  
+  Diploma_Kafka_To_Mongo_Broker:
+    container_name: Diploma_Kafka_To_Mongo_Broker
+    image: kafka_to_mongo_broker:latest
+    build:
+      context: .
+      dockerfile: KafkaToMongoBroker/KafkaToMongoBroker/Dockerfile
+    restart: no
+    depends_on:
+      - Diploma_BackEnd_Api
+    environment:
+      Kafka: "Diploma_Kafka:9092"
+      Mongo: "Diploma_MongoDb:27017"
+      Topics: "application-start"
+      KafkaMaxBatchSizeMB: "1"
+      KafkaMaxPollIntervalSeconds : "30"
+    init: true 
+    stop_signal: SIGINT 
+    stop_grace_period: 30s
+
   Diploma_BackEnd_Api:
     container_name: Diploma_BackEnd_Api
     image: diploma_backend_api:latest
@@ -14,11 +34,11 @@ services:
       - Diploma_MsSQL
       - Diploma_MongoDb
       - Diploma_Redis
+      - Diploma_Kafka
     environment: 
       ConnectionStrings__RelationalDatabase : "Data Source=Diploma_MsSQL,1433;Initial Catalog=DiplomaBD;Persist Security Info=True;User ID=sa;Password=YourStrong!Passw0rd;Trust Server Certificate=True"
       ConnectionStrings__Redis : "Diploma_Redis:6379,password=TwojeSuperHaslo"
-      ConnectionStrings__Kafka : "Diploma_Kafka:9092"  
- 
+      ConnectionStrings__Kafka : "Diploma_Kafka:9092"   
 
   Diploma_MsSQL:
     container_name: Diploma_MsSQL
@@ -65,8 +85,8 @@ services:
     # volatile-random - Usuwa losowe klucze z TTL.
     # volatile-ttl    - Usuwa klucze z najkrótszym czasem życia (TTL).
 
-  Diploma_Zookeeper:
-    container_name: Diploma_Zookeeper
+  Diploma_Kafka_Zookeeper:
+    container_name: Diploma_Kafka_Zookeeper
     image: confluentinc/cp-zookeeper:latest
     ports:
       - "2181:2181"
@@ -83,33 +103,13 @@ services:
       - "9093:9093" 
     restart: unless-stopped 
     depends_on:
-      - Diploma_Zookeeper  
+      - Diploma_Kafka_Zookeeper  
     environment:
       KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: Diploma_Zookeeper:2181
+      KAFKA_ZOOKEEPER_CONNECT: Diploma_Kafka_Zookeeper:2181
       KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://Diploma_Kafka:9092,PLAINTEXT_HOST://localhost:9093" 
       KAFKA_LISTENERS: "PLAINTEXT://Diploma_Kafka:9092,PLAINTEXT_HOST://0.0.0.0:9093" 
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT" 
       KAFKA_INTER_BROKER_LISTENER_NAME: "PLAINTEXT" 
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: true
-
-  KafkaToMongoBroker:
-    container_name: KafkaToMongoBroker
-    image: kafka_to_mongo_broker:latest
-    build:
-      context: .
-      dockerfile: KafkaToMongoBroker/KafkaToMongoBroker/Dockerfile
-    restart: no
-    depends_on:
-      - Diploma_Kafka
-      #- Diploma_MongoDb
-    environment:
-      Kafka: "Diploma_Kafka:9092"
-      Mongo: "Diploma_MongoDb:27017"
-      Topics: "application-start"
-      KafkaMaxBatchSizeMB: "1"
-      KafkaMaxPollIntervalSeconds : "30"
-    init: true 
-    stop_signal: SIGINT 
-    stop_grace_period: 30s
