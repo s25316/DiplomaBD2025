@@ -12,8 +12,8 @@
 
   <ItemGroup>
     <Folder Include="Features\Roles\People\Commands\" />
-    <Folder Include="Shared\" />
     <Folder Include="NonRelationalDatabase\" />
+    <Folder Include="Shared\" />
   </ItemGroup>
 
   <ItemGroup>

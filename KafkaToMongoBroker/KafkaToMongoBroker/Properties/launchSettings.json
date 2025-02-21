@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "KafkaToMongoBroker": {
+      "commandName": "Project"
+    },
+    "Container (Dockerfile)": {
+      "commandName": "Docker"
+    }
+  }
+}
