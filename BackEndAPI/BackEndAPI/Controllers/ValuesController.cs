@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using StackExchange.Redis;
 using System.Text;
 using System.Text.Json;
+using UseCase.Roles.People.Queries;
 
 namespace BackEndAPI.Controllers
 {
@@ -28,7 +29,7 @@ namespace BackEndAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> Get(CancellationToken cancellationToken)
         {
-            var result = await _mediator.Send(new UseCase.Features.Roles.People.Queries.MyQuery());
+            var result = await _mediator.Send(new MyQuery());
             return Ok(result);
         }
 

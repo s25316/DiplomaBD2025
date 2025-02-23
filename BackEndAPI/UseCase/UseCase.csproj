@@ -11,9 +11,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Features\Roles\People\Commands\" />
+    <Folder Include="Relational\" />
+    <Folder Include="Roles\Administrators\Commands\" />
+    <Folder Include="Roles\Administrators\Queries\" />
+    <Folder Include="Roles\CompanyOwners\Queries\" />
+    <Folder Include="Roles\Guests\Commands\" />
+    <Folder Include="Roles\Guests\Queries\" />
+    <Folder Include="Roles\People\Commands\" />
     <Folder Include="NonRelationalDatabase\" />
-    <Folder Include="Shared\" />
+    <Folder Include="Shared\Commands\" />
+    <Folder Include="Shared\Queries\" />
   </ItemGroup>
 
   <ItemGroup>

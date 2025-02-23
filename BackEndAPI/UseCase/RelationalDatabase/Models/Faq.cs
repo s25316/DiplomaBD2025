@@ -5,7 +5,7 @@ namespace UseCase.RelationalDatabase.Models;
 
 public partial class Faq
 {
-    public int FaqId { get; set; }
+    public Guid FaqId { get; set; }
 
     public string Question { get; set; } = null!;
 

@@ -1,5 +1,5 @@
 -- Created by Vertabelo (http://vertabelo.com)
--- Last modification date: 2025-02-17 23:05:37.373
+-- Last modification date: 2025-02-22 20:16:16.808
 
 -- foreign keys
 ALTER TABLE Address DROP CONSTRAINT Address_City;
@@ -12,20 +12,6 @@ ALTER TABLE Branch DROP CONSTRAINT Branch_Company;
 
 ALTER TABLE City DROP CONSTRAINT City_State;
 
-ALTER TABLE CompanyOfferContract DROP CONSTRAINT CompanyOfferContract_CompanyOffer;
-
-ALTER TABLE CompanyOfferContract DROP CONSTRAINT CompanyOfferContract_ContractType;
-
-ALTER TABLE CompanyOfferWork DROP CONSTRAINT CompanyOfferWork_CompanyOffer;
-
-ALTER TABLE CompanyOfferWork DROP CONSTRAINT CompanyOfferWork_WorkType;
-
-ALTER TABLE CompanyOffer DROP CONSTRAINT CompanyOffer_Branch;
-
-ALTER TABLE CompanyOffer DROP CONSTRAINT CompanyOffer_Company;
-
-ALTER TABLE CompanyOffer DROP CONSTRAINT CompanyOffer_Offer;
-
 ALTER TABLE CompanyPerson DROP CONSTRAINT CompanyPerson_Company;
 
 ALTER TABLE CompanyPerson DROP CONSTRAINT CompanyPerson_Person;
@@ -36,7 +22,7 @@ ALTER TABLE HRChat DROP CONSTRAINT HRChat_HRProcess;
 
 ALTER TABLE HRChat DROP CONSTRAINT HRChat_ProcessType;
 
-ALTER TABLE HRProcess DROP CONSTRAINT HRProcess_CompanyOffer;
+ALTER TABLE HRProcess DROP CONSTRAINT HRProcess_Offer;
 
 ALTER TABLE HRProcess DROP CONSTRAINT HRProcess_Person;
 
@@ -46,9 +32,27 @@ ALTER TABLE Notification DROP CONSTRAINT Notification_NotificationType;
 
 ALTER TABLE Notification DROP CONSTRAINT Notification_Person;
 
-ALTER TABLE OfferSkill DROP CONSTRAINT OfferSkill_Offer;
+ALTER TABLE OfferEmploymentType DROP CONSTRAINT OfferEmploymentType_EmploymentType;
+
+ALTER TABLE OfferEmploymentType DROP CONSTRAINT OfferEmploymentType_Offer;
+
+ALTER TABLE OfferSkill DROP CONSTRAINT OfferSkill_OfferTemplate;
 
 ALTER TABLE OfferSkill DROP CONSTRAINT OfferSkill_Skill;
+
+ALTER TABLE OfferWorkMode DROP CONSTRAINT OfferWorkMode_Offer;
+
+ALTER TABLE OfferWorkMode DROP CONSTRAINT OfferWorkMode_WorkMode;
+
+ALTER TABLE Offer DROP CONSTRAINT Offer_Branch;
+
+ALTER TABLE Offer DROP CONSTRAINT Offer_Company;
+
+ALTER TABLE Offer DROP CONSTRAINT Offer_Currency;
+
+ALTER TABLE Offer DROP CONSTRAINT Offer_OfferTemplate;
+
+ALTER TABLE Offer DROP CONSTRAINT Offer_SalaryTerm;
 
 ALTER TABLE PersonSkill DROP CONSTRAINT PersonSkill_Person;
 
@@ -77,17 +81,13 @@ DROP TABLE City;
 
 DROP TABLE Company;
 
-DROP TABLE CompanyOffer;
-
-DROP TABLE CompanyOfferContract;
-
-DROP TABLE CompanyOfferWork;
-
 DROP TABLE CompanyPerson;
 
-DROP TABLE ContractType;
-
 DROP TABLE Country;
+
+DROP TABLE Currency;
+
+DROP TABLE EmploymentType;
 
 DROP TABLE Ex;
 
@@ -105,7 +105,13 @@ DROP TABLE NotificationType;
 
 DROP TABLE Offer;
 
+DROP TABLE OfferEmploymentType;
+
 DROP TABLE OfferSkill;
+
+DROP TABLE OfferTemplate;
+
+DROP TABLE OfferWorkMode;
 
 DROP TABLE Person;
 
@@ -114,6 +120,8 @@ DROP TABLE PersonSkill;
 DROP TABLE ProcessType;
 
 DROP TABLE Role;
+
+DROP TABLE SalaryTerm;
 
 DROP TABLE Skill;
 
@@ -129,7 +137,7 @@ DROP TABLE Url;
 
 DROP TABLE UrlType;
 
-DROP TABLE WorkType;
+DROP TABLE WorkMode;
 
 -- End of file.
 

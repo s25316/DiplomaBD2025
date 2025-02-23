@@ -37,6 +37,10 @@ public partial class Person
 
     public Guid? AddressId { get; set; }
 
+    public string Password { get; set; } = null!;
+
+    public string Salt { get; set; } = null!;
+
     public virtual Address? Address { get; set; }
 
     public virtual ICollection<CompanyPerson> CompanyPeople { get; set; } = new List<CompanyPerson>();

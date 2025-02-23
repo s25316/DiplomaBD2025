@@ -22,17 +22,13 @@ public partial class DiplomaBdContext : DbContext
 
     public virtual DbSet<Company> Companies { get; set; }
 
-    public virtual DbSet<CompanyOffer> CompanyOffers { get; set; }
-
-    public virtual DbSet<CompanyOfferContract> CompanyOfferContracts { get; set; }
-
-    public virtual DbSet<CompanyOfferWork> CompanyOfferWorks { get; set; }
-
     public virtual DbSet<CompanyPerson> CompanyPeople { get; set; }
 
-    public virtual DbSet<ContractType> ContractTypes { get; set; }
-
     public virtual DbSet<Country> Countries { get; set; }
+
+    public virtual DbSet<Currency> Currencies { get; set; }
+
+    public virtual DbSet<EmploymentType> EmploymentTypes { get; set; }
 
     public virtual DbSet<Ex> Exes { get; set; }
 
@@ -50,7 +46,13 @@ public partial class DiplomaBdContext : DbContext
 
     public virtual DbSet<Offer> Offers { get; set; }
 
+    public virtual DbSet<OfferEmploymentType> OfferEmploymentTypes { get; set; }
+
     public virtual DbSet<OfferSkill> OfferSkills { get; set; }
+
+    public virtual DbSet<OfferTemplate> OfferTemplates { get; set; }
+
+    public virtual DbSet<OfferWorkMode> OfferWorkModes { get; set; }
 
     public virtual DbSet<Person> People { get; set; }
 
@@ -59,6 +61,8 @@ public partial class DiplomaBdContext : DbContext
     public virtual DbSet<ProcessType> ProcessTypes { get; set; }
 
     public virtual DbSet<Role> Roles { get; set; }
+
+    public virtual DbSet<SalaryTerm> SalaryTerms { get; set; }
 
     public virtual DbSet<Skill> Skills { get; set; }
 
@@ -72,6 +76,5 @@ public partial class DiplomaBdContext : DbContext
 
     public virtual DbSet<UrlType> UrlTypes { get; set; }
 
-    public virtual DbSet<WorkType> WorkTypes { get; set; }
-
+    public virtual DbSet<WorkMode> WorkModes { get; set; }
 }

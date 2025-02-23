@@ -53,11 +53,11 @@ services:
     
     # MSMS : localhost,1433
     # Copy File to Docker
-    # docker cp "./Databases/MsSQL/Backups/name1.bak" Diploma_MsSQL:/var/opt/mssql/data/name1.bak 
+    # docker cp "./Databases/MsSQL/DiplomaBD.bak" Diploma_MsSQL:/var/opt/mssql/data/DiplomaBD.bak 
     # Copy File From Docker
-    # docker cp Diploma_MsSQL:/var/opt/mssql/data/DiplomaBD.bak "./Databases/MsSQL/Backups/name1.bak"
+    # docker cp Diploma_MsSQL:/var/opt/mssql/data/DiplomaBD.bak "./Databases/MsSQL/DiplomaBD.bak"
     # Remove file from docker
-    # docker exec Diploma_MsSQL rm /var/opt/mssql/data/name1.bak
+    # docker exec Diploma_MsSQL rm /var/opt/mssql/data/DiplomaBD.bak
 
   Diploma_MongoDb:
     container_name: Diploma_MongoDb

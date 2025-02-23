@@ -5,7 +5,9 @@ namespace UseCase.RelationalDatabase.Models;
 
 public partial class OfferSkill
 {
-    public Guid OfferId { get; set; }
+    public Guid OfferSkillId { get; set; }
+
+    public Guid OfferTemplateId { get; set; }
 
     public int SkillId { get; set; }
 
@@ -15,7 +17,7 @@ public partial class OfferSkill
 
     public DateTime? Removed { get; set; }
 
-    public virtual Offer Offer { get; set; } = null!;
+    public virtual OfferTemplate OfferTemplate { get; set; } = null!;
 
     public virtual Skill Skill { get; set; } = null!;
 }

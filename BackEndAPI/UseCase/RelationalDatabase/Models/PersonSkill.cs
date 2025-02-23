@@ -5,11 +5,11 @@ namespace UseCase.RelationalDatabase.Models;
 
 public partial class PersonSkill
 {
-    public int PersonSkillId { get; set; }
+    public Guid PersonSkillId { get; set; }
 
     public Guid PersonId { get; set; }
 
-    public int Skilld { get; set; }
+    public int SkillId { get; set; }
 
     public DateTime Created { get; set; }
 
@@ -17,5 +17,5 @@ public partial class PersonSkill
 
     public virtual Person Person { get; set; } = null!;
 
-    public virtual Skill SkilldNavigation { get; set; } = null!;
+    public virtual Skill Skill { get; set; } = null!;
 }

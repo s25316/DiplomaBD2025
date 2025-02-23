@@ -19,17 +19,17 @@ public partial class Company
 
     public string? Krs { get; set; }
 
-    public string? Url { get; set; }
+    public string? WebsiteUrl { get; set; }
 
     public DateTime Created { get; set; }
 
     public DateTime? Removed { get; set; }
 
-    public DateTime Blocked { get; set; }
+    public DateTime? Blocked { get; set; }
 
     public virtual ICollection<Branch> Branches { get; set; } = new List<Branch>();
 
-    public virtual ICollection<CompanyOffer> CompanyOffers { get; set; } = new List<CompanyOffer>();
-
     public virtual ICollection<CompanyPerson> CompanyPeople { get; set; } = new List<CompanyPerson>();
+
+    public virtual ICollection<Offer> Offers { get; set; } = new List<Offer>();
 }

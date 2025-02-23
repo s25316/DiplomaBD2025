@@ -7,26 +7,24 @@ namespace Infrastructure.RelationalDatabase
 {
     class MsSqlDiplomaBdContext : DiplomaBdContext
     {
-        //Properties
+        // Properties
         private readonly IConfiguration _configuration;
 
-
-        //Constructor
+        // Constructor
         public MsSqlDiplomaBdContext(IConfiguration configuration)
         {
             _configuration = configuration;
         }
 
-
-        //Methods
+        // Methods
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(
-                _configuration.GetSection("ConnectionStrings")["RelationalDatabase"] ??
-                throw new Exception()
-                );
+            //#warning Implement Ex
+            var connectionString = _configuration
+                .GetSection("ConnectionStrings")["RelationalDatabase"] ??
+                throw new Exception();
+            optionsBuilder.UseSqlServer(connectionString);
         }
-
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -36,7 +34,7 @@ namespace Infrastructure.RelationalDatabase
 
                 entity.ToTable("Address");
 
-                entity.Property(e => e.AddressId).ValueGeneratedNever();
+                entity.Property(e => e.AddressId).HasDefaultValueSql("(newid())");
                 entity.Property(e => e.ApartmentNumber).HasMaxLength(25);
                 entity.Property(e => e.HouseNumber).HasMaxLength(25);
                 entity.Property(e => e.PostCode).HasMaxLength(25);
@@ -57,8 +55,10 @@ namespace Infrastructure.RelationalDatabase
 
                 entity.ToTable("Branch");
 
-                entity.Property(e => e.BranchId).ValueGeneratedNever();
-                entity.Property(e => e.Created).HasColumnType("datetime");
+                entity.Property(e => e.BranchId).HasDefaultValueSql("(newid())");
+                entity.Property(e => e.Created)
+                    .HasDefaultValueSql("(getdate())")
+                    .HasColumnType("datetime");
                 entity.Property(e => e.Description).HasMaxLength(800);
                 entity.Property(e => e.Name).HasMaxLength(100);
                 entity.Property(e => e.Removed).HasColumnType("datetime");
@@ -80,7 +80,7 @@ namespace Infrastructure.RelationalDatabase
 
                 entity.ToTable("City");
 
-                entity.Property(e => e.CityId).ValueGeneratedNever();
+                entity.Property(e => e.CityId).HasDefaultValueSql("(NEXT VALUE FOR [CityId_SEQUENCE])");
                 entity.Property(e => e.Name).HasMaxLength(100);
 
                 entity.HasOne(d => d.State).WithMany(p => p.Cities)
@@ -95,9 +95,11 @@ namespace Infrastructure.RelationalDatabase
 
                 entity.ToTable("Company");
 
-                entity.Property(e => e.CompanyId).ValueGeneratedNever();
+                entity.Property(e => e.CompanyId).HasDefaultValueSql("(newid())");
                 entity.Property(e => e.Blocked).HasColumnType("datetime");
-                entity.Property(e => e.Created).HasColumnType("datetime");
+                entity.Property(e => e.Created)
+                    .HasDefaultValueSql("(getdate())")
+                    .HasColumnType("datetime");
                 entity.Property(e => e.Description).HasMaxLength(800);
                 entity.Property(e => e.Krs).HasMaxLength(25);
                 entity.Property(e => e.Logo).HasMaxLength(100);
@@ -105,77 +107,7 @@ namespace Infrastructure.RelationalDatabase
                 entity.Property(e => e.Nip).HasMaxLength(25);
                 entity.Property(e => e.Regon).HasMaxLength(25);
                 entity.Property(e => e.Removed).HasColumnType("datetime");
-                entity.Property(e => e.Url).HasMaxLength(800);
-            });
-
-            modelBuilder.Entity<CompanyOffer>(entity =>
-            {
-                entity.HasKey(e => e.CompanyOfferId).HasName("CompanyOffer_pk");
-
-                entity.ToTable("CompanyOffer");
-
-                entity.Property(e => e.CompanyOfferId).ValueGeneratedNever();
-                entity.Property(e => e.MaxSalary).HasColumnType("money");
-                entity.Property(e => e.MinSalary).HasColumnType("money");
-                entity.Property(e => e.PublishEnd).HasColumnType("datetime");
-                entity.Property(e => e.PublishStart).HasColumnType("datetime");
-                entity.Property(e => e.Url).HasMaxLength(800);
-
-                entity.HasOne(d => d.Branch).WithMany(p => p.CompanyOffers)
-                    .HasForeignKey(d => d.BranchId)
-                    .HasConstraintName("CompanyOffer_Branch");
-
-                entity.HasOne(d => d.Company).WithMany(p => p.CompanyOffers)
-                    .HasForeignKey(d => d.CompanyId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("CompanyOffer_Company");
-
-                entity.HasOne(d => d.Offer).WithMany(p => p.CompanyOffers)
-                    .HasForeignKey(d => d.OfferId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("CompanyOffer_Offer");
-            });
-
-            modelBuilder.Entity<CompanyOfferContract>(entity =>
-            {
-                entity.HasKey(e => e.ContractId).HasName("CompanyOfferContract_pk");
-
-                entity.ToTable("CompanyOfferContract");
-
-                entity.Property(e => e.ContractId).ValueGeneratedNever();
-                entity.Property(e => e.Created).HasColumnType("datetime");
-                entity.Property(e => e.Removed).HasColumnType("datetime");
-
-                entity.HasOne(d => d.CompanyOffer).WithMany(p => p.CompanyOfferContracts)
-                    .HasForeignKey(d => d.CompanyOfferId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("CompanyOfferContract_CompanyOffer");
-
-                entity.HasOne(d => d.ContractType).WithMany(p => p.CompanyOfferContracts)
-                    .HasForeignKey(d => d.ContractTypeId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("CompanyOfferContract_ContractType");
-            });
-
-            modelBuilder.Entity<CompanyOfferWork>(entity =>
-            {
-                entity.HasKey(e => e.WorkId).HasName("CompanyOfferWork_pk");
-
-                entity.ToTable("CompanyOfferWork");
-
-                entity.Property(e => e.WorkId).ValueGeneratedNever();
-                entity.Property(e => e.Created).HasColumnType("datetime");
-                entity.Property(e => e.Removed).HasColumnType("datetime");
-
-                entity.HasOne(d => d.CompanyOffer).WithMany(p => p.CompanyOfferWorks)
-                    .HasForeignKey(d => d.CompanyOfferId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("CompanyOfferWork_CompanyOffer");
-
-                entity.HasOne(d => d.WorkType).WithMany(p => p.CompanyOfferWorks)
-                    .HasForeignKey(d => d.WorkTypeId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("CompanyOfferWork_WorkType");
+                entity.Property(e => e.WebsiteUrl).HasMaxLength(800);
             });
 
             modelBuilder.Entity<CompanyPerson>(entity =>
@@ -184,9 +116,11 @@ namespace Infrastructure.RelationalDatabase
 
                 entity.ToTable("CompanyPerson");
 
-                entity.Property(e => e.CompanyPersonId).ValueGeneratedNever();
+                entity.Property(e => e.CompanyPersonId).HasDefaultValueSql("(newid())");
                 entity.Property(e => e.Deny).HasColumnType("datetime");
-                entity.Property(e => e.Grant).HasColumnType("datetime");
+                entity.Property(e => e.Grant)
+                    .HasDefaultValueSql("(getdate())")
+                    .HasColumnType("datetime");
 
                 entity.HasOne(d => d.Company).WithMany(p => p.CompanyPeople)
                     .HasForeignKey(d => d.CompanyId)
@@ -204,23 +138,33 @@ namespace Infrastructure.RelationalDatabase
                     .HasConstraintName("CompanyPerson_Role");
             });
 
-            modelBuilder.Entity<ContractType>(entity =>
-            {
-                entity.HasKey(e => e.ContractTypeId).HasName("ContractType_pk");
-
-                entity.ToTable("ContractType");
-
-                entity.Property(e => e.ContractTypeId).ValueGeneratedNever();
-                entity.Property(e => e.Name).HasMaxLength(100);
-            });
-
             modelBuilder.Entity<Country>(entity =>
             {
                 entity.HasKey(e => e.CountryId).HasName("Country_pk");
 
                 entity.ToTable("Country");
 
-                entity.Property(e => e.CountryId).ValueGeneratedNever();
+                entity.Property(e => e.CountryId).HasDefaultValueSql("(NEXT VALUE FOR [CountryId_SEQUENCE])");
+                entity.Property(e => e.Name).HasMaxLength(100);
+            });
+
+            modelBuilder.Entity<Currency>(entity =>
+            {
+                entity.HasKey(e => e.CurrencyId).HasName("Currency_pk");
+
+                entity.ToTable("Currency");
+
+                entity.Property(e => e.CurrencyId).HasDefaultValueSql("(NEXT VALUE FOR [CurrencyId_SEQUENCE])");
+                entity.Property(e => e.Name).HasMaxLength(100);
+            });
+
+            modelBuilder.Entity<EmploymentType>(entity =>
+            {
+                entity.HasKey(e => e.EmploymentTypeId).HasName("EmploymentType_pk");
+
+                entity.ToTable("EmploymentType");
+
+                entity.Property(e => e.EmploymentTypeId).HasDefaultValueSql("(NEXT VALUE FOR [EmploymentTypeId_SEQUENCE])");
                 entity.Property(e => e.Name).HasMaxLength(100);
             });
 
@@ -230,8 +174,10 @@ namespace Infrastructure.RelationalDatabase
 
                 entity.ToTable("Ex");
 
-                entity.Property(e => e.ExceptionId).ValueGeneratedNever();
-                entity.Property(e => e.Created).HasColumnType("datetime");
+                entity.Property(e => e.ExceptionId).HasDefaultValueSql("(newid())");
+                entity.Property(e => e.Created)
+                    .HasDefaultValueSql("(getdate())")
+                    .HasColumnType("datetime");
                 entity.Property(e => e.ExceptionType).HasMaxLength(100);
                 entity.Property(e => e.Method).HasMaxLength(100);
                 entity.Property(e => e.StackTrace).HasMaxLength(800);
@@ -243,9 +189,11 @@ namespace Infrastructure.RelationalDatabase
 
                 entity.ToTable("Faq");
 
-                entity.Property(e => e.FaqId).ValueGeneratedNever();
+                entity.Property(e => e.FaqId).HasDefaultValueSql("(newid())");
                 entity.Property(e => e.Answer).HasMaxLength(800);
-                entity.Property(e => e.Created).HasColumnType("datetime");
+                entity.Property(e => e.Created)
+                    .HasDefaultValueSql("(getdate())")
+                    .HasColumnType("datetime");
                 entity.Property(e => e.Question).HasMaxLength(800);
                 entity.Property(e => e.Removed).HasColumnType("datetime");
             });
@@ -256,8 +204,10 @@ namespace Infrastructure.RelationalDatabase
 
                 entity.ToTable("HRChat");
 
-                entity.Property(e => e.MessageId).ValueGeneratedNever();
-                entity.Property(e => e.Created).HasColumnType("datetime");
+                entity.Property(e => e.MessageId).HasDefaultValueSql("(newid())");
+                entity.Property(e => e.Created)
+                    .HasDefaultValueSql("(getdate())")
+                    .HasColumnType("datetime");
                 entity.Property(e => e.Message).HasMaxLength(800);
                 entity.Property(e => e.MongoUrl).HasMaxLength(100);
                 entity.Property(e => e.Read).HasColumnType("datetime");
@@ -280,12 +230,12 @@ namespace Infrastructure.RelationalDatabase
 
                 entity.ToTable("HRProcess");
 
-                entity.Property(e => e.ProcessId).ValueGeneratedNever();
+                entity.Property(e => e.ProcessId).HasDefaultValueSql("(newid())");
 
-                entity.HasOne(d => d.CompanyOffer).WithMany(p => p.Hrprocesses)
-                    .HasForeignKey(d => d.CompanyOfferId)
+                entity.HasOne(d => d.Offer).WithMany(p => p.Hrprocesses)
+                    .HasForeignKey(d => d.OfferId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("HRProcess_CompanyOffer");
+                    .HasConstraintName("HRProcess_Offer");
 
                 entity.HasOne(d => d.Person).WithMany(p => p.Hrprocesses)
                     .HasForeignKey(d => d.PersonId)
@@ -299,8 +249,10 @@ namespace Infrastructure.RelationalDatabase
 
                 entity.ToTable("NChat");
 
-                entity.Property(e => e.MessageId).ValueGeneratedNever();
-                entity.Property(e => e.Created).HasColumnType("datetime");
+                entity.Property(e => e.MessageId).HasDefaultValueSql("(newid())");
+                entity.Property(e => e.Created)
+                    .HasDefaultValueSql("(getdate())")
+                    .HasColumnType("datetime");
                 entity.Property(e => e.Message).HasMaxLength(800);
                 entity.Property(e => e.MongoUrl).HasMaxLength(100);
                 entity.Property(e => e.Read).HasColumnType("datetime");
@@ -318,9 +270,11 @@ namespace Infrastructure.RelationalDatabase
 
                 entity.ToTable("Notification");
 
-                entity.Property(e => e.NotificationId).ValueGeneratedNever();
+                entity.Property(e => e.NotificationId).HasDefaultValueSql("(newid())");
                 entity.Property(e => e.Completed).HasColumnType("datetime");
-                entity.Property(e => e.Created).HasColumnType("datetime");
+                entity.Property(e => e.Created)
+                    .HasDefaultValueSql("(getdate())")
+                    .HasColumnType("datetime");
                 entity.Property(e => e.Email).HasMaxLength(100);
                 entity.Property(e => e.Message).HasMaxLength(800);
                 entity.Property(e => e.Read).HasColumnType("datetime");
@@ -342,7 +296,7 @@ namespace Infrastructure.RelationalDatabase
 
                 entity.ToTable("NotificationType");
 
-                entity.Property(e => e.NotificationTypeId).ValueGeneratedNever();
+                entity.Property(e => e.NotificationTypeId).HasDefaultValueSql("(NEXT VALUE FOR [FaqId_SEQUENCE])");
                 entity.Property(e => e.Description).HasMaxLength(100);
                 entity.Property(e => e.Name).HasMaxLength(100);
             });
@@ -353,31 +307,121 @@ namespace Infrastructure.RelationalDatabase
 
                 entity.ToTable("Offer");
 
-                entity.Property(e => e.OfferId).ValueGeneratedNever();
-                entity.Property(e => e.Created).HasColumnType("datetime");
-                entity.Property(e => e.Description).HasMaxLength(800);
-                entity.Property(e => e.Name).HasMaxLength(100);
+                entity.Property(e => e.OfferId).HasDefaultValueSql("(newid())");
+                entity.Property(e => e.IsNegotiated).HasDefaultValue(true);
+                entity.Property(e => e.PublicationEnd).HasColumnType("datetime");
+                entity.Property(e => e.PublicationStart)
+                    .HasDefaultValueSql("(getdate())")
+                    .HasColumnType("datetime");
+                entity.Property(e => e.SalaryRangeMax).HasColumnType("money");
+                entity.Property(e => e.SalaryRangeMin).HasColumnType("money");
+                entity.Property(e => e.WebsiteUrl).HasMaxLength(800);
+
+                entity.HasOne(d => d.Branch).WithMany(p => p.Offers)
+                    .HasForeignKey(d => d.BranchId)
+                    .HasConstraintName("Offer_Branch");
+
+                entity.HasOne(d => d.Company).WithMany(p => p.Offers)
+                    .HasForeignKey(d => d.CompanyId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("Offer_Company");
+
+                entity.HasOne(d => d.Currency).WithMany(p => p.Offers)
+                    .HasForeignKey(d => d.CurrencyId)
+                    .HasConstraintName("Offer_Currency");
+
+                entity.HasOne(d => d.OfferTemplate).WithMany(p => p.Offers)
+                    .HasForeignKey(d => d.OfferTemplateId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("Offer_OfferTemplate");
+
+                entity.HasOne(d => d.SalaryTerm).WithMany(p => p.Offers)
+                    .HasForeignKey(d => d.SalaryTermId)
+                    .HasConstraintName("Offer_SalaryTerm");
+            });
+
+            modelBuilder.Entity<OfferEmploymentType>(entity =>
+            {
+                entity.HasKey(e => e.OfferEmploymentTypeId).HasName("OfferEmploymentType_pk");
+
+                entity.ToTable("OfferEmploymentType");
+
+                entity.Property(e => e.OfferEmploymentTypeId).HasDefaultValueSql("(newid())");
+                entity.Property(e => e.Created)
+                    .HasDefaultValueSql("(getdate())")
+                    .HasColumnType("datetime");
                 entity.Property(e => e.Removed).HasColumnType("datetime");
+
+                entity.HasOne(d => d.EmploymentType).WithMany(p => p.OfferEmploymentTypes)
+                    .HasForeignKey(d => d.EmploymentTypeId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("OfferEmploymentType_EmploymentType");
+
+                entity.HasOne(d => d.Offer).WithMany(p => p.OfferEmploymentTypes)
+                    .HasForeignKey(d => d.OfferId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("OfferEmploymentType_Offer");
             });
 
             modelBuilder.Entity<OfferSkill>(entity =>
             {
-                entity.HasKey(e => new { e.OfferId, e.SkillId }).HasName("OfferSkill_pk");
+                entity.HasKey(e => e.OfferSkillId).HasName("OfferSkill_pk");
 
                 entity.ToTable("OfferSkill");
 
-                entity.Property(e => e.Created).HasColumnType("datetime");
+                entity.Property(e => e.OfferSkillId).HasDefaultValueSql("(newid())");
+                entity.Property(e => e.Created)
+                    .HasDefaultValueSql("(getdate())")
+                    .HasColumnType("datetime");
                 entity.Property(e => e.Removed).HasColumnType("datetime");
 
-                entity.HasOne(d => d.Offer).WithMany(p => p.OfferSkills)
-                    .HasForeignKey(d => d.OfferId)
+                entity.HasOne(d => d.OfferTemplate).WithMany(p => p.OfferSkills)
+                    .HasForeignKey(d => d.OfferTemplateId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("OfferSkill_Offer");
+                    .HasConstraintName("OfferSkill_OfferTemplate");
 
                 entity.HasOne(d => d.Skill).WithMany(p => p.OfferSkills)
                     .HasForeignKey(d => d.SkillId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("OfferSkill_Skill");
+            });
+
+            modelBuilder.Entity<OfferTemplate>(entity =>
+            {
+                entity.HasKey(e => e.OfferTemplateId).HasName("OfferTemplate_pk");
+
+                entity.ToTable("OfferTemplate");
+
+                entity.Property(e => e.OfferTemplateId).HasDefaultValueSql("(newid())");
+                entity.Property(e => e.Created)
+                    .HasDefaultValueSql("(getdate())")
+                    .HasColumnType("datetime");
+                entity.Property(e => e.Description).HasMaxLength(800);
+                entity.Property(e => e.Name).HasMaxLength(100);
+                entity.Property(e => e.Removed).HasColumnType("datetime");
+            });
+
+            modelBuilder.Entity<OfferWorkMode>(entity =>
+            {
+                entity.HasKey(e => e.OfferWorkModeId).HasName("OfferWorkMode_pk");
+
+                entity.ToTable("OfferWorkMode");
+
+                entity.Property(e => e.OfferWorkModeId).HasDefaultValueSql("(newid())");
+                entity.Property(e => e.Created)
+                    .HasDefaultValueSql("(getdate())")
+                    .HasColumnType("datetime");
+                entity.Property(e => e.Removed).HasColumnType("datetime");
+
+                entity.HasOne(d => d.Offer).WithMany(p => p.OfferWorkModes)
+                    .HasForeignKey(d => d.OfferId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("OfferWorkMode_Offer");
+
+                entity.HasOne(d => d.WorkMode).WithMany(p => p.OfferWorkModes)
+                    .HasForeignKey(d => d.WorkModeId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("OfferWorkMode_WorkMode");
             });
 
             modelBuilder.Entity<Person>(entity =>
@@ -386,10 +430,12 @@ namespace Infrastructure.RelationalDatabase
 
                 entity.ToTable("Person");
 
-                entity.Property(e => e.PersonId).ValueGeneratedNever();
+                entity.Property(e => e.PersonId).HasDefaultValueSql("(newid())");
                 entity.Property(e => e.Blocked).HasColumnType("datetime");
                 entity.Property(e => e.ContactEmail).HasMaxLength(100);
-                entity.Property(e => e.Created).HasColumnType("datetime");
+                entity.Property(e => e.Created)
+                    .HasDefaultValueSql("(getdate())")
+                    .HasColumnType("datetime");
                 entity.Property(e => e.Description).HasMaxLength(800);
                 entity.Property(e => e.Login).HasMaxLength(100);
                 entity.Property(e => e.Logo).HasMaxLength(100);
@@ -409,8 +455,10 @@ namespace Infrastructure.RelationalDatabase
 
                 entity.ToTable("PersonSkill");
 
-                entity.Property(e => e.PersonSkillId).ValueGeneratedNever();
-                entity.Property(e => e.Created).HasColumnType("datetime");
+                entity.Property(e => e.PersonSkillId).HasDefaultValueSql("(newid())");
+                entity.Property(e => e.Created)
+                    .HasDefaultValueSql("(getdate())")
+                    .HasColumnType("datetime");
                 entity.Property(e => e.Removed).HasColumnType("datetime");
 
                 entity.HasOne(d => d.Person).WithMany(p => p.PersonSkills)
@@ -418,8 +466,8 @@ namespace Infrastructure.RelationalDatabase
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("PersonSkill_Person");
 
-                entity.HasOne(d => d.SkilldNavigation).WithMany(p => p.PersonSkills)
-                    .HasForeignKey(d => d.Skilld)
+                entity.HasOne(d => d.Skill).WithMany(p => p.PersonSkills)
+                    .HasForeignKey(d => d.SkillId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("PersonSkill_Skill");
             });
@@ -430,7 +478,7 @@ namespace Infrastructure.RelationalDatabase
 
                 entity.ToTable("ProcessType");
 
-                entity.Property(e => e.ProcessTypeId).ValueGeneratedNever();
+                entity.Property(e => e.ProcessTypeId).HasDefaultValueSql("(NEXT VALUE FOR [ProcessTypeId_SEQUENCE])");
                 entity.Property(e => e.Name).HasMaxLength(100);
             });
 
@@ -440,18 +488,28 @@ namespace Infrastructure.RelationalDatabase
 
                 entity.ToTable("Role");
 
-                entity.Property(e => e.RoleId).ValueGeneratedNever();
+                entity.Property(e => e.RoleId).HasDefaultValueSql("(NEXT VALUE FOR [RoleId_SEQUENCE])");
                 entity.Property(e => e.Description).HasMaxLength(800);
+                entity.Property(e => e.Name).HasMaxLength(100);
+            });
+
+            modelBuilder.Entity<SalaryTerm>(entity =>
+            {
+                entity.HasKey(e => e.SalaryTermId).HasName("SalaryTerm_pk");
+
+                entity.ToTable("SalaryTerm");
+
+                entity.Property(e => e.SalaryTermId).HasDefaultValueSql("(NEXT VALUE FOR [SalaryTermId_SEQUENCE])");
                 entity.Property(e => e.Name).HasMaxLength(100);
             });
 
             modelBuilder.Entity<Skill>(entity =>
             {
-                entity.HasKey(e => e.Skilld).HasName("Skill_pk");
+                entity.HasKey(e => e.SkillId).HasName("Skill_pk");
 
                 entity.ToTable("Skill");
 
-                entity.Property(e => e.Skilld).ValueGeneratedNever();
+                entity.Property(e => e.SkillId).HasDefaultValueSql("(NEXT VALUE FOR [SkillId_SEQUENCE])");
                 entity.Property(e => e.Description).HasMaxLength(800);
                 entity.Property(e => e.Name).HasMaxLength(100);
 
@@ -501,7 +559,7 @@ namespace Infrastructure.RelationalDatabase
 
                 entity.ToTable("SkillType");
 
-                entity.Property(e => e.SkillTypeId).ValueGeneratedNever();
+                entity.Property(e => e.SkillTypeId).HasDefaultValueSql("(NEXT VALUE FOR [SkillTypeId_SEQUENCE])");
                 entity.Property(e => e.Description).HasMaxLength(800);
                 entity.Property(e => e.Name).HasMaxLength(100);
             });
@@ -512,7 +570,7 @@ namespace Infrastructure.RelationalDatabase
 
                 entity.ToTable("State");
 
-                entity.Property(e => e.StateId).ValueGeneratedNever();
+                entity.Property(e => e.StateId).HasDefaultValueSql("(NEXT VALUE FOR [StateId_SEQUENCE])");
                 entity.Property(e => e.Name).HasMaxLength(100);
 
                 entity.HasOne(d => d.Country).WithMany(p => p.States)
@@ -527,7 +585,7 @@ namespace Infrastructure.RelationalDatabase
 
                 entity.ToTable("Street");
 
-                entity.Property(e => e.StreetId).ValueGeneratedNever();
+                entity.Property(e => e.StreetId).HasDefaultValueSql("(NEXT VALUE FOR [StreetId_SEQUENCE])");
                 entity.Property(e => e.Name).HasMaxLength(100);
             });
 
@@ -537,8 +595,10 @@ namespace Infrastructure.RelationalDatabase
 
                 entity.ToTable("Url");
 
-                entity.Property(e => e.UrlId).ValueGeneratedNever();
-                entity.Property(e => e.Created).HasColumnType("datetime");
+                entity.Property(e => e.UrlId).HasDefaultValueSql("(newid())");
+                entity.Property(e => e.Created)
+                    .HasDefaultValueSql("(getdate())")
+                    .HasColumnType("datetime");
                 entity.Property(e => e.Description).HasMaxLength(800);
                 entity.Property(e => e.Name).HasMaxLength(100);
                 entity.Property(e => e.Removed).HasColumnType("datetime");
@@ -561,24 +621,35 @@ namespace Infrastructure.RelationalDatabase
 
                 entity.ToTable("UrlType");
 
-                entity.Property(e => e.UrlTypeId).ValueGeneratedNever();
+                entity.Property(e => e.UrlTypeId).HasDefaultValueSql("(NEXT VALUE FOR [UrlTypeId_SEQUENCE])");
                 entity.Property(e => e.Description).HasMaxLength(800);
                 entity.Property(e => e.Name).HasMaxLength(100);
             });
 
-            modelBuilder.Entity<WorkType>(entity =>
+            modelBuilder.Entity<WorkMode>(entity =>
             {
-                entity.HasKey(e => e.WorkTypeId).HasName("WorkType_pk");
+                entity.HasKey(e => e.WorkModeId).HasName("WorkMode_pk");
 
-                entity.ToTable("WorkType");
+                entity.ToTable("WorkMode");
 
-                entity.Property(e => e.WorkTypeId).ValueGeneratedNever();
+                entity.Property(e => e.WorkModeId).HasDefaultValueSql("(NEXT VALUE FOR [WorkModeId_SEQUENCE])");
                 entity.Property(e => e.Name).HasMaxLength(100);
             });
-
-            //OnModelCreatingPartial(modelBuilder);
+            modelBuilder.HasSequence("CityId_SEQUENCE");
+            modelBuilder.HasSequence("CountryId_SEQUENCE");
+            modelBuilder.HasSequence("CurrencyId_SEQUENCE");
+            modelBuilder.HasSequence("EmploymentTypeId_SEQUENCE");
+            modelBuilder.HasSequence("FaqId_SEQUENCE");
+            modelBuilder.HasSequence("ProcessTypeId_SEQUENCE");
+            modelBuilder.HasSequence("RoleId_SEQUENCE");
+            modelBuilder.HasSequence("SalaryTermId_SEQUENCE");
+            modelBuilder.HasSequence("SkillId_SEQUENCE");
+            modelBuilder.HasSequence("SkillTypeId_SEQUENCE");
+            modelBuilder.HasSequence("StateId_SEQUENCE");
+            modelBuilder.HasSequence("StreetId_SEQUENCE");
+            modelBuilder.HasSequence("UrlTypeId_SEQUENCE");
+            modelBuilder.HasSequence("WorkModeId_SEQUENCE");
         }
 
-        //partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
     }
 }

@@ -1,5 +1,5 @@
 -- Created by Vertabelo (http://vertabelo.com)
--- Last modification date: 2025-02-17 23:05:37.373
+-- Last modification date: 2025-02-22 20:16:16.808
 
 -- tables
 -- Table: Address
@@ -20,11 +20,11 @@ CREATE TABLE Address (
 CREATE TABLE Branch (
     BranchId uniqueidentifier  NOT NULL,
     CompanyId uniqueidentifier  NOT NULL,
+    AddressId uniqueidentifier  NOT NULL,
     Name nvarchar(100)  NULL,
     Description nvarchar(800)  NULL,
     Created datetime  NOT NULL,
     Removed datetime  NULL,
-    AddressId uniqueidentifier  NOT NULL,
     CONSTRAINT Branch_pk PRIMARY KEY  (BranchId)
 );
 
@@ -45,48 +45,11 @@ CREATE TABLE Company (
     Regon nvarchar(25)  NULL,
     Nip nvarchar(25)  NULL,
     Krs nvarchar(25)  NULL,
-    Url nvarchar(800)  NULL,
+    WebsiteUrl nvarchar(800)  NULL,
     Created datetime  NOT NULL,
     Removed datetime  NULL,
-    Blocked datetime  NOT NULL,
+    Blocked datetime  NULL,
     CONSTRAINT Company_pk PRIMARY KEY  (CompanyId)
-);
-
--- Table: CompanyOffer
-CREATE TABLE CompanyOffer (
-    CompanyOfferId uniqueidentifier  NOT NULL,
-    CompanyId uniqueidentifier  NOT NULL,
-    OfferId uniqueidentifier  NOT NULL,
-    BranchId uniqueidentifier  NULL,
-    PublishStart datetime  NOT NULL,
-    PublishEnd datetime  NULL,
-    WorkStart date  NULL,
-    WorkEnd date  NULL,
-    MinSalary money  NOT NULL,
-    MaxSalary money  NOT NULL,
-    IsNegotiated bit  NOT NULL,
-    Url nvarchar(800)  NULL,
-    CONSTRAINT CompanyOffer_pk PRIMARY KEY  (CompanyOfferId)
-);
-
--- Table: CompanyOfferContract
-CREATE TABLE CompanyOfferContract (
-    ContractId int  NOT NULL,
-    ContractTypeId int  NOT NULL,
-    CompanyOfferId uniqueidentifier  NOT NULL,
-    Created datetime  NOT NULL,
-    Removed datetime  NULL,
-    CONSTRAINT CompanyOfferContract_pk PRIMARY KEY  (ContractId)
-);
-
--- Table: CompanyOfferWork
-CREATE TABLE CompanyOfferWork (
-    WorkId int  NOT NULL,
-    WorkTypeId int  NOT NULL,
-    CompanyOfferId uniqueidentifier  NOT NULL,
-    Created datetime  NOT NULL,
-    Removed datetime  NULL,
-    CONSTRAINT CompanyOfferWork_pk PRIMARY KEY  (WorkId)
 );
 
 -- Table: CompanyPerson
@@ -100,18 +63,25 @@ CREATE TABLE CompanyPerson (
     CONSTRAINT CompanyPerson_pk PRIMARY KEY  (CompanyPersonId)
 );
 
--- Table: ContractType
-CREATE TABLE ContractType (
-    ContractTypeId int  NOT NULL,
-    Name nvarchar(100)  NOT NULL,
-    CONSTRAINT ContractType_pk PRIMARY KEY  (ContractTypeId)
-);
-
 -- Table: Country
 CREATE TABLE Country (
     CountryId int  NOT NULL,
     Name nvarchar(100)  NOT NULL,
     CONSTRAINT Country_pk PRIMARY KEY  (CountryId)
+);
+
+-- Table: Currency
+CREATE TABLE Currency (
+    CurrencyId int  NOT NULL,
+    Name nvarchar(100)  NOT NULL,
+    CONSTRAINT Currency_pk PRIMARY KEY  (CurrencyId)
+);
+
+-- Table: EmploymentType
+CREATE TABLE EmploymentType (
+    EmploymentTypeId int  NOT NULL,
+    Name nvarchar(100)  NOT NULL,
+    CONSTRAINT EmploymentType_pk PRIMARY KEY  (EmploymentTypeId)
 );
 
 -- Table: Ex
@@ -121,7 +91,7 @@ CREATE TABLE Ex (
     ExceptionType nvarchar(100)  NOT NULL,
     Method nvarchar(100)  NULL,
     StackTrace nvarchar(800)  NOT NULL,
-    Message  nvarchar(max)  NOT NULL,
+    Message nvarchar(max)  NOT NULL,
     Other nvarchar(max)  NULL,
     Request int  NULL,
     CONSTRAINT Ex_pk PRIMARY KEY  (ExceptionId)
@@ -129,7 +99,7 @@ CREATE TABLE Ex (
 
 -- Table: Faq
 CREATE TABLE Faq (
-    FaqId int  NOT NULL,
+    FaqId uniqueidentifier  NOT NULL,
     Question nvarchar(800)  NOT NULL,
     Answer nvarchar(800)  NOT NULL,
     Created datetime  NOT NULL,
@@ -154,8 +124,8 @@ CREATE TABLE HRChat (
 -- Table: HRProcess
 CREATE TABLE HRProcess (
     ProcessId uniqueidentifier  NOT NULL,
-    CompanyOfferId uniqueidentifier  NOT NULL,
     PersonId uniqueidentifier  NOT NULL,
+    OfferId uniqueidentifier  NOT NULL,
     CONSTRAINT HRProcess_pk PRIMARY KEY  (ProcessId)
 );
 
@@ -199,21 +169,61 @@ CREATE TABLE NotificationType (
 -- Table: Offer
 CREATE TABLE Offer (
     OfferId uniqueidentifier  NOT NULL,
-    Name nvarchar(100)  NOT NULL,
-    Description nvarchar(800)  NOT NULL,
+    CompanyId uniqueidentifier  NOT NULL,
+    OfferTemplateId uniqueidentifier  NOT NULL,
+    BranchId uniqueidentifier  NULL,
+    PublicationStart datetime  NOT NULL,
+    PublicationEnd datetime  NULL,
+    WorkBeginDate date  NULL,
+    WorkEndDate date  NULL,
+    SalaryRangeMin money  NOT NULL,
+    SalaryRangeMax money  NOT NULL,
+    SalaryTermId int  NULL,
+    CurrencyId int  NULL,
+    IsNegotiated bit  NOT NULL,
+    WebsiteUrl nvarchar(800)  NULL,
+    CONSTRAINT Offer_pk PRIMARY KEY  (OfferId)
+);
+
+-- Table: OfferEmploymentType
+CREATE TABLE OfferEmploymentType (
+    OfferEmploymentTypeId uniqueidentifier  NOT NULL,
+    OfferId uniqueidentifier  NOT NULL,
+    EmploymentTypeId int  NOT NULL,
     Created datetime  NOT NULL,
     Removed datetime  NULL,
-    CONSTRAINT Offer_pk PRIMARY KEY  (OfferId)
+    CONSTRAINT OfferEmploymentType_pk PRIMARY KEY  (OfferEmploymentTypeId)
 );
 
 -- Table: OfferSkill
 CREATE TABLE OfferSkill (
-    OfferId uniqueidentifier  NOT NULL,
+    OfferSkillId uniqueidentifier  NOT NULL,
+    OfferTemplateId uniqueidentifier  NOT NULL,
     SkillId int  NOT NULL,
     IsRequired bit  NOT NULL,
     Created datetime  NOT NULL,
     Removed datetime  NULL,
-    CONSTRAINT OfferSkill_pk PRIMARY KEY  (OfferId,SkillId)
+    CONSTRAINT OfferSkill_pk PRIMARY KEY  (OfferSkillId)
+);
+
+-- Table: OfferTemplate
+CREATE TABLE OfferTemplate (
+    OfferTemplateId uniqueidentifier  NOT NULL,
+    Name nvarchar(100)  NOT NULL,
+    Description nvarchar(800)  NOT NULL,
+    Created datetime  NOT NULL,
+    Removed datetime  NULL,
+    CONSTRAINT OfferTemplate_pk PRIMARY KEY  (OfferTemplateId)
+);
+
+-- Table: OfferWorkMode
+CREATE TABLE OfferWorkMode (
+    OfferWorkModeId uniqueidentifier  NOT NULL,
+    OfferId uniqueidentifier  NOT NULL,
+    WorkModeId int  NOT NULL,
+    Created datetime  NOT NULL,
+    Removed datetime  NULL,
+    CONSTRAINT OfferWorkMode_pk PRIMARY KEY  (OfferWorkModeId)
 );
 
 -- Table: Person
@@ -234,14 +244,16 @@ CREATE TABLE Person (
     IsStudent bit  NOT NULL,
     IsAdmin bit  NOT NULL,
     AddressId uniqueidentifier  NULL,
+    Password nvarchar(max)  NOT NULL,
+    Salt nvarchar(max)  NOT NULL,
     CONSTRAINT Person_pk PRIMARY KEY  (PersonId)
 );
 
 -- Table: PersonSkill
 CREATE TABLE PersonSkill (
-    PersonSkillId int  NOT NULL,
+    PersonSkillId uniqueidentifier  NOT NULL,
     PersonId uniqueidentifier  NOT NULL,
-    Skilld int  NOT NULL,
+    SkillId int  NOT NULL,
     Created datetime  NOT NULL,
     Removed datetime  NULL,
     CONSTRAINT PersonSkill_pk PRIMARY KEY  (PersonSkillId)
@@ -262,13 +274,20 @@ CREATE TABLE Role (
     CONSTRAINT Role_pk PRIMARY KEY  (RoleId)
 );
 
+-- Table: SalaryTerm
+CREATE TABLE SalaryTerm (
+    SalaryTermId int  NOT NULL,
+    Name nvarchar(100)  NOT NULL,
+    CONSTRAINT SalaryTerm_pk PRIMARY KEY  (SalaryTermId)
+);
+
 -- Table: Skill
 CREATE TABLE Skill (
-    Skilld int  NOT NULL,
+    SkillId int  NOT NULL,
     Name nvarchar(100)  NOT NULL,
     Description nvarchar(800)  NOT NULL,
     SkillTypeId int  NOT NULL,
-    CONSTRAINT Skill_pk PRIMARY KEY  (Skilld)
+    CONSTRAINT Skill_pk PRIMARY KEY  (SkillId)
 );
 
 -- Table: SkillConnections
@@ -303,7 +322,7 @@ CREATE TABLE Street (
 
 -- Table: Url
 CREATE TABLE Url (
-    UrlId int  NOT NULL,
+    UrlId uniqueidentifier  NOT NULL,
     UrlTypeId int  NOT NULL,
     PersonId uniqueidentifier  NOT NULL,
     Value nvarchar(800)  NULL,
@@ -322,11 +341,11 @@ CREATE TABLE UrlType (
     CONSTRAINT UrlType_pk PRIMARY KEY  (UrlTypeId)
 );
 
--- Table: WorkType
-CREATE TABLE WorkType (
-    WorkTypeId int  NOT NULL,
+-- Table: WorkMode
+CREATE TABLE WorkMode (
+    WorkModeId int  NOT NULL,
     Name nvarchar(100)  NOT NULL,
-    CONSTRAINT WorkType_pk PRIMARY KEY  (WorkTypeId)
+    CONSTRAINT WorkMode_pk PRIMARY KEY  (WorkModeId)
 );
 
 -- foreign keys
@@ -355,41 +374,6 @@ ALTER TABLE City ADD CONSTRAINT City_State
     FOREIGN KEY (StateId)
     REFERENCES State (StateId);
 
--- Reference: CompanyOfferContract_CompanyOffer (table: CompanyOfferContract)
-ALTER TABLE CompanyOfferContract ADD CONSTRAINT CompanyOfferContract_CompanyOffer
-    FOREIGN KEY (CompanyOfferId)
-    REFERENCES CompanyOffer (CompanyOfferId);
-
--- Reference: CompanyOfferContract_ContractType (table: CompanyOfferContract)
-ALTER TABLE CompanyOfferContract ADD CONSTRAINT CompanyOfferContract_ContractType
-    FOREIGN KEY (ContractTypeId)
-    REFERENCES ContractType (ContractTypeId);
-
--- Reference: CompanyOfferWork_CompanyOffer (table: CompanyOfferWork)
-ALTER TABLE CompanyOfferWork ADD CONSTRAINT CompanyOfferWork_CompanyOffer
-    FOREIGN KEY (CompanyOfferId)
-    REFERENCES CompanyOffer (CompanyOfferId);
-
--- Reference: CompanyOfferWork_WorkType (table: CompanyOfferWork)
-ALTER TABLE CompanyOfferWork ADD CONSTRAINT CompanyOfferWork_WorkType
-    FOREIGN KEY (WorkTypeId)
-    REFERENCES WorkType (WorkTypeId);
-
--- Reference: CompanyOffer_Branch (table: CompanyOffer)
-ALTER TABLE CompanyOffer ADD CONSTRAINT CompanyOffer_Branch
-    FOREIGN KEY (BranchId)
-    REFERENCES Branch (BranchId);
-
--- Reference: CompanyOffer_Company (table: CompanyOffer)
-ALTER TABLE CompanyOffer ADD CONSTRAINT CompanyOffer_Company
-    FOREIGN KEY (CompanyId)
-    REFERENCES Company (CompanyId);
-
--- Reference: CompanyOffer_Offer (table: CompanyOffer)
-ALTER TABLE CompanyOffer ADD CONSTRAINT CompanyOffer_Offer
-    FOREIGN KEY (OfferId)
-    REFERENCES Offer (OfferId);
-
 -- Reference: CompanyPerson_Company (table: CompanyPerson)
 ALTER TABLE CompanyPerson ADD CONSTRAINT CompanyPerson_Company
     FOREIGN KEY (CompanyId)
@@ -415,10 +399,10 @@ ALTER TABLE HRChat ADD CONSTRAINT HRChat_ProcessType
     FOREIGN KEY (ProcessTypeId)
     REFERENCES ProcessType (ProcessTypeId);
 
--- Reference: HRProcess_CompanyOffer (table: HRProcess)
-ALTER TABLE HRProcess ADD CONSTRAINT HRProcess_CompanyOffer
-    FOREIGN KEY (CompanyOfferId)
-    REFERENCES CompanyOffer (CompanyOfferId);
+-- Reference: HRProcess_Offer (table: HRProcess)
+ALTER TABLE HRProcess ADD CONSTRAINT HRProcess_Offer
+    FOREIGN KEY (OfferId)
+    REFERENCES Offer (OfferId);
 
 -- Reference: HRProcess_Person (table: HRProcess)
 ALTER TABLE HRProcess ADD CONSTRAINT HRProcess_Person
@@ -440,15 +424,60 @@ ALTER TABLE Notification ADD CONSTRAINT Notification_Person
     FOREIGN KEY (PersonId)
     REFERENCES Person (PersonId);
 
--- Reference: OfferSkill_Offer (table: OfferSkill)
-ALTER TABLE OfferSkill ADD CONSTRAINT OfferSkill_Offer
+-- Reference: OfferEmploymentType_EmploymentType (table: OfferEmploymentType)
+ALTER TABLE OfferEmploymentType ADD CONSTRAINT OfferEmploymentType_EmploymentType
+    FOREIGN KEY (EmploymentTypeId)
+    REFERENCES EmploymentType (EmploymentTypeId);
+
+-- Reference: OfferEmploymentType_Offer (table: OfferEmploymentType)
+ALTER TABLE OfferEmploymentType ADD CONSTRAINT OfferEmploymentType_Offer
     FOREIGN KEY (OfferId)
     REFERENCES Offer (OfferId);
+
+-- Reference: OfferSkill_OfferTemplate (table: OfferSkill)
+ALTER TABLE OfferSkill ADD CONSTRAINT OfferSkill_OfferTemplate
+    FOREIGN KEY (OfferTemplateId)
+    REFERENCES OfferTemplate (OfferTemplateId);
 
 -- Reference: OfferSkill_Skill (table: OfferSkill)
 ALTER TABLE OfferSkill ADD CONSTRAINT OfferSkill_Skill
     FOREIGN KEY (SkillId)
-    REFERENCES Skill (Skilld);
+    REFERENCES Skill (SkillId);
+
+-- Reference: OfferWorkMode_Offer (table: OfferWorkMode)
+ALTER TABLE OfferWorkMode ADD CONSTRAINT OfferWorkMode_Offer
+    FOREIGN KEY (OfferId)
+    REFERENCES Offer (OfferId);
+
+-- Reference: OfferWorkMode_WorkMode (table: OfferWorkMode)
+ALTER TABLE OfferWorkMode ADD CONSTRAINT OfferWorkMode_WorkMode
+    FOREIGN KEY (WorkModeId)
+    REFERENCES WorkMode (WorkModeId);
+
+-- Reference: Offer_Branch (table: Offer)
+ALTER TABLE Offer ADD CONSTRAINT Offer_Branch
+    FOREIGN KEY (BranchId)
+    REFERENCES Branch (BranchId);
+
+-- Reference: Offer_Company (table: Offer)
+ALTER TABLE Offer ADD CONSTRAINT Offer_Company
+    FOREIGN KEY (CompanyId)
+    REFERENCES Company (CompanyId);
+
+-- Reference: Offer_Currency (table: Offer)
+ALTER TABLE Offer ADD CONSTRAINT Offer_Currency
+    FOREIGN KEY (CurrencyId)
+    REFERENCES Currency (CurrencyId);
+
+-- Reference: Offer_OfferTemplate (table: Offer)
+ALTER TABLE Offer ADD CONSTRAINT Offer_OfferTemplate
+    FOREIGN KEY (OfferTemplateId)
+    REFERENCES OfferTemplate (OfferTemplateId);
+
+-- Reference: Offer_SalaryTerm (table: Offer)
+ALTER TABLE Offer ADD CONSTRAINT Offer_SalaryTerm
+    FOREIGN KEY (SalaryTermId)
+    REFERENCES SalaryTerm (SalaryTermId);
 
 -- Reference: PersonSkill_Person (table: PersonSkill)
 ALTER TABLE PersonSkill ADD CONSTRAINT PersonSkill_Person
@@ -457,8 +486,8 @@ ALTER TABLE PersonSkill ADD CONSTRAINT PersonSkill_Person
 
 -- Reference: PersonSkill_Skill (table: PersonSkill)
 ALTER TABLE PersonSkill ADD CONSTRAINT PersonSkill_Skill
-    FOREIGN KEY (Skilld)
-    REFERENCES Skill (Skilld);
+    FOREIGN KEY (SkillId)
+    REFERENCES Skill (SkillId);
 
 -- Reference: Person_Address (table: Person)
 ALTER TABLE Person ADD CONSTRAINT Person_Address
@@ -468,12 +497,12 @@ ALTER TABLE Person ADD CONSTRAINT Person_Address
 -- Reference: SkillConnections_Skill1 (table: SkillConnections)
 ALTER TABLE SkillConnections ADD CONSTRAINT SkillConnections_Skill1
     FOREIGN KEY (Parentld)
-    REFERENCES Skill (Skilld);
+    REFERENCES Skill (SkillId);
 
 -- Reference: SkillConnections_Skill2 (table: SkillConnections)
 ALTER TABLE SkillConnections ADD CONSTRAINT SkillConnections_Skill2
     FOREIGN KEY (Childld)
-    REFERENCES Skill (Skilld);
+    REFERENCES Skill (SkillId);
 
 -- Reference: Skill_SkillType (table: Skill)
 ALTER TABLE Skill ADD CONSTRAINT Skill_SkillType

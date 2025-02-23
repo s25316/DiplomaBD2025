@@ -5,7 +5,7 @@ namespace UseCase.RelationalDatabase.Models;
 
 public partial class Url
 {
-    public int UrlId { get; set; }
+    public Guid UrlId { get; set; }
 
     public int UrlTypeId { get; set; }
 
