@@ -3,12 +3,12 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
+  --background: #ffffffb2;
   --foreground: #171717;
 }
 /* Obsługa Tailwind dla dark mode */
 .dark {
-  --background: #0a0a0a;
+  --background: #1b1919;
   --foreground: #ededed;
 }
 @media (prefers-color-scheme: dark) {
