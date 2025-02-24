@@ -8,7 +8,7 @@ services:
     build:
       context: .
       dockerfile: KafkaToMongoBroker/KafkaToMongoBroker/Dockerfile
-    restart: no
+    restart: unless-stopped 
     depends_on:
       - Diploma_BackEnd_Api
     environment:
@@ -36,6 +36,10 @@ services:
       - Diploma_Redis
       - Diploma_Kafka
     environment: 
+      Authentication__Secret : "KdKSpSy?ZDU8hD{hyRym43HdrSbc*SE8eh)#]$%LqN*r=W_d9z=zcR1$g-3n,%xwyVZNF-{_2RyPU_pPyR9/1*KEtaE})M@9rP5LkyfaZic%$vq$t(e@}0R6?"
+      Authentication__Issuer : "JuniorBase"
+      Authentication__Audience : "JuniorBase"
+
       ConnectionStrings__RelationalDatabase : "Data Source=Diploma_MsSQL,1433;Initial Catalog=DiplomaBD;Persist Security Info=True;User ID=sa;Password=YourStrong!Passw0rd;Trust Server Certificate=True"
       ConnectionStrings__Redis : "Diploma_Redis:6379,password=TwojeSuperHaslo"
       ConnectionStrings__Kafka : "Diploma_Kafka:9092"   

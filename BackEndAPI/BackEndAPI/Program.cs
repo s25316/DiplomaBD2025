@@ -10,16 +10,19 @@ namespace BackEndAPI
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-            builder.Services.AddCheckUserSecrets(builder.Configuration);
             builder.Services.AddDependencies(builder.Configuration);
 
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
 
             var app = builder.Build();
             await CreateKafkaTopicsAsync(app);
+
+            // Configure the requesting from any host
+            app.UseCors(x => x.AllowAnyMethod()
+                .AllowAnyHeader()
+                .SetIsOriginAllowed(origin => true)
+                .AllowCredentials());
 
             // Configure the HTTP request pipeline.
             app.UseSwagger();
@@ -48,7 +51,7 @@ namespace BackEndAPI
                     Value = "Aplikacja zosta³a uruchomiona"
                 };
 
-                var result = await producer.ProduceAsync(topic, message);
+                _ = await producer.ProduceAsync(topic, message);
             }
             catch (ProduceException<Null, string> e)
             {

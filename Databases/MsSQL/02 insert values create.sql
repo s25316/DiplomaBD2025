@@ -51,8 +51,8 @@ VALUES
 INSERT INTO [dbo].[EmploymentType]
 (EmploymentTypeId, Name)
 VALUES
-(1, 'Internship '),
-(2, 'Apprenticeship '),
+(1, 'Internship'),
+(2, 'Apprenticeship'),
 (3, 'Employment Contract'),
 (4, 'Fixed-Term Contract'),
 (5, 'Indefinite Contract'),

@@ -1,4 +1,5 @@
 ﻿namespace UseCase.RelationalDatabase.Models;
+using NetTopologySuite.Geometries;
 
 public partial class Address
 {
@@ -10,13 +11,15 @@ public partial class Address
 
     public string HouseNumber { get; set; } = null!;
 
-    public string ApartmentNumber { get; set; } = null!;
+    public string? ApartmentNumber { get; set; }
 
     public string PostCode { get; set; } = null!;
 
     public float Lon { get; set; }
 
     public float Lat { get; set; }
+
+    public Point Point { get; set; } = null!;
 
     public virtual ICollection<Branch> Branches { get; set; } = new List<Branch>();
 

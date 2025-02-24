@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿// Ignore Spelling: Bd Hrchats Hrprocesses Nchats
+using Microsoft.EntityFrameworkCore;
 using UseCase.RelationalDatabase.Models;
 
 namespace UseCase.RelationalDatabase;

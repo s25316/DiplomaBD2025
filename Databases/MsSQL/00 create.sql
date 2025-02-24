@@ -1,5 +1,5 @@
 -- Created by Vertabelo (http://vertabelo.com)
--- Last modification date: 2025-02-22 20:16:16.808
+-- Last modification date: 2025-02-24 15:09:01.61
 
 -- tables
 -- Table: Address
@@ -8,7 +8,7 @@ CREATE TABLE Address (
     CityId int  NOT NULL,
     StreetId int  NULL,
     HouseNumber nvarchar(25)  NOT NULL,
-    ApartmentNumber nvarchar(25)  NOT NULL,
+    ApartmentNumber nvarchar(25)  NULL,
     PostCode nvarchar(25)  NOT NULL,
     Lon real  NOT NULL,
     Lat real  NOT NULL,

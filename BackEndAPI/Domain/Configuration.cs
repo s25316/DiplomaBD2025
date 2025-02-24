@@ -1,15 +1,11 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 
 namespace Domain
 {
     public static class Configuration
     {
-        public static IServiceCollection DomainConfiguration(
-            this IServiceCollection services,
-            IConfiguration configuration)
+        public static IServiceCollection AddDomainConfiguration(this IServiceCollection services)
         {
-            services.AddSingleton<IConfiguration>(configuration);
             return services;
         }
     }

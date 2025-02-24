@@ -1,5 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+﻿// Ignore Spelling: Sql, Bd, newid, getdate, datetime, Faq, Parentld, Childld
+using Microsoft.EntityFrameworkCore;
 using UseCase.RelationalDatabase;
 using UseCase.RelationalDatabase.Models;
 
@@ -7,24 +7,14 @@ namespace Infrastructure.RelationalDatabase
 {
     class MsSqlDiplomaBdContext : DiplomaBdContext
     {
-        // Properties
-        private readonly IConfiguration _configuration;
-
-        // Constructor
-        public MsSqlDiplomaBdContext(IConfiguration configuration)
-        {
-            _configuration = configuration;
-        }
-
         // Methods
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            //#warning Implement Ex
-            var connectionString = _configuration
-                .GetSection("ConnectionStrings")["RelationalDatabase"] ??
-                throw new Exception();
-            optionsBuilder.UseSqlServer(connectionString);
+            optionsBuilder.UseSqlServer(
+                UseCase.Configuration.RelationalDatabaseConnectionString,
+                x => x.UseNetTopologySuite());
         }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -38,6 +28,7 @@ namespace Infrastructure.RelationalDatabase
                 entity.Property(e => e.ApartmentNumber).HasMaxLength(25);
                 entity.Property(e => e.HouseNumber).HasMaxLength(25);
                 entity.Property(e => e.PostCode).HasMaxLength(25);
+                entity.Property(e => e.Point).HasColumnType("geography");
 
                 entity.HasOne(d => d.City).WithMany(p => p.Addresses)
                     .HasForeignKey(d => d.CityId)
