@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
+using UseCase.Roles.Guests.Queries.Dictionaries.Repositories;
 using UseCase.Shared.Exceptions;
 using UseCase.Shared.Services.Authentication.Generators;
 using UseCase.Shared.Services.Authentication.Inspectors;
@@ -48,10 +49,13 @@ namespace UseCase
             services.AddMediatR(config => config.RegisterServicesFromAssembly(
                 Assembly.GetExecutingAssembly()
                 ));
+            services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
             services.AddTransient<IAuthenticationGeneratorService, AuthenticationGeneratorService>();
             services.AddTransient<IAuthenticationInspectorService, AuthenticationInspectorService>();
             services.AddTransient<ITimeService, TimeService>();
+
+            services.AddTransient<IDictionariesRepository, DictionariesRepository>();
             return services;
         }
     }

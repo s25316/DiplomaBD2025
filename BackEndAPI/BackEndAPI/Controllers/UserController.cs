@@ -32,7 +32,7 @@ namespace BackEndAPI.Controllers
             return result.IsCreated ? Ok(result.Message) : BadRequest(result.Message);
         }
 
-        [HttpPost("loginIn")]
+        [HttpPost("login")]
         public async Task<IActionResult> PersonLoginInAsync(
             UserLoginInCommand command,
             CancellationToken cancellationToken)

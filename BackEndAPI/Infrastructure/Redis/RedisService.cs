@@ -1,4 +1,4 @@
-﻿// Ignore Spelling: redis
+﻿// Ignore Spelling: redis Dto
 
 using StackExchange.Redis;
 using System.Text;
@@ -14,7 +14,7 @@ namespace Infrastructure.Redis
         private readonly IDatabase _database;
         private readonly ITimeService _timeService;
 
-        private static int _countHoursExpiration = 2;
+        private static int _countHoursExpiration = 1;
         private static string _host = UseCase.Configuration.RedisConnectionString
             .Split(",")[0].Split(":")[0].Trim();
         private static int _port = int.Parse(UseCase.Configuration.RedisConnectionString
@@ -31,7 +31,10 @@ namespace Infrastructure.Redis
         }
 
         //Methods
-        public async Task SetAsync(Dictionary<string, object> dictionary)
+
+        public async Task SetAsync<TKey, TDto>(Dictionary<TKey, TDto> dictionary)
+           where TKey : notnull
+           where TDto : class
         {
             if (!dictionary.Any())
             {
@@ -44,26 +47,33 @@ namespace Infrastructure.Redis
 
             foreach (var pair in dictionary)
             {
-                var key = $"{pair.Value.GetType().Name}:{pair.Key}";
+                var key = $"{typeof(TDto).Name}:{pair.Key}";
                 var value = JsonSerializer.Serialize(pair.Value);
 
-                await _database.StringSetAsync(key, value);
-                await _database.KeyExpireAsync(key, DateTimeOffset.FromUnixTimeSeconds(unixTimestamp).UtcDateTime);
+                await _database.StringSetAsync(
+                    key,
+                    value
+                    );
+                await _database.KeyExpireAsync(
+                    key,
+                    DateTimeOffset.FromUnixTimeSeconds(unixTimestamp).UtcDateTime
+                    );
             }
         }
 
-        public async Task<IEnumerable<T>> GetAsync<T>() where T : class
+        public async Task<Dictionary<TKey, TDto>> GetAsync<TKey, TDto>(Func<TDto, TKey> keySelector)
+            where TKey : notnull
+            where TDto : class
         {
             var server = _database.Multiplexer.GetServer(_host, _port);
-            var keys = server.Keys(pattern: $"{typeof(T).Name}:*").ToList();
+            var keys = server.Keys(pattern: $"{typeof(TDto).Name}:*").ToList();
 
             if (!keys.Any())
             {
-                return Enumerable.Empty<T>();
+                return [];
             }
 
-
-            var result = new List<T>();
+            var dictionary = new Dictionary<TKey, TDto>();
             var values = await _database.StringGetAsync(keys.ToArray());
 
             foreach (var value in values)
@@ -75,10 +85,10 @@ namespace Infrastructure.Redis
                 var json = Encoding.UTF8.GetString(value);
                 try
                 {
-                    var deserializedValue = JsonSerializer.Deserialize<T>(json);
+                    var deserializedValue = JsonSerializer.Deserialize<TDto>(json);
                     if (deserializedValue != null)
                     {
-                        result.Add(deserializedValue);
+                        dictionary[keySelector(deserializedValue)] = deserializedValue;
                     }
                 }
                 catch (JsonException)
@@ -86,7 +96,7 @@ namespace Infrastructure.Redis
                     // Obsługa błędu deserializacji JSON (opcjonalnie)
                 }
             }
-            return result;
+            return dictionary;
         }
     }
 }
