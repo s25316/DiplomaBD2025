@@ -8,15 +8,15 @@
 }
 /* Obsługa Tailwind dla dark mode */
 .dark {
-  --background: #1b1919;
+  --background: #0a0a0a; /*1b1919*/
   --foreground: #ededed;
 }
-@media (prefers-color-scheme: dark) {
+/* @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
   }
-}
+} */
 
 body {
   color: var(--foreground);
