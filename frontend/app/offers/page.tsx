@@ -1,7 +1,5 @@
 import React from 'react'
-import MainPageButton from '../components/buttons/MainPageButton'
 import Link from 'next/link'
-import ThemeToggle from '../components/buttons/ThemeToggle'
 
 // interface Offer{
 //     id: number;
@@ -17,8 +15,6 @@ const Offers = async () => {
   return (
     
     <div> 
-        <MainPageButton/>
-        <ThemeToggle/>
         <h1>Offers </h1>
         <ul>
             <Link href="/offers/123" >off</Link>
