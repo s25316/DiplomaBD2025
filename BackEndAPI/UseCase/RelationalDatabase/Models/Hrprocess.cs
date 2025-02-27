@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace UseCase.RelationalDatabase.Models;
+﻿namespace UseCase.RelationalDatabase.Models;
 
 public partial class Hrprocess
 {

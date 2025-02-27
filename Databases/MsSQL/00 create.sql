@@ -1,5 +1,5 @@
 -- Created by Vertabelo (http://vertabelo.com)
--- Last modification date: 2025-02-24 15:09:01.61
+-- Last modification date: 2025-02-27 14:05:20.937
 
 -- tables
 -- Table: Address
@@ -169,7 +169,6 @@ CREATE TABLE NotificationType (
 -- Table: Offer
 CREATE TABLE Offer (
     OfferId uniqueidentifier  NOT NULL,
-    CompanyId uniqueidentifier  NOT NULL,
     OfferTemplateId uniqueidentifier  NOT NULL,
     BranchId uniqueidentifier  NULL,
     PublicationStart datetime  NOT NULL,
@@ -209,6 +208,7 @@ CREATE TABLE OfferSkill (
 -- Table: OfferTemplate
 CREATE TABLE OfferTemplate (
     OfferTemplateId uniqueidentifier  NOT NULL,
+    CompanyId uniqueidentifier  NOT NULL,
     Name nvarchar(100)  NOT NULL,
     Description nvarchar(800)  NOT NULL,
     Created datetime  NOT NULL,
@@ -444,6 +444,11 @@ ALTER TABLE OfferSkill ADD CONSTRAINT OfferSkill_Skill
     FOREIGN KEY (SkillId)
     REFERENCES Skill (SkillId);
 
+-- Reference: OfferTemplate_Company (table: OfferTemplate)
+ALTER TABLE OfferTemplate ADD CONSTRAINT OfferTemplate_Company
+    FOREIGN KEY (CompanyId)
+    REFERENCES Company (CompanyId);
+
 -- Reference: OfferWorkMode_Offer (table: OfferWorkMode)
 ALTER TABLE OfferWorkMode ADD CONSTRAINT OfferWorkMode_Offer
     FOREIGN KEY (OfferId)
@@ -458,11 +463,6 @@ ALTER TABLE OfferWorkMode ADD CONSTRAINT OfferWorkMode_WorkMode
 ALTER TABLE Offer ADD CONSTRAINT Offer_Branch
     FOREIGN KEY (BranchId)
     REFERENCES Branch (BranchId);
-
--- Reference: Offer_Company (table: Offer)
-ALTER TABLE Offer ADD CONSTRAINT Offer_Company
-    FOREIGN KEY (CompanyId)
-    REFERENCES Company (CompanyId);
 
 -- Reference: Offer_Currency (table: Offer)
 ALTER TABLE Offer ADD CONSTRAINT Offer_Currency

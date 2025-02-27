@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 using UseCase.Roles.Guests.Queries.Dictionaries.Repositories;
 using UseCase.Shared.Exceptions;
+using UseCase.Shared.Repositories.Addresses;
 using UseCase.Shared.Services.Authentication.Generators;
 using UseCase.Shared.Services.Authentication.Inspectors;
 using UseCase.Shared.Services.Time;
@@ -51,11 +52,15 @@ namespace UseCase
                 ));
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
+            // Guest
+            services.AddTransient<IDictionariesRepository, DictionariesRepository>();
+
+            // Shared
+            services.AddTransient<IAddressRepository, AddressRepository>();
+
             services.AddTransient<IAuthenticationGeneratorService, AuthenticationGeneratorService>();
             services.AddTransient<IAuthenticationInspectorService, AuthenticationInspectorService>();
             services.AddTransient<ITimeService, TimeService>();
-
-            services.AddTransient<IDictionariesRepository, DictionariesRepository>();
             return services;
         }
     }

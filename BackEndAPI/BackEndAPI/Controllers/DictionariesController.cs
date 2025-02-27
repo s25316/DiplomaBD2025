@@ -3,9 +3,12 @@ using Microsoft.AspNetCore.Mvc;
 using UseCase.Roles.Guests.Queries.Dictionaries.GetCompanyRoles.Request;
 using UseCase.Roles.Guests.Queries.Dictionaries.GetCurrencies.Request;
 using UseCase.Roles.Guests.Queries.Dictionaries.GetEmploymentTypes.Request;
+using UseCase.Roles.Guests.Queries.Dictionaries.GetFaqs.Request;
+using UseCase.Roles.Guests.Queries.Dictionaries.GetNotificationTypes.Request;
 using UseCase.Roles.Guests.Queries.Dictionaries.GetSalaryTerms.Request;
 using UseCase.Roles.Guests.Queries.Dictionaries.GetSkills.Request;
 using UseCase.Roles.Guests.Queries.Dictionaries.GetSkillTypes.Request;
+using UseCase.Roles.Guests.Queries.Dictionaries.GetUrlTypes.Requests;
 using UseCase.Roles.Guests.Queries.Dictionaries.GetWorkModes.Request;
 
 namespace BackEndAPI.Controllers
@@ -87,6 +90,33 @@ namespace BackEndAPI.Controllers
         {
             var result = await _mediator.Send(
                 new GetSkillsRequest { SkillTypeId = skillTypeId },
+                cancellationToken);
+            return Ok(result);
+        }
+
+        [HttpGet("faq")]
+        public async Task<IActionResult> GetFaqsAsync(CancellationToken cancellationToken)
+        {
+            var result = await _mediator.Send(
+                new GetFaqsRequest(),
+                cancellationToken);
+            return Ok(result);
+        }
+
+        [HttpGet("notificationTypes")]
+        public async Task<IActionResult> GetNotificationTypesAsync(CancellationToken cancellationToken)
+        {
+            var result = await _mediator.Send(
+                new GetNotificationTypesRequest(),
+                cancellationToken);
+            return Ok(result);
+        }
+
+        [HttpGet("urlTypes")]
+        public async Task<IActionResult> GetUrlTypesAsync(CancellationToken cancellationToken)
+        {
+            var result = await _mediator.Send(
+                new GetUrlTypesRequest(),
                 cancellationToken);
             return Ok(result);
         }

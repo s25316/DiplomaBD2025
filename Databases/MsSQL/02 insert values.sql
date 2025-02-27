@@ -1,3 +1,14 @@
+DELETE FROM [dbo].[NotificationType];
+DELETE FROM [dbo].[UrlType];
+DELETE FROM [dbo].[Role];
+DELETE FROM [dbo].[WorkMode];
+DELETE FROM [dbo].[EmploymentType];
+DELETE FROM [dbo].[SalaryTerm];
+DELETE FROM [dbo].[Currency];
+DELETE FROM [dbo].[ProcessType];
+DELETE FROM  [dbo].[SkillType];
+DELETE FROM [dbo].[Skill];
+DELETE FROM [dbo].[SkillConnections];
 -- OUR OWN IMPLEMENTATION OF VALUES OF SOME TABLES
 --======================================================================================
 --======================================================================================

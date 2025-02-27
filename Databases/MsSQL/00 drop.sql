@@ -1,5 +1,5 @@
 -- Created by Vertabelo (http://vertabelo.com)
--- Last modification date: 2025-02-24 15:09:01.61
+-- Last modification date: 2025-02-27 14:05:20.937
 
 -- foreign keys
 ALTER TABLE Address DROP CONSTRAINT Address_City;
@@ -40,13 +40,13 @@ ALTER TABLE OfferSkill DROP CONSTRAINT OfferSkill_OfferTemplate;
 
 ALTER TABLE OfferSkill DROP CONSTRAINT OfferSkill_Skill;
 
+ALTER TABLE OfferTemplate DROP CONSTRAINT OfferTemplate_Company;
+
 ALTER TABLE OfferWorkMode DROP CONSTRAINT OfferWorkMode_Offer;
 
 ALTER TABLE OfferWorkMode DROP CONSTRAINT OfferWorkMode_WorkMode;
 
 ALTER TABLE Offer DROP CONSTRAINT Offer_Branch;
-
-ALTER TABLE Offer DROP CONSTRAINT Offer_Company;
 
 ALTER TABLE Offer DROP CONSTRAINT Offer_Currency;
 

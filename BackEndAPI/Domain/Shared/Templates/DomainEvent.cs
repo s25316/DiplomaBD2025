@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Domain.Shared.Templates
+﻿namespace Domain.Shared.Templates
 {
-    class DomainEvent
+    public class DomainEvent
     {
     }
 }

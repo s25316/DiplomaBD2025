@@ -11,5 +11,8 @@ namespace UseCase.Roles.Guests.Queries.Dictionaries.Repositories
         Task<Dictionary<int, WorkModeDto>> GetWorkModesAsync();
         Task<Dictionary<int, SkillTypeDto>> GetSkillTypesAsync();
         Task<Dictionary<int, SkillResponseDto>> GetSkillsAsync();
+        Task<Dictionary<int, NotificationTypeDto>> GetNotificationTypesAsync();
+        Task<Dictionary<int, UrlTypeDto>> GetUrlTypesAsync();
+        Task<Dictionary<Guid, FaqDto>> GetFaqsAsync();
     }
 }

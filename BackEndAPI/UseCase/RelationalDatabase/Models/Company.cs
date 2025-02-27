@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace UseCase.RelationalDatabase.Models;
+﻿namespace UseCase.RelationalDatabase.Models;
 
 public partial class Company
 {
@@ -31,5 +28,5 @@ public partial class Company
 
     public virtual ICollection<CompanyPerson> CompanyPeople { get; set; } = new List<CompanyPerson>();
 
-    public virtual ICollection<Offer> Offers { get; set; } = new List<Offer>();
+    public virtual ICollection<OfferTemplate> OfferTemplates { get; set; } = new List<OfferTemplate>();
 }

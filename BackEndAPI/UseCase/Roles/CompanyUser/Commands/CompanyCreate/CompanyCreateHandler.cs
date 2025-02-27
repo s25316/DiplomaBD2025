@@ -30,11 +30,7 @@ namespace UseCase.Roles.CompanyUser.Commands.CompanyCreate
         async Task<CompanyCreateResponse> IRequestHandler<CompanyCreateRequest, CompanyCreateResponse>.Handle(CompanyCreateRequest request, CancellationToken cancellationToken)
         {
             var now = _timeService.GetNow();
-            var userId = _authenticationInspector.GetClaimsName(request.Metadata.Claims);
-            if (string.IsNullOrWhiteSpace(userId))
-            {
-                return new CompanyCreateResponse();
-            }
+            var userId = _authenticationInspector.GetPersonId(request.Metadata.Claims);
 
             var databaseCompany = new Company
             {
@@ -49,7 +45,7 @@ namespace UseCase.Roles.CompanyUser.Commands.CompanyCreate
             var databaseRole = new CompanyPerson
             {
                 Company = databaseCompany,
-                PersonId = Guid.Parse(userId),
+                PersonId = userId,
                 RoleId = 1,
                 Grant = now,
             };
@@ -59,7 +55,9 @@ namespace UseCase.Roles.CompanyUser.Commands.CompanyCreate
 
             return new CompanyCreateResponse
             {
-                CompanyId = databaseCompany.CompanyId,
+                Company = request.Command,
+                IsSuccess = true,
+                Message = "Success"
             };
         }
     }

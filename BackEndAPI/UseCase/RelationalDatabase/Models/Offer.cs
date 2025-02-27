@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace UseCase.RelationalDatabase.Models;
+﻿namespace UseCase.RelationalDatabase.Models;
 
 public partial class Offer
 {
     public Guid OfferId { get; set; }
-
-    public Guid CompanyId { get; set; }
 
     public Guid OfferTemplateId { get; set; }
 
@@ -34,8 +29,6 @@ public partial class Offer
     public string? WebsiteUrl { get; set; }
 
     public virtual Branch? Branch { get; set; }
-
-    public virtual Company Company { get; set; } = null!;
 
     public virtual Currency? Currency { get; set; }
 

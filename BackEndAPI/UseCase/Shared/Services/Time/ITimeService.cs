@@ -3,5 +3,6 @@
     public interface ITimeService
     {
         DateTime GetNow();
+        DateTime FromDateOnly(DateOnly dateOnly);
     }
 }

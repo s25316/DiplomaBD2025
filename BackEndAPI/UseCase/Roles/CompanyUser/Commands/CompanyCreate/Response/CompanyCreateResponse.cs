@@ -1,7 +1,10 @@
-﻿namespace UseCase.Roles.CompanyUser.Commands.CompanyCreate.Response
+﻿using UseCase.Roles.CompanyUser.Commands.CompanyCreate.Request;
+using UseCase.Shared.Templates.Response;
+
+namespace UseCase.Roles.CompanyUser.Commands.CompanyCreate.Response
 {
-    public class CompanyCreateResponse
+    public class CompanyCreateResponse : BaseResponse
     {
-        public Guid CompanyId { get; init; }
+        public required CompanyCreateCommand Company { get; init; }
     }
 }

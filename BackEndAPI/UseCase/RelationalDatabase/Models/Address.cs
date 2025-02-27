@@ -1,5 +1,6 @@
-﻿namespace UseCase.RelationalDatabase.Models;
-using NetTopologySuite.Geometries;
+﻿using NetTopologySuite.Geometries;
+
+namespace UseCase.RelationalDatabase.Models;
 
 public partial class Address
 {
@@ -19,7 +20,7 @@ public partial class Address
 
     public float Lat { get; set; }
 
-    public Point Point { get; set; } = null!;
+    public Geometry Point { get; set; } = null!;
 
     public virtual ICollection<Branch> Branches { get; set; } = new List<Branch>();
 

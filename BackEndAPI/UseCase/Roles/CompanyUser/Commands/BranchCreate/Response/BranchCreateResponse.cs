@@ -1,7 +1,10 @@
-﻿namespace UseCase.Roles.CompanyUser.Commands.BranchCreate.Response
+﻿using UseCase.Roles.CompanyUser.Commands.BranchCreate.Request;
+using UseCase.Shared.Templates.Response;
+
+namespace UseCase.Roles.CompanyUser.Commands.BranchCreate.Response
 {
     public class BranchCreateResponse
     {
-        public Guid BranchId { get; init; }
+        public IEnumerable<BaseResponseGeneric<BranchCreateCommand>> Commands { get; init; } = [];
     }
 }

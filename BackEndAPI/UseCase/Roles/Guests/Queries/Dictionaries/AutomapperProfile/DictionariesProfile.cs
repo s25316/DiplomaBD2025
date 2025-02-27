@@ -28,6 +28,15 @@ namespace UseCase.Roles.Guests.Queries.Dictionaries.AutomapperProfile
             CreateMap<SkillType, SkillTypeDto>();
             CreateMap<SkillTypeDto, SkillType>();
 
+            CreateMap<NotificationType, NotificationTypeDto>();
+            CreateMap<NotificationTypeDto, NotificationType>();
+
+            CreateMap<Faq, FaqDto>();
+            CreateMap<FaqDto, Faq>();
+
+            CreateMap<UrlType, UrlTypeDto>();
+            CreateMap<UrlTypeDto, UrlType>();
+
             CreateMap<Skill, SkillResponseDto>().ForMember(
                 dest => dest.SkillType,
                 opt => opt.MapFrom(src => src.SkillType)

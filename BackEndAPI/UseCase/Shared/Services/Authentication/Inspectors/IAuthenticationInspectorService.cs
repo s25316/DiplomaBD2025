@@ -1,4 +1,5 @@
 ﻿// Ignore Spelling: Validator, Validators
+using Domain.Features.People.ValueObjects;
 using System.Security.Claims;
 
 namespace UseCase.Shared.Services.Authentication.Inspectors
@@ -8,5 +9,6 @@ namespace UseCase.Shared.Services.Authentication.Inspectors
         bool IsValidJwt(string jwt, bool allowedExpired = false);
         string? GetClaimsName(IEnumerable<Claim> claims);
         string? GetClaimsName(string jwt, bool allowedExpired = false);
+        PersonId GetPersonId(IEnumerable<Claim> claims);
     }
 }

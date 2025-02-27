@@ -61,6 +61,15 @@ namespace UseCase {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Procedure_Address_Create_InvalidResult.
+        /// </summary>
+        internal static string Procedure_Address_Create_InvalidResult {
+            get {
+                return ResourceManager.GetString("Procedure_Address_Create_InvalidResult", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to aaa.
         /// </summary>
         internal static string UserSecrets_NotFound_Audience {

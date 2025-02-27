@@ -1,0 +1,11 @@
+﻿using UseCase.Roles.CompanyUser.Commands.OfferTemplatesCreate.Response;
+using UseCase.Shared.Templates.Requests;
+
+namespace UseCase.Roles.CompanyUser.Commands.OfferTemplatesCreate.Request
+{
+    public class OfferTemplatesCreateRequest : BaseRequest<OfferTemplatesCreateResponse>
+    {
+        public required Guid CompanyId { get; init; }
+        public IEnumerable<OfferTemplateCommand> Commands { get; init; } = [];
+    }
+}

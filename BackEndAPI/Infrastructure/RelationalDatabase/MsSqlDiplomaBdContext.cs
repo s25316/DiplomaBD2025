@@ -28,7 +28,6 @@ namespace Infrastructure.RelationalDatabase
                 entity.Property(e => e.ApartmentNumber).HasMaxLength(25);
                 entity.Property(e => e.HouseNumber).HasMaxLength(25);
                 entity.Property(e => e.PostCode).HasMaxLength(25);
-                entity.Property(e => e.Point).HasColumnType("geography");
 
                 entity.HasOne(d => d.City).WithMany(p => p.Addresses)
                     .HasForeignKey(d => d.CityId)
@@ -312,11 +311,6 @@ namespace Infrastructure.RelationalDatabase
                     .HasForeignKey(d => d.BranchId)
                     .HasConstraintName("Offer_Branch");
 
-                entity.HasOne(d => d.Company).WithMany(p => p.Offers)
-                    .HasForeignKey(d => d.CompanyId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("Offer_Company");
-
                 entity.HasOne(d => d.Currency).WithMany(p => p.Offers)
                     .HasForeignKey(d => d.CurrencyId)
                     .HasConstraintName("Offer_Currency");
@@ -390,6 +384,11 @@ namespace Infrastructure.RelationalDatabase
                 entity.Property(e => e.Description).HasMaxLength(800);
                 entity.Property(e => e.Name).HasMaxLength(100);
                 entity.Property(e => e.Removed).HasColumnType("datetime");
+
+                entity.HasOne(d => d.Company).WithMany(p => p.OfferTemplates)
+                    .HasForeignKey(d => d.CompanyId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("OfferTemplate_Company");
             });
 
             modelBuilder.Entity<OfferWorkMode>(entity =>

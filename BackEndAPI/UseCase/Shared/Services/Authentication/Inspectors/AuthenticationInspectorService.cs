@@ -1,4 +1,7 @@
 ﻿// Ignore Spelling: jwt
+using Domain.Features.People.Exceptions;
+using Domain.Features.People.ValueObjects;
+using Domain.Shared.Templates.Exceptions;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -62,6 +65,19 @@ namespace UseCase.Shared.Services.Authentication.Inspectors
             }
             var claims = GetClaimsFromJwt(jwt);
             return GetClaimsName(claims);
+        }
+
+        public PersonId GetPersonId(IEnumerable<Claim> claims)
+        {
+            var claimsName = GetClaimsName(claims);
+            if (
+                string.IsNullOrWhiteSpace(claimsName) ||
+                !Guid.TryParse(claimsName, out var id)
+                )
+            {
+                throw new PersonException("", HttpCodeEnum.Unauthorized);
+            }
+            return new PersonId(id);
         }
 
         // Private Methods 
