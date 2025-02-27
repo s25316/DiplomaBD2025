@@ -10,8 +10,8 @@ const ThemeToggle = () => {
     setMounted(true);
   }, []);
 
-  if (!mounted) {
-    return <div className="invisible">Loading...</div>; // Ukrywa przycisk do momentu załadowania
+  if (!mounted) {//Nie renderuje przycisku do momentu, aż komponent zostanie zamontowany po stronie klienta.
+    return null;
   }
 
   return (

@@ -13,7 +13,7 @@ const Profile = () => {
       {session?.user ? (
         <>
           <p>Logged in as: {session.user.token}</p>
-          <button onClick={() => router.push("/createCompany")}>
+          <button onClick={() => router.push("/profile/createCompany")}>
             Create Company
           </button>
         </>

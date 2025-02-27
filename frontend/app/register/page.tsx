@@ -23,11 +23,11 @@ const Register = () => {
   }
   return (
     <div>
-      <form onSubmit={fetchPost}>
-        <label htmlFor='email'>Email:</label><br />
-        <input name='email' type='email' required placeholder='example@gmail.com' onChange={e => setEmail(e.target.value)} /><br />
-        <label htmlFor='password'>Password:</label><br />
-        <input name='password' type='password' required placeholder='****' onChange={e => setPassword(e.target.value)} /><br />
+      <form onSubmit={fetchPost} className="flex flex-col gap-4">
+        <label htmlFor='email'>Email:</label>
+        <input name='email' type='email' required placeholder='example@gmail.com' onChange={e => setEmail(e.target.value)} />
+        <label htmlFor='password'>Password:</label>
+        <input name='password' type='password' required placeholder='****' onChange={e => setPassword(e.target.value)} />
         <input type='submit' value='Sign Up' />
       </form>
     </div>
