@@ -1,25 +1,21 @@
-"use client";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import React from "react";
+import CreateCompanyButton from "@/app/components/buttons/CreateCompanyButton"
+import { getServerSession } from "next-auth";
+import { authOptions } from "../api/auth/[...nextauth]/route";
+import { redirect } from "next/navigation";
 
-const Profile = () => {
-  const { data: session } = useSession();
-  const router = useRouter();
+const Profile = async () => {
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user) {
+    redirect("/api/auth/signin")
+  }
 
   return (
     <div>
       <h1>Profile</h1>
-      {session?.user ? (
-        <>
-          <p>Logged in as: {session.user.token}</p>
-          <button onClick={() => router.push("/profile/createCompany")}>
-            Create Company
-          </button>
-        </>
-      ) : (
-        <p>You need to be logged in.</p>
-      )}
+      <p>Logged in as: {session.user.token}</p>
+      <CreateCompanyButton />
     </div>
   );
 };

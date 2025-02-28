@@ -1,4 +1,5 @@
 "use client"
+import { redirect } from 'next/navigation'
 import React, { FormEventHandler, useState } from 'react'
 
 const Register = () => {
@@ -18,7 +19,7 @@ const Register = () => {
       })
     })
     if(await res.text() === "Created"){
-      window.location.href = "/"
+      redirect("/api/auth/signin")
     }
   }
   return (

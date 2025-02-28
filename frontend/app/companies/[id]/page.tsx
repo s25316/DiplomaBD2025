@@ -1,12 +1,12 @@
-import MainPageButton from '@/app/components/buttons/MainPageButton'
+import CreateBranchButton from '@/app/components/buttons/CreateBranchButton'
 import React from 'react'
 
 const CompanyDetails = () => {
   return (
     
     <div>
-        <MainPageButton />
         CompanyDetails
+        <CreateBranchButton/>
     </div>
   )
 }

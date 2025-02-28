@@ -1,11 +1,10 @@
 "use client";
 import React, { useState } from "react";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { redirect } from "next/navigation";
 
 const CreateCompany = () => {
   const { data: session } = useSession();
-  const router = useRouter();
   const [form, setForm] = useState({
     name: "",
     description: "",
@@ -38,7 +37,7 @@ const CreateCompany = () => {
     if (res.ok) {
       const data = await res.json();
       alert(`Company created! ID: ${data.companyId}`);
-      router.push("/profile");
+      redirect("/profile");
     } else {
       alert("Failed to create company.");
     }
