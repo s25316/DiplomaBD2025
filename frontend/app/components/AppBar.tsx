@@ -2,6 +2,7 @@
 import { signIn, signOut, useSession } from 'next-auth/react'
 import React from 'react'
 import ThemeToggle from './buttons/ThemeToggle';
+import ReturnButton from './buttons/ReturnButton';
 
 const AppBar = () => {
   const { data: session } = useSession();
@@ -10,6 +11,7 @@ const AppBar = () => {
     <div>
       
       <button onClick={() => { window.location.href = '/' }}>MainPage</button>
+      <ReturnButton/>
       <ThemeToggle/>
 
       {session?.user ? (
