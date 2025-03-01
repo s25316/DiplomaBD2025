@@ -1,25 +1,8 @@
 "use client"
-import { usePathname, useRouter } from 'next/navigation'
-import React, { useState } from 'react'
+import { redirect, usePathname, useRouter } from 'next/navigation'
+import React, { useState, useRef } from 'react'
 import { useSession } from 'next-auth/react'
 import BranchCreateForm from '@/app/components/BranchCreateForm'
-
-interface Data {
-  index: number,
-  name: string,
-  description: string | null,
-  address: {
-    countryName: string,
-    stateName: string,
-    cityName: string,
-    streetName: string | null,
-    houseNumber: string,
-    apartmentNumber: string | null,
-    postCode: string,
-    lon: number,
-    lat: number,
-  },
-}
 
 interface SendData {
   name: string,
@@ -37,6 +20,10 @@ interface SendData {
   },
 }
 
+interface Data extends SendData {
+  index: number,
+}
+
 const createBranch = () => {
   const { data: session } = useSession({
     required: true,
@@ -46,12 +33,12 @@ const createBranch = () => {
     },
   });
 
-//check if the owner of the company
+  //check if the owner of the company
 
-  const [sendData, setSendData] = useState(Array<Data>)
+  const sendData = useRef<Data[]>([])
 
   const handleData = (data: Data) => {
-    setSendData([...sendData, data])
+    sendData.current = sendData.current.filter((value) => value.index !== data.index).concat(data)
   }
 
   const companyId = usePathname().split("/")[2];
@@ -60,8 +47,9 @@ const createBranch = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+
     var sendArray: SendData[] = []
-    sendData.map((value) => {
+    sendData.current.sort((value) => value.index).map((value) => {
       const { index, ...rest } = value
       sendArray.push(rest)
     })
@@ -77,8 +65,7 @@ const createBranch = () => {
 
     if (res.ok) {
       alert("Branch(es) created")
-      const router = useRouter()
-      router.back()
+      redirect(`/companies/${companyId}`)
     }
     else {
       alert("Failed to create branch(es)")
@@ -96,7 +83,7 @@ const createBranch = () => {
               <button onClick={() => {
                 setForms(forms.filter((val) => {
                   if (val.props.index === value.props.index) {
-                    setSendData(sendData.filter((v) => v.index !== val.props.index))
+                    sendData.current = sendData.current.filter((v) => v.index !== val.props.index)
                     return false
                   }
                   return true
