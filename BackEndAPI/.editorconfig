@@ -1,4 +1,0 @@
-﻿[*.cs]
-
-# Default severity for analyzer diagnostics with category 'Blocker Code Smell'
-dotnet_analyzer_diagnostic.category-Blocker Code Smell.severity = none

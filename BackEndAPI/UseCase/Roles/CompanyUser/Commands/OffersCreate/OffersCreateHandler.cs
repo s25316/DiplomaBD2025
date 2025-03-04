@@ -1,170 +1,268 @@
-﻿using Domain.Features.People.ValueObjects;
+﻿using Domain.Features.Branches.ValueObjects;
+using Domain.Features.People.ValueObjects;
+using Domain.Shared.Enums;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using System.Text;
-using UseCase.RelationalDatabase;
-using UseCase.RelationalDatabase.Models;
 using UseCase.Roles.CompanyUser.Commands.OffersCreate.Request;
 using UseCase.Roles.CompanyUser.Commands.OffersCreate.Response;
+using UseCase.Roles.CompanyUser.Commands.Repositories.Offers;
 using UseCase.Roles.Guests.Queries.Dictionaries.Repositories;
+using UseCase.Shared.DTOs.Responses.Dictionaries;
 using UseCase.Shared.Services.Authentication.Inspectors;
-using UseCase.Shared.Services.Time;
-using UseCase.Shared.Templates.Requests;
 using UseCase.Shared.Templates.Response;
+using DomainOffer = Domain.Features.Offers.Entities.Offer;
 
 namespace UseCase.Roles.CompanyUser.Commands.OffersCreate
 {
     public class OffersCreateHandler : IRequestHandler<OffersCreateRequest, OffersCreateResponse>
     {
         // Properties 
-        private readonly DiplomaBdContext _context;
-        private readonly ITimeService _timeService;
         private readonly IAuthenticationInspectorService _authenticationInspector;
         private readonly IDictionariesRepository _dictionariesRepository;
+        private readonly IOfferRepository _offerRepository;
+
 
         // Constructor
         public OffersCreateHandler(
-            DiplomaBdContext context,
-            ITimeService timeService,
             IAuthenticationInspectorService authenticationInspector,
-            IDictionariesRepository dictionariesRepository)
+            IDictionariesRepository dictionariesRepository,
+            IOfferRepository offerRepository)
         {
-            _context = context;
-            _timeService = timeService;
             _authenticationInspector = authenticationInspector;
             _dictionariesRepository = dictionariesRepository;
+            _offerRepository = offerRepository;
         }
 
 
         // Methods
         public async Task<OffersCreateResponse> Handle(OffersCreateRequest request, CancellationToken cancellationToken)
         {
-            var commands = new List<BaseResponseGeneric<OfferCreateCommand>>();
-            var offers = new List<Offer>();
+            var personId = GetPersonId(request);
+            var isAllowedOperation = await _offerRepository.IsAllowedOperationAsync(
+                personId,
+                request.CompanyId,
+                request.OfferTemplateId,
+                cancellationToken);
 
-            var workModesDictionary = await _dictionariesRepository.GetWorkModesAsync();
-            var employmentTypesDictionary = await _dictionariesRepository.GetEmploymentTypesAsync();
-            var salaryTermsDictionary = await _dictionariesRepository.GetSalaryTermsAsync();
-            var currenciesDictionary = await _dictionariesRepository.GetSalaryTermsAsync();
-            foreach (var command in request.Commands)
+            if ((int)isAllowedOperation != 200)
             {
-                var builder = new StringBuilder();
-                if (
-                    command.SalaryTermId != null &&
-                    !salaryTermsDictionary.ContainsKey(command.SalaryTermId.Value)
-                    )
+                return new OffersCreateResponse
                 {
-                    builder.AppendLine($"SalaryTermId not found: {command.SalaryTermId.Value}");
-                }
-                if (
-                    command.CurrencyId != null &&
-                    !currenciesDictionary.ContainsKey(command.CurrencyId.Value)
-                    )
-                {
-                    builder.AppendLine($"CurrencyId not found: {command.CurrencyId.Value}");
-                }
-
-                var notFoundIds = new List<int>();
-                foreach (var workModeId in command.WorkModes)
-                {
-                    if (!workModesDictionary.ContainsKey(workModeId))
+                    Commands = request.Commands.Select(cmd => new ResponseItemTemplate<OfferCreateCommand>
                     {
-                        notFoundIds.Add(workModeId);
-                    }
-                }
-                if (notFoundIds.Any())
-                {
-                    builder.AppendLine(
-                        $"WorkModeId not found: {string.Join(", ", notFoundIds)}"
-                        );
-                }
-
-                notFoundIds.Clear();
-                foreach (var employmentTypeId in command.EmploymentTypes)
-                {
-                    if (!employmentTypesDictionary.ContainsKey(employmentTypeId))
-                    {
-                        notFoundIds.Add(employmentTypeId);
-                    }
-                }
-                if (notFoundIds.Any())
-                {
-                    builder.AppendLine(
-                    $"EmploymentTypeId not found: {string.Join(", ", notFoundIds)}"
-                    );
-                }
-
-                if (builder.Length > 0)
-                {
-                    commands.Add(new BaseResponseGeneric<OfferCreateCommand>
-                    {
-                        Item = command,
-                        IsSuccess = false,
-                        Message = builder.ToString()
-                    });
-                    continue;
-                }
-
-                offers.Add(new Offer
-                {
-                    OfferTemplateId = request.OfferTemplateId,
-                    BranchId = command.BranchId,
-                    PublicationStart = command.PublicationStart,
-                    PublicationEnd = command.PublicationEnd,
-                    WorkBeginDate = command.WorkBeginDate == null ?
-                        null :
-                        DateOnly.FromDateTime(command.WorkBeginDate.Value),
-
-                    WorkEndDate = command.WorkEndDate == null ?
-                        null :
-                        DateOnly.FromDateTime(command.WorkEndDate.Value),
-                    SalaryRangeMin = command.SalaryRangeMin,
-                    SalaryRangeMax = command.SalaryRangeMax,
-                    SalaryTermId = command.SalaryTermId,
-                    CurrencyId = command.CurrencyId,
-                    IsNegotiated = command.IsNegotiated,
-                    WebsiteUrl = command.WebsiteUrl,
-                });
-                commands.Add(new BaseResponseGeneric<OfferCreateCommand>
-                {
-                    Item = command,
-                    IsSuccess = true,
-                    Message = "Success"
-                });
+                        Item = cmd,
+                        IsCorrect = false,
+                        Message = isAllowedOperation.ToString(),
+                    }),
+                    HttpCode = isAllowedOperation,
+                    IsCorrect = false,
+                };
             }
 
-            await _context.Offers.AddRangeAsync(offers, cancellationToken);
-            await _context.SaveChangesAsync(cancellationToken);
+            var validationResult = await CheckRequestAsync(request, cancellationToken);
+            if (!validationResult.IsValidRequest)
+            {
+                return new OffersCreateResponse
+                {
+                    Commands = validationResult.Dictionary.Select(pair => new ResponseItemTemplate<OfferCreateCommand>
+                    {
+                        Item = pair.Key,
+                        IsCorrect = string.IsNullOrWhiteSpace(pair.Value.ErrorMessage),
+                        Message = pair.Value.ErrorMessage,
+                    }),
+                    HttpCode = HttpCode.BadRequest,
+                    IsCorrect = false,
+                };
+            }
+
+            var domainOffers = validationResult.Dictionary.Select(pair => pair.Value.Builder.Build());
+            await _offerRepository.CreateAsync(domainOffers, cancellationToken);
 
             return new OffersCreateResponse
             {
-                Commands = commands,
+                Commands = request.Commands.Select(cmd => new ResponseItemTemplate<OfferCreateCommand>
+                {
+                    Item = cmd,
+                    IsCorrect = true,
+                    Message = HttpCode.Created.Description(),
+                }),
+                HttpCode = HttpCode.Created,
+                IsCorrect = true,
             };
         }
 
-        private async Task<bool> HasAccessToCompanyAsync(
-            Guid companyId,
-            PersonId personId,
+        // Private Methods
+        private PersonId GetPersonId(OffersCreateRequest request)
+        {
+            return _authenticationInspector.GetPersonId(request.Metadata.Claims);
+        }
+
+        // Record for returning Complicated result for Method below
+        private sealed record CheckRequestResult(
+            bool IsValidRequest,
+            Dictionary<OfferCreateCommand, (DomainOffer.Builder Builder, string ErrorMessage)> Dictionary);
+
+        private async Task<CheckRequestResult> CheckRequestAsync(
+            OffersCreateRequest request,
             CancellationToken cancellationToken)
         {
-            var roleIds = await _context.CompanyPeople.Where(cp =>
-                cp.PersonId == personId.Value &&
-                cp.CompanyId == companyId &&
-                cp.Deny == null)
-                .Select(cp => cp.RoleId)
-                .ToListAsync(cancellationToken);
-            return roleIds.Any();
+            var resultDictionary = new Dictionary<OfferCreateCommand, (DomainOffer.Builder Builder, string ErrorMessage)>();
+            var currenciesDictionary = await _dictionariesRepository.GetCurrenciesAsync();
+            var workModesDictionary = await _dictionariesRepository.GetWorkModesAsync();
+            var salaryTermsDictionary = await _dictionariesRepository.GetSalaryTermsAsync();
+            var employmentTypesDictionary = await _dictionariesRepository.GetEmploymentTypesAsync();
+
+            var branchIds = request.Commands
+                .Where(cmd => cmd.BranchId != null)
+                .Select(cmd => new BranchId(cmd.BranchId.Value));
+            var notFoundedBranchIds = await _offerRepository.GetNotFoundedBranchIdsAsync(
+                request.CompanyId,
+                branchIds,
+                cancellationToken);
+            var notFoundedBranchIdsHashSet = notFoundedBranchIds.ToHashSet();
+
+            var isValidRequest = true;
+            foreach (var command in request.Commands)
+            {
+                var builder = CreateDomainOfferBuilder(
+                    request.OfferTemplateId,
+                    command);
+
+                var domain = builder.Build();
+                var errors = new StringBuilder();
+                if (builder.HasErrors())
+                {
+                    errors.AppendLine(builder.GetErrors());
+                }
+
+                var notFoundDictionaryValues = ReturnFoundDictionaryValues(
+                   domain,
+                   currenciesDictionary,
+                   workModesDictionary,
+                   salaryTermsDictionary,
+                   employmentTypesDictionary);
+
+                if (!string.IsNullOrWhiteSpace(notFoundDictionaryValues))
+                {
+                    errors.AppendLine(notFoundDictionaryValues);
+                }
+
+                if (
+                    notFoundedBranchIdsHashSet.Any() &&
+                    domain.BranchId != null &&
+                    notFoundedBranchIdsHashSet.Contains(domain.BranchId))
+                {
+                    errors.AppendLine($"{nameof(OfferCreateCommand.BranchId)} not found: {domain.BranchId.Value}");
+                }
+
+                if (isValidRequest && errors.Length > 0)
+                {
+                    isValidRequest = false;
+                }
+                resultDictionary[command] = (builder, errors.ToString());
+            }
+            return new CheckRequestResult(isValidRequest, resultDictionary);
         }
 
-
-        private PersonId GetPersonId(RequestMetadata metadata)
+        private DomainOffer.Builder CreateDomainOfferBuilder(
+            Guid offerTemplateId,
+            OfferCreateCommand command)
         {
-            return _authenticationInspector.GetPersonId(metadata.Claims);
+            return new DomainOffer.Builder()
+                    .SetOfferTemplateId(offerTemplateId)
+                    .SetBranchId(command.BranchId)
+                    .SetDatesRanges(
+                    command.PublicationStart,
+                    command.PublicationEnd,
+                    command.WorkBeginDate,
+                    command.WorkEndDate)
+                    .SetSalaryData(
+                    command.SalaryRangeMin,
+                    command.SalaryRangeMax,
+                    command.SalaryTermId,
+                    command.CurrencyId,
+                    command.IsNegotiated)
+                    .SetWebsiteUrl(command.WebsiteUrl)
+                    .SetEmploymentTypeIds(command.EmploymentTypeIds)
+                    .SetWorkModeIds(command.WorkModeIds);
         }
 
-        private DateTime Now()
+        private string ReturnFoundDictionaryValues(
+            DomainOffer domain,
+            Dictionary<int, CurrencyDto> currenciesDictionary,
+            Dictionary<int, WorkModeDto> workModesDictionary,
+            Dictionary<int, SalaryTermDto> salaryTermsDictionary,
+            Dictionary<int, EmploymentTypeDto> employmentTypesDictionary
+
+            )
         {
-            return _timeService.GetNow();
+            var errors = new StringBuilder();
+
+            if (domain.SalaryTermId != null)
+            {
+                var notFoundSalaryTermId = ReturnNotFoundIds(
+                [domain.SalaryTermId.Value],
+                salaryTermsDictionary,
+                nameof(OfferCreateCommand.SalaryTermId));
+
+                if (!string.IsNullOrWhiteSpace(notFoundSalaryTermId))
+                {
+                    errors.AppendLine(notFoundSalaryTermId);
+                }
+            }
+            if (domain.CurrencyId != null)
+            {
+                var notFoundCurrencyId = ReturnNotFoundIds(
+                [domain.CurrencyId.Value],
+                currenciesDictionary,
+                nameof(OfferCreateCommand.CurrencyId));
+
+                if (!string.IsNullOrWhiteSpace(notFoundCurrencyId))
+                {
+                    errors.AppendLine(notFoundCurrencyId);
+                }
+            }
+
+            var notFoundEmploymentTypeIds = ReturnNotFoundIds(
+                domain.EmploymentTypeIds,
+                employmentTypesDictionary,
+                nameof(OfferCreateCommand.EmploymentTypeIds));
+            if (!string.IsNullOrWhiteSpace(notFoundEmploymentTypeIds))
+            {
+                errors.AppendLine(notFoundEmploymentTypeIds);
+            }
+
+            var notFoundWorkModeIds = ReturnNotFoundIds(
+                domain.WorkModeIds,
+                workModesDictionary,
+                nameof(OfferCreateCommand.WorkModeIds));
+            if (!string.IsNullOrWhiteSpace(notFoundWorkModeIds))
+            {
+                errors.AppendLine(notFoundWorkModeIds);
+            }
+
+            return errors.ToString().Trim();
+        }
+
+        private static string ReturnNotFoundIds<T>(
+            IEnumerable<int> inputIds,
+            Dictionary<int, T> dictionary,
+            string propertyName)
+        {
+            var notFoundIds = new List<int>();
+
+            foreach (var employmentTypeId in inputIds)
+            {
+                if (!dictionary.ContainsKey(employmentTypeId))
+                {
+                    notFoundIds.Add(employmentTypeId);
+                }
+            }
+            if (notFoundIds.Any())
+            {
+                return $"Not found {propertyName}: {string.Join(", ", notFoundIds)}";
+            }
+            return string.Empty;
         }
     }
 }

@@ -3,8 +3,8 @@ using UseCase.Shared.Templates.Response;
 
 namespace UseCase.Roles.CompanyUser.Commands.OffersCreate.Response
 {
-    public class OffersCreateResponse
+    public class OffersCreateResponse : ResponseTemplate
     {
-        public IEnumerable<BaseResponseGeneric<OfferCreateCommand>> Commands { get; init; } = [];
+        public IEnumerable<ResponseItemTemplate<OfferCreateCommand>> Commands { get; init; } = [];
     }
 }

@@ -13,7 +13,7 @@
         public int? CurrencyId { get; init; }
         public bool IsNegotiated { get; init; }
         public string? WebsiteUrl { get; init; }
-        public IEnumerable<int> EmploymentTypes { get; init; } = [];
-        public IEnumerable<int> WorkModes { get; init; } = [];
+        public IEnumerable<int> EmploymentTypeIds { get; init; } = [];
+        public IEnumerable<int> WorkModeIds { get; init; } = [];
     }
 }

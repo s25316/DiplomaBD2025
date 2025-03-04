@@ -1,10 +1,10 @@
 ﻿// Ignore Spelling: redis Dto
 
+using Domain.Shared.CustomProviders;
 using StackExchange.Redis;
 using System.Text;
 using System.Text.Json;
 using UseCase.Shared.Interfaces;
-using UseCase.Shared.Services.Time;
 
 namespace Infrastructure.Redis
 {
@@ -12,7 +12,6 @@ namespace Infrastructure.Redis
     {
         // Properties
         private readonly IDatabase _database;
-        private readonly ITimeService _timeService;
 
         private static int _countHoursExpiration = 1;
         private static string _host = UseCase.Configuration.RedisConnectionString
@@ -23,11 +22,9 @@ namespace Infrastructure.Redis
 
         // Constructor
         public RedisService(
-            ITimeService timeService,
             IConnectionMultiplexer redis)
         {
             _database = redis.GetDatabase();
-            _timeService = timeService;
         }
 
         //Methods
@@ -41,9 +38,11 @@ namespace Infrastructure.Redis
                 return;
             }
 
-            var unixTimestamp = (long)(
-                _timeService.GetNow().AddHours(_countHoursExpiration).ToUniversalTime() - DateTime.UnixEpoch
-                ).TotalSeconds;
+            var universalTimeExpiration = CustomTimeProvider
+                .GetDateTimeNow()
+                .AddHours(_countHoursExpiration)
+                .ToUniversalTime();
+            var unixTimestamp = (long)(universalTimeExpiration - DateTime.UnixEpoch).TotalSeconds;
 
             foreach (var pair in dictionary)
             {

@@ -1,7 +1,7 @@
 ﻿// Ignore Spelling: jwt
 using Domain.Features.People.Exceptions;
 using Domain.Features.People.ValueObjects;
-using Domain.Shared.Templates.Exceptions;
+using Domain.Shared.Enums;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -75,7 +75,7 @@ namespace UseCase.Shared.Services.Authentication.Inspectors
                 !Guid.TryParse(claimsName, out var id)
                 )
             {
-                throw new PersonException("", HttpCodeEnum.Unauthorized);
+                throw new PersonException("", HttpCode.Unauthorized);
             }
             return new PersonId(id);
         }

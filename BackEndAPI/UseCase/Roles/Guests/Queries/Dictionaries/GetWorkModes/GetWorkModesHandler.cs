@@ -3,7 +3,7 @@
 using MediatR;
 using UseCase.Roles.Guests.Queries.Dictionaries.GetWorkModes.Request;
 using UseCase.Roles.Guests.Queries.Dictionaries.Repositories;
-using UseCase.Shared.DTOs.Responses;
+using UseCase.Shared.DTOs.Responses.Dictionaries;
 
 namespace UseCase.Roles.Guests.Queries.Dictionaries.GetWorkModes
 {

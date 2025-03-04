@@ -1,64 +1,102 @@
-﻿using MediatR;
-using UseCase.RelationalDatabase;
-using UseCase.RelationalDatabase.Models;
+﻿using Domain.Features.People.ValueObjects;
+using Domain.Shared.Enums;
+using MediatR;
 using UseCase.Roles.CompanyUser.Commands.CompanyCreate.Request;
 using UseCase.Roles.CompanyUser.Commands.CompanyCreate.Response;
+using UseCase.Roles.CompanyUser.Commands.Repositories.Companies;
 using UseCase.Shared.Services.Authentication.Inspectors;
-using UseCase.Shared.Services.Time;
+using DomainCompany = Domain.Features.Companies.Entities.Company;
 
 namespace UseCase.Roles.CompanyUser.Commands.CompanyCreate
 {
     public class CompanyCreateHandler : IRequestHandler<CompanyCreateRequest, CompanyCreateResponse>
     {
         // Properties
-        private readonly DiplomaBdContext _context;
-        private readonly ITimeService _timeService;
+        private readonly ICompanyRepository _companyRepository;
         private readonly IAuthenticationInspectorService _authenticationInspector;
+
 
         // Constructor
         public CompanyCreateHandler(
-            DiplomaBdContext context,
-            ITimeService timeService,
+            ICompanyRepository companyRepository,
             IAuthenticationInspectorService authenticationInspector)
         {
-            _context = context;
-            _timeService = timeService;
+            _companyRepository = companyRepository;
             _authenticationInspector = authenticationInspector;
         }
+
 
         // Methods
         async Task<CompanyCreateResponse> IRequestHandler<CompanyCreateRequest, CompanyCreateResponse>.Handle(CompanyCreateRequest request, CancellationToken cancellationToken)
         {
-            var now = _timeService.GetNow();
-            var userId = _authenticationInspector.GetPersonId(request.Metadata.Claims);
+            var personId = GetPersonId(request);
+            var builder = PrepareBuilder(request.Command);
+            var domain = builder.Build();
 
-            var databaseCompany = new Company
+            if (builder.HasErrors())
             {
-                Name = request.Command.Name,
-                Description = request.Command.Description,
-                Regon = request.Command.Regon,
-                Nip = request.Command.Nip,
-                Krs = request.Command.Krs,
-                WebsiteUrl = request.Command.WebsiteUrl,
-                Created = now,
-            };
-            var databaseRole = new CompanyPerson
-            {
-                Company = databaseCompany,
-                PersonId = userId,
-                RoleId = 1,
-                Grant = now,
-            };
-            await _context.Companies.AddAsync(databaseCompany, cancellationToken);
-            await _context.CompanyPeople.AddAsync(databaseRole, cancellationToken);
-            await _context.SaveChangesAsync(cancellationToken);
+                return new CompanyCreateResponse
+                {
+                    Command = new Shared.Templates.Response.ResponseItemTemplate<CompanyCreateCommand>
+                    {
+                        Item = request.Command,
+                        IsCorrect = false,
+                        Message = builder.GetErrors(),
+                    },
+                    IsCorrect = false,
+                    HttpCode = HttpCode.BadRequest,
+                };
+            }
 
+            var duplicates = await _companyRepository
+                .FindDuplicatesAsync(domain, cancellationToken);
+
+            if (!string.IsNullOrWhiteSpace(duplicates))
+            {
+                return new CompanyCreateResponse
+                {
+                    Command = new Shared.Templates.Response.ResponseItemTemplate<CompanyCreateCommand>
+                    {
+                        Item = request.Command,
+                        IsCorrect = false,
+                        Message = duplicates,
+                    },
+                    IsCorrect = false,
+                    HttpCode = HttpCode.BadRequest,
+                };
+            }
+            await _companyRepository.CreateAsync(
+                personId,
+                domain,
+                cancellationToken);
             return new CompanyCreateResponse
             {
-                Company = request.Command,
-                IsSuccess = true,
-                Message = "Success"
+                Command = new Shared.Templates.Response.ResponseItemTemplate<CompanyCreateCommand>
+                {
+                    Item = request.Command,
+                    IsCorrect = true,
+                    Message = HttpCode.Created.Description(),
+                },
+                IsCorrect = true,
+                HttpCode = HttpCode.Created,
             };
+        }
+
+        // Private Methods
+        private PersonId GetPersonId(CompanyCreateRequest request)
+        {
+            return _authenticationInspector.GetPersonId(request.Metadata.Claims);
+        }
+
+        private static DomainCompany.Builder PrepareBuilder(CompanyCreateCommand command)
+        {
+            return new DomainCompany.Builder()
+                .SetName(command.Name)
+                .SetDescription(command.Description)
+                .SetRegon(command.Regon)
+                .SetNip(command.Nip)
+                .SetKrs(command.Krs)
+                .SetWebsiteUrl(command.WebsiteUrl);
         }
     }
 }

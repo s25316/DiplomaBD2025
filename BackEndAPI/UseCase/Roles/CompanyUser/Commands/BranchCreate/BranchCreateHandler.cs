@@ -1,92 +1,136 @@
-﻿using MediatR;
-using Microsoft.EntityFrameworkCore;
+﻿using Domain.Features.People.ValueObjects;
+using Domain.Shared.Enums;
+using MediatR;
 using System.Data;
-using UseCase.RelationalDatabase;
-using UseCase.RelationalDatabase.Models;
 using UseCase.Roles.CompanyUser.Commands.BranchCreate.Request;
 using UseCase.Roles.CompanyUser.Commands.BranchCreate.Response;
+using UseCase.Roles.CompanyUser.Commands.Repositories.Branches;
 using UseCase.Shared.Repositories.Addresses;
 using UseCase.Shared.Services.Authentication.Inspectors;
-using UseCase.Shared.Services.Time;
 using UseCase.Shared.Templates.Response;
+using DomainBranch = Domain.Features.Branches.Entities.Branch;
 
 namespace UseCase.Roles.CompanyUser.Commands.BranchCreate
 {
     public class BranchCreateHandler : IRequestHandler<BranchCreateRequest, BranchCreateResponse>
     {
         // Properties
-        private readonly DiplomaBdContext _context;
-        private readonly ITimeService _timeService;
         private readonly IAuthenticationInspectorService _authenticationInspector;
         private readonly IAddressRepository _addressRepository;
+        private readonly IBranchRepository _branchRepository;
+
 
         // Constructor
         public BranchCreateHandler(
-            DiplomaBdContext context,
-            ITimeService timeService,
             IAuthenticationInspectorService authenticationInspector,
-            IAddressRepository addressRepository)
+            IAddressRepository addressRepository,
+            IBranchRepository branchRepository)
         {
-            _context = context;
-            _timeService = timeService;
             _authenticationInspector = authenticationInspector;
             _addressRepository = addressRepository;
+            _branchRepository = branchRepository;
         }
+
 
         // Methods
         public async Task<BranchCreateResponse> Handle(BranchCreateRequest request, CancellationToken cancellationToken)
         {
-            var now = _timeService.GetNow();
-            var userId = _authenticationInspector.GetPersonId(request.Metadata.Claims);
-            var companyRolesCount = await _context.CompanyPeople
-                .Where(conn =>
-                    conn.PersonId == userId.Value &&
-                    conn.CompanyId == request.CompanyId)
-                .CountAsync(cancellationToken);
+            var personId = GetPersonId(request);
+            var operationIsAllowed = await _branchRepository.HasAccessToCompany(
+                personId,
+                request.CompanyId,
+                cancellationToken);
 
-            if (companyRolesCount == 0)
+            if (!operationIsAllowed)
             {
                 return new BranchCreateResponse
                 {
-                    Commands = request.Commands.Select(
-                    command => new BaseResponseGeneric<BranchCreateCommand>
+                    Commands = request.Commands.Select(cmd => new ResponseItemTemplate<BranchCreateCommand>
                     {
-                        Item = command,
-                        IsSuccess = false,
-                        Message = "Forbidden"
-                    })
+                        Item = cmd,
+                        IsCorrect = false,
+                        Message = HttpCode.Forbidden.Description(),
+                    }),
+                    HttpCode = HttpCode.Forbidden,
+                    IsCorrect = false,
                 };
             }
 
-            var branches = new List<Branch>();
-            foreach (var command in request.Commands)
+            var builders = await GetBuildersAsync(request);
+            var isAllValid = true;
+            foreach (var pair in builders.Values)
             {
-                var addressId = await _addressRepository
-                    .CreateAddressAsync(command.Address);
-                branches.Add(new Branch
+                if (pair.HasErrors())
                 {
-                    CompanyId = request.CompanyId,
-                    Name = command.Name,
-                    Description = command.Description,
-                    AddressId = addressId,
-                    Created = now,
-                });
+                    isAllValid = false;
+                    break;
+                }
             }
 
-            await _context.Branches.AddRangeAsync(branches, cancellationToken);
-            await _context.SaveChangesAsync(cancellationToken);
+            if (!isAllValid)
+            {
+                return new BranchCreateResponse
+                {
+                    Commands = builders.Select(pair => new ResponseItemTemplate<BranchCreateCommand>
+                    {
+                        Item = pair.Key,
+                        IsCorrect = !pair.Value.HasErrors(),
+                        Message = pair.Value.HasErrors() ?
+                            pair.Value.GetErrors() :
+                            HttpCode.Correct.Description(),
+                    }),
+                    HttpCode = HttpCode.BadRequest,
+                    IsCorrect = false
+                };
+            }
+
+            var domainBraches = builders.Select(pair => pair.Value.Build());
+            await _branchRepository.CreateAsync(domainBraches, cancellationToken);
 
             return new BranchCreateResponse
             {
                 Commands = request.Commands.Select(
-                    command => new BaseResponseGeneric<BranchCreateCommand>
+                    command => new ResponseItemTemplate<BranchCreateCommand>
                     {
                         Item = command,
-                        IsSuccess = true,
-                        Message = "Success"
-                    })
+                        IsCorrect = true,
+                        Message = HttpCode.Created.Description(),
+                    }),
+                HttpCode = HttpCode.Created,
+                IsCorrect = true,
             };
         }
 
+        // Private methods
+        private PersonId GetPersonId(BranchCreateRequest request)
+        {
+            return _authenticationInspector.GetPersonId(request.Metadata.Claims);
+        }
+
+
+        private async Task<Dictionary<BranchCreateCommand, DomainBranch.Builder>> GetBuildersAsync(
+            BranchCreateRequest request)
+        {
+            if (!request.Commands.Any())
+            {
+                return [];
+            }
+
+            var dictionary = new Dictionary<BranchCreateCommand, DomainBranch.Builder>();
+            foreach (var command in request.Commands)
+            {
+                if (dictionary.ContainsKey(command))
+                {
+                    continue;
+                }
+                var addressId = await _addressRepository.CreateAddressAsync(command.Address);
+                dictionary[command] = new DomainBranch.Builder()
+                    .SetAddressId(addressId)
+                    .SetCompanyId(request.CompanyId)
+                    .SetName(command.Name)
+                    .SetDescription(command.Description);
+            }
+            return dictionary;
+        }
     }
 }

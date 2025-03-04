@@ -13,7 +13,6 @@
   <ItemGroup>
     <Folder Include="Roles\Administrators\Commands\" />
     <Folder Include="Roles\Administrators\Queries\" />
-    <Folder Include="Roles\CompanyUser\Queries\" />
     <Folder Include="Roles\Guests\Commands\" />
     <Folder Include="NonRelationalDatabase\" />
     <Folder Include="Roles\Users\Queries\" />

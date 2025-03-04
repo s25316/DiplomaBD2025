@@ -117,28 +117,40 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Entity_Company_KrsDuplicate" xml:space="preserve">
+    <value>Contains KRS duplicates existing company</value>
+  </data>
+  <data name="Entity_Company_NameDuplicate" xml:space="preserve">
+    <value>Contains Name duplicates existing company</value>
+  </data>
+  <data name="Entity_Company_NipDuplicate" xml:space="preserve">
+    <value>Contains NIP duplicates existing company</value>
+  </data>
+  <data name="Entity_Company_RegonDuplicate" xml:space="preserve">
+    <value>Contains REGON duplicates existing company</value>
+  </data>
   <data name="Procedure_Address_Create_InvalidResult" xml:space="preserve">
     <value>Procedure_Address_Create_InvalidResult</value>
   </data>
   <data name="UserSecrets_NotFound_Audience" xml:space="preserve">
-    <value>aaa</value>
+    <value>NotFound Audience</value>
     <comment>aa</comment>
   </data>
   <data name="UserSecrets_NotFound_Issuer" xml:space="preserve">
-    <value>aaa</value>
+    <value>NotFound Issuer</value>
     <comment>aaa</comment>
   </data>
   <data name="UserSecrets_NotFound_Kafka" xml:space="preserve">
-    <value>aaa</value>
+    <value>NotFound Kafka</value>
   </data>
   <data name="UserSecrets_NotFound_Redis" xml:space="preserve">
-    <value>aaa</value>
+    <value>NotFound Redis</value>
     <comment>a</comment>
   </data>
   <data name="UserSecrets_NotFound_RelationalDatabase" xml:space="preserve">
-    <value>aaa</value>
+    <value>NotFound RelationalDatabase</value>
   </data>
   <data name="UserSecrets_NotFound_Secret" xml:space="preserve">
-    <value>aaa</value>
+    <value>NotFound Secret</value>
   </data>
 </root>

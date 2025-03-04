@@ -1,11 +1,11 @@
 ﻿// Ignore Spelling: Jwt
+using Domain.Shared.CustomProviders;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using UseCase.Shared.Services.Time;
 
 namespace UseCase.Shared.Services.Authentication.Generators
 {
@@ -18,14 +18,6 @@ namespace UseCase.Shared.Services.Authentication.Generators
         private static readonly string _jwtIssuer = Configuration.JwtIssuer;
         private static readonly string _jwtAudience = Configuration.JwtAudience;
         private static readonly string _jwtSecret = Configuration.JwtSecret;
-        private readonly ITimeService _timeService;
-
-
-        // Constructor 
-        public AuthenticationGeneratorService(ITimeService timeService)
-        {
-            _timeService = timeService;
-        }
 
         // Methods
         /// <summary>
@@ -72,8 +64,10 @@ namespace UseCase.Shared.Services.Authentication.Generators
         public (string RefreshToken, DateTime ValidTo) GenerateRefreshToken()
         {
             var refresh = GenerateRandomString(1024);
-            var valid = _timeService.GetNow().AddDays(_countDaysValidRefreshToken);
-            return (refresh, valid);
+            var validTo = CustomTimeProvider
+                .GetDateTimeNow()
+                .AddDays(_countDaysValidRefreshToken);
+            return (refresh, validTo);
         }
 
         public IEnumerable<Claim> GenerateClaims(string name, IEnumerable<string> roles)

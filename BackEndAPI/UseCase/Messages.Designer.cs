@@ -61,6 +61,42 @@ namespace UseCase {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Contains KRS duplicates existing company.
+        /// </summary>
+        internal static string Entity_Company_KrsDuplicate {
+            get {
+                return ResourceManager.GetString("Entity_Company_KrsDuplicate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Contains Name duplicates existing company.
+        /// </summary>
+        internal static string Entity_Company_NameDuplicate {
+            get {
+                return ResourceManager.GetString("Entity_Company_NameDuplicate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Contains NIP duplicates existing company.
+        /// </summary>
+        internal static string Entity_Company_NipDuplicate {
+            get {
+                return ResourceManager.GetString("Entity_Company_NipDuplicate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Contains REGON duplicates existing company.
+        /// </summary>
+        internal static string Entity_Company_RegonDuplicate {
+            get {
+                return ResourceManager.GetString("Entity_Company_RegonDuplicate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Procedure_Address_Create_InvalidResult.
         /// </summary>
         internal static string Procedure_Address_Create_InvalidResult {
@@ -70,7 +106,7 @@ namespace UseCase {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to aaa.
+        ///   Looks up a localized string similar to NotFound Audience.
         /// </summary>
         internal static string UserSecrets_NotFound_Audience {
             get {
@@ -79,7 +115,7 @@ namespace UseCase {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to aaa.
+        ///   Looks up a localized string similar to NotFound Issuer.
         /// </summary>
         internal static string UserSecrets_NotFound_Issuer {
             get {
@@ -88,7 +124,7 @@ namespace UseCase {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to aaa.
+        ///   Looks up a localized string similar to NotFound Kafka.
         /// </summary>
         internal static string UserSecrets_NotFound_Kafka {
             get {
@@ -97,7 +133,7 @@ namespace UseCase {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to aaa.
+        ///   Looks up a localized string similar to NotFound Redis.
         /// </summary>
         internal static string UserSecrets_NotFound_Redis {
             get {
@@ -106,7 +142,7 @@ namespace UseCase {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to aaa.
+        ///   Looks up a localized string similar to NotFound RelationalDatabase.
         /// </summary>
         internal static string UserSecrets_NotFound_RelationalDatabase {
             get {
@@ -115,7 +151,7 @@ namespace UseCase {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to aaa.
+        ///   Looks up a localized string similar to NotFound Secret.
         /// </summary>
         internal static string UserSecrets_NotFound_Secret {
             get {

@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using UseCase.Roles.Guests.Queries.Dictionaries.GetSkills.Request;
 using UseCase.Roles.Guests.Queries.Dictionaries.Repositories;
-using UseCase.Shared.DTOs.Responses;
+using UseCase.Shared.DTOs.Responses.Dictionaries;
 
 namespace UseCase.Roles.Guests.Queries.Dictionaries.GetSkills
 {

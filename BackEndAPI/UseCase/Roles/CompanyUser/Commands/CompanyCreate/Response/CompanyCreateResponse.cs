@@ -3,8 +3,8 @@ using UseCase.Shared.Templates.Response;
 
 namespace UseCase.Roles.CompanyUser.Commands.CompanyCreate.Response
 {
-    public class CompanyCreateResponse : BaseResponse
+    public class CompanyCreateResponse : ResponseTemplate
     {
-        public required CompanyCreateCommand Company { get; init; }
+        public required ResponseItemTemplate<CompanyCreateCommand> Command { get; init; }
     }
 }

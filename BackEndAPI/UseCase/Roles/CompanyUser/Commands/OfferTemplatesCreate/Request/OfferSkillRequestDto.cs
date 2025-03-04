@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace UseCase.Roles.CompanyUser.Commands.OfferTemplatesCreate.Request
 {
-    public class OfferSkillRequestDto
+    public record OfferSkillRequestDto
     {
         [Required]
         public int SkillId { get; init; }

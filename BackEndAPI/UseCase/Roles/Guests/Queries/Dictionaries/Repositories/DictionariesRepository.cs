@@ -4,7 +4,7 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using UseCase.RelationalDatabase;
 using UseCase.RelationalDatabase.Models;
-using UseCase.Shared.DTOs.Responses;
+using UseCase.Shared.DTOs.Responses.Dictionaries;
 using UseCase.Shared.Interfaces;
 
 namespace UseCase.Roles.Guests.Queries.Dictionaries.Repositories
@@ -109,30 +109,11 @@ namespace UseCase.Roles.Guests.Queries.Dictionaries.Repositories
                 () => _context.Skills.Include(i => i.SkillType).AsQueryable(),
                 entity => entity.SkillId);
         }
-        /*
-                public async Task<Dictionary<int, SkillResponseDto>> GetSkillsAsync()
-                {
-                    var redisDictionary = await _redisService.GetAsync<int, SkillResponseDto>(dto => dto.SkillId);
-                    if (redisDictionary.Any())
-                    {
-                        return redisDictionary;
-                    }
-
-                    var dictionary = await _context.Skills
-                        .Include(skill => skill.SkillType)
-                        .ToDictionaryAsync(
-                        value => value.SkillId,
-                        value => _mapper.Map<SkillResponseDto>(value));
-
-                    await _redisService.SetAsync(dictionary);
-                    return dictionary;
-                }*/
 
         // Private Methods
         private async Task<Dictionary<TKey, TDto>> GetDataAsync<TKey, TDto, TEntity>(
             Func<TDto, TKey> keySelectorTDto,
             Func<IQueryable<TEntity>> Table,
-            //Func<DbSet<TEntity>> Table,
             Func<TEntity, TKey> keySelectorTEntity)
             where TKey : notnull
             where TDto : class

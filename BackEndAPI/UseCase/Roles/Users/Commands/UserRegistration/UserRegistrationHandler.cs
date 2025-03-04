@@ -1,11 +1,11 @@
-﻿using MediatR;
+﻿using Domain.Shared.CustomProviders;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using UseCase.RelationalDatabase;
 using UseCase.RelationalDatabase.Models;
 using UseCase.Roles.Users.Commands.UserRegistration.Request;
 using UseCase.Roles.Users.Commands.UserRegistration.Response;
 using UseCase.Shared.Services.Authentication.Generators;
-using UseCase.Shared.Services.Time;
 
 namespace UseCase.Roles.Users.Commands.UserRegistration
 {
@@ -14,18 +14,15 @@ namespace UseCase.Roles.Users.Commands.UserRegistration
         // Properties
         private readonly DiplomaBdContext _context;
         private readonly IAuthenticationGeneratorService _authenticationGenerator;
-        private readonly ITimeService _timeService;
 
 
         // Constructor
         public UserRegistrationHandler(
             DiplomaBdContext context,
-            IAuthenticationGeneratorService authenticationGenerator,
-            ITimeService timeService)
+            IAuthenticationGeneratorService authenticationGenerator)
         {
             _context = context;
             _authenticationGenerator = authenticationGenerator;
-            _timeService = timeService;
         }
 
         public async Task<UserRegistrationResponse> Handle(UserRegistrationRequest request, CancellationToken cancellationToken)
@@ -50,7 +47,7 @@ namespace UseCase.Roles.Users.Commands.UserRegistration
                 Login = request.Command.Login,
                 Salt = hashData.Salt,
                 Password = hashData.HashedPassword,
-                Created = _timeService.GetNow(),
+                Created = CustomTimeProvider.GetDateTimeNow(),
 
             };
             await _context.People.AddAsync(person, cancellationToken);

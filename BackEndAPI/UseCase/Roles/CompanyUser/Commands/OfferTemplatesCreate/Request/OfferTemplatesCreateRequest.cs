@@ -3,7 +3,7 @@ using UseCase.Shared.Templates.Requests;
 
 namespace UseCase.Roles.CompanyUser.Commands.OfferTemplatesCreate.Request
 {
-    public class OfferTemplatesCreateRequest : BaseRequest<OfferTemplatesCreateResponse>
+    public class OfferTemplatesCreateRequest : RequestTemplate<OfferTemplatesCreateResponse>
     {
         public required Guid CompanyId { get; init; }
         public IEnumerable<OfferTemplateCommand> Commands { get; init; } = [];

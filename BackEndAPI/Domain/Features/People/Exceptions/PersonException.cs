@@ -1,11 +1,12 @@
-﻿using Domain.Shared.Templates.Exceptions;
+﻿using Domain.Shared.Enums;
+using Domain.Shared.Templates;
 
 namespace Domain.Features.People.Exceptions
 {
-    public class PersonException : DomainException
+    public class PersonException : TemplateException
     {
         // Constructor
-        public PersonException(string? message, HttpCodeEnum code) : base(message, code)
+        public PersonException(string? message, HttpCode code) : base(message, code)
         {
         }
     }

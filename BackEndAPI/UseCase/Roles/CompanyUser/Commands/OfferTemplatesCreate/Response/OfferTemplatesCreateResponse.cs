@@ -3,9 +3,9 @@ using UseCase.Shared.Templates.Response;
 
 namespace UseCase.Roles.CompanyUser.Commands.OfferTemplatesCreate.Response
 {
-    public class OfferTemplatesCreateResponse
+    public class OfferTemplatesCreateResponse : ResponseTemplate
     {
-        public IEnumerable<BaseResponseGeneric<OfferTemplateCommand>> Commands { get; init; } = [];
+        public IEnumerable<ResponseItemTemplate<OfferTemplateCommand>> Commands { get; init; } = [];
 
     }
 }

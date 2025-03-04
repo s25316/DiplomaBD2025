@@ -4,7 +4,7 @@ using UseCase.Shared.Templates.Requests;
 
 namespace UseCase.Roles.Users.Commands.UserRegistration.Request
 {
-    public class UserRegistrationRequest : BaseRequest<UserRegistrationResponse>
+    public class UserRegistrationRequest : RequestTemplate<UserRegistrationResponse>
     {
         [Required]
         public required UserRegistrationCommand Command { get; init; } = null!;

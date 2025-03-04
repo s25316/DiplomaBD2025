@@ -3,8 +3,8 @@ using UseCase.Shared.Templates.Response;
 
 namespace UseCase.Roles.CompanyUser.Commands.BranchCreate.Response
 {
-    public class BranchCreateResponse
+    public class BranchCreateResponse : ResponseTemplate
     {
-        public IEnumerable<BaseResponseGeneric<BranchCreateCommand>> Commands { get; init; } = [];
+        public IEnumerable<ResponseItemTemplate<BranchCreateCommand>> Commands { get; init; } = [];
     }
 }

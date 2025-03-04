@@ -2,12 +2,16 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
+using UseCase.Roles.CompanyUser.Commands.Repositories.Branches;
+using UseCase.Roles.CompanyUser.Commands.Repositories.Companies;
+using UseCase.Roles.CompanyUser.Commands.Repositories.Offers;
+using UseCase.Roles.CompanyUser.Commands.Repositories.OfferTemplates;
 using UseCase.Roles.Guests.Queries.Dictionaries.Repositories;
 using UseCase.Shared.Exceptions;
 using UseCase.Shared.Repositories.Addresses;
 using UseCase.Shared.Services.Authentication.Generators;
 using UseCase.Shared.Services.Authentication.Inspectors;
-using UseCase.Shared.Services.Time;
+
 
 namespace UseCase
 {
@@ -47,10 +51,18 @@ namespace UseCase
 
         public static IServiceCollection AddUseCaseConfiguration(this IServiceCollection services)
         {
+            // Main Configuration
             services.AddMediatR(config => config.RegisterServicesFromAssembly(
                 Assembly.GetExecutingAssembly()
                 ));
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
+
+
+            // Company User
+            services.AddTransient<IBranchRepository, BranchRepository>();
+            services.AddTransient<ICompanyRepository, CompanyRepository>();
+            services.AddTransient<IOfferTemplateRepository, OfferTemplateRepository>();
+            services.AddTransient<IOfferRepository, OfferRepository>();
 
             // Guest
             services.AddTransient<IDictionariesRepository, DictionariesRepository>();
@@ -60,7 +72,6 @@ namespace UseCase
 
             services.AddTransient<IAuthenticationGeneratorService, AuthenticationGeneratorService>();
             services.AddTransient<IAuthenticationInspectorService, AuthenticationInspectorService>();
-            services.AddTransient<ITimeService, TimeService>();
             return services;
         }
     }
