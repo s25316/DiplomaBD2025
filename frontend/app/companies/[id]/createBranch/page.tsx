@@ -1,5 +1,5 @@
 "use client"
-import { redirect, usePathname, useRouter } from 'next/navigation'
+import { redirect, useParams, usePathname, useRouter } from 'next/navigation'
 import React, { useState, useRef } from 'react'
 import { useSession } from 'next-auth/react'
 import BranchCreateForm from '@/app/components/BranchCreateForm'
@@ -41,7 +41,7 @@ const createBranch = () => {
     sendData.current = sendData.current.filter((value) => value.index !== data.index).concat(data)
   }
 
-  const companyId = usePathname().split("/")[2];
+  const { id } = useParams();
   const [counter, setCounter] = useState(1);
   const [forms, setForms] = useState([<BranchCreateForm index={0} getData={handleData} />]);
 
@@ -54,7 +54,7 @@ const createBranch = () => {
       sendArray.push(rest)
     })
 
-    const res = await fetch(`http://localhost:8080/api/User/companies/${companyId}/branches`, {
+    const res = await fetch(`http://localhost:8080/api/User/companies/${id}/branches`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -65,7 +65,7 @@ const createBranch = () => {
 
     if (res.ok) {
       alert("Branch(es) created")
-      redirect(`/companies/${companyId}`)
+      redirect(`/companies/${id}`)
     }
     else {
       alert("Failed to create branch(es)")
