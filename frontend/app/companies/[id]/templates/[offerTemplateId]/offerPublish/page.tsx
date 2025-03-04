@@ -3,56 +3,72 @@ import React, { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter, useParams } from "next/navigation";
 
-const CreateOffer = () => {
+const PublishOffer = () => {
   const { data: session } = useSession();
   const router = useRouter();
-  const { id, branchId } = useParams(); // Pobieramy companyId i branchId z URL-a
+  const { id, offerTemplateId } = useParams(); // Pobieramy companyId i offerTemplateId z URL-a
 
-  const offerTemplateId = "4036595E-6BAB-4FC8-9266-C2FD7D915191"; // Wpisane na sztywno
+  const [branches, setBranches] = useState<{ branchId: string; name: string }[]>([]);
+  const [selectedBranch, setSelectedBranch] = useState<string>("");
 
   const [workModes, setWorkModes] = useState<{ workModeId: number; name: string }[]>([]);
   const [employmentTypes, setEmploymentTypes] = useState<{ employmentTypeId: number; name: string }[]>([]);
 
   const [form, setForm] = useState({
-    branchId: branchId as string,
+    branchId: "",
     publicationStart: "",
     publicationEnd: "",
     workBeginDate: "",
     workEndDate: "",
     salaryRangeMin: 0,
     salaryRangeMax: 0,
-    salaryTermId: 1, // Upewnij się, że to prawidłowe ID
-    currencyId: 1, // Upewnij się, że to prawidłowe ID
+    salaryTermId: 1, // Upewnia się, że to prawidłowe ID
+    currencyId: 1, // Upewnia się, że to prawidłowe ID
     isNegotiated: false,
     websiteUrl: "",
     employmentTypes: [] as number[],
     workModes: [] as number[],
   });
 
-  // Pobieranie danych z API (tryby pracy i typy zatrudnienia)
+  // Pobieranie branchId, workModes i employmentTypes z API
   useEffect(() => {
     const fetchData = async () => {
       if (!session?.user?.token) return;
       try {
+        // Pobieranie branchy
+        const resBranches = await fetch(`http://localhost:8080/api/User/companies/${id}/branches`, {
+          headers: { Authorization: `Bearer ${session.user.token}` },
+        });
+        const branchesData = await resBranches.json();
+        setBranches(branchesData.branches);
+        setSelectedBranch(branchesData.branches[0]?.branchId || "");
+
+        // Pobieranie workModes
         const resWorkModes = await fetch("http://localhost:8080/api/Dictionaries/offer/workModes", {
           headers: { Authorization: `Bearer ${session.user.token}` },
         });
+        setWorkModes(await resWorkModes.json());
+
+        // Pobieranie employmentTypes
         const resEmploymentTypes = await fetch("http://localhost:8080/api/Dictionaries/offer/employmentTypes", {
           headers: { Authorization: `Bearer ${session.user.token}` },
         });
-
-        setWorkModes(await resWorkModes.json());
         setEmploymentTypes(await resEmploymentTypes.json());
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
     fetchData();
-  }, [session]);
+  }, [session, id]);
 
   // Aktualizacja formularza
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  // Aktualizacja wyboru branchId
+  const handleBranchChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedBranch(e.target.value);
   };
 
   // Aktualizacja checkboxów
@@ -71,6 +87,8 @@ const CreateOffer = () => {
       return;
     }
 
+    const offerData = { ...form, branchId: selectedBranch };
+
     const res = await fetch(
       `http://localhost:8080/api/User/companies/${id}/offers/templates/${offerTemplateId}/offers`,
       {
@@ -79,13 +97,13 @@ const CreateOffer = () => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${session.user.token}`,
         },
-        body: JSON.stringify([form]), // API wymaga tablicy
+        body: JSON.stringify([offerData]), // API wymaga tablicy
       }
     );
 
     if (res.ok) {
       alert("Offer created successfully!");
-      router.push(`/companies/${id}/branches/${branchId}`); // Przekierowanie po sukcesie
+      router.push(`/companies/${id}/${selectedBranch}`); // Przekierowanie po sukcesie
     } else {
       alert("Failed to create offer.");
     }
@@ -95,6 +113,16 @@ const CreateOffer = () => {
     <div>
       <h1>Create Offer</h1>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        {/* Wybór Branch */}
+        <label>Select Branch:</label>
+        <select value={selectedBranch} onChange={handleBranchChange} required>
+          {branches.map((branch) => (
+            <option key={branch.branchId} value={branch.branchId}>
+              {branch.name}
+            </option>
+          ))}
+        </select>
+
         <label>Publication Start:</label>
         <input type="datetime-local" name="publicationStart" onChange={handleChange} required />
 
@@ -121,7 +149,7 @@ const CreateOffer = () => {
         />
 
         <label>Website URL:</label>
-        <input type="text" name="websiteUrl" onChange={handleChange} required />
+        <input type="text" name="websiteUrl"  placeholder="https://www.strona.pl" onChange={handleChange} required />
 
         <h3>Work Modes</h3>
         {workModes.map((mode) => (
@@ -147,10 +175,10 @@ const CreateOffer = () => {
           </label>
         ))}
 
-        <button type="submit">Create Offer</button>
+        <button type="submit">Publish Offer</button>
       </form>
     </div>
   );
 };
 
-export default CreateOffer;
+export default PublishOffer;
