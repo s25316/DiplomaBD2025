@@ -45,7 +45,7 @@ namespace UseCase.Roles.CompanyUser.Commands.BranchCreate
             {
                 return new BranchCreateResponse
                 {
-                    Commands = request.Commands.Select(cmd => new ResponseItemTemplate<BranchCreateCommand>
+                    Commands = request.Commands.Select(cmd => new ResponseCommandTemplate<BranchCreateCommand>
                     {
                         Item = cmd,
                         IsCorrect = false,
@@ -71,7 +71,7 @@ namespace UseCase.Roles.CompanyUser.Commands.BranchCreate
             {
                 return new BranchCreateResponse
                 {
-                    Commands = builders.Select(pair => new ResponseItemTemplate<BranchCreateCommand>
+                    Commands = builders.Select(pair => new ResponseCommandTemplate<BranchCreateCommand>
                     {
                         Item = pair.Key,
                         IsCorrect = !pair.Value.HasErrors(),
@@ -90,7 +90,7 @@ namespace UseCase.Roles.CompanyUser.Commands.BranchCreate
             return new BranchCreateResponse
             {
                 Commands = request.Commands.Select(
-                    command => new ResponseItemTemplate<BranchCreateCommand>
+                    command => new ResponseCommandTemplate<BranchCreateCommand>
                     {
                         Item = command,
                         IsCorrect = true,

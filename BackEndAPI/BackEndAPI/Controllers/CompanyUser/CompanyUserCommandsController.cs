@@ -6,18 +6,18 @@ using UseCase.Roles.CompanyUser.Commands.CompanyCreate.Request;
 using UseCase.Roles.CompanyUser.Commands.OffersCreate.Request;
 using UseCase.Roles.CompanyUser.Commands.OfferTemplatesCreate.Request;
 
-namespace BackEndAPI.Controllers
+namespace BackEndAPI.Controllers.CompanyUser
 {
-    [Route("api/User/companies")]
+    [Route("api/CompanyUser/companies")]
     [ApiController]
-    public class UserCompanyCommandsController : ControllerBase
+    public class CompanyUserCommandsController : ControllerBase
     {
         //Properties
         private readonly IMediator _mediator;
 
 
         // Constructor
-        public UserCompanyCommandsController(IMediator mediator)
+        public CompanyUserCommandsController(IMediator mediator)
         {
             _mediator = mediator;
         }
@@ -92,12 +92,5 @@ namespace BackEndAPI.Controllers
             var result = await _mediator.Send(request, cancellationToken);
             return StatusCode((int)result.HttpCode, result.Commands);
         }
-
-        /* [HttpGet]
-         public async Task<IActionResult> Get(CancellationToken cancellationToken)
-         {
-             var result = await _mediator.Send(new GetOffersRequest(), cancellationToken);
-             return Ok(result);
-         }*/
     }
 }

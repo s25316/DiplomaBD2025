@@ -43,24 +43,24 @@ namespace Infrastructure.Redis
                 .AddHours(_countHoursExpiration)
                 .ToUniversalTime();
             var unixTimestamp = (long)(universalTimeExpiration - DateTime.UnixEpoch).TotalSeconds;
+            var dateTimeOffsetEnd = DateTimeOffset.FromUnixTimeSeconds(unixTimestamp).UtcDateTime;
 
+            var transaction = _database.CreateTransaction();
             foreach (var pair in dictionary)
             {
                 var key = $"{typeof(TDto).Name}:{pair.Key}";
                 var value = JsonSerializer.Serialize(pair.Value);
 
-                await _database.StringSetAsync(
-                    key,
-                    value
-                    );
-                await _database.KeyExpireAsync(
-                    key,
-                    DateTimeOffset.FromUnixTimeSeconds(unixTimestamp).UtcDateTime
-                    );
+                _ = transaction.StringSetAsync(key, value)
+                    .ConfigureAwait(false);
+                _ = transaction.KeyExpireAsync(key, dateTimeOffsetEnd)
+                    .ConfigureAwait(false);
             }
+            await transaction.ExecuteAsync().ConfigureAwait(false);
         }
 
-        public async Task<Dictionary<TKey, TDto>> GetAsync<TKey, TDto>(Func<TDto, TKey> keySelector)
+        public async Task<Dictionary<TKey, TDto>> GetAsync<TKey, TDto>(
+            Func<TDto, TKey> keySelector)
             where TKey : notnull
             where TDto : class
         {

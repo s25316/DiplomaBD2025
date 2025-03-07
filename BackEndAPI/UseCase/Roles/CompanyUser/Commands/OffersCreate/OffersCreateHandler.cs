@@ -48,7 +48,7 @@ namespace UseCase.Roles.CompanyUser.Commands.OffersCreate
             {
                 return new OffersCreateResponse
                 {
-                    Commands = request.Commands.Select(cmd => new ResponseItemTemplate<OfferCreateCommand>
+                    Commands = request.Commands.Select(cmd => new ResponseCommandTemplate<OfferCreateCommand>
                     {
                         Item = cmd,
                         IsCorrect = false,
@@ -64,7 +64,7 @@ namespace UseCase.Roles.CompanyUser.Commands.OffersCreate
             {
                 return new OffersCreateResponse
                 {
-                    Commands = validationResult.Dictionary.Select(pair => new ResponseItemTemplate<OfferCreateCommand>
+                    Commands = validationResult.Dictionary.Select(pair => new ResponseCommandTemplate<OfferCreateCommand>
                     {
                         Item = pair.Key,
                         IsCorrect = string.IsNullOrWhiteSpace(pair.Value.ErrorMessage),
@@ -80,7 +80,7 @@ namespace UseCase.Roles.CompanyUser.Commands.OffersCreate
 
             return new OffersCreateResponse
             {
-                Commands = request.Commands.Select(cmd => new ResponseItemTemplate<OfferCreateCommand>
+                Commands = request.Commands.Select(cmd => new ResponseCommandTemplate<OfferCreateCommand>
                 {
                     Item = cmd,
                     IsCorrect = true,

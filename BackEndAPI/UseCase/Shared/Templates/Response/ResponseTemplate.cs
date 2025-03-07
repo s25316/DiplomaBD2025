@@ -1,10 +1,8 @@
-﻿using Domain.Shared.Enums;
-
-namespace UseCase.Shared.Templates.Response
+﻿namespace UseCase.Shared.Templates.Response
 {
-    public class ResponseTemplate
+    public class ResponseTemplate<T> : ResponseMetaData where T : class
     {
-        public required bool IsCorrect { get; init; }
-        public required HttpCode HttpCode { get; init; }
+        public required T Result { get; init; }
     }
 }
+

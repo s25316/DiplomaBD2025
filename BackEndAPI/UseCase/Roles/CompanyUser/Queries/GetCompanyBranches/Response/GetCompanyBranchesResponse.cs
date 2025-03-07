@@ -1,9 +1,8 @@
-﻿using UseCase.Shared.DTOs.Responses.Companies;
+﻿using UseCase.Shared.Templates.Response;
 
 namespace UseCase.Roles.CompanyUser.Queries.GetCompanyBranches.Response
 {
-    public class GetCompanyBranchesResponse
+    public class GetCompanyBranchesResponse : ResponseTemplate<GetCompanyBranchesQueryResult>
     {
-        public required IEnumerable<BranchDto> Branches { get; init; } = [];
     }
 }

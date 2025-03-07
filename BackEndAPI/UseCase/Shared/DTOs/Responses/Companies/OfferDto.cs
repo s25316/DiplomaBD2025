@@ -1,6 +1,5 @@
 ﻿// Ignore Spelling: Dto
 
-using UseCase.RelationalDatabase.Models;
 using UseCase.Shared.DTOs.Responses.Dictionaries;
 
 namespace UseCase.Shared.DTOs.Responses.Companies
@@ -23,7 +22,7 @@ namespace UseCase.Shared.DTOs.Responses.Companies
         public CurrencyDto? Currency { get; init; }
         public SalaryTermDto? SalaryTerm { get; init; }
         public IEnumerable<WorkModeDto> WorkModes { get; init; } = [];
-        public IEnumerable<EmploymentType> EmploymentTypes { get; init; } = [];
+        public IEnumerable<EmploymentTypeDto> EmploymentTypes { get; init; } = [];
 
         // Branch
     }

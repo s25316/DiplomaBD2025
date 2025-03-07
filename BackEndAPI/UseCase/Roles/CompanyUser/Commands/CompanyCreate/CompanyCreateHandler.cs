@@ -37,7 +37,7 @@ namespace UseCase.Roles.CompanyUser.Commands.CompanyCreate
             {
                 return new CompanyCreateResponse
                 {
-                    Command = new Shared.Templates.Response.ResponseItemTemplate<CompanyCreateCommand>
+                    Command = new Shared.Templates.Response.ResponseCommandTemplate<CompanyCreateCommand>
                     {
                         Item = request.Command,
                         IsCorrect = false,
@@ -55,7 +55,7 @@ namespace UseCase.Roles.CompanyUser.Commands.CompanyCreate
             {
                 return new CompanyCreateResponse
                 {
-                    Command = new Shared.Templates.Response.ResponseItemTemplate<CompanyCreateCommand>
+                    Command = new Shared.Templates.Response.ResponseCommandTemplate<CompanyCreateCommand>
                     {
                         Item = request.Command,
                         IsCorrect = false,
@@ -71,7 +71,7 @@ namespace UseCase.Roles.CompanyUser.Commands.CompanyCreate
                 cancellationToken);
             return new CompanyCreateResponse
             {
-                Command = new Shared.Templates.Response.ResponseItemTemplate<CompanyCreateCommand>
+                Command = new Shared.Templates.Response.ResponseCommandTemplate<CompanyCreateCommand>
                 {
                     Item = request.Command,
                     IsCorrect = true,

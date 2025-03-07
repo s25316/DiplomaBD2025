@@ -51,18 +51,12 @@ namespace UseCase.Shared.DTOs.Responses.Companies.AutoMapperProfile
                 opt => opt.MapFrom(db => db.OfferEmploymentTypes));
 
             CreateMap<OfferWorkMode, WorkModeDto>()
-                .ConstructUsing(db => new WorkModeDto
-                {
-                    WorkModeId = db.WorkMode.WorkModeId,
-                    Name = db.WorkMode.Name
-                });
+                .ConvertUsing((src, dest, context) =>
+                context.Mapper.Map<WorkModeDto>(src.WorkMode));
 
             CreateMap<OfferEmploymentType, EmploymentTypeDto>()
-                .ConstructUsing(db => new EmploymentTypeDto
-                {
-                    EmploymentTypeId = db.EmploymentType.EmploymentTypeId,
-                    Name = db.EmploymentType.Name
-                });
+                .ConvertUsing((src, dest, context) =>
+                context.Mapper.Map<EmploymentTypeDto>(src.EmploymentType));
 
         }
     }
