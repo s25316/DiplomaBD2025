@@ -7,7 +7,7 @@ using UseCase.Roles.CompanyUser.Commands.BranchCreate.Response;
 using UseCase.Roles.CompanyUser.Commands.Repositories.Branches;
 using UseCase.Shared.Repositories.Addresses;
 using UseCase.Shared.Services.Authentication.Inspectors;
-using UseCase.Shared.Templates.Response;
+using UseCase.Shared.Templates.Response.Commands;
 using DomainBranch = Domain.Features.Branches.Entities.Branch;
 
 namespace UseCase.Roles.CompanyUser.Commands.BranchCreate

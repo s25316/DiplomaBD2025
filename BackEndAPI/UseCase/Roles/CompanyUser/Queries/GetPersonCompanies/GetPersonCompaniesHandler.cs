@@ -1,17 +1,20 @@
 ﻿using AutoMapper;
 using Domain.Features.People.ValueObjects;
+using Domain.Shared.CustomProviders;
 using Domain.Shared.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using UseCase.RelationalDatabase;
 using UseCase.RelationalDatabase.Models;
+using UseCase.Roles.CompanyUser.Enums;
 using UseCase.Roles.CompanyUser.Queries.GetPersonCompanies.Request;
 using UseCase.Roles.CompanyUser.Queries.GetPersonCompanies.Response;
 using UseCase.Shared.DTOs.Responses.Companies;
 using UseCase.Shared.Enums;
 using UseCase.Shared.ExtensionMethods;
 using UseCase.Shared.Services.Authentication.Inspectors;
+using UseCase.Shared.Templates.Response.QueryResults;
 
 namespace UseCase.Roles.CompanyUser.Queries.GetPersonCompanies
 {
@@ -21,7 +24,8 @@ namespace UseCase.Roles.CompanyUser.Queries.GetPersonCompanies
         private readonly DiplomaBdContext _context;
         private readonly IMapper _mapper;
         private readonly IAuthenticationInspectorService _authenticationInspector;
-        private static readonly IEnumerable<int> _authorizationRoles = [1];
+        private static readonly IEnumerable<CompanyUserRoles> _authorizedRoles = [
+            CompanyUserRoles.CompanyOwner];
 
 
         //Constructor
@@ -40,33 +44,50 @@ namespace UseCase.Roles.CompanyUser.Queries.GetPersonCompanies
         public async Task<GetPersonCompaniesResponse> Handle(GetPersonCompaniesRequest request, CancellationToken cancellationToken)
         {
             var personId = GetPersonId(request);
-            var baseQuery = _context.Companies
-                    .Include(c => c.CompanyPeople)
-                    .AsNoTracking()
-                    .AsQueryable();
+            var query = BuildQuery(request, personId);
+            var selector = BuildSelector(personId, query);
+            var selectedValues = await query
+                .Paginate(request.Page, request.ItemsPerPage)
+                .Select(selector)
+                .ToListAsync(cancellationToken);
 
-            // Parameters Defines The Company
-            if (
-                request.CompanyId != null ||
-                request.Regon != null ||
-                request.Nip != null ||
-                request.Krs != null
-                )
+            var totalCount = -1;
+            var isForbidden = false;
+            var isRemoved = false;
+            var dtos = new List<CompanyDto>();
+            for (int i = 0; i < selectedValues.Count; i++)
             {
-                return await HandleSingleCompanyAsync(
-                    request,
-                    personId,
-                    baseQuery,
-                    cancellationToken);
+                var selectedValue = selectedValues[i];
+                if (totalCount < 0)
+                {
+                    totalCount = selectedValue.TotalCount;
+                }
+                if (selectedValue.AuthorizeRolesCount == 0)
+                {
+                    isForbidden = true;
+                    break;
+                }
+                if (selectedValue.Company.Removed != null)
+                {
+                    isRemoved = true;
+                    break;
+                }
+                dtos.Add(_mapper.Map<CompanyDto>(selectedValue.Company));
             }
-            else
+
+            if (!selectedValues.Any())
             {
-                return await HandleListCompaniesAsync(
-                    request,
-                    personId,
-                    baseQuery,
-                    cancellationToken);
+                return InvalidResponse(HttpCode.NotFound);
             }
+            if (isForbidden)
+            {
+                return InvalidResponse(HttpCode.Forbidden);
+            }
+            if (isRemoved)
+            {
+                return InvalidResponse(HttpCode.Gone);
+            }
+            return ValidResponse(HttpCode.Ok, dtos, totalCount);
         }
 
         // Private Methods
@@ -75,80 +96,70 @@ namespace UseCase.Roles.CompanyUser.Queries.GetPersonCompanies
             return _authenticationInspector.GetPersonId(request.Metadata.Claims);
         }
 
-        private async Task<GetPersonCompaniesResponse> HandleSingleCompanyAsync(
-            GetPersonCompaniesRequest request,
-            PersonId personId,
-            IQueryable<Company> baseQuery,
-            CancellationToken cancellationToken)
+        private IQueryable<Company> BuildBaseQuery()
         {
-            var filters = BuildFiltersForSingleCompany(request);
-            var query = baseQuery.Where(filters);
+            return _context.Companies
+                .Include(c => c.CompanyPeople)
+                .AsNoTracking();
+        }
 
-            var singleCompany = await query.Select(company => new
+        private IQueryable<Company> BuildQuery(
+            GetPersonCompaniesRequest request,
+            PersonId personId)
+        {
+            var query = BuildBaseQuery();
+
+            // Parameters Defines The Company
+            if (request.CompanyId != null ||
+                request.Regon != null ||
+                request.Nip != null ||
+                request.Krs != null)
+            {
+                var filters = BuildCompanyFilter(request);
+                query = query.Where(filters);
+            }
+            else
+            {
+                var filters = BuildSearchTextFilter(request.SearchText);
+                query = query
+                    .Where(filters)
+                    .Where(company => company.CompanyPeople.Any(role =>
+                        _authorizedRoles.Any(roleId =>
+                            role.RoleId == (int)roleId &&
+                            role.PersonId == personId.Value &&
+                            role.Deny == null
+                        )));
+                query = ApplyOrderBy(query, request.OrderBy, request.Ascending);
+            }
+            return query;
+        }
+
+        // Private Static Methods and private Class for EF selection
+        private sealed class CompanySelectionResult
+        {
+            public required Company Company { get; set; }
+            public required int AuthorizeRolesCount { get; set; }
+            public required int TotalCount { get; set; }
+        }
+
+        private static Expression<Func<Company, CompanySelectionResult>> BuildSelector(
+            PersonId personId,
+            IQueryable<Company> totalCountQuery)
+        {
+            return company => new CompanySelectionResult
             {
                 Company = company,
-                CountRoleIds = company.CompanyPeople
-                    .Count(role => _authorizationRoles.Any(id =>
-                        role.RoleId == id &&
-                        role.Deny == null &&
-                        role.PersonId == personId.Value
-                    ))
-            })
-            .FirstOrDefaultAsync(cancellationToken);
-
-            switch (singleCompany)
-            {
-                case null:
-                    return InvalidResponse(HttpCode.NotFound);
-                case { CountRoleIds: 0 }:
-                    return InvalidResponse(HttpCode.Forbidden);
-                default:
-                    var item = new GetPersonCompaniesQueryResult
-                    {
-                        Items = [_mapper.Map<CompanyDto>(singleCompany.Company)],
-                        TotalCount = 1,
-                    };
-                    return ValidResponse(HttpCode.Ok, item);
-            }
-        }
-
-        private async Task<GetPersonCompaniesResponse> HandleListCompaniesAsync(
-           GetPersonCompaniesRequest request,
-           PersonId personId,
-           IQueryable<Company> baseQuery,
-           CancellationToken cancellationToken)
-        {
-            var filters = BuildFiltersForListCompanies(personId, request);
-            var query = baseQuery.Where(filters);
-            var notPaginatedQuery = query;
-
-            query = ApplyOrderBy(query, request);
-            query = query.Paginate(request.Page, request.ItemsPerPage);
-
-            var companies = await query
-                .Select(company => new
-                {
-                    Company = company,
-                    TotalCount = notPaginatedQuery.Count(),
-                })
-                .ToListAsync(cancellationToken);
-
-            if (!companies.Any())
-            {
-                return InvalidResponse(HttpCode.NotFound);
-            }
-
-            var result = new GetPersonCompaniesQueryResult
-            {
-                Items = companies
-                        .Select(x => _mapper.Map<CompanyDto>(x.Company)),
-                TotalCount = companies[0].TotalCount,
+                AuthorizeRolesCount = company.CompanyPeople.Count(role =>
+                    _authorizedRoles.Any(roleId =>
+                        role.RoleId == (int)roleId &&
+                        role.PersonId == personId.Value &&
+                        role.Deny == null
+                    )),
+                TotalCount = totalCountQuery.Count(),
             };
-            return ValidResponse(HttpCode.Ok, result);
         }
 
-        // Private Static Methods
-        private static Expression<Func<Company, bool>> BuildFiltersForSingleCompany(
+        private static Expression<Func<Company, bool>> BuildCompanyFilter(
             GetPersonCompaniesRequest request)
         {
             if (request.CompanyId != null)
@@ -161,28 +172,15 @@ namespace UseCase.Roles.CompanyUser.Queries.GetPersonCompanies
                     (request.Krs == null || company.Krs == request.Krs);
         }
 
-        private static Expression<Func<Company, bool>> BuildFiltersForListCompanies(
-            PersonId personId,
-            GetPersonCompaniesRequest request)
+        private static Expression<Func<Company, bool>> BuildSearchTextFilter(string? searchText)
         {
-            char[] separators = { ' ', ',', '\n', '\t' };
-            var searchWords = string.IsNullOrWhiteSpace(request.SearchText)
-                ? []
-                : request.SearchText
-                .Split(separators, StringSplitOptions.RemoveEmptyEntries);
+            var searchWords = CustomStringProvider.Split(searchText);
 
-            Expression<Func<Company, bool>> filters = company =>
+            return company =>
                 company.Name != null &&
                 company.Nip != null &&
                 company.Regon != null &&
                 company.Removed == null &&
-
-                _authorizationRoles.Any(roleId => company.CompanyPeople.Any(cp =>
-                    cp.Deny == null &&
-                    cp.PersonId == personId.Value &&
-                    cp.RoleId == roleId
-                    ))
-                 &&
                 (
                     !searchWords.Any() ||
                     searchWords.Any(word =>
@@ -190,19 +188,21 @@ namespace UseCase.Roles.CompanyUser.Queries.GetPersonCompanies
                         (company.Description != null && company.Description.Contains(word))
                     )
                 );
-            return filters;
         }
 
-        private static IQueryable<Company> ApplyOrderBy(IQueryable<Company> query, GetPersonCompaniesRequest request)
+        private static IQueryable<Company> ApplyOrderBy(
+            IQueryable<Company> query,
+            CompaniesOrderBy orderBy,
+            bool ascending)
         {
-            switch (request.OrderBy)
+            switch (orderBy)
             {
                 case CompaniesOrderBy.Name:
-                    return request.Ascending ?
+                    return ascending ?
                         query.OrderBy(company => company.Name) :
                         query.OrderByDescending(company => company.Name);
                 default:
-                    return request.Ascending ?
+                    return ascending ?
                         query.OrderBy(company => company.Created) :
                         query.OrderByDescending(company => company.Created);
             }
@@ -212,7 +212,7 @@ namespace UseCase.Roles.CompanyUser.Queries.GetPersonCompanies
         {
             return new GetPersonCompaniesResponse
             {
-                Result = new GetPersonCompaniesQueryResult
+                Result = new ResponseQueryResultTemplate<CompanyDto>
                 {
                     Items = [],
                     TotalCount = 0,
@@ -224,11 +224,16 @@ namespace UseCase.Roles.CompanyUser.Queries.GetPersonCompanies
 
         private static GetPersonCompaniesResponse ValidResponse(
             HttpCode code,
-            GetPersonCompaniesQueryResult result)
+            IEnumerable<CompanyDto> items,
+            int totalCount)
         {
             return new GetPersonCompaniesResponse
             {
-                Result = result,
+                Result = new ResponseQueryResultTemplate<CompanyDto>
+                {
+                    Items = items,
+                    TotalCount = totalCount,
+                },
                 IsCorrect = true,
                 HttpCode = code,
             };

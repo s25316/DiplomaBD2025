@@ -70,8 +70,10 @@ namespace Domain.Shared.Enums
 
         [Description("Conflict")]
         Conflict = 409,
-        /*Gone = 410,
-        LengthRequired = 411,
+
+        [Description("Gone")]
+        Gone = 410,
+        /*LengthRequired = 411,
         PreconditionFailed = 412,
         PayloadTooLarge = 413,
         URITooLong = 414,

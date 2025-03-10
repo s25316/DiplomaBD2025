@@ -21,7 +21,7 @@ namespace UseCase.Shared.Enums
         [Description("By Offer Template Removed")]
         OfferTemplateRemoved = 5,
 
-        [Description("By Offer Template Skills")]
-        OfferTemplateSkills = 5,
+        [Description("By Offer Skills")]
+        Skills = 6,
     }
 }

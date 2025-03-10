@@ -1,6 +1,6 @@
 ﻿using Domain.Shared.Enums;
 
-namespace UseCase.Shared.Templates.Response
+namespace UseCase.Shared.Templates.Response.Responses
 {
     public class ResponseMetaData
     {

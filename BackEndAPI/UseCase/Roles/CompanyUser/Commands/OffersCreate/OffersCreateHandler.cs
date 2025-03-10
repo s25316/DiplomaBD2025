@@ -9,7 +9,7 @@ using UseCase.Roles.CompanyUser.Commands.Repositories.Offers;
 using UseCase.Roles.Guests.Queries.Dictionaries.Repositories;
 using UseCase.Shared.DTOs.Responses.Dictionaries;
 using UseCase.Shared.Services.Authentication.Inspectors;
-using UseCase.Shared.Templates.Response;
+using UseCase.Shared.Templates.Response.Commands;
 using DomainOffer = Domain.Features.Offers.Entities.Offer;
 
 namespace UseCase.Roles.CompanyUser.Commands.OffersCreate

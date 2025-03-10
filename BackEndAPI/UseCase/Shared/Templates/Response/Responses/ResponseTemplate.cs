@@ -1,4 +1,4 @@
-﻿namespace UseCase.Shared.Templates.Response
+﻿namespace UseCase.Shared.Templates.Response.Responses
 {
     public class ResponseTemplate<T> : ResponseMetaData where T : class
     {

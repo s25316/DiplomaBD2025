@@ -8,7 +8,7 @@ using UseCase.Roles.CompanyUser.Commands.OfferTemplatesCreate.Response;
 using UseCase.Roles.CompanyUser.Commands.Repositories.OfferTemplates;
 using UseCase.Roles.Guests.Queries.Dictionaries.Repositories;
 using UseCase.Shared.Services.Authentication.Inspectors;
-using UseCase.Shared.Templates.Response;
+using UseCase.Shared.Templates.Response.Commands;
 using DomainOfferTemplate = Domain.Features.OfferTemplates.Entities.OfferTemplate;
 
 namespace UseCase.Roles.CompanyUser.Commands.OfferTemplatesCreate

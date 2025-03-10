@@ -7,16 +7,25 @@ namespace UseCase.Roles.CompanyUser.Queries.GetCompanyOfferTemplates.Request
 {
     public class GetCompanyOfferTemplatesRequest : RequestTemplate<GetCompanyOfferTemplatesResponse>
     {
-        public Guid? CompanyId { get; init; }
+        // For selection single Template
         public Guid? OfferTemplateId { get; init; }
-        public string? SearchText { get; init; } = null;
+
+        // Company Identification  
+        public Guid? CompanyId { get; init; }
         public string? Regon { get; init; } = null;
         public string? Nip { get; init; } = null;
         public string? Krs { get; init; } = null;
+
+        // Other filters
+        public string? SearchText { get; init; } = null;
         public IEnumerable<int> SkillIds { get; init; } = [];
         public required bool ShowRemoved { get; init; }
+
+        // Pagination
         public required int Page { get; init; }
         public required int ItemsPerPage { get; init; }
+
+        // Sorting
         public required OfferTemplatesOrderBy OrderBy { get; init; }
         public required bool Ascending { get; init; }
     }

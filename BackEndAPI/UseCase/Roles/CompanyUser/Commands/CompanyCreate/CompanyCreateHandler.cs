@@ -5,6 +5,7 @@ using UseCase.Roles.CompanyUser.Commands.CompanyCreate.Request;
 using UseCase.Roles.CompanyUser.Commands.CompanyCreate.Response;
 using UseCase.Roles.CompanyUser.Commands.Repositories.Companies;
 using UseCase.Shared.Services.Authentication.Inspectors;
+using UseCase.Shared.Templates.Response.Commands;
 using DomainCompany = Domain.Features.Companies.Entities.Company;
 
 namespace UseCase.Roles.CompanyUser.Commands.CompanyCreate
@@ -37,7 +38,7 @@ namespace UseCase.Roles.CompanyUser.Commands.CompanyCreate
             {
                 return new CompanyCreateResponse
                 {
-                    Command = new Shared.Templates.Response.ResponseCommandTemplate<CompanyCreateCommand>
+                    Command = new ResponseCommandTemplate<CompanyCreateCommand>
                     {
                         Item = request.Command,
                         IsCorrect = false,
@@ -55,7 +56,7 @@ namespace UseCase.Roles.CompanyUser.Commands.CompanyCreate
             {
                 return new CompanyCreateResponse
                 {
-                    Command = new Shared.Templates.Response.ResponseCommandTemplate<CompanyCreateCommand>
+                    Command = new ResponseCommandTemplate<CompanyCreateCommand>
                     {
                         Item = request.Command,
                         IsCorrect = false,
@@ -71,7 +72,7 @@ namespace UseCase.Roles.CompanyUser.Commands.CompanyCreate
                 cancellationToken);
             return new CompanyCreateResponse
             {
-                Command = new Shared.Templates.Response.ResponseCommandTemplate<CompanyCreateCommand>
+                Command = new ResponseCommandTemplate<CompanyCreateCommand>
                 {
                     Item = request.Command,
                     IsCorrect = true,

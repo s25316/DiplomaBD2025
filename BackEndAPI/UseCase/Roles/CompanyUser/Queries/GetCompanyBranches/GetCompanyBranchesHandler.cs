@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Domain.Features.People.ValueObjects;
+using Domain.Shared.CustomProviders;
 using Domain.Shared.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -7,12 +8,14 @@ using NetTopologySuite.Geometries;
 using System.Linq.Expressions;
 using UseCase.RelationalDatabase;
 using UseCase.RelationalDatabase.Models;
+using UseCase.Roles.CompanyUser.Enums;
 using UseCase.Roles.CompanyUser.Queries.GetCompanyBranches.Request;
 using UseCase.Roles.CompanyUser.Queries.GetCompanyBranches.Response;
 using UseCase.Shared.DTOs.Responses.Companies;
 using UseCase.Shared.Enums;
 using UseCase.Shared.ExtensionMethods;
 using UseCase.Shared.Services.Authentication.Inspectors;
+using UseCase.Shared.Templates.Response.QueryResults;
 
 namespace UseCase.Roles.CompanyUser.Queries.GetCompanyBranches
 {
@@ -22,7 +25,8 @@ namespace UseCase.Roles.CompanyUser.Queries.GetCompanyBranches
         private readonly DiplomaBdContext _context;
         private readonly IMapper _mapper;
         private readonly IAuthenticationInspectorService _authenticationInspector;
-        private static readonly IEnumerable<int> _autorizeRoles = [1];
+        private static readonly IEnumerable<CompanyUserRoles> _authorizedRoles = [
+            CompanyUserRoles.CompanyOwner];
 
         //Constructor
         public GetCompanyBranchesHandler(
@@ -40,46 +44,58 @@ namespace UseCase.Roles.CompanyUser.Queries.GetCompanyBranches
         public async Task<GetCompanyBranchesResponse> Handle(GetCompanyBranchesRequest request, CancellationToken cancellationToken)
         {
             var personId = GetPersonId(request);
-            var filters = BuildFilters(request);
-            var baseQuery = BuildBaseQuery();
-            Expression<Func<Branch, object>> selector = branch => new
-            {
-                Branch = branch,
-                RolesCount = branch.Company.CompanyPeople.Count(role =>
-                    _autorizeRoles.Any(roleId =>
-                        role.RoleId == roleId &&
-                        role.Deny == null &&
-                        role.PersonId == personId.Value
-                )),
-                TotalCount = baseQuery.Where(filters).Count(),
-            };
+            var query = BuildQuery(request, personId);
+            var selector = BuildSelector(personId, query);
 
-            var query = baseQuery
-                .Where(filters)
-                .AsQueryable();
-
-            query = ApplyOrderBy(query, request);
-            var branches = await query
+            var selectedValues = await query
                 .Paginate(request.Page, request.ItemsPerPage)
-
+                .Select(selector)
                 .ToListAsync(cancellationToken);
 
-            return new GetCompanyBranchesResponse
+            var totalCount = -1;
+            var isForbidden = false;
+            var isRemoved = false;
+            var dtos = new List<CompanyAndBranchDto>();
+            for (int i = 0; i < selectedValues.Count; i++)
             {
-                Result = new GetCompanyBranchesQueryResult
+                var selectedValue = selectedValues[i];
+                if (totalCount < 0)
                 {
-                    Items = branches.Select(branch => new CompanyAndBranchDto
-                    {
-                        Company = _mapper.Map<CompanyDto>(branch.Company),
-                        Branch = _mapper.Map<BranchDto>(branch),
-                    }),
-                    TotalCount = 0,
-                },
-                IsCorrect = true,
-                HttpCode = HttpCode.Ok,
-            };
+                    totalCount = selectedValue.TotalCount;
+                }
+                if (selectedValue.AuthorizedRolesCount == 0)
+                {
+                    isForbidden = true;
+                    break;
+                }
+                if (selectedValue.Branch.Company.Removed != null)
+                {
+                    isRemoved = true;
+                    break;
+                }
+                dtos.Add(new CompanyAndBranchDto
+                {
+                    Company = _mapper.Map<CompanyDto>(selectedValue.Branch.Company),
+                    Branch = _mapper.Map<BranchDto>(selectedValue.Branch),
+                });
+            }
+
+            if (!selectedValues.Any())
+            {
+                return InvalidResponse(HttpCode.NotFound);
+            }
+            if (isForbidden)
+            {
+                return InvalidResponse(HttpCode.Forbidden);
+            }
+            if (isRemoved)
+            {
+                return InvalidResponse(HttpCode.Gone);
+            }
+            return ValidResponse(HttpCode.Ok, dtos, totalCount);
         }
 
+        // Non Static Methods
         private PersonId GetPersonId(GetCompanyBranchesRequest request)
         {
             return _authenticationInspector.GetPersonId(request.Metadata.Claims);
@@ -98,43 +114,113 @@ namespace UseCase.Roles.CompanyUser.Queries.GetCompanyBranches
                 .ThenInclude(a => a.City)
                 .ThenInclude(a => a.State)
                 .ThenInclude(a => a.Country)
-                .Where(branch =>
-                    branch.Company.Name != null &&
-                    branch.Company.Regon != null &&
-                    branch.Company.Nip != null &&
-                    branch.Company.Removed == null &&
-                    branch.Name != null &&
-                    branch.Address != null);
+                .AsNoTracking();
         }
 
-        private static Expression<Func<Branch, bool>> BuildFiltersByBranchId(
-            GetCompanyBranchesRequest request)
+        private IQueryable<Branch> BuildQuery(
+            GetCompanyBranchesRequest request,
+            PersonId personId)
         {
-            return branch => branch.BranchId == request.BranchId;
-        }
-
-
-        private static Expression<Func<Branch, bool>> BuildFiltersByCompany(
-            GetCompanyBranchesRequest request)
-        {
-            if (request.CompanyId.HasValue)
+            var query = BuildBaseQuery();
+            if (request.BranchId.HasValue)
             {
-                return branch => branch.Company.CompanyId == request.CompanyId;
+                var filter = BuildBranchFilter(request.BranchId.Value);
+                query = query.Where(filter);
+            }
+            else
+            {
+                if (request.CompanyId.HasValue ||
+                    request.Regon != null ||
+                    request.Nip != null ||
+                    request.Krs != null)
+                {
+                    var companyFilter = BuildCompanyFilters(
+                       request.CompanyId,
+                       request.Regon,
+                       request.Nip,
+                       request.Krs);
+                    query = query.Where(companyFilter);
+                }
+                else
+                {
+                    query = query.Where(branch => branch.Company.CompanyPeople
+                        .Any(role => _authorizedRoles.Any(roleId =>
+                            role.RoleId == (int)roleId &&
+                            role.PersonId == personId.Value &&
+                            role.Deny == null
+                        )));
+                }
+
+                var otherFilters = BuildOtherFilters(
+                    request.SearchText,
+                    request.ShowRemoved);
+                query = query.Where(otherFilters);
+                query = ApplyOrderBy(
+                    query,
+                    request.OrderBy,
+                    request.Ascending,
+                    request.ShowRemoved,
+                    request.Lon,
+                    request.Lat);
+            }
+            return query;
+        }
+
+        // Private static Methods
+        private sealed class SelectResult
+        {
+            public required Branch Branch { get; init; }
+            public required int AuthorizedRolesCount { get; init; }
+            public required int TotalCount { get; init; }
+
+        }
+
+        private static Expression<Func<Branch, SelectResult>> BuildSelector(
+            PersonId personId,
+            IQueryable<Branch> totalCountQuery)
+        {
+            return branch => new SelectResult
+            {
+                Branch = branch,
+                AuthorizedRolesCount = branch.Company.CompanyPeople.Count(role =>
+                    _authorizedRoles.Any(roleId =>
+                        role.RoleId == (int)roleId &&
+                        role.PersonId == personId.Value &&
+                        role.Deny == null
+                )),
+                TotalCount = totalCountQuery.Count(),
+            };
+        }
+
+        private static Expression<Func<Branch, bool>> BuildBranchFilter(
+            Guid branchId)
+        {
+            return branch => branch.BranchId == branchId;
+        }
+
+
+        private static Expression<Func<Branch, bool>> BuildCompanyFilters(
+            Guid? companyId,
+            string? regon,
+            string? nip,
+            string? krs)
+        {
+            if (companyId.HasValue)
+            {
+                return branch => branch.Company.CompanyId == companyId;
             }
 
             return branch =>
-                (request.Regon == null || branch.Company.Regon == request.Regon) &&
-                (request.Nip == null || branch.Company.Nip == request.Nip) &&
-                (request.Krs == null || branch.Company.Krs == request.Krs);
+                (regon == null || branch.Company.Regon == regon) &&
+                (nip == null || branch.Company.Nip == nip) &&
+                (krs == null || branch.Company.Krs == krs);
         }
 
-        private static Expression<Func<Branch, bool>> BuildFilters(GetCompanyBranchesRequest request)
+        private static Expression<Func<Branch, bool>> BuildOtherFilters(
+            string? searchText,
+            bool showRemoved)
         {
-            char[] separators = { ' ', ',', '\n', '\t' };
-            var searchWords = string.IsNullOrWhiteSpace(request.SearchText) ?
-                [] :
-                request.SearchText
-                .Split(separators, StringSplitOptions.RemoveEmptyEntries);
+            var searchWords = CustomStringProvider.Split(searchText);
 
             return branch =>
                 branch.Name != null &&
@@ -143,17 +229,12 @@ namespace UseCase.Roles.CompanyUser.Queries.GetCompanyBranches
                     !searchWords.Any() || searchWords.Any(word =>
                         branch.Name.Contains(word) ||
                         branch.Company.Name.Contains(word) ||
-                        (
-                            branch.Company.Description == null ||
-                            branch.Company.Description.Contains(word)
-                        ) ||
-                        (
-                            branch.Description == null ||
-                            branch.Description.Contains(word)
-                        ))
+                        (branch.Description != null && branch.Description.Contains(word)) ||
+                        (branch.Company.Description != null && branch.Company.Description.Contains(word))
+                    )
                 ) &&
                 (
-                     request.ShowRemoved
+                     showRemoved
                         ? branch.Removed != null
                         : branch.Removed == null
                 );
@@ -161,16 +242,19 @@ namespace UseCase.Roles.CompanyUser.Queries.GetCompanyBranches
 
         private static IQueryable<Branch> ApplyOrderBy(
             IQueryable<Branch> query,
-            GetCompanyBranchesRequest request)
+            BranchesOrderBy orderBy,
+            bool ascending,
+            bool showRemoved,
+            float? lon,
+            float? lat
+            )
         {
-            if (
-                request.OrderBy == BranchesOrderBy.Point &&
-                request.Lon != null &&
-                request.Lat != null
-                )
+            if (orderBy == BranchesOrderBy.Point &&
+                lon != null &&
+                lat != null)
             {
-                var point = new Point(request.Lon.Value, request.Lat.Value) { SRID = 4326 };
-                return request.Ascending ?
+                var point = new Point(lon.Value, lat.Value) { SRID = 4326 };
+                return ascending ?
                     query.OrderBy(branch => branch.Address.Point.Distance(point))
                     .ThenBy(branch => branch.Created) :
                     query.OrderByDescending(branch =>
@@ -178,35 +262,64 @@ namespace UseCase.Roles.CompanyUser.Queries.GetCompanyBranches
                         )
                     .ThenByDescending(branch => branch.Created);
             }
-            if (
-                !request.ShowRemoved &&
-                request.OrderBy == BranchesOrderBy.BranchRemoved
-                )
+            if (orderBy == BranchesOrderBy.BranchRemoved &&
+                showRemoved)
             {
-                return request.Ascending ?
-                            query.OrderBy(branch => branch.Removed) :
-                            query.OrderByDescending(branch => branch.Removed);
+                return ascending ?
+                    query.OrderBy(branch => branch.Removed) :
+                    query.OrderByDescending(branch => branch.Removed);
             }
 
-            switch (request.OrderBy)
+            switch (orderBy)
             {
                 case BranchesOrderBy.CompanyName:
-                    return request.Ascending ?
+                    return ascending ?
                         query.OrderBy(branch => branch.Company.Name) :
                         query.OrderByDescending(branch => branch.Company.Name);
                 case BranchesOrderBy.CompanyCreated:
-                    return request.Ascending ?
+                    return ascending ?
                         query.OrderBy(branch => branch.Company.Created) :
                         query.OrderByDescending(branch => branch.Company.Created);
                 case BranchesOrderBy.BranchName:
-                    return request.Ascending ?
+                    return ascending ?
                         query.OrderBy(branch => branch.Name) :
                         query.OrderByDescending(branch => branch.Name);
                 default:
-                    return request.Ascending ?
+                    return ascending ?
                         query.OrderBy(branch => branch.Created) :
                         query.OrderByDescending(branch => branch.Created);
             }
+        }
+
+        private static GetCompanyBranchesResponse InvalidResponse(HttpCode code)
+        {
+            return new GetCompanyBranchesResponse
+            {
+                Result = new ResponseQueryResultTemplate<CompanyAndBranchDto>
+                {
+                    Items = [],
+                    TotalCount = 0,
+                },
+                IsCorrect = false,
+                HttpCode = code,
+            };
+        }
+
+        private static GetCompanyBranchesResponse ValidResponse(
+            HttpCode code,
+            IEnumerable<CompanyAndBranchDto> items,
+            int totalCount)
+        {
+            return new GetCompanyBranchesResponse
+            {
+                Result = new ResponseQueryResultTemplate<CompanyAndBranchDto>
+                {
+                    Items = items,
+                    TotalCount = totalCount,
+                },
+                IsCorrect = false,
+                HttpCode = code,
+            };
         }
     }
 }
