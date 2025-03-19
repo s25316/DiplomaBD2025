@@ -54,7 +54,7 @@ const createBranch = () => {
       sendArray.push(rest)
     })
 
-    const res = await fetch(`http://localhost:8080/api/User/companies/${id}/branches`, {
+    const res = await fetch(`http://localhost:8080/api/CompanyUser/companies/${id}/branches`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

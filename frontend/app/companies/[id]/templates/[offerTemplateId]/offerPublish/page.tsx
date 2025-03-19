@@ -36,7 +36,7 @@ const PublishOffer = () => {
       if (!session?.user?.token) return;
       try {
         // Pobieranie branchy
-        const resBranches = await fetch(`http://localhost:8080/api/User/companies/${id}/branches`, {
+        const resBranches = await fetch(`http://localhost:8080/api/CompanyUser/companies/${id}/branches`, {
           headers: { Authorization: `Bearer ${session.user.token}` },
         });
         const branchesData = await resBranches.json();
@@ -90,7 +90,7 @@ const PublishOffer = () => {
     const offerData = { ...form, branchId: selectedBranch };
 
     const res = await fetch(
-      `http://localhost:8080/api/User/companies/${id}/offers/templates/${offerTemplateId}/offers`,
+      `http://localhost:8080/api/ComapnyUser/companies/${id}/offers/templates/${offerTemplateId}/offers`,
       {
         method: "POST",
         headers: {

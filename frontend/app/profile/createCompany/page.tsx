@@ -25,7 +25,7 @@ const CreateCompany = () => {
       return;
     }
 
-    const res = await fetch("http://localhost:8080/api/User/Companies", {
+    const res = await fetch("http://localhost:8080/api/CompanyUser/Companies", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

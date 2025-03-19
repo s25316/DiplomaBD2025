@@ -6,9 +6,10 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 
 interface CompanyProfile {
-  companyId: number,
+  companyId: string,
   name: string,
   description: string,
+  websiteUrl?: string;
 }
 
 const Profile = async () => {
@@ -18,7 +19,7 @@ const Profile = async () => {
     redirect("/api/auth/signin")
   }
 
-  const res = await fetch("http://localhost:8080/api/User/companies", {
+  const res = await fetch("http://localhost:8080/api/CompanyUser/companies", {
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${session?.user.token}`
@@ -29,7 +30,7 @@ const Profile = async () => {
 
   if (res.ok) {
     let tmp = await res.json()
-    companies = tmp.companies
+    companies = tmp.items;
   }
 
   return (

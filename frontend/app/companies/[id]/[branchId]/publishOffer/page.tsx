@@ -38,7 +38,7 @@ const PublishOffer = () => {
     const fetchData = async () => {
       try {
         // Pobranie listy offer templates
-        const resTemplates = await fetch(`http://localhost:8080/api/User/companies/${id}/offerTemplates`, {
+        const resTemplates = await fetch(`http://localhost:8080/api/CompanyUser/companies/${id}/offerTemplates`, {
           headers: { Authorization: `Bearer ${session.user.token}` },
         });
         setTemplates(await resTemplates.json().then((data) => data.offerTemplates));
@@ -134,6 +134,7 @@ const PublishOffer = () => {
 
         <label>Work End Date:</label>
         <input type="datetime-local" name="workEndDate" onChange={handleChange} required />
+
 
         <label>Salary Min:</label>
         <input type="number" name="salaryRangeMin" onChange={handleChange} required />

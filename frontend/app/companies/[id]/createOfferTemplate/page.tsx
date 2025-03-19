@@ -55,7 +55,7 @@ const CreateOfferTemplate = () => {
       return;
     }
 
-    const res = await fetch(`http://localhost:8080/api/User/companies/${id}/offers/templates`, {
+    const res = await fetch(`http://localhost:8080/api/CompanyUser/companies/${id}/offerTemplates`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

@@ -13,7 +13,7 @@ const ReturnButton = () => {
 
   return (
     <button onClick={handleGoBack} className="border-2 border-foreground px-4 py-2 rounded-lg font-bold transition duration-300 ease-in-out">
-      Return
+      Back
     </button>
   );
 };
