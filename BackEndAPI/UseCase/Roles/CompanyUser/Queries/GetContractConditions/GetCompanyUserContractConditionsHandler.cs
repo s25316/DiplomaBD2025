@@ -50,7 +50,7 @@ namespace UseCase.Roles.CompanyUser.Queries.GetContractConditions
                 .Paginate(request.Page, request.ItemsPerPage)
                 .Select(selector)
                 .ToListAsync(cancellationToken);
-            Console.WriteLine(query.ToQueryString());
+
             return PrepareResponse(selectResult);
         }
 
@@ -292,7 +292,8 @@ namespace UseCase.Roles.CompanyUser.Queries.GetContractConditions
 
                 .Include(cc => cc.ContractAttributes)
                 .ThenInclude(c => c.ContractParameter)
-                .ThenInclude(c => c.ContractParameterType);
+                .ThenInclude(c => c.ContractParameterType)
+                .AsNoTracking();
         }
 
         private IQueryable<ContractCondition> PrepareQuery(

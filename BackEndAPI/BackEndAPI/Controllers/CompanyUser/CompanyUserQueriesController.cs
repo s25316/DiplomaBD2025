@@ -13,6 +13,7 @@ using UseCase.Roles.CompanyUser.Queries.GetOffers.Request;
 using UseCase.Roles.CompanyUser.Queries.GetOfferTemplates.Enums;
 using UseCase.Roles.CompanyUser.Queries.GetOfferTemplates.Request;
 using UseCase.Shared.DTOs.Responses.Companies.Offers;
+using UseCase.Shared.ValidationAttributes;
 
 namespace BackEndAPI.Controllers.CompanyUser
 {
@@ -30,14 +31,18 @@ namespace BackEndAPI.Controllers.CompanyUser
             _mediator = mediator;
         }
 
-
+        public sealed class CompanyQueryParameters
+        {
+            [Regon]
+            public string? regon { get; init; }
+        }
         // Methods
         [Authorize]
         [HttpGet("companies")]
         [HttpGet("companies/{companyId:guid}")]
         public async Task<IActionResult> GetUserCompaniesAsync(
             Guid? companyId,
-            string? regon,
+            [FromQuery] CompanyQueryParameters company,
             string? nip,
             string? krs,
             string? searchText,
@@ -50,7 +55,7 @@ namespace BackEndAPI.Controllers.CompanyUser
             var result = await _mediator.Send(new GetCompanyUserCompaniesRequest
             {
                 CompanyId = companyId,
-                Regon = regon,
+                Regon = company.regon,
                 Nip = nip,
                 Krs = krs,
                 SearchText = searchText,

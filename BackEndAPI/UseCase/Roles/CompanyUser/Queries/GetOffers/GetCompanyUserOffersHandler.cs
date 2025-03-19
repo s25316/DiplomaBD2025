@@ -44,7 +44,7 @@ namespace UseCase.Roles.CompanyUser.Queries.GetOffers
         {
             var personId = GetPersonId(request);
             var query = BuildQuery(personId, request);
-            Console.WriteLine(query.ToQueryString());
+
             var selector = BuildSelector(personId, query);
             var selectResults = await query
                 .Paginate(request.Page, request.ItemsPerPage)
@@ -313,7 +313,8 @@ namespace UseCase.Roles.CompanyUser.Queries.GetOffers
                 .ThenInclude(oc => oc.OfferTemplate)
                 .ThenInclude(oc => oc.OfferSkills)
                 .ThenInclude(oc => oc.Skill)
-                .ThenInclude(oc => oc.SkillType);
+                .ThenInclude(oc => oc.SkillType)
+                .AsNoTracking();
         }
 
         private IQueryable<Offer> BuildQuery(

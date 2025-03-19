@@ -147,8 +147,6 @@ namespace UseCase.Roles.CompanyUser.Commands.ContractConditionsCreate.Repositori
                 paramiterIds.AddRange(domain.WorkModeIds);
                 paramiterIds.AddRange(domain.EmploymentTypeIds);
 
-                foreach (var z in paramiterIds)
-                    Console.WriteLine(z);
                 var attributes = paramiterIds.Select(id => new DatabaseContractAttribute
                 {
                     ContractParameterId = id,
