@@ -117,17 +117,23 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Entity_Company_KrsDuplicate" xml:space="preserve">
-    <value>Contains KRS duplicates existing company</value>
+  <data name="Entity_Branch_SkillIds_NotFound" xml:space="preserve">
+    <value>SkillIds Not Found</value>
   </data>
-  <data name="Entity_Company_NameDuplicate" xml:space="preserve">
-    <value>Contains Name duplicates existing company</value>
+  <data name="Entity_Company_Krs_Conflict" xml:space="preserve">
+    <value>Duplicate Company KRS</value>
   </data>
-  <data name="Entity_Company_NipDuplicate" xml:space="preserve">
-    <value>Contains NIP duplicates existing company</value>
+  <data name="Entity_Company_Name_Conflict" xml:space="preserve">
+    <value>Duplicate Company Name</value>
   </data>
-  <data name="Entity_Company_RegonDuplicate" xml:space="preserve">
-    <value>Contains REGON duplicates existing company</value>
+  <data name="Entity_Company_Nip_Conflict" xml:space="preserve">
+    <value>Duplicate Company NIP</value>
+  </data>
+  <data name="Entity_Company_Regon_Conflict" xml:space="preserve">
+    <value>Duplicate Company REGON</value>
+  </data>
+  <data name="Entity_Offers_Status_Started" xml:space="preserve">
+    <value>Offer publish start invalid, offer start</value>
   </data>
   <data name="Procedure_Address_Create_InvalidResult" xml:space="preserve">
     <value>Procedure_Address_Create_InvalidResult</value>

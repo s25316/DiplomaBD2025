@@ -12,7 +12,7 @@ namespace Domain.Shared.Templates
 
         // Public Methods
         public bool HasErrors() => _errors.Length > 0;
-        public string GetErrors() => _errors.ToString().Trim();
+        public string? GetErrors() => _errors.Length == 0 ? null : _errors.ToString().Trim();
         public T Build()
         {
             SetDefaultValues()(_value);

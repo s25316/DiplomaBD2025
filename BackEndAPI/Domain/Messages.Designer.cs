@@ -97,11 +97,20 @@ namespace Domain {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Currency can not be empty.
+        ///   Looks up a localized string similar to CurrencyId can not be Empty.
         /// </summary>
-        internal static string Entity_Offer_CurrencyIdRequired {
+        internal static string Entity_ContractCondition_CurrencyId_Empty {
             get {
-                return ResourceManager.GetString("Entity_Offer_CurrencyIdRequired", resourceCulture);
+                return ResourceManager.GetString("Entity_ContractCondition_CurrencyId_Empty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SalaryTermId can not be Empty.
+        /// </summary>
+        internal static string Entity_ContractCondition_SalaryTermId_Empty {
+            get {
+                return ResourceManager.GetString("Entity_ContractCondition_SalaryTermId_Empty", resourceCulture);
             }
         }
         
@@ -111,33 +120,6 @@ namespace Domain {
         internal static string Entity_Offer_EmptyPublicationEndForWorkRange {
             get {
                 return ResourceManager.GetString("Entity_Offer_EmptyPublicationEndForWorkRange", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Salary can not be less then zero.
-        /// </summary>
-        internal static string Entity_Offer_SalaryRangeLessZero {
-            get {
-                return ResourceManager.GetString("Entity_Offer_SalaryRangeLessZero", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Salary Term can not be empty.
-        /// </summary>
-        internal static string Entity_Offer_SalaryTermIdRequired {
-            get {
-                return ResourceManager.GetString("Entity_Offer_SalaryTermIdRequired", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Work can be start minimum on next day after Publication End .
-        /// </summary>
-        internal static string Entity_Offer_WorkRangeLessPublicationEnd {
-            get {
-                return ResourceManager.GetString("Entity_Offer_WorkRangeLessPublicationEnd", resourceCulture);
             }
         }
         
@@ -160,11 +142,38 @@ namespace Domain {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Employment Length can not be less or 0.
+        /// </summary>
+        internal static string Record_EmploymentLength_Invalid {
+            get {
+                return ResourceManager.GetString("Record_EmploymentLength_Invalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to  Hours Per Term can not be less 1.
+        /// </summary>
+        internal static string Record_HoursPerTerm_Invalid {
+            get {
+                return ResourceManager.GetString("Record_HoursPerTerm_Invalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to KRS need to contain 10 numbers, value invalid.
         /// </summary>
         internal static string Record_Krs_Invalid {
             get {
                 return ResourceManager.GetString("Record_Krs_Invalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Money value is invalid.
+        /// </summary>
+        internal static string Record_Money_Invalid {
+            get {
+                return ResourceManager.GetString("Record_Money_Invalid", resourceCulture);
             }
         }
         
@@ -183,6 +192,15 @@ namespace Domain {
         internal static string Record_Regon_Invalid {
             get {
                 return ResourceManager.GetString("Record_Regon_Invalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Salary can not be less then zero.
+        /// </summary>
+        internal static string Record_SalaryRange_Invalid {
+            get {
+                return ResourceManager.GetString("Record_SalaryRange_Invalid", resourceCulture);
             }
         }
         

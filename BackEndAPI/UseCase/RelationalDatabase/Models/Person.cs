@@ -4,6 +4,8 @@ public partial class Person
 {
     public Guid PersonId { get; set; }
 
+    public Guid? AddressId { get; set; }
+
     public string? Login { get; set; }
 
     public string? Logo { get; set; }
@@ -18,12 +20,6 @@ public partial class Person
 
     public string? ContactEmail { get; set; }
 
-    public DateTime Created { get; set; }
-
-    public DateTime? Removed { get; set; }
-
-    public DateTime? Blocked { get; set; }
-
     public DateOnly? BirthDate { get; set; }
 
     public bool IsTwoFactorAuth { get; set; }
@@ -32,17 +28,19 @@ public partial class Person
 
     public bool IsAdmin { get; set; }
 
-    public Guid? AddressId { get; set; }
-
     public string Password { get; set; } = null!;
 
     public string Salt { get; set; } = null!;
 
+    public DateTime Created { get; set; }
+
+    public DateTime? Blocked { get; set; }
+
+    public DateTime? Removed { get; set; }
+
     public virtual Address? Address { get; set; }
 
     public virtual ICollection<CompanyPerson> CompanyPeople { get; set; } = new List<CompanyPerson>();
-
-    public virtual ICollection<Hrprocess> Hrprocesses { get; set; } = new List<Hrprocess>();
 
     public virtual ICollection<Notification> Notifications { get; set; } = new List<Notification>();
 

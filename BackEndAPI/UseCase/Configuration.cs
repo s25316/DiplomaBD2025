@@ -2,11 +2,12 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
-using UseCase.Roles.CompanyUser.Commands.Repositories.Branches;
-using UseCase.Roles.CompanyUser.Commands.Repositories.Companies;
-using UseCase.Roles.CompanyUser.Commands.Repositories.Offers;
-using UseCase.Roles.CompanyUser.Commands.Repositories.OfferTemplates;
-using UseCase.Roles.Guests.Queries.Dictionaries.Repositories;
+using UseCase.Roles.CompanyUser.Commands.BranchesCreate.Repositories;
+using UseCase.Roles.CompanyUser.Commands.CompaniesCreate.Repositories;
+using UseCase.Roles.CompanyUser.Commands.ContractConditionsCreate.Repositories;
+using UseCase.Roles.CompanyUser.Commands.OffersCreate.Repositories;
+using UseCase.Roles.CompanyUser.Commands.OfferTemplatesCreate.Repositories;
+using UseCase.Shared.Dictionaries.Repositories;
 using UseCase.Shared.Exceptions;
 using UseCase.Shared.Repositories.Addresses;
 using UseCase.Shared.Services.Authentication.Generators;
@@ -59,15 +60,16 @@ namespace UseCase
 
 
             // Company User
-            services.AddTransient<IBranchRepository, BranchRepository>();
             services.AddTransient<ICompanyRepository, CompanyRepository>();
+            services.AddTransient<IBranchRepository, BranchRepository>();
             services.AddTransient<IOfferTemplateRepository, OfferTemplateRepository>();
+            services.AddTransient<IContractConditionRepository, ContractConditionRepository>();
             services.AddTransient<IOfferRepository, OfferRepository>();
 
             // Guest
-            services.AddTransient<IDictionariesRepository, DictionariesRepository>();
 
             // Shared
+            services.AddTransient<IDictionariesRepository, DictionariesRepository>();
             services.AddTransient<IAddressRepository, AddressRepository>();
 
             services.AddTransient<IAuthenticationGeneratorService, AuthenticationGeneratorService>();

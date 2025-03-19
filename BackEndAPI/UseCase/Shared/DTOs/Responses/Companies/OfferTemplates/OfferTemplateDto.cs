@@ -4,12 +4,18 @@ namespace UseCase.Shared.DTOs.Responses.Companies.OfferTemplates
 {
     public class OfferTemplateDto
     {
-        public Guid OfferTemplateId { get; init; }
-        public Guid CompanyId { get; init; }
-        public string Name { get; init; } = null!;
-        public string Description { get; init; } = null!;
-        public DateTime Created { get; init; }
-        public DateTime? Removed { get; init; }
+        public Guid OfferTemplateId { get; set; }
+
+        public Guid CompanyId { get; set; }
+
+        public string Name { get; set; } = null!;
+
+        public string Description { get; set; } = null!;
+
+        public DateTime Created { get; set; }
+
+        public DateTime? Removed { get; set; }
+
         public IEnumerable<OfferSkillDto> Skills { get; init; } = [];
     }
 }

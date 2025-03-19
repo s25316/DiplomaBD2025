@@ -15,14 +15,11 @@ namespace Infrastructure.RelationalDatabase
                 x => x.UseNetTopologySuite());
         }
 
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Address>(entity =>
             {
-                entity.HasKey(e => e.AddressId).HasName("Address_pk");
-
-                entity.ToTable("Address");
+                entity.HasKey(e => e.AddressId).HasName("Addresses_pk");
 
                 entity.Property(e => e.AddressId).HasDefaultValueSql("(newid())");
                 entity.Property(e => e.ApartmentNumber).HasMaxLength(25);
@@ -32,18 +29,16 @@ namespace Infrastructure.RelationalDatabase
                 entity.HasOne(d => d.City).WithMany(p => p.Addresses)
                     .HasForeignKey(d => d.CityId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("Address_City");
+                    .HasConstraintName("Addresses_Cities");
 
                 entity.HasOne(d => d.Street).WithMany(p => p.Addresses)
                     .HasForeignKey(d => d.StreetId)
-                    .HasConstraintName("Address_Street");
+                    .HasConstraintName("Addresses_Streets");
             });
 
             modelBuilder.Entity<Branch>(entity =>
             {
-                entity.HasKey(e => e.BranchId).HasName("Branch_pk");
-
-                entity.ToTable("Branch");
+                entity.HasKey(e => e.BranchId).HasName("Branches_pk");
 
                 entity.Property(e => e.BranchId).HasDefaultValueSql("(newid())");
                 entity.Property(e => e.Created)
@@ -56,19 +51,17 @@ namespace Infrastructure.RelationalDatabase
                 entity.HasOne(d => d.Address).WithMany(p => p.Branches)
                     .HasForeignKey(d => d.AddressId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("Branch_Address");
+                    .HasConstraintName("Branches_Addresses");
 
                 entity.HasOne(d => d.Company).WithMany(p => p.Branches)
                     .HasForeignKey(d => d.CompanyId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("Branch_Company");
+                    .HasConstraintName("Branches_Companies");
             });
 
             modelBuilder.Entity<City>(entity =>
             {
-                entity.HasKey(e => e.CityId).HasName("City_pk");
-
-                entity.ToTable("City");
+                entity.HasKey(e => e.CityId).HasName("Cities_pk");
 
                 entity.Property(e => e.CityId).HasDefaultValueSql("(NEXT VALUE FOR [CityId_SEQUENCE])");
                 entity.Property(e => e.Name).HasMaxLength(100);
@@ -76,14 +69,12 @@ namespace Infrastructure.RelationalDatabase
                 entity.HasOne(d => d.State).WithMany(p => p.Cities)
                     .HasForeignKey(d => d.StateId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("City_State");
+                    .HasConstraintName("Cities_States");
             });
 
             modelBuilder.Entity<Company>(entity =>
             {
-                entity.HasKey(e => e.CompanyId).HasName("Company_pk");
-
-                entity.ToTable("Company");
+                entity.HasKey(e => e.CompanyId).HasName("Companies_pk");
 
                 entity.Property(e => e.CompanyId).HasDefaultValueSql("(newid())");
                 entity.Property(e => e.Blocked).HasColumnType("datetime");
@@ -102,9 +93,7 @@ namespace Infrastructure.RelationalDatabase
 
             modelBuilder.Entity<CompanyPerson>(entity =>
             {
-                entity.HasKey(e => e.CompanyPersonId).HasName("CompanyPerson_pk");
-
-                entity.ToTable("CompanyPerson");
+                entity.HasKey(e => e.CompanyPersonId).HasName("CompanyPeople_pk");
 
                 entity.Property(e => e.CompanyPersonId).HasDefaultValueSql("(newid())");
                 entity.Property(e => e.Deny).HasColumnType("datetime");
@@ -115,69 +104,106 @@ namespace Infrastructure.RelationalDatabase
                 entity.HasOne(d => d.Company).WithMany(p => p.CompanyPeople)
                     .HasForeignKey(d => d.CompanyId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("CompanyPerson_Company");
+                    .HasConstraintName("CompanyPeople_Companies");
 
                 entity.HasOne(d => d.Person).WithMany(p => p.CompanyPeople)
                     .HasForeignKey(d => d.PersonId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("CompanyPerson_Person");
+                    .HasConstraintName("CompanyPeople_People");
 
                 entity.HasOne(d => d.Role).WithMany(p => p.CompanyPeople)
                     .HasForeignKey(d => d.RoleId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("CompanyPerson_Role");
+                    .HasConstraintName("CompanyPeople_Roles");
+            });
+
+            modelBuilder.Entity<ContractAttribute>(entity =>
+            {
+                entity.HasKey(e => e.ContractAttributeId).HasName("ContractAttributes_pk");
+
+                entity.Property(e => e.ContractAttributeId).HasDefaultValueSql("(newid())");
+                entity.Property(e => e.Created)
+                    .HasDefaultValueSql("(getdate())")
+                    .HasColumnType("datetime");
+                entity.Property(e => e.Removed).HasColumnType("datetime");
+
+                entity.HasOne(d => d.ContractCondition).WithMany(p => p.ContractAttributes)
+                    .HasForeignKey(d => d.ContractConditionId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("ContractAttributes_ContractConditions");
+
+                entity.HasOne(d => d.ContractParameter).WithMany(p => p.ContractAttributes)
+                    .HasForeignKey(d => d.ContractParameterId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("ContractAttributes_ContractParameters");
+            });
+
+            modelBuilder.Entity<ContractCondition>(entity =>
+            {
+                entity.HasKey(e => e.ContractConditionId).HasName("ContractConditions_pk");
+
+                entity.Property(e => e.ContractConditionId).HasDefaultValueSql("(newid())");
+                entity.Property(e => e.Created)
+                    .HasDefaultValueSql("(getdate())")
+                    .HasColumnType("datetime");
+                entity.Property(e => e.HoursPerTerm).HasDefaultValue(1);
+                entity.Property(e => e.IsNegotiable).HasDefaultValue(true);
+                entity.Property(e => e.Removed).HasColumnType("datetime");
+                entity.Property(e => e.SalaryMax).HasColumnType("money");
+                entity.Property(e => e.SalaryMin).HasColumnType("money");
+
+                entity.HasOne(d => d.Company).WithMany(p => p.ContractConditions)
+                    .HasForeignKey(d => d.CompanyId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("ContractConditions_Companies");
+            });
+
+            modelBuilder.Entity<ContractParameter>(entity =>
+            {
+                entity.HasKey(e => e.ContractParameterId).HasName("ContractParameters_pk");
+
+                entity.Property(e => e.ContractParameterId).HasDefaultValueSql("(NEXT VALUE FOR [ContractParameterId_SEQUENCE])");
+                entity.Property(e => e.Name).HasMaxLength(100);
+
+                entity.HasOne(d => d.ContractParameterType).WithMany(p => p.ContractParameters)
+                    .HasForeignKey(d => d.ContractParameterTypeId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("ContractParameters_ContractParameterTypes");
+            });
+
+            modelBuilder.Entity<ContractParameterType>(entity =>
+            {
+                entity.HasKey(e => e.ContractParameterTypeId).HasName("ContractParameterTypes_pk");
+
+                entity.Property(e => e.ContractParameterTypeId).HasDefaultValueSql("(NEXT VALUE FOR [ContractParameterTypeId_SEQUENCE])");
+                entity.Property(e => e.Name).HasMaxLength(100);
             });
 
             modelBuilder.Entity<Country>(entity =>
             {
-                entity.HasKey(e => e.CountryId).HasName("Country_pk");
-
-                entity.ToTable("Country");
+                entity.HasKey(e => e.CountryId).HasName("Countries_pk");
 
                 entity.Property(e => e.CountryId).HasDefaultValueSql("(NEXT VALUE FOR [CountryId_SEQUENCE])");
                 entity.Property(e => e.Name).HasMaxLength(100);
             });
 
-            modelBuilder.Entity<Currency>(entity =>
-            {
-                entity.HasKey(e => e.CurrencyId).HasName("Currency_pk");
-
-                entity.ToTable("Currency");
-
-                entity.Property(e => e.CurrencyId).HasDefaultValueSql("(NEXT VALUE FOR [CurrencyId_SEQUENCE])");
-                entity.Property(e => e.Name).HasMaxLength(100);
-            });
-
-            modelBuilder.Entity<EmploymentType>(entity =>
-            {
-                entity.HasKey(e => e.EmploymentTypeId).HasName("EmploymentType_pk");
-
-                entity.ToTable("EmploymentType");
-
-                entity.Property(e => e.EmploymentTypeId).HasDefaultValueSql("(NEXT VALUE FOR [EmploymentTypeId_SEQUENCE])");
-                entity.Property(e => e.Name).HasMaxLength(100);
-            });
-
             modelBuilder.Entity<Ex>(entity =>
             {
-                entity.HasKey(e => e.ExceptionId).HasName("Ex_pk");
-
-                entity.ToTable("Ex");
+                entity.HasKey(e => e.ExceptionId).HasName("Exs_pk");
 
                 entity.Property(e => e.ExceptionId).HasDefaultValueSql("(newid())");
                 entity.Property(e => e.Created)
                     .HasDefaultValueSql("(getdate())")
                     .HasColumnType("datetime");
                 entity.Property(e => e.ExceptionType).HasMaxLength(100);
+                entity.Property(e => e.Handled).HasColumnType("datetime");
                 entity.Property(e => e.Method).HasMaxLength(100);
                 entity.Property(e => e.StackTrace).HasMaxLength(800);
             });
 
             modelBuilder.Entity<Faq>(entity =>
             {
-                entity.HasKey(e => e.FaqId).HasName("Faq_pk");
-
-                entity.ToTable("Faq");
+                entity.HasKey(e => e.FaqId).HasName("Faqs_pk");
 
                 entity.Property(e => e.FaqId).HasDefaultValueSql("(newid())");
                 entity.Property(e => e.Answer).HasMaxLength(800);
@@ -186,6 +212,15 @@ namespace Infrastructure.RelationalDatabase
                     .HasColumnType("datetime");
                 entity.Property(e => e.Question).HasMaxLength(800);
                 entity.Property(e => e.Removed).HasColumnType("datetime");
+            });
+
+            modelBuilder.Entity<HrProcess>(entity =>
+            {
+                entity.HasKey(e => e.ProcessId).HasName("HrProcess_pk");
+
+                entity.ToTable("HrProcess");
+
+                entity.Property(e => e.ProcessId).HasDefaultValueSql("(newid())");
             });
 
             modelBuilder.Entity<Hrchat>(entity =>
@@ -214,25 +249,6 @@ namespace Infrastructure.RelationalDatabase
                     .HasConstraintName("HRChat_ProcessType");
             });
 
-            modelBuilder.Entity<Hrprocess>(entity =>
-            {
-                entity.HasKey(e => e.ProcessId).HasName("HRProcess_pk");
-
-                entity.ToTable("HRProcess");
-
-                entity.Property(e => e.ProcessId).HasDefaultValueSql("(newid())");
-
-                entity.HasOne(d => d.Offer).WithMany(p => p.Hrprocesses)
-                    .HasForeignKey(d => d.OfferId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("HRProcess_Offer");
-
-                entity.HasOne(d => d.Person).WithMany(p => p.Hrprocesses)
-                    .HasForeignKey(d => d.PersonId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("HRProcess_Person");
-            });
-
             modelBuilder.Entity<Nchat>(entity =>
             {
                 entity.HasKey(e => e.MessageId).HasName("NChat_pk");
@@ -247,18 +263,11 @@ namespace Infrastructure.RelationalDatabase
                 entity.Property(e => e.MongoUrl).HasMaxLength(100);
                 entity.Property(e => e.Read).HasColumnType("datetime");
                 entity.Property(e => e.Removed).HasColumnType("datetime");
-
-                entity.HasOne(d => d.Notification).WithMany(p => p.Nchats)
-                    .HasForeignKey(d => d.NotificationId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("NChat_Notification");
             });
 
             modelBuilder.Entity<Notification>(entity =>
             {
-                entity.HasKey(e => e.NotificationId).HasName("Notification_pk");
-
-                entity.ToTable("Notification");
+                entity.HasKey(e => e.NotificationId).HasName("Notifications_pk");
 
                 entity.Property(e => e.NotificationId).HasDefaultValueSql("(newid())");
                 entity.Property(e => e.Completed).HasColumnType("datetime");
@@ -273,86 +282,81 @@ namespace Infrastructure.RelationalDatabase
                 entity.HasOne(d => d.NotificationType).WithMany(p => p.Notifications)
                     .HasForeignKey(d => d.NotificationTypeId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("Notification_NotificationType");
+                    .HasConstraintName("Notifications_NotificationTypes");
 
                 entity.HasOne(d => d.Person).WithMany(p => p.Notifications)
                     .HasForeignKey(d => d.PersonId)
-                    .HasConstraintName("Notification_Person");
+                    .HasConstraintName("Notifications_People");
             });
 
             modelBuilder.Entity<NotificationType>(entity =>
             {
-                entity.HasKey(e => e.NotificationTypeId).HasName("NotificationType_pk");
+                entity.HasKey(e => e.NotificationTypeId).HasName("NotificationTypes_pk");
 
-                entity.ToTable("NotificationType");
-
-                entity.Property(e => e.NotificationTypeId).HasDefaultValueSql("(NEXT VALUE FOR [FaqId_SEQUENCE])");
+                entity.Property(e => e.NotificationTypeId).HasDefaultValueSql("(NEXT VALUE FOR [NotificationTypeId_SEQUENCE])");
                 entity.Property(e => e.Description).HasMaxLength(100);
                 entity.Property(e => e.Name).HasMaxLength(100);
             });
 
             modelBuilder.Entity<Offer>(entity =>
             {
-                entity.HasKey(e => e.OfferId).HasName("Offer_pk");
-
-                entity.ToTable("Offer");
+                entity.HasKey(e => e.OfferId).HasName("Offers_pk");
 
                 entity.Property(e => e.OfferId).HasDefaultValueSql("(newid())");
-                entity.Property(e => e.IsNegotiated).HasDefaultValue(true);
                 entity.Property(e => e.PublicationEnd).HasColumnType("datetime");
-                entity.Property(e => e.PublicationStart)
-                    .HasDefaultValueSql("(getdate())")
-                    .HasColumnType("datetime");
-                entity.Property(e => e.SalaryRangeMax).HasColumnType("money");
-                entity.Property(e => e.SalaryRangeMin).HasColumnType("money");
+                entity.Property(e => e.PublicationStart).HasColumnType("datetime");
                 entity.Property(e => e.WebsiteUrl).HasMaxLength(800);
 
                 entity.HasOne(d => d.Branch).WithMany(p => p.Offers)
                     .HasForeignKey(d => d.BranchId)
-                    .HasConstraintName("Offer_Branch");
-
-                entity.HasOne(d => d.Currency).WithMany(p => p.Offers)
-                    .HasForeignKey(d => d.CurrencyId)
-                    .HasConstraintName("Offer_Currency");
-
-                entity.HasOne(d => d.OfferTemplate).WithMany(p => p.Offers)
-                    .HasForeignKey(d => d.OfferTemplateId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("Offer_OfferTemplate");
-
-                entity.HasOne(d => d.SalaryTerm).WithMany(p => p.Offers)
-                    .HasForeignKey(d => d.SalaryTermId)
-                    .HasConstraintName("Offer_SalaryTerm");
+                    .HasConstraintName("Offers_Branches");
             });
 
-            modelBuilder.Entity<OfferEmploymentType>(entity =>
+            modelBuilder.Entity<OfferCondition>(entity =>
             {
-                entity.HasKey(e => e.OfferEmploymentTypeId).HasName("OfferEmploymentType_pk");
+                entity.HasKey(e => e.OfferConditionId).HasName("OfferConditions_pk");
 
-                entity.ToTable("OfferEmploymentType");
-
-                entity.Property(e => e.OfferEmploymentTypeId).HasDefaultValueSql("(newid())");
+                entity.Property(e => e.OfferConditionId).HasDefaultValueSql("(newid())");
                 entity.Property(e => e.Created)
                     .HasDefaultValueSql("(getdate())")
                     .HasColumnType("datetime");
                 entity.Property(e => e.Removed).HasColumnType("datetime");
 
-                entity.HasOne(d => d.EmploymentType).WithMany(p => p.OfferEmploymentTypes)
-                    .HasForeignKey(d => d.EmploymentTypeId)
+                entity.HasOne(d => d.ContractCondition).WithMany(p => p.OfferConditions)
+                    .HasForeignKey(d => d.ContractConditionId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("OfferEmploymentType_EmploymentType");
+                    .HasConstraintName("OfferConditions_ContractConditions");
 
-                entity.HasOne(d => d.Offer).WithMany(p => p.OfferEmploymentTypes)
+                entity.HasOne(d => d.Offer).WithMany(p => p.OfferConditions)
                     .HasForeignKey(d => d.OfferId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("OfferEmploymentType_Offer");
+                    .HasConstraintName("OfferConditions_Offers");
+            });
+
+            modelBuilder.Entity<OfferConnection>(entity =>
+            {
+                entity.HasKey(e => e.OfferConnectionId).HasName("OfferConnections_pk");
+
+                entity.Property(e => e.OfferConnectionId).HasDefaultValueSql("(newid())");
+                entity.Property(e => e.Created)
+                    .HasDefaultValueSql("(getdate())")
+                    .HasColumnType("datetime");
+                entity.Property(e => e.Removed).HasColumnType("datetime");
+
+                entity.HasOne(d => d.Offer).WithMany(p => p.OfferConnections)
+                    .HasForeignKey(d => d.OfferId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("OfferConnections_Offers");
+
+                entity.HasOne(d => d.OfferTemplate).WithMany(p => p.OfferConnections)
+                    .HasForeignKey(d => d.OfferTemplateId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("OfferConnections_OfferTemplates");
             });
 
             modelBuilder.Entity<OfferSkill>(entity =>
             {
-                entity.HasKey(e => e.OfferSkillId).HasName("OfferSkill_pk");
-
-                entity.ToTable("OfferSkill");
+                entity.HasKey(e => e.OfferSkillId).HasName("OfferSkills_pk");
 
                 entity.Property(e => e.OfferSkillId).HasDefaultValueSql("(newid())");
                 entity.Property(e => e.Created)
@@ -363,19 +367,17 @@ namespace Infrastructure.RelationalDatabase
                 entity.HasOne(d => d.OfferTemplate).WithMany(p => p.OfferSkills)
                     .HasForeignKey(d => d.OfferTemplateId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("OfferSkill_OfferTemplate");
+                    .HasConstraintName("OfferSkills_OfferTemplates");
 
                 entity.HasOne(d => d.Skill).WithMany(p => p.OfferSkills)
                     .HasForeignKey(d => d.SkillId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("OfferSkill_Skill");
+                    .HasConstraintName("OfferSkills_Skills");
             });
 
             modelBuilder.Entity<OfferTemplate>(entity =>
             {
-                entity.HasKey(e => e.OfferTemplateId).HasName("OfferTemplate_pk");
-
-                entity.ToTable("OfferTemplate");
+                entity.HasKey(e => e.OfferTemplateId).HasName("OfferTemplates_pk");
 
                 entity.Property(e => e.OfferTemplateId).HasDefaultValueSql("(newid())");
                 entity.Property(e => e.Created)
@@ -388,37 +390,12 @@ namespace Infrastructure.RelationalDatabase
                 entity.HasOne(d => d.Company).WithMany(p => p.OfferTemplates)
                     .HasForeignKey(d => d.CompanyId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("OfferTemplate_Company");
-            });
-
-            modelBuilder.Entity<OfferWorkMode>(entity =>
-            {
-                entity.HasKey(e => e.OfferWorkModeId).HasName("OfferWorkMode_pk");
-
-                entity.ToTable("OfferWorkMode");
-
-                entity.Property(e => e.OfferWorkModeId).HasDefaultValueSql("(newid())");
-                entity.Property(e => e.Created)
-                    .HasDefaultValueSql("(getdate())")
-                    .HasColumnType("datetime");
-                entity.Property(e => e.Removed).HasColumnType("datetime");
-
-                entity.HasOne(d => d.Offer).WithMany(p => p.OfferWorkModes)
-                    .HasForeignKey(d => d.OfferId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("OfferWorkMode_Offer");
-
-                entity.HasOne(d => d.WorkMode).WithMany(p => p.OfferWorkModes)
-                    .HasForeignKey(d => d.WorkModeId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("OfferWorkMode_WorkMode");
+                    .HasConstraintName("OfferTemplates_Companies");
             });
 
             modelBuilder.Entity<Person>(entity =>
             {
-                entity.HasKey(e => e.PersonId).HasName("Person_pk");
-
-                entity.ToTable("Person");
+                entity.HasKey(e => e.PersonId).HasName("People_pk");
 
                 entity.Property(e => e.PersonId).HasDefaultValueSql("(newid())");
                 entity.Property(e => e.Blocked).HasColumnType("datetime");
@@ -436,14 +413,12 @@ namespace Infrastructure.RelationalDatabase
 
                 entity.HasOne(d => d.Address).WithMany(p => p.People)
                     .HasForeignKey(d => d.AddressId)
-                    .HasConstraintName("Person_Address");
+                    .HasConstraintName("People_Addresses");
             });
 
             modelBuilder.Entity<PersonSkill>(entity =>
             {
-                entity.HasKey(e => e.PersonSkillId).HasName("PersonSkill_pk");
-
-                entity.ToTable("PersonSkill");
+                entity.HasKey(e => e.PersonSkillId).HasName("PersonSkills_pk");
 
                 entity.Property(e => e.PersonSkillId).HasDefaultValueSql("(newid())");
                 entity.Property(e => e.Created)
@@ -454,12 +429,12 @@ namespace Infrastructure.RelationalDatabase
                 entity.HasOne(d => d.Person).WithMany(p => p.PersonSkills)
                     .HasForeignKey(d => d.PersonId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("PersonSkill_Person");
+                    .HasConstraintName("PersonSkills_People");
 
                 entity.HasOne(d => d.Skill).WithMany(p => p.PersonSkills)
                     .HasForeignKey(d => d.SkillId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("PersonSkill_Skill");
+                    .HasConstraintName("PersonSkills_Skills");
             });
 
             modelBuilder.Entity<ProcessType>(entity =>
@@ -474,91 +449,71 @@ namespace Infrastructure.RelationalDatabase
 
             modelBuilder.Entity<Role>(entity =>
             {
-                entity.HasKey(e => e.RoleId).HasName("Role_pk");
-
-                entity.ToTable("Role");
+                entity.HasKey(e => e.RoleId).HasName("Roles_pk");
 
                 entity.Property(e => e.RoleId).HasDefaultValueSql("(NEXT VALUE FOR [RoleId_SEQUENCE])");
                 entity.Property(e => e.Description).HasMaxLength(800);
                 entity.Property(e => e.Name).HasMaxLength(100);
             });
 
-            modelBuilder.Entity<SalaryTerm>(entity =>
-            {
-                entity.HasKey(e => e.SalaryTermId).HasName("SalaryTerm_pk");
-
-                entity.ToTable("SalaryTerm");
-
-                entity.Property(e => e.SalaryTermId).HasDefaultValueSql("(NEXT VALUE FOR [SalaryTermId_SEQUENCE])");
-                entity.Property(e => e.Name).HasMaxLength(100);
-            });
-
             modelBuilder.Entity<Skill>(entity =>
             {
-                entity.HasKey(e => e.SkillId).HasName("Skill_pk");
-
-                entity.ToTable("Skill");
+                entity.HasKey(e => e.SkillId).HasName("Skills_pk");
 
                 entity.Property(e => e.SkillId).HasDefaultValueSql("(NEXT VALUE FOR [SkillId_SEQUENCE])");
-                entity.Property(e => e.Description).HasMaxLength(800);
                 entity.Property(e => e.Name).HasMaxLength(100);
 
                 entity.HasOne(d => d.SkillType).WithMany(p => p.Skills)
                     .HasForeignKey(d => d.SkillTypeId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("Skill_SkillType");
+                    .HasConstraintName("Skills_SkillTypes");
 
-                entity.HasMany(d => d.Childlds).WithMany(p => p.Parentlds)
+                entity.HasMany(d => d.ChildSkills).WithMany(p => p.ParentSkills)
                     .UsingEntity<Dictionary<string, object>>(
                         "SkillConnection",
                         r => r.HasOne<Skill>().WithMany()
-                            .HasForeignKey("Childld")
+                            .HasForeignKey("ChildSkillId")
                             .OnDelete(DeleteBehavior.ClientSetNull)
-                            .HasConstraintName("SkillConnections_Skill2"),
+                            .HasConstraintName("SkillConnections_Skills1"),
                         l => l.HasOne<Skill>().WithMany()
-                            .HasForeignKey("Parentld")
+                            .HasForeignKey("ParentSkillId")
                             .OnDelete(DeleteBehavior.ClientSetNull)
-                            .HasConstraintName("SkillConnections_Skill1"),
+                            .HasConstraintName("SkillConnections_Skills2"),
                         j =>
                         {
-                            j.HasKey("Parentld", "Childld").HasName("SkillConnections_pk");
+                            j.HasKey("ParentSkillId", "ChildSkillId").HasName("SkillConnections_pk");
                             j.ToTable("SkillConnections");
                         });
 
-                entity.HasMany(d => d.Parentlds).WithMany(p => p.Childlds)
+                entity.HasMany(d => d.ParentSkills).WithMany(p => p.ChildSkills)
                     .UsingEntity<Dictionary<string, object>>(
                         "SkillConnection",
                         r => r.HasOne<Skill>().WithMany()
-                            .HasForeignKey("Parentld")
+                            .HasForeignKey("ParentSkillId")
                             .OnDelete(DeleteBehavior.ClientSetNull)
-                            .HasConstraintName("SkillConnections_Skill1"),
+                            .HasConstraintName("SkillConnections_Skills2"),
                         l => l.HasOne<Skill>().WithMany()
-                            .HasForeignKey("Childld")
+                            .HasForeignKey("ChildSkillId")
                             .OnDelete(DeleteBehavior.ClientSetNull)
-                            .HasConstraintName("SkillConnections_Skill2"),
+                            .HasConstraintName("SkillConnections_Skills1"),
                         j =>
                         {
-                            j.HasKey("Parentld", "Childld").HasName("SkillConnections_pk");
+                            j.HasKey("ParentSkillId", "ChildSkillId").HasName("SkillConnections_pk");
                             j.ToTable("SkillConnections");
                         });
             });
 
             modelBuilder.Entity<SkillType>(entity =>
             {
-                entity.HasKey(e => e.SkillTypeId).HasName("SkillType_pk");
-
-                entity.ToTable("SkillType");
+                entity.HasKey(e => e.SkillTypeId).HasName("SkillTypes_pk");
 
                 entity.Property(e => e.SkillTypeId).HasDefaultValueSql("(NEXT VALUE FOR [SkillTypeId_SEQUENCE])");
-                entity.Property(e => e.Description).HasMaxLength(800);
                 entity.Property(e => e.Name).HasMaxLength(100);
             });
 
             modelBuilder.Entity<State>(entity =>
             {
-                entity.HasKey(e => e.StateId).HasName("State_pk");
-
-                entity.ToTable("State");
+                entity.HasKey(e => e.StateId).HasName("States_pk");
 
                 entity.Property(e => e.StateId).HasDefaultValueSql("(NEXT VALUE FOR [StateId_SEQUENCE])");
                 entity.Property(e => e.Name).HasMaxLength(100);
@@ -566,14 +521,12 @@ namespace Infrastructure.RelationalDatabase
                 entity.HasOne(d => d.Country).WithMany(p => p.States)
                     .HasForeignKey(d => d.CountryId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("State_Country");
+                    .HasConstraintName("States_Countries");
             });
 
             modelBuilder.Entity<Street>(entity =>
             {
-                entity.HasKey(e => e.StreetId).HasName("Street_pk");
-
-                entity.ToTable("Street");
+                entity.HasKey(e => e.StreetId).HasName("Streets_pk");
 
                 entity.Property(e => e.StreetId).HasDefaultValueSql("(NEXT VALUE FOR [StreetId_SEQUENCE])");
                 entity.Property(e => e.Name).HasMaxLength(100);
@@ -581,9 +534,7 @@ namespace Infrastructure.RelationalDatabase
 
             modelBuilder.Entity<Url>(entity =>
             {
-                entity.HasKey(e => e.UrlId).HasName("Url_pk");
-
-                entity.ToTable("Url");
+                entity.HasKey(e => e.UrlId).HasName("Urls_pk");
 
                 entity.Property(e => e.UrlId).HasDefaultValueSql("(newid())");
                 entity.Property(e => e.Created)
@@ -597,49 +548,33 @@ namespace Infrastructure.RelationalDatabase
                 entity.HasOne(d => d.Person).WithMany(p => p.Urls)
                     .HasForeignKey(d => d.PersonId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("Url_Person");
+                    .HasConstraintName("Urls_People");
 
                 entity.HasOne(d => d.UrlType).WithMany(p => p.Urls)
                     .HasForeignKey(d => d.UrlTypeId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("Url_UrlType");
+                    .HasConstraintName("Urls_UrlTypes");
             });
 
             modelBuilder.Entity<UrlType>(entity =>
             {
-                entity.HasKey(e => e.UrlTypeId).HasName("UrlType_pk");
-
-                entity.ToTable("UrlType");
+                entity.HasKey(e => e.UrlTypeId).HasName("UrlTypes_pk");
 
                 entity.Property(e => e.UrlTypeId).HasDefaultValueSql("(NEXT VALUE FOR [UrlTypeId_SEQUENCE])");
-                entity.Property(e => e.Description).HasMaxLength(800);
-                entity.Property(e => e.Name).HasMaxLength(100);
-            });
-
-            modelBuilder.Entity<WorkMode>(entity =>
-            {
-                entity.HasKey(e => e.WorkModeId).HasName("WorkMode_pk");
-
-                entity.ToTable("WorkMode");
-
-                entity.Property(e => e.WorkModeId).HasDefaultValueSql("(NEXT VALUE FOR [WorkModeId_SEQUENCE])");
                 entity.Property(e => e.Name).HasMaxLength(100);
             });
             modelBuilder.HasSequence("CityId_SEQUENCE");
+            modelBuilder.HasSequence("ContractParameterId_SEQUENCE");
+            modelBuilder.HasSequence("ContractParameterTypeId_SEQUENCE");
             modelBuilder.HasSequence("CountryId_SEQUENCE");
-            modelBuilder.HasSequence("CurrencyId_SEQUENCE");
-            modelBuilder.HasSequence("EmploymentTypeId_SEQUENCE");
-            modelBuilder.HasSequence("FaqId_SEQUENCE");
+            modelBuilder.HasSequence("NotificationTypeId_SEQUENCE");
             modelBuilder.HasSequence("ProcessTypeId_SEQUENCE");
             modelBuilder.HasSequence("RoleId_SEQUENCE");
-            modelBuilder.HasSequence("SalaryTermId_SEQUENCE");
             modelBuilder.HasSequence("SkillId_SEQUENCE");
             modelBuilder.HasSequence("SkillTypeId_SEQUENCE");
             modelBuilder.HasSequence("StateId_SEQUENCE");
             modelBuilder.HasSequence("StreetId_SEQUENCE");
             modelBuilder.HasSequence("UrlTypeId_SEQUENCE");
-            modelBuilder.HasSequence("WorkModeId_SEQUENCE");
         }
-
     }
 }

@@ -129,35 +129,41 @@
   <data name="Entity_Company_EmptyRegon" xml:space="preserve">
     <value>REGON  can not be empty</value>
   </data>
+  <data name="Entity_ContractCondition_CurrencyId_Empty" xml:space="preserve">
+    <value>CurrencyId can not be Empty</value>
+  </data>
+  <data name="Entity_ContractCondition_SalaryTermId_Empty" xml:space="preserve">
+    <value>SalaryTermId can not be Empty</value>
+  </data>
   <data name="Entity_OfferTemplate_EmptyDescription" xml:space="preserve">
     <value>Template description can not be empty</value>
   </data>
   <data name="Entity_OfferTemplate_EmptyName" xml:space="preserve">
     <value>Template name can not be empty</value>
   </data>
-  <data name="Entity_Offer_CurrencyIdRequired" xml:space="preserve">
-    <value>Currency can not be empty</value>
-  </data>
   <data name="Entity_Offer_EmptyPublicationEndForWorkRange" xml:space="preserve">
     <value>For inserting work range need insert Publication End </value>
   </data>
-  <data name="Entity_Offer_SalaryRangeLessZero" xml:space="preserve">
-    <value>Salary can not be less then zero</value>
+  <data name="Record_EmploymentLength_Invalid" xml:space="preserve">
+    <value>Employment Length can not be less or 0</value>
   </data>
-  <data name="Entity_Offer_SalaryTermIdRequired" xml:space="preserve">
-    <value>Salary Term can not be empty</value>
-  </data>
-  <data name="Entity_Offer_WorkRangeLessPublicationEnd" xml:space="preserve">
-    <value>Work can be start minimum on next day after Publication End </value>
+  <data name="Record_HoursPerTerm_Invalid" xml:space="preserve">
+    <value> Hours Per Term can not be less 1</value>
   </data>
   <data name="Record_Krs_Invalid" xml:space="preserve">
     <value>KRS need to contain 10 numbers, value invalid</value>
+  </data>
+  <data name="Record_Money_Invalid" xml:space="preserve">
+    <value>Money value is invalid</value>
   </data>
   <data name="Record_Nip_Invalid" xml:space="preserve">
     <value>NIP need to contain 9 or 14 numbers, value invalid</value>
   </data>
   <data name="Record_Regon_Invalid" xml:space="preserve">
     <value>REGON  need to contain 10 numbers, value invalid</value>
+  </data>
+  <data name="Record_SalaryRange_Invalid" xml:space="preserve">
+    <value>Salary can not be less then zero</value>
   </data>
   <data name="Record_Url_Invalid" xml:space="preserve">
     <value>This URL invalid</value>

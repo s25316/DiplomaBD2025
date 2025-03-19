@@ -6,8 +6,6 @@ public partial class Skill
 
     public string Name { get; set; } = null!;
 
-    public string Description { get; set; } = null!;
-
     public int SkillTypeId { get; set; }
 
     public virtual ICollection<OfferSkill> OfferSkills { get; set; } = new List<OfferSkill>();
@@ -16,7 +14,7 @@ public partial class Skill
 
     public virtual SkillType SkillType { get; set; } = null!;
 
-    public virtual ICollection<Skill> Childlds { get; set; } = new List<Skill>();
+    public virtual ICollection<Skill> ChildSkills { get; set; } = new List<Skill>();
 
-    public virtual ICollection<Skill> Parentlds { get; set; } = new List<Skill>();
+    public virtual ICollection<Skill> ParentSkills { get; set; } = new List<Skill>();
 }

@@ -1,4 +1,4 @@
-﻿// Ignore Spelling: Bd Hrchats Hrprocesses Nchats
+﻿// Ignore Spelling: Bd Hrchats Hrprocesses Nchats Exs
 using Microsoft.EntityFrameworkCore;
 using UseCase.RelationalDatabase.Models;
 
@@ -25,19 +25,23 @@ public partial class DiplomaBdContext : DbContext
 
     public virtual DbSet<CompanyPerson> CompanyPeople { get; set; }
 
+    public virtual DbSet<ContractAttribute> ContractAttributes { get; set; }
+
+    public virtual DbSet<ContractCondition> ContractConditions { get; set; }
+
+    public virtual DbSet<ContractParameter> ContractParameters { get; set; }
+
+    public virtual DbSet<ContractParameterType> ContractParameterTypes { get; set; }
+
     public virtual DbSet<Country> Countries { get; set; }
 
-    public virtual DbSet<Currency> Currencies { get; set; }
-
-    public virtual DbSet<EmploymentType> EmploymentTypes { get; set; }
-
-    public virtual DbSet<Ex> Exes { get; set; }
+    public virtual DbSet<Ex> Exs { get; set; }
 
     public virtual DbSet<Faq> Faqs { get; set; }
 
-    public virtual DbSet<Hrchat> Hrchats { get; set; }
+    public virtual DbSet<HrProcess> HrProcesses { get; set; }
 
-    public virtual DbSet<Hrprocess> Hrprocesses { get; set; }
+    public virtual DbSet<Hrchat> Hrchats { get; set; }
 
     public virtual DbSet<Nchat> Nchats { get; set; }
 
@@ -47,13 +51,13 @@ public partial class DiplomaBdContext : DbContext
 
     public virtual DbSet<Offer> Offers { get; set; }
 
-    public virtual DbSet<OfferEmploymentType> OfferEmploymentTypes { get; set; }
+    public virtual DbSet<OfferCondition> OfferConditions { get; set; }
+
+    public virtual DbSet<OfferConnection> OfferConnections { get; set; }
 
     public virtual DbSet<OfferSkill> OfferSkills { get; set; }
 
     public virtual DbSet<OfferTemplate> OfferTemplates { get; set; }
-
-    public virtual DbSet<OfferWorkMode> OfferWorkModes { get; set; }
 
     public virtual DbSet<Person> People { get; set; }
 
@@ -62,8 +66,6 @@ public partial class DiplomaBdContext : DbContext
     public virtual DbSet<ProcessType> ProcessTypes { get; set; }
 
     public virtual DbSet<Role> Roles { get; set; }
-
-    public virtual DbSet<SalaryTerm> SalaryTerms { get; set; }
 
     public virtual DbSet<Skill> Skills { get; set; }
 
@@ -77,5 +79,4 @@ public partial class DiplomaBdContext : DbContext
 
     public virtual DbSet<UrlType> UrlTypes { get; set; }
 
-    public virtual DbSet<WorkMode> WorkModes { get; set; }
 }

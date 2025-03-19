@@ -16,7 +16,7 @@ public partial class OfferTemplate
 
     public virtual Company Company { get; set; } = null!;
 
-    public virtual ICollection<OfferSkill> OfferSkills { get; set; } = new List<OfferSkill>();
+    public virtual ICollection<OfferConnection> OfferConnections { get; set; } = new List<OfferConnection>();
 
-    public virtual ICollection<Offer> Offers { get; set; } = new List<Offer>();
+    public virtual ICollection<OfferSkill> OfferSkills { get; set; } = new List<OfferSkill>();
 }

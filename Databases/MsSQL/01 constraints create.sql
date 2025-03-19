@@ -1,257 +1,260 @@
 -- OUR OWN IMPLEMENTATION OF CONSTRAINTS
 --======================================================================================
 --======================================================================================
---[Address]
+--[Addresses]
 --Create
-ALTER TABLE [dbo].[Address]
+ALTER TABLE [dbo].[Addresses]
 ADD 
-CONSTRAINT Address_Default_AddressId DEFAULT NEWID() FOR [AddressId];
+CONSTRAINT Addresses_Default_AddressId DEFAULT NEWID() FOR [AddressId];
 --======================================================================================
---[City]
+--[Cities]
 --Create
 CREATE SEQUENCE CityId_SEQUENCE
     START WITH 1 
     INCREMENT BY 1;
-ALTER TABLE [dbo].[City]
+ALTER TABLE [dbo].[Cities] 
 ADD 
-CONSTRAINT City_Default_CityId DEFAULT (NEXT VALUE FOR CityId_SEQUENCE) FOR [CityId];
+CONSTRAINT Cities_Default_CityId DEFAULT (NEXT VALUE FOR CityId_SEQUENCE) FOR [CityId];
 --======================================================================================
---[Street]
+--[Streets]
 --Create
 CREATE SEQUENCE StreetId_SEQUENCE
     START WITH 1 
     INCREMENT BY 1;
-ALTER TABLE [dbo].[Street]
+ALTER TABLE [dbo].[Streets]
 ADD 
-CONSTRAINT Street_Default_StreetId DEFAULT (NEXT VALUE FOR StreetId_SEQUENCE) FOR [StreetId];
+CONSTRAINT Streets_Default_StreetId DEFAULT (NEXT VALUE FOR StreetId_SEQUENCE) FOR [StreetId];
 --======================================================================================
---[State]
+--[States]
 --Create
 CREATE SEQUENCE StateId_SEQUENCE
     START WITH 1 
     INCREMENT BY 1;
-ALTER TABLE [dbo].[State]
+ALTER TABLE [dbo].[States]
 ADD 
-CONSTRAINT State_Default_StateId DEFAULT (NEXT VALUE FOR StateId_SEQUENCE) FOR [StateId];
+CONSTRAINT States_Default_StateId DEFAULT (NEXT VALUE FOR StateId_SEQUENCE) FOR [StateId];
 --======================================================================================
---[Country]
+--[Countries]
 --Create
 CREATE SEQUENCE CountryId_SEQUENCE
     START WITH 1 
     INCREMENT BY 1;
-ALTER TABLE [dbo].[Country]
+ALTER TABLE [dbo].[Countries]
 ADD 
-CONSTRAINT Country_Default_CountryId DEFAULT (NEXT VALUE FOR CountryId_SEQUENCE) FOR [CountryId];
+CONSTRAINT Countries_Default_CountryId DEFAULT (NEXT VALUE FOR CountryId_SEQUENCE) FOR [CountryId];
 
 
 --======================================================================================
 --======================================================================================
 --[Notification]
 --Create
-ALTER TABLE [dbo].[Notification]
+ALTER TABLE [dbo].[Notifications]
 ADD 
-CONSTRAINT Notification_Default_NotificationId DEFAULT NEWID() FOR [NotificationId],
-CONSTRAINT Notification_Default_Created DEFAULT GETDATE() FOR [Created];
+CONSTRAINT Notifications_Default_NotificationId DEFAULT NEWID() FOR [NotificationId],
+CONSTRAINT Notifications_Default_Created DEFAULT GETDATE() FOR [Created];
 --======================================================================================
---[NChat]
+--[NChat] [rebuild]
 --Create
 ALTER TABLE [dbo].[NChat]
 ADD 
 CONSTRAINT NChat_Default_MessageId DEFAULT NEWID() FOR [MessageId],
 CONSTRAINT NChat_Default_Created DEFAULT GETDATE() FOR [Created];
 --======================================================================================
---[Ex]
+--[Exs]
 --Create
-ALTER TABLE [dbo].[Ex]
+ALTER TABLE [dbo].[Exs]
 ADD 
-CONSTRAINT Ex_Default_ExceptionId DEFAULT NEWID() FOR [ExceptionId],
-CONSTRAINT Ex_Default_Created DEFAULT GETDATE() FOR [Created];
+CONSTRAINT Exs_Default_ExceptionId DEFAULT NEWID() FOR [ExceptionId],
+CONSTRAINT Exs_Default_Created DEFAULT GETDATE() FOR [Created];
 --======================================================================================
---[Faq]
+--[Faqs]
 --Create
-ALTER TABLE [dbo].[Faq]
+ALTER TABLE [dbo].[Faqs]
 ADD 
-CONSTRAINT Faq_Default_FaqId DEFAULT NEWID() FOR [FaqId],
-CONSTRAINT Faq_Default_Created DEFAULT GETDATE() FOR [Created];
+CONSTRAINT Faqs_Default_FaqId DEFAULT NEWID() FOR [FaqId],
+CONSTRAINT Faqs_Default_Created DEFAULT GETDATE() FOR [Created];
 --======================================================================================
---[NotificationType]
+--[NotificationTypes]
 --Create
-CREATE SEQUENCE FaqId_SEQUENCE
+CREATE SEQUENCE NotificationTypeId_SEQUENCE
     START WITH 1 
     INCREMENT BY 1;
-ALTER TABLE [dbo].[NotificationType]
+ALTER TABLE [dbo].[NotificationTypes]
 ADD 
-CONSTRAINT NotificationType_Default_NotificationTypeId DEFAULT (NEXT VALUE FOR FaqId_SEQUENCE) FOR [NotificationTypeId];
+CONSTRAINT NotificationTypes_Default_NotificationTypeId DEFAULT (NEXT VALUE FOR NotificationTypeId_SEQUENCE) FOR [NotificationTypeId];
 
 
 --======================================================================================
 --======================================================================================
---[Person]
+--[People]
 --Create
-ALTER TABLE [dbo].[Person]
+ALTER TABLE [dbo].[People]
 ADD 
-CONSTRAINT Person_Default_PersonId DEFAULT NEWID() FOR [PersonId],
-CONSTRAINT Person_Default_Created DEFAULT GETDATE() FOR [Created],
-CONSTRAINT Person_Default_IsTwoFactorAuth DEFAULT 0 FOR [IsTwoFactorAuth],
-CONSTRAINT Person_Default_IsStudent DEFAULT 0 FOR [IsStudent],
-CONSTRAINT Person_Default_IsAdmin DEFAULT 0 FOR [IsAdmin];
+CONSTRAINT People_Default_PersonId DEFAULT NEWID() FOR [PersonId],
+CONSTRAINT People_Default_Created DEFAULT GETDATE() FOR [Created],
+CONSTRAINT People_Default_IsTwoFactorAuth DEFAULT 0 FOR [IsTwoFactorAuth],
+CONSTRAINT People_Default_IsStudent DEFAULT 0 FOR [IsStudent],
+CONSTRAINT People_Default_IsAdmin DEFAULT 0 FOR [IsAdmin];
 --======================================================================================
---[Url]
+--[Urls]
 --Create
-ALTER TABLE [dbo].[Url]
+ALTER TABLE [dbo].[Urls]
 ADD 
-CONSTRAINT Url_Default_UrlId DEFAULT NEWID() FOR [UrlId],
-CONSTRAINT Url_Default_Created DEFAULT GETDATE() FOR [Created];
+CONSTRAINT Urls_Default_UrlId DEFAULT NEWID() FOR [UrlId],
+CONSTRAINT Urls_Default_Created DEFAULT GETDATE() FOR [Created];
 --======================================================================================
---[PersonSkill]
+--[PersonSkills]
 --Create
-ALTER TABLE [dbo].[PersonSkill]
+ALTER TABLE [dbo].[PersonSkills]
 ADD 
-CONSTRAINT PersonSkill_Default_PersonSkillId DEFAULT NEWID() FOR [PersonSkillId],
-CONSTRAINT PersonSkill_Default_Created DEFAULT GETDATE() FOR [Created];
+CONSTRAINT PersonSkills_Default_PersonSkillId DEFAULT NEWID() FOR [PersonSkillId],
+CONSTRAINT PersonSkills_Default_Created DEFAULT GETDATE() FOR [Created];
 --======================================================================================
---[UrlType]
+--[UrlTypes]
 --Create
 CREATE SEQUENCE UrlTypeId_SEQUENCE
     START WITH 1 
     INCREMENT BY 1;
-ALTER TABLE [dbo].[UrlType]
+ALTER TABLE [dbo].[UrlTypes]
 ADD 
-CONSTRAINT UrlType_Default_UrlTypeId DEFAULT (NEXT VALUE FOR UrlTypeId_SEQUENCE) FOR [UrlTypeId];
+CONSTRAINT UrlTypes_Default_UrlTypeId DEFAULT (NEXT VALUE FOR UrlTypeId_SEQUENCE) FOR [UrlTypeId];
 
 
 --======================================================================================
 --======================================================================================
---[CompanyPerson]
+--[CompanyPeople]
 --Create
-ALTER TABLE [dbo].[CompanyPerson]
+ALTER TABLE [dbo].[CompanyPeople]
 ADD 
-CONSTRAINT CompanyPerson_Default_CompanyPersonId DEFAULT NEWID() FOR [CompanyPersonId],
-CONSTRAINT CompanyPerson_Default_Grant DEFAULT GETDATE() FOR [Grant];
+CONSTRAINT CompanyPeople_Default_CompanyPersonId DEFAULT NEWID() FOR [CompanyPersonId],
+CONSTRAINT CompanyPeople_Default_Grant DEFAULT GETDATE() FOR [Grant];
 --======================================================================================
---[Role]
+--[Roles]
 --Create
 CREATE SEQUENCE RoleId_SEQUENCE
     START WITH 1 
     INCREMENT BY 1;
-ALTER TABLE [dbo].[Role]
+ALTER TABLE [dbo].[Roles]
 ADD 
-CONSTRAINT Role_Default_RoleId DEFAULT (NEXT VALUE FOR RoleId_SEQUENCE) FOR [RoleId];
+CONSTRAINT Roles_Default_RoleId DEFAULT (NEXT VALUE FOR RoleId_SEQUENCE) FOR [RoleId];
 
 
 --======================================================================================
 --======================================================================================
---[Company]
+--[Companies]
 --Create
-ALTER TABLE [dbo].[Company]
+ALTER TABLE [dbo].[Companies]
 ADD 
-CONSTRAINT Company_Default_CompanyId DEFAULT NEWID() FOR [CompanyId],
-CONSTRAINT Company_Default_Created DEFAULT GETDATE() FOR [Created];
+CONSTRAINT Companies_Default_CompanyId DEFAULT NEWID() FOR [CompanyId],
+CONSTRAINT Companies_Default_Created DEFAULT GETDATE() FOR [Created];
 --======================================================================================
---[Branch]
+--[Branches]
 --Create
-ALTER TABLE [dbo].[Branch]
+ALTER TABLE [dbo].[Branches]
 ADD 
-CONSTRAINT Branch_Default_BranchId DEFAULT NEWID() FOR [BranchId],
-CONSTRAINT Branch_Default_Created DEFAULT GETDATE() FOR [Created];
+CONSTRAINT Branches_Default_BranchId DEFAULT NEWID() FOR [BranchId],
+CONSTRAINT Branches_Default_Created DEFAULT GETDATE() FOR [Created];
 
 
 --======================================================================================
 --======================================================================================
---[SkillType]
+--[SkillTypes]
 --Create
 CREATE SEQUENCE SkillTypeId_SEQUENCE
     START WITH 1 
     INCREMENT BY 1;
-ALTER TABLE [dbo].[SkillType]
+ALTER TABLE [dbo].[SkillTypes]
 ADD 
-CONSTRAINT SkillType_Default_SkillTypeId DEFAULT (NEXT VALUE FOR SkillTypeId_SEQUENCE) FOR [SkillTypeId];
+CONSTRAINT SkillTypes_Default_SkillTypeId DEFAULT (NEXT VALUE FOR SkillTypeId_SEQUENCE) FOR [SkillTypeId];
 --======================================================================================
---[Skill]
+--[Skills]
 --Create
 CREATE SEQUENCE SkillId_SEQUENCE
     START WITH 1 
     INCREMENT BY 1;
-ALTER TABLE [dbo].[Skill]
+ALTER TABLE [dbo].[Skills]
 ADD 
-CONSTRAINT Skill_Default_SkillId DEFAULT (NEXT VALUE FOR SkillId_SEQUENCE) FOR [SkillId];
+CONSTRAINT Skills_Default_SkillId DEFAULT (NEXT VALUE FOR SkillId_SEQUENCE) FOR [SkillId];
  
 
 --======================================================================================
 --======================================================================================
---[Offer]
+--[OfferTemplates]
 --Create
-ALTER TABLE [dbo].[Offer]
+ALTER TABLE [dbo].[OfferTemplates]
 ADD 
-CONSTRAINT Offer_Default_OfferId DEFAULT NEWID() FOR [OfferId],
-CONSTRAINT Offer_Default_PublicationStart DEFAULT GETDATE() FOR [PublicationStart],
-CONSTRAINT Offer_Default_IsNegotiated DEFAULT 1 FOR [IsNegotiated];
+CONSTRAINT OfferTemplates_Default_OfferTemplateId DEFAULT NEWID() FOR [OfferTemplateId],
+CONSTRAINT OfferTemplates_Default_Created DEFAULT GETDATE() FOR [Created];
 --======================================================================================
---[OfferTemplate]
+--[OfferSkills]
 --Create
-ALTER TABLE [dbo].[OfferTemplate]
+ALTER TABLE [dbo].[OfferSkills]
 ADD 
-CONSTRAINT OfferTemplate_Default_OfferTemplateId DEFAULT NEWID() FOR [OfferTemplateId],
-CONSTRAINT OfferTemplate_Default_Created DEFAULT GETDATE() FOR [Created];
---======================================================================================
---[OfferSkill]
---Create
-ALTER TABLE [dbo].[OfferSkill]
-ADD 
-CONSTRAINT OfferSkill_Default_OfferSkillId DEFAULT NEWID() FOR [OfferSkillId],
-CONSTRAINT OfferSkill_Default_Created DEFAULT GETDATE() FOR [Created],
-CONSTRAINT OfferSkill_Default_IsRequired DEFAULT 0 FOR [IsRequired];
+CONSTRAINT OfferSkills_Default_OfferSkillId DEFAULT NEWID() FOR [OfferSkillId],
+CONSTRAINT OfferSkills_Default_Created DEFAULT GETDATE() FOR [Created],
+CONSTRAINT OfferSkills_Default_IsRequired DEFAULT 0 FOR [IsRequired];
 --======================================================================================
 --[OfferWorkMode]
---Create
-ALTER TABLE [dbo].[OfferWorkMode]
-ADD 
-CONSTRAINT OfferWorkMode_Default_OfferSkillId DEFAULT NEWID() FOR [OfferWorkModeId],
-CONSTRAINT OfferWorkMode_Default_Created DEFAULT GETDATE() FOR [Created];
---======================================================================================
 --[OfferEmploymentType]
---Create
-ALTER TABLE [dbo].[OfferEmploymentType]
-ADD 
-CONSTRAINT OfferEmploymentType_Default_OfferSkillId DEFAULT NEWID() FOR [OfferEmploymentTypeId],
-CONSTRAINT OfferEmploymentType_Default_Created DEFAULT GETDATE() FOR [Created];
---======================================================================================
 --[EmploymentType]
---Create
-CREATE SEQUENCE EmploymentTypeId_SEQUENCE
-    START WITH 1 
-    INCREMENT BY 1;
-ALTER TABLE [dbo].[EmploymentType]
-ADD 
-CONSTRAINT EmploymentType_Default_EmploymentTypeId DEFAULT (NEXT VALUE FOR EmploymentTypeId_SEQUENCE) FOR [EmploymentTypeId];
---======================================================================================
 --[WorkMode]
---Create
-CREATE SEQUENCE WorkModeId_SEQUENCE
-    START WITH 1 
-    INCREMENT BY 1;
-ALTER TABLE [dbo].[WorkMode]
-ADD 
-CONSTRAINT WorkMode_Default_WorkModeId DEFAULT (NEXT VALUE FOR WorkModeId_SEQUENCE) FOR [WorkModeId];
---======================================================================================
 --[SalaryTerm]
---Create
-CREATE SEQUENCE SalaryTermId_SEQUENCE
-    START WITH 1 
-    INCREMENT BY 1;
-ALTER TABLE [dbo].[SalaryTerm]
-ADD 
-CONSTRAINT SalaryTerm_Default_SalaryTermId DEFAULT (NEXT VALUE FOR SalaryTermId_SEQUENCE) FOR [SalaryTermId];
---======================================================================================
 --[Currency]
+
+--[ContractParameterTypes]
 --Create
-CREATE SEQUENCE CurrencyId_SEQUENCE
+CREATE SEQUENCE ContractParameterTypeId_SEQUENCE
     START WITH 1 
     INCREMENT BY 1;
-ALTER TABLE [dbo].[Currency]
+ALTER TABLE [dbo].[ContractParameterTypes]
 ADD 
-CONSTRAINT Currency_Default_CurrencyId DEFAULT (NEXT VALUE FOR CurrencyId_SEQUENCE) FOR [CurrencyId];
-
+CONSTRAINT ContractParameterTypes_Default_ContractParameterTypeId DEFAULT (NEXT VALUE FOR ContractParameterTypeId_SEQUENCE) FOR [ContractParameterTypeId];
+--======================================================================================
+--[ContractParameterTypes]
+--Create
+CREATE SEQUENCE ContractParameterId_SEQUENCE
+    START WITH 1 
+    INCREMENT BY 1;
+ALTER TABLE [dbo].[ContractParameters]
+ADD 
+CONSTRAINT ContractParameters_Default_ContractParameterTypeId DEFAULT (NEXT VALUE FOR ContractParameterId_SEQUENCE) FOR [ContractParameterId];
+--======================================================================================
+--[ContractAttributes]
+--Create
+ALTER TABLE [dbo].[ContractAttributes]
+ADD 
+CONSTRAINT ContractAttributes_Default_ContractAttributeId DEFAULT NEWID() FOR [ContractAttributeId],
+CONSTRAINT ContractAttributes_Default_Created DEFAULT GETDATE() FOR [Created];
+--======================================================================================
+--[ContractConditions]
+--Create
+ALTER TABLE [dbo].[ContractConditions]
+ADD 
+CONSTRAINT ContractConditions_Default_ContractAttributeId DEFAULT NEWID() FOR [ContractConditionId],
+CONSTRAINT ContractConditions_Default_HoursPerTerm DEFAULT 1 FOR [HoursPerTerm],
+CONSTRAINT ContractConditions_Default_IsNegotiable DEFAULT 1 FOR [IsNegotiable],
+CONSTRAINT ContractConditions_Default_Created DEFAULT GETDATE() FOR [Created];
+--======================================================================================
+--[OfferConditions]
+--Create
+ALTER TABLE [dbo].[OfferConditions]
+ADD 
+CONSTRAINT OfferConditions_Default_ContractAttributeId DEFAULT NEWID() FOR [OfferConditionId],
+CONSTRAINT OfferConditions_Default_Created DEFAULT GETDATE() FOR [Created];
+--======================================================================================
+--[Offer]
+--Create
+ALTER TABLE [dbo].[Offers]
+ADD 
+CONSTRAINT Offers_Default_OfferId DEFAULT NEWID() FOR [OfferId];
+--======================================================================================
+--[OfferConnections]
+--Create
+ALTER TABLE [dbo].[OfferConnections]
+ADD 
+CONSTRAINT OfferConnections_Default_OfferConnectionId DEFAULT NEWID() FOR [OfferConnectionId],
+CONSTRAINT OfferConnections_Default_Created DEFAULT GETDATE() FOR [Created];
+ 
 
 --======================================================================================
 --======================================================================================

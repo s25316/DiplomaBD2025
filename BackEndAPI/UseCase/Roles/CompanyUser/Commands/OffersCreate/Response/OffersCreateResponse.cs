@@ -4,8 +4,8 @@ using UseCase.Shared.Templates.Response.Responses;
 
 namespace UseCase.Roles.CompanyUser.Commands.OffersCreate.Response
 {
-    public class OffersCreateResponse : ResponseMetaData
+    public class OffersCreateResponse :
+        ResponseTemplate<IEnumerable<ResponseCommandTemplate<OfferCreateCommand>>>
     {
-        public IEnumerable<ResponseCommandTemplate<OfferCreateCommand>> Commands { get; init; } = [];
     }
 }

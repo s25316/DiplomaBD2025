@@ -4,8 +4,6 @@ public partial class Nchat
 {
     public Guid MessageId { get; set; }
 
-    public Guid NotificationId { get; set; }
-
     public DateTime Created { get; set; }
 
     public DateTime? Removed { get; set; }
@@ -17,6 +15,4 @@ public partial class Nchat
     public string? Message { get; set; }
 
     public string? MongoUrl { get; set; }
-
-    public virtual Notification Notification { get; set; } = null!;
 }

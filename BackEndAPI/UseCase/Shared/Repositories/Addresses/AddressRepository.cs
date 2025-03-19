@@ -20,6 +20,7 @@ namespace UseCase.Shared.Repositories.Addresses
 
 
         // Public Methods
+
         public async Task<Guid> CreateAddressAsync(AddressRequestDto request)
         {
             var idParam = new SqlParameter

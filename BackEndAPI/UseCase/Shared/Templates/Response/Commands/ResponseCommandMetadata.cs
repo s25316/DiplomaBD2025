@@ -1,4 +1,6 @@
-﻿namespace UseCase.Shared.Templates.Response.Commands
+﻿// Ignore Spelling: Metadata
+
+namespace UseCase.Shared.Templates.Response.Commands
 {
     public class ResponseCommandMetadata
     {

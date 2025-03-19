@@ -15,6 +15,7 @@
     <Folder Include="Roles\Administrators\Queries\" />
     <Folder Include="Roles\Guests\Commands\" />
     <Folder Include="NonRelationalDatabase\" />
+    <Folder Include="Roles\Guests\Queries\" />
     <Folder Include="Roles\Users\Queries\" />
   </ItemGroup>
 

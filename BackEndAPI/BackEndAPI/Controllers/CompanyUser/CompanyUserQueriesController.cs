@@ -2,11 +2,17 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using UseCase.Roles.CompanyUser.Queries.GetCompanyBranches.Request;
-using UseCase.Roles.CompanyUser.Queries.GetCompanyOffers.Request;
-using UseCase.Roles.CompanyUser.Queries.GetCompanyOfferTemplates.Request;
-using UseCase.Roles.CompanyUser.Queries.GetPersonCompanies.Request;
-using UseCase.Shared.Enums;
+using UseCase.Roles.CompanyUser.Queries.GetBranches.Enums;
+using UseCase.Roles.CompanyUser.Queries.GetBranches.Request;
+using UseCase.Roles.CompanyUser.Queries.GetCompanies.Enums;
+using UseCase.Roles.CompanyUser.Queries.GetCompanies.Request;
+using UseCase.Roles.CompanyUser.Queries.GetContractConditions.Enums;
+using UseCase.Roles.CompanyUser.Queries.GetContractConditions.Request;
+using UseCase.Roles.CompanyUser.Queries.GetOffers.Enums;
+using UseCase.Roles.CompanyUser.Queries.GetOffers.Request;
+using UseCase.Roles.CompanyUser.Queries.GetOfferTemplates.Enums;
+using UseCase.Roles.CompanyUser.Queries.GetOfferTemplates.Request;
+using UseCase.Shared.DTOs.Responses.Companies.Offers;
 
 namespace BackEndAPI.Controllers.CompanyUser
 {
@@ -25,52 +31,35 @@ namespace BackEndAPI.Controllers.CompanyUser
         }
 
 
-        //Methods
+        // Methods
         [Authorize]
         [HttpGet("companies")]
         [HttpGet("companies/{companyId:guid}")]
-        public async Task<IActionResult> GetCompaniesAsync(
-            // For single company
+        public async Task<IActionResult> GetUserCompaniesAsync(
             Guid? companyId,
             string? regon,
             string? nip,
             string? krs,
-
-            // Other Filters
             string? searchText,
-
-            // Pagination
             int? page,
             int? itemsPerPage,
-
-            // Sorting
-            CompaniesOrderBy? orderBy,
+            CompanyUserCompaniesOrderBy? orderBy,
             bool? ascending,
-
             CancellationToken cancellationToken)
         {
-            var request = new GetPersonCompaniesRequest
+            var result = await _mediator.Send(new GetCompanyUserCompaniesRequest
             {
-                // For single company
                 CompanyId = companyId,
                 Regon = regon,
                 Nip = nip,
                 Krs = krs,
-
-                // Other Filters
                 SearchText = searchText,
-
-                // Pagination
                 Page = page ?? 1,
-                ItemsPerPage = itemsPerPage ?? 10,
-
-                // Sorting
-                OrderBy = orderBy ?? CompaniesOrderBy.Created,
+                ItemsPerPage = itemsPerPage ?? 100,
+                OrderBy = orderBy ?? CompanyUserCompaniesOrderBy.Created,
                 Ascending = ascending ?? true,
-
                 Metadata = HttpContext,
-            };
-            var result = await _mediator.Send(request, cancellationToken);
+            }, cancellationToken);
             return StatusCode((int)result.HttpCode, result.Result);
         }
 
@@ -78,58 +67,39 @@ namespace BackEndAPI.Controllers.CompanyUser
         [HttpGet("branches")]
         [HttpGet("branches/{branchId:guid}")]
         [HttpGet("companies/{companyId:guid}/branches")]
-        public async Task<IActionResult> GetBranchesAsync(
-            // For single Company
+        public async Task<IActionResult> GetUserBranchesAsync(
             Guid? branchId,
-
-            // Company identification
             Guid? companyId,
             string? regon,
             string? nip,
             string? krs,
-
-            // Other filters
             string? searchText,
             float? lon,
             float? lat,
             bool? showRemoved,
-
-            // Pagination
             int? page,
             int? itemsPerPage,
-
-            // Sorting
-            BranchesOrderBy? orderBy,
+            CompanyUserBranchesOrderBy? orderBy,
             bool? ascending,
-
             CancellationToken cancellationToken)
         {
-            var request = new GetCompanyBranchesRequest
+            var result = await _mediator.Send(new GetCompanyUserBranchesRequest
             {
-                // For single Company
                 BranchId = branchId,
-
-                // Company identification
                 CompanyId = companyId,
                 Regon = regon,
                 Nip = nip,
                 Krs = krs,
-
-                // Other filters
                 SearchText = searchText,
+                Lon = lon,
+                Lat = lat,
                 ShowRemoved = showRemoved ?? false,
-
-                // Pagination
                 Page = page ?? 1,
-                ItemsPerPage = itemsPerPage ?? 10,
-
-                // Sorting
-                OrderBy = orderBy ?? BranchesOrderBy.BranchCreated,
+                ItemsPerPage = itemsPerPage ?? 100,
+                OrderBy = orderBy ?? CompanyUserBranchesOrderBy.BranchCreated,
                 Ascending = ascending ?? true,
-
                 Metadata = HttpContext,
-            };
-            var result = await _mediator.Send(request, cancellationToken);
+            }, cancellationToken);
             return StatusCode((int)result.HttpCode, result.Result);
         }
 
@@ -138,10 +108,8 @@ namespace BackEndAPI.Controllers.CompanyUser
         [HttpGet("offerTemplates/{offerTemplateId:guid}")]
         [HttpGet("companies/{companyId:guid}/offerTemplates")]
         public async Task<IActionResult> GetCompanyOfferTemplatesAsync(
-            // For selection single Template
             Guid? offerTemplateId,
 
-            // Company Identification  
             Guid? companyId,
             string? regon,
             string? nip,
@@ -153,34 +121,88 @@ namespace BackEndAPI.Controllers.CompanyUser
 
             int? page,
             int? itemsPerPage,
-
-            OfferTemplatesOrderBy? orderBy,
+            CompanyUserOfferTemplatesOrderBy? orderBy,
             bool? ascending,
-
             CancellationToken cancellationToken)
         {
-            var request = new GetCompanyOfferTemplatesRequest
+            var request = new GetCompanyUserOfferTemplatesRequest
             {
-                // For selection single Template
                 OfferTemplateId = offerTemplateId,
 
-                // Company Identification  
                 CompanyId = companyId,
                 Regon = regon,
                 Nip = nip,
                 Krs = krs,
 
-                // Other filters
                 SearchText = searchText,
                 SkillIds = skillIds,
                 ShowRemoved = showRemoved ?? false,
 
-                // Pagination
                 Page = page ?? 1,
                 ItemsPerPage = itemsPerPage ?? 10,
 
-                // Sorting
-                OrderBy = orderBy ?? OfferTemplatesOrderBy.OfferTemplateCreated,
+                OrderBy = orderBy ?? CompanyUserOfferTemplatesOrderBy.OfferTemplateCreated,
+                Ascending = ascending ?? true,
+                Metadata = HttpContext,
+            };
+            var result = await _mediator.Send(request, cancellationToken);
+            return StatusCode((int)result.HttpCode, result.Result);
+        }
+
+        [Authorize]
+        [HttpGet("contractConditions")]
+        [HttpGet("contractConditions/{contractConditionId:guid}")]
+        [HttpGet("companies/{companyId:guid}/contractConditions")]
+        public async Task<IActionResult> GetCompanyOfferTemplatesAsync(
+            Guid? contractConditionId,
+
+            Guid? companyId,
+            string? regon,
+            string? nip,
+            string? krs,
+
+            string? searchText,
+            bool? showRemoved,
+            bool? isNegotiable,
+            bool? isPaid,
+            decimal? salaryPerHourMin,
+            decimal? salaryPerHourMax,
+            decimal? salaryMin,
+            decimal? salaryMax,
+            int? hoursMin,
+            int? hoursMax,
+            [FromHeader] IEnumerable<int> parameterIds,
+
+            int? page,
+            int? itemsPerPage,
+            CompanyUserContractConditionsOrderBy? orderBy,
+            bool? ascending,
+            CancellationToken cancellationToken)
+        {
+            var request = new GetCompanyUserContractConditionsRequest
+            {
+                ContractConditionId = contractConditionId,
+                CompanyId = companyId,
+                Regon = regon,
+                Nip = nip,
+                Krs = krs,
+
+                SearchText = searchText,
+                ShowRemoved = showRemoved ?? false,
+                IsNegotiable = isNegotiable,
+                IsPaid = isPaid,
+                SalaryPerHourMin = salaryPerHourMin,
+                SalaryPerHourMax = salaryPerHourMax,
+                SalaryMin = salaryMin,
+                SalaryMax = salaryMax,
+                HoursMin = hoursMin,
+                HoursMax = hoursMax,
+                ParameterIds = parameterIds,
+
+                Page = page ?? 1,
+                ItemsPerPage = itemsPerPage ?? 10,
+
+                OrderBy = orderBy ?? CompanyUserContractConditionsOrderBy.ContractConditionCreated,
                 Ascending = ascending ?? true,
 
                 Metadata = HttpContext,
@@ -192,85 +214,89 @@ namespace BackEndAPI.Controllers.CompanyUser
         [Authorize]
         [HttpGet("offers")]
         [HttpGet("offers/{offerId:guid}")]
-        [HttpGet("branches/{branchId:guid}/offers")]
         [HttpGet("companies/{companyId:guid}/offers")]
+        [HttpGet("branches/{branchId:guid}/offers")]
+        [HttpGet("contractConditions/{contractConditionId:guid}/offers")]
         [HttpGet("offerTemplates/{offerTemplateId:guid}/offers")]
-        public async Task<IActionResult> GetCompanyOffersAsync(
-            // For single Offer
+        public async Task<IActionResult> GetCompanyUserOffersAsync(
             Guid? offerId,
 
-            // Company Identification
+            OfferStatus? status,
+
             Guid? companyId,
             string? regon,
             string? nip,
             string? krs,
 
-            // Branch
             Guid? branchId,
             float? lon,
             float? lat,
 
-            // Offer Template
+            Guid? contractConditionId,
+            bool? isNegotiable,
+            bool? isPaid,
+            decimal? salaryPerHourMin,
+            decimal? salaryPerHourMax,
+            decimal? salaryMin,
+            decimal? salaryMax,
+            int? hoursMin,
+            int? hoursMax,
+            [FromHeader] IEnumerable<int> parameterIds,
+
             Guid? offerTemplateId,
             [FromHeader] IEnumerable<int> skillIds,
 
             string? searchText,
-            DateTime? publicationStart,
-            DateTime? publicationEnd,
-            DateTime? workBeginDate,
-            DateTime? workEndDate,
-            float? minSalary,
-            float? maxSalary,
-            bool? isNegotiated,
-            int? currencyId,
-            int? salaryTermIds,
-            [FromHeader] IEnumerable<int> workModeIds,
-            [FromHeader] IEnumerable<int> employmentTypeIds,
 
-            CancellationToken cancellationToken,
             int? page,
             int? itemsPerPage,
 
-            bool? ascending)
+            CompanyUserOffersOrderBy? orderBy,
+            bool? ascending,
+
+            CancellationToken cancellationToken)
         {
-            var request = new GetCompanyOffersRequest
+            var request = new GetCompanyUserOffersRequest
             {
-                // For single Offer
                 OfferId = offerId,
 
-                // Company Identification
+                Status = status,
+
                 CompanyId = companyId,
                 Regon = regon,
                 Nip = nip,
                 Krs = krs,
 
-                // Branch
                 BranchId = branchId,
                 Lon = lon,
                 Lat = lat,
 
-                // Other Filters
-                SearchText = searchText,
-                PublicationStart = publicationStart,
-                PublicationEnd = publicationEnd,
-                WorkBegin = workBeginDate,
-                WorkEnd = workEndDate,
-                MinSalary = minSalary,
-                MaxSalary = maxSalary,
-                IsNegotiated = isNegotiated,
-                CurrencyId = currencyId,
+                ContractConditionId = contractConditionId,
+                IsNegotiable = isNegotiable,
+                IsPaid = isPaid,
+                SalaryPerHourMin = salaryPerHourMin,
+                SalaryPerHourMax = salaryPerHourMax,
+                SalaryMin = salaryMin,
+                SalaryMax = salaryMax,
+                HoursMin = hoursMin,
+                HoursMax = hoursMax,
+                ParameterIds = parameterIds,
 
-                // Pagination
+                OfferTemplateId = offerTemplateId,
+                SkillIds = skillIds,
+
+                SearchText = searchText,
+
                 Page = page ?? 1,
                 ItemsPerPage = itemsPerPage ?? 10,
 
-                // Sorting
+                OrderBy = orderBy ?? CompanyUserOffersOrderBy.Undefined,
                 Ascending = ascending ?? true,
 
                 Metadata = HttpContext,
             };
             var result = await _mediator.Send(request, cancellationToken);
-            return Ok(result);
+            return StatusCode((int)result.HttpCode, result.Result);
         }
     }
 }

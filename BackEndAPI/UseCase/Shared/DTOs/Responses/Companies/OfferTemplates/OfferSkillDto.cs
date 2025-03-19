@@ -1,12 +1,13 @@
 ﻿// Ignore Spelling: Dto
 
-using UseCase.Shared.DTOs.Responses.Dictionaries;
+using UseCase.Shared.Dictionaries.GetSkills.Response;
 
 namespace UseCase.Shared.DTOs.Responses.Companies.OfferTemplates
 {
     public class OfferSkillDto
     {
-        public SkillResponseDto Skill { get; init; } = null!;
-        public bool IsRequired { get; init; }
+        public bool IsRequired { get; set; }
+
+        public SkillDto Skill { get; init; } = null!;
     }
 }

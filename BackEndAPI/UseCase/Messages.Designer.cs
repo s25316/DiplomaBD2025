@@ -61,38 +61,56 @@ namespace UseCase {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Contains KRS duplicates existing company.
+        ///   Looks up a localized string similar to SkillIds Not Found.
         /// </summary>
-        internal static string Entity_Company_KrsDuplicate {
+        internal static string Entity_Branch_SkillIds_NotFound {
             get {
-                return ResourceManager.GetString("Entity_Company_KrsDuplicate", resourceCulture);
+                return ResourceManager.GetString("Entity_Branch_SkillIds_NotFound", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Contains Name duplicates existing company.
+        ///   Looks up a localized string similar to Duplicate Company KRS.
         /// </summary>
-        internal static string Entity_Company_NameDuplicate {
+        internal static string Entity_Company_Krs_Conflict {
             get {
-                return ResourceManager.GetString("Entity_Company_NameDuplicate", resourceCulture);
+                return ResourceManager.GetString("Entity_Company_Krs_Conflict", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Contains NIP duplicates existing company.
+        ///   Looks up a localized string similar to Duplicate Company Name.
         /// </summary>
-        internal static string Entity_Company_NipDuplicate {
+        internal static string Entity_Company_Name_Conflict {
             get {
-                return ResourceManager.GetString("Entity_Company_NipDuplicate", resourceCulture);
+                return ResourceManager.GetString("Entity_Company_Name_Conflict", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Contains REGON duplicates existing company.
+        ///   Looks up a localized string similar to Duplicate Company NIP.
         /// </summary>
-        internal static string Entity_Company_RegonDuplicate {
+        internal static string Entity_Company_Nip_Conflict {
             get {
-                return ResourceManager.GetString("Entity_Company_RegonDuplicate", resourceCulture);
+                return ResourceManager.GetString("Entity_Company_Nip_Conflict", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Duplicate Company REGON.
+        /// </summary>
+        internal static string Entity_Company_Regon_Conflict {
+            get {
+                return ResourceManager.GetString("Entity_Company_Regon_Conflict", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Offer publish start invalid, offer start.
+        /// </summary>
+        internal static string Entity_Offers_Status_Started {
+            get {
+                return ResourceManager.GetString("Entity_Offers_Status_Started", resourceCulture);
             }
         }
         

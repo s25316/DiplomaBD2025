@@ -3,10 +3,11 @@ using Domain.Features.People.ValueObjects;
 using Domain.Shared.Enums;
 using MediatR;
 using System.Text;
+using UseCase.Roles.CompanyUser.Commands.OfferTemplatesCreate.Repositories;
 using UseCase.Roles.CompanyUser.Commands.OfferTemplatesCreate.Request;
 using UseCase.Roles.CompanyUser.Commands.OfferTemplatesCreate.Response;
-using UseCase.Roles.CompanyUser.Commands.Repositories.OfferTemplates;
-using UseCase.Roles.Guests.Queries.Dictionaries.Repositories;
+using UseCase.Shared.Dictionaries.GetSkills.Response;
+using UseCase.Shared.Dictionaries.Repositories;
 using UseCase.Shared.Services.Authentication.Inspectors;
 using UseCase.Shared.Templates.Response.Commands;
 using DomainOfferTemplate = Domain.Features.OfferTemplates.Entities.OfferTemplate;
@@ -15,18 +16,19 @@ namespace UseCase.Roles.CompanyUser.Commands.OfferTemplatesCreate
 {
     public class OfferTemplatesCreateHandler : IRequestHandler<OfferTemplatesCreateRequest, OfferTemplatesCreateResponse>
     {
-        // Properties 
-        private readonly IAuthenticationInspectorService _authenticationInspector;
+        // Property
+        private readonly IAuthenticationInspectorService _inspectorService;
         private readonly IDictionariesRepository _dictionariesRepository;
         private readonly IOfferTemplateRepository _offerTemplateRepository;
 
+
         // Constructor
         public OfferTemplatesCreateHandler(
-            IAuthenticationInspectorService authenticationInspector,
+            IAuthenticationInspectorService inspectorService,
             IDictionariesRepository dictionariesRepository,
             IOfferTemplateRepository offerTemplateRepository)
         {
-            _authenticationInspector = authenticationInspector;
+            _inspectorService = inspectorService;
             _dictionariesRepository = dictionariesRepository;
             _offerTemplateRepository = offerTemplateRepository;
         }
@@ -36,126 +38,130 @@ namespace UseCase.Roles.CompanyUser.Commands.OfferTemplatesCreate
         public async Task<OfferTemplatesCreateResponse> Handle(OfferTemplatesCreateRequest request, CancellationToken cancellationToken)
         {
             var personId = GetPersonId(request);
-            var isAllowedOperation = await _offerTemplateRepository.HasAccessToCompany(
-                personId,
-                request.CompanyId,
-                cancellationToken);
+            var skillDictionary = await _dictionariesRepository.GetSkillsAsync();
+            var buildResult = Build(request, skillDictionary);
 
-            if (!isAllowedOperation)
+            if (!buildResult.IsValid)
             {
                 return new OfferTemplatesCreateResponse
                 {
-                    Commands = request.Commands.Select(cmd => new ResponseCommandTemplate<OfferTemplateCommand>
-                    {
-                        Item = cmd,
-                        IsCorrect = false,
-                        Message = HttpCode.Forbidden.Description(),
-                    }),
-                    IsCorrect = false,
-                    HttpCode = HttpCode.Forbidden,
-                };
-            }
-
-            var builders = await GetBuildersAsync(request);
-            if (!builders.IsValidRequest)
-            {
-                return new OfferTemplatesCreateResponse
-                {
-                    Commands = builders.Dictionary.Select(pair => new ResponseCommandTemplate<OfferTemplateCommand>
-                    {
-                        Item = pair.Key,
-                        IsCorrect = string.IsNullOrWhiteSpace(pair.Value.Error),
-                        Message = string.IsNullOrWhiteSpace(pair.Value.Error) ?
-                            HttpCode.Correct.Description() :
-                            pair.Value.Error,
-                    }),
-                    IsCorrect = false,
+                    Result = buildResult.Dictionary
+                        .Select(pair => new ResponseCommandTemplate<OfferTemplateCreateCommand>
+                        {
+                            Item = pair.Key,
+                            IsCorrect = string.IsNullOrWhiteSpace(pair.Value.Error),
+                            Message = pair.Value.Error ?? string.Empty,
+                        }),
                     HttpCode = HttpCode.BadRequest,
                 };
             }
 
-            var list = new List<DomainOfferTemplate>();
-            foreach (var pair in builders.Dictionary.Values)
-            {
-                list.Add(pair.Builder.Build());
-            }
+            var dictionary = buildResult.Dictionary.ToDictionary(
+                val => val.Key,
+                val => val.Value.OfferTemplate);
+            var repositoryResult = await _offerTemplateRepository.CreateAsync(
+                personId,
+                dictionary.Values,
+                cancellationToken);
 
-            await _offerTemplateRepository.CreateAsync(list, cancellationToken);
             return new OfferTemplatesCreateResponse
             {
-                Commands = request.Commands.Select(cmd => new ResponseCommandTemplate<OfferTemplateCommand>
-                {
-                    Item = cmd,
-                    IsCorrect = true,
-                    Message = HttpCode.Created.Description(),
-                }),
-                IsCorrect = true,
-                HttpCode = HttpCode.Created
+                Result = dictionary
+                        .Select(pair => new ResponseCommandTemplate<OfferTemplateCreateCommand>
+                        {
+                            Item = pair.Key,
+                            IsCorrect = repositoryResult.Dictionary[pair.Value].IsCorrect,
+                            Message = repositoryResult.Dictionary[pair.Value].Message,
+                        }),
+                HttpCode = repositoryResult.Code,
             };
         }
 
-        // Private Methods
-        private PersonId GetPersonId(OfferTemplatesCreateRequest request)
+        // Private Static Methods
+        private static DomainOfferTemplate.Builder PrepareBuilder(
+            Guid companyId,
+            OfferTemplateCreateCommand command)
         {
-            return _authenticationInspector.GetPersonId(request.Metadata.Claims);
+            return new DomainOfferTemplate.Builder()
+                .SetCompanyId(companyId)
+                .SetName(command.Name)
+                .SetDescription(command.Description)
+                .SetSkillsIds(command.Skills.Select(skill => new OfferSkill
+                {
+                    SkillId = skill.SkillId,
+                    IsRequired = skill.IsRequired,
+                }));
         }
 
-        // Records for Method below
-        private sealed record GetBuildersResult(
-            bool IsValidRequest,
-            Dictionary<OfferTemplateCommand, BuilderAndError> Dictionary);
-
-        private sealed record BuilderAndError(
-            DomainOfferTemplate.Builder Builder,
-            string Error);
-
-        private async Task<GetBuildersResult> GetBuildersAsync(OfferTemplatesCreateRequest request)
+        private sealed class BuildResult
         {
-            var skillsDictionary = await _dictionariesRepository.GetSkillsAsync();
-            var dictionary = new Dictionary<OfferTemplateCommand, BuilderAndError>();
-            var isValidRequest = true;
+            public required Dictionary<OfferTemplateCreateCommand, OfferTemplateAndError> Dictionary { get; init; }
+            public required bool IsValid { get; init; }
+        }
+
+        private sealed class OfferTemplateAndError
+        {
+            public required DomainOfferTemplate OfferTemplate { get; init; }
+            public required string? Error { get; init; }
+        }
+
+        private static BuildResult Build(
+            OfferTemplatesCreateRequest request,
+            IReadOnlyDictionary<int, SkillDto> skillDictionary)
+        {
+            var stringBuilder = new StringBuilder();
+            var notFoundSkillIds = new StringBuilder();
+            var dictionary = new Dictionary<OfferTemplateCreateCommand, OfferTemplateAndError>();
+            var isValid = true;
 
             foreach (var command in request.Commands)
             {
-                var builder = new DomainOfferTemplate.Builder()
-                    .SetName(command.Name)
-                    .SetDescription(command.Description)
-                    .SetCompanyId(request.CompanyId)
-                    .SetSkillsIds(command.Skills.Select(skill => new OfferSkill
-                    {
-                        SkillId = skill.SkillId,
-                        IsRequired = skill.IsRequired,
-                    }));
+                stringBuilder.Clear();
+                notFoundSkillIds.Clear();
 
-                var notFoundIds = new List<int>();
-                foreach (var skill in command.Skills)
+                var builder = PrepareBuilder(request.CompanyId, command);
+                if (builder.HasErrors())
                 {
-                    if (!skillsDictionary.ContainsKey(skill.SkillId))
+                    stringBuilder.AppendLine(builder.GetErrors());
+                }
+
+                foreach (var skillId in command.Skills)
+                {
+                    if (!skillDictionary.ContainsKey(skillId.SkillId))
                     {
-                        notFoundIds.Add(skill.SkillId);
+                        notFoundSkillIds.Append($"{skillId.SkillId} ");
                     }
                 }
 
-                var errors = new StringBuilder();
-                if (builder.HasErrors())
+                if (notFoundSkillIds.Length > 0)
                 {
-                    errors.AppendLine(builder.GetErrors());
-                }
-                if (notFoundIds.Any())
-                {
-                    errors.Append($"Not found {nameof(OfferSkillRequestDto.SkillId)}s : ");
-                    errors.Append(string.Join(", ", notFoundIds));
-                }
-                //Set valid request on false
-                if (isValidRequest && errors.Length > 0)
-                {
-                    isValidRequest = false;
+                    stringBuilder.AppendLine(
+                        $"{Messages.Entity_Branch_SkillIds_NotFound}: {notFoundSkillIds.ToString()}");
                 }
 
-                dictionary[command] = new BuilderAndError(builder, errors.ToString());
+                if (isValid && stringBuilder.Length > 0)
+                {
+                    isValid = false;
+                }
+
+                dictionary[command] = new OfferTemplateAndError
+                {
+                    OfferTemplate = builder.Build(),
+                    Error = stringBuilder.Length == 0 ? null : stringBuilder.ToString(),
+                };
             }
-            return new GetBuildersResult(isValidRequest, dictionary);
+
+            return new BuildResult
+            {
+                Dictionary = dictionary,
+                IsValid = isValid
+            };
         }
 
+        // Private Non Static Methods
+        private PersonId GetPersonId(OfferTemplatesCreateRequest request)
+        {
+            return _inspectorService.GetPersonId(request.Metadata.Claims);
+        }
     }
 }

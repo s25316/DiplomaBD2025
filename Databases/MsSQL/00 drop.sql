@@ -1,143 +1,139 @@
 -- Created by Vertabelo (http://vertabelo.com)
--- Last modification date: 2025-02-27 14:05:20.937
+-- Last modification date: 2025-03-15 02:02:15.639
 
 -- foreign keys
-ALTER TABLE Address DROP CONSTRAINT Address_City;
+ALTER TABLE Addresses DROP CONSTRAINT Addresses_Cities;
 
-ALTER TABLE Address DROP CONSTRAINT Address_Street;
+ALTER TABLE Addresses DROP CONSTRAINT Addresses_Streets;
 
-ALTER TABLE Branch DROP CONSTRAINT Branch_Address;
+ALTER TABLE Branches DROP CONSTRAINT Branches_Addresses;
 
-ALTER TABLE Branch DROP CONSTRAINT Branch_Company;
+ALTER TABLE Branches DROP CONSTRAINT Branches_Companies;
 
-ALTER TABLE City DROP CONSTRAINT City_State;
+ALTER TABLE Cities DROP CONSTRAINT Cities_States;
 
-ALTER TABLE CompanyPerson DROP CONSTRAINT CompanyPerson_Company;
+ALTER TABLE CompanyPeople DROP CONSTRAINT CompanyPeople_Companies;
 
-ALTER TABLE CompanyPerson DROP CONSTRAINT CompanyPerson_Person;
+ALTER TABLE CompanyPeople DROP CONSTRAINT CompanyPeople_People;
 
-ALTER TABLE CompanyPerson DROP CONSTRAINT CompanyPerson_Role;
+ALTER TABLE CompanyPeople DROP CONSTRAINT CompanyPeople_Roles;
+
+ALTER TABLE ContractAttributes DROP CONSTRAINT ContractAttributes_ContractConditions;
+
+ALTER TABLE ContractAttributes DROP CONSTRAINT ContractAttributes_ContractParameters;
+
+ALTER TABLE ContractConditions DROP CONSTRAINT ContractConditions_Companies;
+
+ALTER TABLE ContractParameters DROP CONSTRAINT ContractParameters_ContractParameterTypes;
 
 ALTER TABLE HRChat DROP CONSTRAINT HRChat_HRProcess;
 
 ALTER TABLE HRChat DROP CONSTRAINT HRChat_ProcessType;
 
-ALTER TABLE HRProcess DROP CONSTRAINT HRProcess_Offer;
+ALTER TABLE Notifications DROP CONSTRAINT Notifications_NotificationTypes;
 
-ALTER TABLE HRProcess DROP CONSTRAINT HRProcess_Person;
+ALTER TABLE Notifications DROP CONSTRAINT Notifications_People;
 
-ALTER TABLE NChat DROP CONSTRAINT NChat_Notification;
+ALTER TABLE OfferConditions DROP CONSTRAINT OfferConditions_ContractConditions;
 
-ALTER TABLE Notification DROP CONSTRAINT Notification_NotificationType;
+ALTER TABLE OfferConditions DROP CONSTRAINT OfferConditions_Offers;
 
-ALTER TABLE Notification DROP CONSTRAINT Notification_Person;
+ALTER TABLE OfferConnections DROP CONSTRAINT OfferConnections_OfferTemplates;
 
-ALTER TABLE OfferEmploymentType DROP CONSTRAINT OfferEmploymentType_EmploymentType;
+ALTER TABLE OfferConnections DROP CONSTRAINT OfferConnections_Offers;
 
-ALTER TABLE OfferEmploymentType DROP CONSTRAINT OfferEmploymentType_Offer;
+ALTER TABLE OfferSkills DROP CONSTRAINT OfferSkills_OfferTemplates;
 
-ALTER TABLE OfferSkill DROP CONSTRAINT OfferSkill_OfferTemplate;
+ALTER TABLE OfferSkills DROP CONSTRAINT OfferSkills_Skills;
 
-ALTER TABLE OfferSkill DROP CONSTRAINT OfferSkill_Skill;
+ALTER TABLE OfferTemplates DROP CONSTRAINT OfferTemplates_Companies;
 
-ALTER TABLE OfferTemplate DROP CONSTRAINT OfferTemplate_Company;
+ALTER TABLE Offers DROP CONSTRAINT Offers_Branches;
 
-ALTER TABLE OfferWorkMode DROP CONSTRAINT OfferWorkMode_Offer;
+ALTER TABLE People DROP CONSTRAINT People_Addresses;
 
-ALTER TABLE OfferWorkMode DROP CONSTRAINT OfferWorkMode_WorkMode;
+ALTER TABLE PersonSkills DROP CONSTRAINT PersonSkills_People;
 
-ALTER TABLE Offer DROP CONSTRAINT Offer_Branch;
+ALTER TABLE PersonSkills DROP CONSTRAINT PersonSkills_Skills;
 
-ALTER TABLE Offer DROP CONSTRAINT Offer_Currency;
+ALTER TABLE SkillConnections DROP CONSTRAINT SkillConnections_Skills1;
 
-ALTER TABLE Offer DROP CONSTRAINT Offer_OfferTemplate;
+ALTER TABLE SkillConnections DROP CONSTRAINT SkillConnections_Skills2;
 
-ALTER TABLE Offer DROP CONSTRAINT Offer_SalaryTerm;
+ALTER TABLE Skills DROP CONSTRAINT Skills_SkillTypes;
 
-ALTER TABLE PersonSkill DROP CONSTRAINT PersonSkill_Person;
+ALTER TABLE States DROP CONSTRAINT States_Countries;
 
-ALTER TABLE PersonSkill DROP CONSTRAINT PersonSkill_Skill;
+ALTER TABLE Urls DROP CONSTRAINT Urls_People;
 
-ALTER TABLE Person DROP CONSTRAINT Person_Address;
-
-ALTER TABLE SkillConnections DROP CONSTRAINT SkillConnections_Skill1;
-
-ALTER TABLE SkillConnections DROP CONSTRAINT SkillConnections_Skill2;
-
-ALTER TABLE Skill DROP CONSTRAINT Skill_SkillType;
-
-ALTER TABLE State DROP CONSTRAINT State_Country;
-
-ALTER TABLE Url DROP CONSTRAINT Url_Person;
-
-ALTER TABLE Url DROP CONSTRAINT Url_UrlType;
+ALTER TABLE Urls DROP CONSTRAINT Urls_UrlTypes;
 
 -- tables
-DROP TABLE Address;
+DROP TABLE Addresses;
 
-DROP TABLE Branch;
+DROP TABLE Branches;
 
-DROP TABLE City;
+DROP TABLE Cities;
 
-DROP TABLE Company;
+DROP TABLE Companies;
 
-DROP TABLE CompanyPerson;
+DROP TABLE CompanyPeople;
 
-DROP TABLE Country;
+DROP TABLE ContractAttributes;
 
-DROP TABLE Currency;
+DROP TABLE ContractConditions;
 
-DROP TABLE EmploymentType;
+DROP TABLE ContractParameterTypes;
 
-DROP TABLE Ex;
+DROP TABLE ContractParameters;
 
-DROP TABLE Faq;
+DROP TABLE Countries;
+
+DROP TABLE Exs;
+
+DROP TABLE Faqs;
 
 DROP TABLE HRChat;
 
-DROP TABLE HRProcess;
+DROP TABLE HrProcess;
 
 DROP TABLE NChat;
 
-DROP TABLE Notification;
+DROP TABLE NotificationTypes;
 
-DROP TABLE NotificationType;
+DROP TABLE Notifications;
 
-DROP TABLE Offer;
+DROP TABLE OfferConditions;
 
-DROP TABLE OfferEmploymentType;
+DROP TABLE OfferConnections;
 
-DROP TABLE OfferSkill;
+DROP TABLE OfferSkills;
 
-DROP TABLE OfferTemplate;
+DROP TABLE OfferTemplates;
 
-DROP TABLE OfferWorkMode;
+DROP TABLE Offers;
 
-DROP TABLE Person;
+DROP TABLE People;
 
-DROP TABLE PersonSkill;
+DROP TABLE PersonSkills;
 
 DROP TABLE ProcessType;
 
-DROP TABLE Role;
-
-DROP TABLE SalaryTerm;
-
-DROP TABLE Skill;
+DROP TABLE Roles;
 
 DROP TABLE SkillConnections;
 
-DROP TABLE SkillType;
+DROP TABLE SkillTypes;
 
-DROP TABLE State;
+DROP TABLE Skills;
 
-DROP TABLE Street;
+DROP TABLE States;
 
-DROP TABLE Url;
+DROP TABLE Streets;
 
-DROP TABLE UrlType;
+DROP TABLE UrlTypes;
 
-DROP TABLE WorkMode;
+DROP TABLE Urls;
 
 -- End of file.
 

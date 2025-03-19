@@ -1,7 +1,4 @@
-﻿using Domain.Features.Branches.ValueObjects;
-using Domain.Features.Offers.ValueObjects;
-using Domain.Features.OfferTemplates.ValueObjects;
-using Domain.Shared.CustomProviders;
+﻿using Domain.Features.Offers.ValueObjects;
 using Domain.Shared.Templates;
 using System.Text;
 
@@ -12,92 +9,50 @@ namespace Domain.Features.Offers.Entities
         public class Builder : TemplateBuilder<Offer>
         {
             //Public Methods
-            public Builder SetId(Guid offerId)
+            public Builder SetId(Guid id)
             {
-                SetProperty(offer => offer.Id = (OfferId)offerId);
+                SetProperty(offer => offer.Id = id);
                 return this;
             }
+
             public Builder SetOfferTemplateId(Guid offerTemplateId)
             {
-                SetProperty(offer =>
-                    offer.OfferTemplateId = (OfferTemplateId)offerTemplateId
-                );
+                SetProperty(offer => offer.OfferTemplateId = offerTemplateId);
                 return this;
             }
 
             public Builder SetBranchId(Guid? branchId)
             {
-                SetProperty(offer => offer.BranchId = (BranchId?)branchId);
+                SetProperty(offer => offer.SetBranchId(branchId));
                 return this;
             }
 
-            public Builder SetDatesRanges(
-                DateTime publicationRangeStart,
-                DateTime? publicationRangeEnd,
-                DateOnly? workRangeStart,
-                DateOnly? workRangeEnd)
+            public Builder SetPublicationRange(
+                DateTime start,
+                DateTime? end)
             {
-                SetProperty(offer => offer.SetDatesRanges(
-                    publicationRangeStart,
-                    publicationRangeEnd,
-                    workRangeStart,
-                    workRangeEnd));
+                SetProperty(offer => offer.SetPublicationRange(start, end));
                 return this;
             }
 
-            public Builder SetDatesRanges(
-                DateTime publicationRangeStart,
-                DateTime? publicationRangeEnd,
-                DateTime? workRangeStart,
-                DateTime? workRangeEnd)
+            public Builder SetEmploymentLength(float? employmentLength)
             {
-                var worStart = workRangeStart == null ?
-                    (DateOnly?)null :
-                    CustomTimeProvider.GetDateOnly(workRangeStart.Value);
-                var worEnd = workRangeEnd == null ?
-                    (DateOnly?)null :
-                    CustomTimeProvider.GetDateOnly(workRangeEnd.Value);
-
-                return SetDatesRanges(
-                    publicationRangeStart,
-                    publicationRangeEnd,
-                    worStart,
-                    worEnd);
-            }
-
-            public Builder SetSalaryData(
-                decimal salaryRangeMin,
-                decimal salaryRangeMax,
-                int? salaryTermId,
-                int? currencyId,
-                bool isNegotiated)
-            {
-                SetProperty(offer => offer.SetSalaryData(
-                    salaryRangeMin,
-                    salaryRangeMax,
-                    salaryTermId,
-                    currencyId,
-                    isNegotiated));
+                SetProperty(offer => offer.SetEmploymentLength(employmentLength));
                 return this;
             }
 
-            public Builder SetWebsiteUrl(string? url)
+            public Builder SetWebsiteUrl(string? websiteUrl)
             {
-                SetProperty(offer => offer.SetWebsiteUrl(url));
+                SetProperty(offer => offer.SetWebsiteUrl(websiteUrl));
                 return this;
             }
 
-            public Builder SetWorkModeIds(IEnumerable<int> workModeIds)
+            public Builder SetContractConditionIds(IEnumerable<Guid> ids)
             {
-                SetProperty(offer => offer.SetWorkModeIds(workModeIds));
+                SetProperty(offer => offer.SetContractConditionIds(ids));
                 return this;
             }
 
-            public Builder SetEmploymentTypeIds(IEnumerable<int> employmentTypeIds)
-            {
-                SetProperty(offer => offer.SetEmploymentTypeIds(employmentTypeIds));
-                return this;
-            }
             // Protected Methods 
             protected override Action<Offer> SetDefaultValues()
             {
@@ -116,10 +71,6 @@ namespace Domain.Features.Offers.Entities
                     if (offer.PublicationRange == null)
                     {
                         errors.AppendLine($"about Publication");
-                    }
-                    if (offer.SalaryRange == null)
-                    {
-                        errors.AppendLine($"about Salary");
                     }
                     return errors.ToString();
                 };

@@ -6,6 +6,8 @@ public partial class Ex
 
     public DateTime Created { get; set; }
 
+    public DateTime? Handled { get; set; }
+
     public string ExceptionType { get; set; } = null!;
 
     public string? Method { get; set; }

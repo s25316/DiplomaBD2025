@@ -28,5 +28,7 @@ public partial class Company
 
     public virtual ICollection<CompanyPerson> CompanyPeople { get; set; } = new List<CompanyPerson>();
 
+    public virtual ICollection<ContractCondition> ContractConditions { get; set; } = new List<ContractCondition>();
+
     public virtual ICollection<OfferTemplate> OfferTemplates { get; set; } = new List<OfferTemplate>();
 }

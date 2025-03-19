@@ -20,7 +20,7 @@ public partial class Hrchat
 
     public int ProcessTypeId { get; set; }
 
-    public virtual Hrprocess Process { get; set; } = null!;
+    public virtual HrProcess Process { get; set; } = null!;
 
     public virtual ProcessType ProcessType { get; set; } = null!;
 }
