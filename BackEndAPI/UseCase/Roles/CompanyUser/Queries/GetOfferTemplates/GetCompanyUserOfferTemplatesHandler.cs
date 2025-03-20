@@ -230,9 +230,9 @@ namespace UseCase.Roles.CompanyUser.Queries.GetOfferTemplates
             return _context.OfferTemplates
 
                 .Include(ot => ot.Company)
-                .ThenInclude(c => c.CompanyPeople)
+                .ThenInclude(c => c.CompanyPeople.Where(x => x.Deny == null))
 
-                .Include(ot => ot.OfferSkills)
+                .Include(ot => ot.OfferSkills.Where(x => x.Removed == null))
                 .ThenInclude(os => os.Skill)
                 .ThenInclude(s => s.SkillType)
                 .AsNoTracking();

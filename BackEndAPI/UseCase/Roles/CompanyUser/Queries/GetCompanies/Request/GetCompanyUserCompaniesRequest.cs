@@ -9,13 +9,13 @@ namespace UseCase.Roles.CompanyUser.Queries.GetCompanies.Request
     public class GetCompanyUserCompaniesRequest : RequestTemplate<GetCompanyUserCompaniesResponse>
     {
         // For single company
-        public Guid? CompanyId { get; init; }
-        public string? Regon { get; init; } = null;
-        public string? Nip { get; init; } = null;
-        public string? Krs { get; init; } = null;
+        public required Guid? CompanyId { get; init; }
+        public required string? Regon { get; init; } = null;
+        public required string? Nip { get; init; } = null;
+        public required string? Krs { get; init; } = null;
 
         // Other Filters
-        public string? SearchText { get; init; } = null;
+        public required string? SearchText { get; init; } = null;
 
         // Pagination
         public required int Page { get; init; }

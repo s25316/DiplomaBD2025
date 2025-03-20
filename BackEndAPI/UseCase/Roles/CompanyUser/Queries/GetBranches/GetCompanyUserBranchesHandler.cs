@@ -216,7 +216,7 @@ namespace UseCase.Roles.CompanyUser.Queries.GetBranches
         {
             return _context.Branches
                 .Include(b => b.Company)
-                .ThenInclude(c => c.CompanyPeople)
+                .ThenInclude(c => c.CompanyPeople.Where(x => x.Deny == null))
 
                 .Include(b => b.Address)
                 .ThenInclude(a => a.Street)

@@ -9,18 +9,18 @@ namespace UseCase.Roles.CompanyUser.Queries.GetBranches.Request
     public class GetCompanyUserBranchesRequest : RequestTemplate<GetCompanyUserBranchesResponse>
     {
         // For single Company
-        public Guid? BranchId { get; init; }
+        public required Guid? BranchId { get; init; }
 
         // Company identification
-        public Guid? CompanyId { get; init; }
-        public string? Regon { get; init; } = null;
-        public string? Nip { get; init; } = null;
-        public string? Krs { get; init; } = null;
+        public required Guid? CompanyId { get; init; }
+        public required string? Regon { get; init; } = null;
+        public required string? Nip { get; init; } = null;
+        public required string? Krs { get; init; } = null;
 
         // Other filters
-        public string? SearchText { get; init; } = null;
-        public float? Lon { get; init; } = null;
-        public float? Lat { get; init; } = null;
+        public required string? SearchText { get; init; } = null;
+        public required float? Lon { get; init; } = null;
+        public required float? Lat { get; init; } = null;
         public required bool ShowRemoved { get; init; }
 
         // Pagination

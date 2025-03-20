@@ -162,7 +162,7 @@ namespace UseCase.Roles.CompanyUser.Queries.GetCompanies
         private IQueryable<Company> BuildBaseQuery()
         {
             return _context.Companies
-                .Include(c => c.CompanyPeople)
+                .Include(c => c.CompanyPeople.Where(x => x.Deny == null))
                 .AsNoTracking();
         }
 

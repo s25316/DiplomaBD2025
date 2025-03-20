@@ -108,6 +108,7 @@ namespace UseCase.Roles.CompanyUser.Queries.GetContractConditions
                     (cc.Company.Description != null && cc.Company.Description.Contains(word))
                 );
         }
+
         private static Expression<Func<ContractCondition, bool>> BuildOtherFilters(
            GetCompanyUserContractConditionsRequest request)
         {
@@ -288,9 +289,9 @@ namespace UseCase.Roles.CompanyUser.Queries.GetContractConditions
         {
             return _context.ContractConditions
                 .Include(cc => cc.Company)
-                .ThenInclude(c => c.CompanyPeople)
+                .ThenInclude(c => c.CompanyPeople.Where(x => x.Deny == null))
 
-                .Include(cc => cc.ContractAttributes)
+                .Include(cc => cc.ContractAttributes.Where(x => x.Removed == null))
                 .ThenInclude(c => c.ContractParameter)
                 .ThenInclude(c => c.ContractParameterType)
                 .AsNoTracking();
@@ -301,11 +302,7 @@ namespace UseCase.Roles.CompanyUser.Queries.GetContractConditions
             GetCompanyUserContractConditionsRequest request)
         {
             // Base Configuration
-            var query = BaseQuery()
-                .Where(cc =>
-                    cc.ContractAttributes.Any(ca =>
-                        ca.Removed == null
-                ));
+            var query = BaseQuery();
 
             // Filter ContractCondition if have no access to it
             if (request.ContractConditionId.HasValue)

@@ -4,8 +4,8 @@ namespace UseCase.Shared.Templates.ValidationAttributes
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
     public class CustomStringAttribute : TemplateAttribute
     {
-        /*protected static Func<object?, ValidationContext, ValidationResult?> PrepareIsValid<T>()
-            where T : new()
+        protected static Func<object?, ValidationContext, ValidationResult?> BuildIsValid(
+            Func<string, string> valueString)
         {
             return (value, validationContext) =>
             {
@@ -16,8 +16,7 @@ namespace UseCase.Shared.Templates.ValidationAttributes
 
                 try
                 {
-                    var item = new T(stringValue);
-                    SetValue(validationContext, item.Value);
+                    SetStringValue(validationContext, valueString(stringValue));
                 }
                 catch (Exception ex)
                 {
@@ -25,7 +24,7 @@ namespace UseCase.Shared.Templates.ValidationAttributes
                 }
                 return ValidationResult.Success;
             };
-        }*/
+        }
 
         protected static bool IsNullOrWhiteSpace(
             object? value,
@@ -41,7 +40,7 @@ namespace UseCase.Shared.Templates.ValidationAttributes
             var param = value.ToString();
             if (string.IsNullOrWhiteSpace(param))
             {
-                SetValue(validationContext, null);
+                SetStringValue(validationContext, null);
                 stringValue = string.Empty;
                 return true;
             }
