@@ -6,8 +6,10 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import Link from 'next/link';
 
 interface BranchesProfile {
-  branchId: string;
-  name: string;
+  branch: {
+    branchId: string;
+    name: string;
+  }
 }
 
 interface Templates {
@@ -28,7 +30,7 @@ interface CompanyDetails {
 
 const CompanyDetails = async ({ params }: { params: { id: string } }) => {
   const session = await getServerSession(authOptions);
-  const { id } = params;
+  const { id } = await params;
 
   let companyDetails: CompanyDetails | null = null;
   let branches: BranchesProfile[] = [];
@@ -107,8 +109,8 @@ const CompanyDetails = async ({ params }: { params: { id: string } }) => {
           <h2>Branches:</h2>
           <ul>
             {branches.map((value) => (
-              <li key={value.branchId}>
-                <Link href={`/companies/${id}/${value.branchId}`}><b>Name: {value.name}</b></Link>
+              <li key={value.branch.branchId}>
+                <Link href={`/companies/${id}/${value.branch.branchId}`}><b>Name: {value.branch.name}</b></Link>
               </li>
             ))}
           </ul>
