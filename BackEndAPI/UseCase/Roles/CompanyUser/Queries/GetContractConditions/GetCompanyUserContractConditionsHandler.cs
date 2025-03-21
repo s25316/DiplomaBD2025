@@ -12,7 +12,10 @@ using UseCase.Roles.CompanyUser.Queries.GetContractConditions.Enums;
 using UseCase.Roles.CompanyUser.Queries.GetContractConditions.Request;
 using UseCase.Roles.CompanyUser.Queries.GetContractConditions.Response;
 using UseCase.Shared.DTOs.Responses.Companies;
-using UseCase.Shared.ExtensionMethods;
+using UseCase.Shared.ExtensionMethods.EF;
+using UseCase.Shared.ExtensionMethods.EF.Companies;
+using UseCase.Shared.ExtensionMethods.EF.CompanyPeople;
+using UseCase.Shared.ExtensionMethods.EF.ContractConditions;
 using UseCase.Shared.Services.Authentication.Inspectors;
 using UseCase.Shared.Templates.Response.QueryResults;
 
@@ -47,7 +50,7 @@ namespace UseCase.Roles.CompanyUser.Queries.GetContractConditions
             var query = PrepareQuery(personId, request);
             var selector = BuildSelector(personId, query);
             var selectResult = await query
-                .Paginate(request.Page, request.ItemsPerPage)
+                .Paginate(request.Pagination)
                 .Select(selector)
                 .ToListAsync(cancellationToken);
 
@@ -66,109 +69,21 @@ namespace UseCase.Roles.CompanyUser.Queries.GetContractConditions
             PersonId personId,
             IQueryable<ContractCondition> totalCountQuery)
         {
+            var personIdValue = personId.Value;
+            var roleIds = _authorizedRoles.Select(r => (int)r);
             return cc => new SelectResult
             {
                 ContractCondition = cc,
                 AuthorizeRolesCount = cc.Company.CompanyPeople.Count(role =>
-                    _authorizedRoles.Any(roleId =>
-                        role.PersonId == personId.Value &&
-                        role.RoleId == (int)roleId &&
+                    roleIds.Any(roleId =>
+                        role.PersonId == personIdValue &&
+                        role.RoleId == roleId &&
                         role.Deny == null
                     )
                 ),
                 TotalCount = totalCountQuery.Count(),
             };
         }
-
-        private static Expression<Func<ContractCondition, bool>> BuildContractConditionFilter(
-            Guid contractConditionId)
-        {
-            return cc => cc.ContractConditionId == contractConditionId;
-        }
-
-        private static Expression<Func<ContractCondition, bool>> BuildCompanyFilter(
-            GetCompanyUserContractConditionsRequest request)
-        {
-            if (request.CompanyId.HasValue)
-            {
-                return cc => cc.CompanyId == request.CompanyId;
-            }
-
-            return cc =>
-                (request.Regon == null || cc.Company.Regon == request.Regon) &&
-                (request.Nip == null || cc.Company.Nip == request.Nip) &&
-                (request.Krs == null || cc.Company.Krs == request.Krs);
-        }
-
-        private static Expression<Func<ContractCondition, bool>> BuildSearchTextCompanyFilter(
-            IEnumerable<string> searchWords)
-        {
-            return cc => !searchWords.Any() || searchWords.Any(word =>
-                    (cc.Company.Name != null && cc.Company.Name.Contains(word)) ||
-                    (cc.Company.Description != null && cc.Company.Description.Contains(word))
-                );
-        }
-
-        private static Expression<Func<ContractCondition, bool>> BuildOtherFilters(
-           GetCompanyUserContractConditionsRequest request)
-        {
-            return cc =>
-                (
-                    !request.ParameterIds.Any() ||
-                    request.ParameterIds.Any(parametrId =>
-                        cc.ContractAttributes.Any(atribute =>
-                            atribute.ContractParameterId == parametrId
-                    ))
-                ) &&
-                (
-                    request.ShowRemoved
-                        ? cc.Removed != null
-                        : cc.Removed == null
-                ) &&
-                (
-                    !request.IsNegotiable.HasValue ||
-                    (
-                        request.IsNegotiable == true
-                            ? cc.IsNegotiable
-                            : !cc.IsNegotiable
-                    )
-                ) &&
-                (
-                    !request.IsPaid.HasValue ||
-                    (
-                        request.IsPaid == true
-                            ? cc.SalaryMin > 0
-                            : cc.SalaryMax <= 0
-                    )
-                ) &&
-                (
-                    (
-                        !request.SalaryPerHourMin.HasValue ||
-                        ((cc.SalaryMin / cc.HoursPerTerm) >= request.SalaryPerHourMin)
-                    ) &&
-                    (
-                        !request.SalaryPerHourMax.HasValue ||
-                        ((cc.SalaryMax / cc.HoursPerTerm) <= request.SalaryPerHourMax)
-                    ) &&
-                    (
-                        !request.SalaryMin.HasValue ||
-                        (cc.SalaryMin >= request.SalaryMin)
-                    ) &&
-                    (
-                        !request.SalaryMax.HasValue ||
-                        (cc.SalaryMax <= request.SalaryMax)
-                    ) &&
-                    (
-                        !request.HoursMin.HasValue ||
-                        (cc.HoursPerTerm >= request.HoursMin)
-                    ) &&
-                    (
-                        !request.HoursMax.HasValue ||
-                        (cc.HoursPerTerm <= request.HoursMax)
-                    )
-                );
-        }
-
 
         private static GetCompanyUserContractConditionsResponse InvalidResponse(HttpCode code)
         {
@@ -289,9 +204,9 @@ namespace UseCase.Roles.CompanyUser.Queries.GetContractConditions
         {
             return _context.ContractConditions
                 .Include(cc => cc.Company)
-                .ThenInclude(c => c.CompanyPeople.Where(x => x.Deny == null))
+                .ThenInclude(c => c.CompanyPeople)
 
-                .Include(cc => cc.ContractAttributes.Where(x => x.Removed == null))
+                .Include(cc => cc.ContractAttributes)
                 .ThenInclude(c => c.ContractParameter)
                 .ThenInclude(c => c.ContractParameterType)
                 .AsNoTracking();
@@ -307,37 +222,44 @@ namespace UseCase.Roles.CompanyUser.Queries.GetContractConditions
             // Filter ContractCondition if have no access to it
             if (request.ContractConditionId.HasValue)
             {
-                var filter = BuildContractConditionFilter(request.ContractConditionId.Value);
-                return query.Where(filter);
+                return query.Where(cc => cc.ContractConditionId == request.ContractConditionId);
             }
-
             // Filter Companies if have no access to it
             if (request.CompanyId.HasValue ||
-                request.Regon != null ||
-                request.Nip != null ||
-                request.Krs != null)
+                request.CompanyParameters.ContainsAny())
             {
-                var companyFilter = BuildCompanyFilter(request);
-                query = query.Where(companyFilter);
+                query = query.Where(cc => _context.Companies
+                    .IdentificationFilter(request.CompanyId, request.CompanyParameters)
+                    .Any(company => company.CompanyId == cc.CompanyId));
             }
             // Filter only to which have access
             else
             {
                 query = query.Where(cc =>
-                    cc.Company.Removed == null &&
-                    cc.Company.CompanyPeople.Any(role =>
-                        _authorizedRoles.Any(roleId =>
-                            role.PersonId == personId.Value &&
-                            role.RoleId == (int)roleId &&
-                            role.Deny == null
-                    ))
-                );
+                    cc.Company.Removed == null)
+                    .Where(cc => _context.CompanyPeople
+                        .WhereAuthorize(personId, _authorizedRoles)
+                        .Any(role => role.CompanyId == cc.CompanyId));
             }
 
+            // Show only removed, or only not removed
+            query = query.Where(cc => request.ShowRemoved
+                ? cc.Removed != null
+                : cc.Removed == null);
+
+            // Search Text Filter 
             var searchWords = CustomStringProvider.Split(request.SearchText);
-            var searchTextFilter = BuildSearchTextCompanyFilter(searchWords);
-            var otherFilters = BuildOtherFilters(request);
-            query = query.Where(otherFilters).Where(searchTextFilter);
+            if (searchWords.Any())
+            {
+                query = query.Where(cc => _context.Companies
+                    .SearchTextFilter(searchWords)
+                    .Any(company => company.CompanyId == cc.CompanyId));
+            }
+
+            // Contract Parameters And Salary
+            query = query.ContractParametersAndSalaryFilter(
+                request.ContractParameterIds,
+                request.SalaryParameters);
 
             query = ApplyOrderBy(
                 query,

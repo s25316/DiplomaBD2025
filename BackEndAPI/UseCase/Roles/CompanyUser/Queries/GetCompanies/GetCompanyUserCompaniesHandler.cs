@@ -1,4 +1,6 @@
-﻿using AutoMapper;
+﻿// Ignore Spelling: dtos
+
+using AutoMapper;
 using Domain.Features.People.ValueObjects;
 using Domain.Shared.CustomProviders;
 using Domain.Shared.Enums;
@@ -12,7 +14,9 @@ using UseCase.Roles.CompanyUser.Queries.GetCompanies.Enums;
 using UseCase.Roles.CompanyUser.Queries.GetCompanies.Request;
 using UseCase.Roles.CompanyUser.Queries.GetCompanies.Response;
 using UseCase.Shared.DTOs.Responses.Companies;
-using UseCase.Shared.ExtensionMethods;
+using UseCase.Shared.ExtensionMethods.EF;
+using UseCase.Shared.ExtensionMethods.EF.Companies;
+using UseCase.Shared.ExtensionMethods.EF.CompanyPeople;
 using UseCase.Shared.Services.Authentication.Inspectors;
 using UseCase.Shared.Templates.Response.QueryResults;
 
@@ -47,7 +51,7 @@ namespace UseCase.Roles.CompanyUser.Queries.GetCompanies
             var query = BuildQuery(request, personId);
             var selector = BuildSelector(personId, query);
             var selectedValues = await query
-                .Paginate(request.Page, request.ItemsPerPage)
+                .Paginate(request.Pagination)
                 .Select(selector)
                 .ToListAsync(cancellationToken);
 
@@ -77,32 +81,6 @@ namespace UseCase.Roles.CompanyUser.Queries.GetCompanies
                     )),
                 TotalCount = totalCountQuery.Count(),
             };
-        }
-
-        private static Expression<Func<Company, bool>> BuildCompanyFilter(
-            GetCompanyUserCompaniesRequest request)
-        {
-            if (request.CompanyId != null)
-            {
-                return company => company.CompanyId == request.CompanyId;
-            }
-            return company =>
-                    (request.Regon == null || company.Regon == request.Regon) &&
-                    (request.Nip == null || company.Nip == request.Nip) &&
-                    (request.Krs == null || company.Krs == request.Krs);
-        }
-
-        private static Expression<Func<Company, bool>> BuildSearchTextFilter(
-            IEnumerable<string> searchWords)
-        {
-            return company =>
-                company.Name != null &&
-                (
-                    !searchWords.Any() ||
-                    searchWords.Any(word =>
-                        (company.Name != null && company.Name.Contains(word)) ||
-                        (company.Description != null && company.Description.Contains(word))
-                ));
         }
 
         private static IQueryable<Company> ApplyOrderBy(
@@ -152,7 +130,6 @@ namespace UseCase.Roles.CompanyUser.Queries.GetCompanies
             };
         }
 
-
         // Private Non Static Methods
         private PersonId GetPersonId(GetCompanyUserCompaniesRequest request)
         {
@@ -172,28 +149,23 @@ namespace UseCase.Roles.CompanyUser.Queries.GetCompanies
         {
             var query = BuildBaseQuery();
 
-            // Parameters Defines The Company
-            if (request.CompanyId != null ||
-                request.Regon != null ||
-                request.Nip != null ||
-                request.Krs != null)
+            // Single Company
+            if (request.CompanyId.HasValue ||
+                request.CompanyParameters.ContainsAny())
             {
-                var companyFilters = BuildCompanyFilter(request);
-                return query.Where(companyFilters);
+                return query
+                    .IdentificationFilter(request.CompanyId, request.CompanyParameters);
             }
 
+            // Companies
             var searchWords = CustomStringProvider.Split(request.SearchText);
-            var filters = BuildSearchTextFilter(searchWords);
+            query = query.SearchTextFilter(searchWords);
+
             query = query
-                .Where(filters)
-                .Where(company =>
-                    company.Removed == null &&
-                    company.CompanyPeople.Any(role =>
-                        _authorizedRoles.Any(roleId =>
-                            role.RoleId == (int)roleId &&
-                            role.PersonId == personId.Value &&
-                            role.Deny == null
-                        )));
+                .Where(company => company.Removed == null)
+                .Where(company => _context.CompanyPeople
+                    .WhereAuthorize(personId, _authorizedRoles)
+                    .Any(role => role.CompanyId == company.CompanyId));
 
             query = ApplyOrderBy(
                 query,

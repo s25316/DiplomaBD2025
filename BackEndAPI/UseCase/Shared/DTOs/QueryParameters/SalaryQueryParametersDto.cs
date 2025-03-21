@@ -1,8 +1,10 @@
-﻿using UseCase.Shared.ValidationAttributes.ContractConditionAttributes;
+﻿// Ignore Spelling: Dto
 
-namespace BackEndAPI.QueryParameters
+using UseCase.Shared.ValidationAttributes.ContractConditionAttributes;
+
+namespace UseCase.Shared.DTOs.QueryParameters
 {
-    public sealed class ContractConditionsQueryParameters
+    public sealed class SalaryQueryParametersDto
     {
         public bool? IsNegotiable { get; init; }
 

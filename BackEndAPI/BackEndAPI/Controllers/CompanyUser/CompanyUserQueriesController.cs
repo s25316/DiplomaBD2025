@@ -1,5 +1,4 @@
 ﻿// Ignore Spelling: regon, nip, krs, api
-using BackEndAPI.QueryParameters;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,6 +12,7 @@ using UseCase.Roles.CompanyUser.Queries.GetOffers.Enums;
 using UseCase.Roles.CompanyUser.Queries.GetOffers.Request;
 using UseCase.Roles.CompanyUser.Queries.GetOfferTemplates.Enums;
 using UseCase.Roles.CompanyUser.Queries.GetOfferTemplates.Request;
+using UseCase.Shared.DTOs.QueryParameters;
 using UseCase.Shared.DTOs.Responses.Companies.Offers;
 
 namespace BackEndAPI.Controllers.CompanyUser
@@ -41,25 +41,20 @@ namespace BackEndAPI.Controllers.CompanyUser
             string? searchText,
             bool? ascending,
             CompanyUserCompaniesOrderBy? orderBy,
-
-            [FromQuery] CompanyQueryParameters company,
-            [FromQuery] PaginationQueryParameters pagination,
+            [FromQuery] CompanyQueryParametersDto companyParameters,
+            [FromQuery] PaginationQueryParametersDto pagination,
             CancellationToken cancellationToken)
         {
             var result = await _mediator.Send(new GetCompanyUserCompaniesRequest
             {
+                CompanyId = companyId,
+                CompanyParameters = companyParameters,
+
                 SearchText = searchText,
+
                 OrderBy = orderBy ?? CompanyUserCompaniesOrderBy.Created,
                 Ascending = ascending ?? true,
-
-
-                CompanyId = companyId,
-                Regon = company.Regon,
-                Nip = company.Nip,
-                Krs = company.Krs,
-
-                Page = pagination.Page,
-                ItemsPerPage = pagination.ItemsPerPage,
+                Pagination = pagination,
 
                 Metadata = HttpContext,
             }, cancellationToken);
@@ -82,29 +77,24 @@ namespace BackEndAPI.Controllers.CompanyUser
             bool? ascending,
             CompanyUserBranchesOrderBy? orderBy,
 
-            [FromQuery] CompanyQueryParameters company,
-            [FromQuery] PaginationQueryParameters pagination,
+            [FromQuery] CompanyQueryParametersDto companyParameters,
+            [FromQuery] PaginationQueryParametersDto pagination,
             CancellationToken cancellationToken)
         {
             var result = await _mediator.Send(new GetCompanyUserBranchesRequest
             {
                 BranchId = branchId,
+                CompanyId = companyId,
+                CompanyParameters = companyParameters,
+
+                ShowRemoved = showRemoved ?? false,
+                SearchText = searchText,
                 Lon = lon,
                 Lat = lat,
-                SearchText = searchText,
-                ShowRemoved = showRemoved ?? false,
 
                 Ascending = ascending ?? true,
                 OrderBy = orderBy ?? CompanyUserBranchesOrderBy.BranchCreated,
-
-
-                CompanyId = companyId,
-                Regon = company.Regon,
-                Nip = company.Nip,
-                Krs = company.Krs,
-
-                Page = pagination.Page,
-                ItemsPerPage = pagination.ItemsPerPage,
+                Pagination = pagination,
 
                 Metadata = HttpContext,
             }, cancellationToken);
@@ -125,30 +115,24 @@ namespace BackEndAPI.Controllers.CompanyUser
             CompanyUserOfferTemplatesOrderBy? orderBy,
 
             [FromHeader] IEnumerable<int> skillIds,
-            [FromQuery] CompanyQueryParameters company,
-            [FromQuery] PaginationQueryParameters pagination,
+            [FromQuery] CompanyQueryParametersDto companyParameters,
+            [FromQuery] PaginationQueryParametersDto pagination,
             CancellationToken cancellationToken)
         {
             var request = new GetCompanyUserOfferTemplatesRequest
             {
                 OfferTemplateId = offerTemplateId,
 
-                SearchText = searchText,
+                CompanyId = companyId,
+                CompanyParameters = companyParameters,
+
                 ShowRemoved = showRemoved ?? false,
+                SearchText = searchText,
+                SkillIds = skillIds,
 
                 Ascending = ascending ?? true,
                 OrderBy = orderBy ?? CompanyUserOfferTemplatesOrderBy.OfferTemplateCreated,
-
-
-                SkillIds = skillIds,
-
-                CompanyId = companyId,
-                Regon = company.Regon,
-                Nip = company.Nip,
-                Krs = company.Krs,
-
-                Page = pagination.Page,
-                ItemsPerPage = pagination.ItemsPerPage,
+                Pagination = pagination,
 
                 Metadata = HttpContext,
             };
@@ -165,44 +149,30 @@ namespace BackEndAPI.Controllers.CompanyUser
             Guid? contractConditionId,
             string? searchText,
             bool? showRemoved,
-
             bool? ascending,
             CompanyUserContractConditionsOrderBy? orderBy,
 
             [FromHeader] IEnumerable<int> parameterIds,
-            [FromQuery] CompanyQueryParameters company,
-            [FromQuery] PaginationQueryParameters pagination,
-            [FromQuery] ContractConditionsQueryParameters contractConditions,
+            [FromQuery] CompanyQueryParametersDto companyParameters,
+            [FromQuery] PaginationQueryParametersDto pagination,
+            [FromQuery] SalaryQueryParametersDto salaryParameters,
             CancellationToken cancellationToken)
         {
             var request = new GetCompanyUserContractConditionsRequest
             {
-                SearchText = searchText,
+                ContractConditionId = contractConditionId,
+
+                CompanyId = companyId,
+                CompanyParameters = companyParameters,
+
                 ShowRemoved = showRemoved ?? false,
+                SearchText = searchText,
+                SalaryParameters = salaryParameters,
+                ContractParameterIds = parameterIds,
 
                 Ascending = ascending ?? true,
                 OrderBy = orderBy ?? CompanyUserContractConditionsOrderBy.ContractConditionCreated,
-
-
-                ParameterIds = parameterIds,
-
-                CompanyId = companyId,
-                Regon = company.Regon,
-                Nip = company.Nip,
-                Krs = company.Krs,
-
-                Page = pagination.Page,
-                ItemsPerPage = pagination.ItemsPerPage,
-
-                ContractConditionId = contractConditionId,
-                IsNegotiable = contractConditions.IsNegotiable,
-                IsPaid = contractConditions.IsPaid,
-                SalaryPerHourMin = contractConditions.SalaryPerHourMin,
-                SalaryPerHourMax = contractConditions.SalaryPerHourMax,
-                SalaryMin = contractConditions.SalaryMin,
-                SalaryMax = contractConditions.SalaryMax,
-                HoursMin = contractConditions.HoursMin,
-                HoursMax = contractConditions.HoursMax,
+                Pagination = pagination,
 
                 Metadata = HttpContext,
             };
@@ -233,9 +203,9 @@ namespace BackEndAPI.Controllers.CompanyUser
 
             [FromHeader] IEnumerable<int> skillIds,
             [FromHeader] IEnumerable<int> parameterIds,
-            [FromQuery] CompanyQueryParameters company,
-            [FromQuery] PaginationQueryParameters pagination,
-            [FromQuery] ContractConditionsQueryParameters contractConditions,
+            [FromQuery] CompanyQueryParametersDto company,
+            [FromQuery] PaginationQueryParametersDto pagination,
+            [FromQuery] SalaryQueryParametersDto contractConditions,
             CancellationToken cancellationToken)
         {
             var request = new GetCompanyUserOffersRequest

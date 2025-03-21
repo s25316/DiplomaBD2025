@@ -13,7 +13,10 @@ using UseCase.Roles.CompanyUser.Queries.GetOfferTemplates.Request;
 using UseCase.Roles.CompanyUser.Queries.GetOfferTemplates.Response;
 using UseCase.Shared.DTOs.Responses.Companies;
 using UseCase.Shared.DTOs.Responses.Companies.OfferTemplates;
-using UseCase.Shared.ExtensionMethods;
+using UseCase.Shared.ExtensionMethods.EF;
+using UseCase.Shared.ExtensionMethods.EF.Companies;
+using UseCase.Shared.ExtensionMethods.EF.CompanyPeople;
+using UseCase.Shared.ExtensionMethods.EF.OfferTemplates;
 using UseCase.Shared.Services.Authentication.Inspectors;
 using UseCase.Shared.Templates.Response.QueryResults;
 
@@ -49,7 +52,7 @@ namespace UseCase.Roles.CompanyUser.Queries.GetOfferTemplates
             var selector = BuldSelector(personId, query);
 
             var selectedValues = await query
-                .Paginate(request.Page, request.ItemsPerPage)
+                .Paginate(request.Pagination)
                 .Select(selector)
                 .ToListAsync(cancellationToken);
 
@@ -79,55 +82,6 @@ namespace UseCase.Roles.CompanyUser.Queries.GetOfferTemplates
                     )),
                 TotalCount = totalCountQuery.Count(),
             };
-        }
-
-        private static Expression<Func<OfferTemplate, bool>> BuildOfferTemplateFilter(
-            Guid offerTemplateId)
-        {
-            return ot => ot.OfferTemplateId == offerTemplateId;
-        }
-
-        private static Expression<Func<OfferTemplate, bool>> BuildCompanyFilter(
-            Guid? companyId,
-            string? regon,
-            string? nip,
-            string? krs)
-        {
-            if (companyId.HasValue)
-            {
-                return ot => ot.Company.CompanyId == companyId.Value;
-            }
-
-            return ot =>
-                (regon == null || ot.Company.Regon == regon) &&
-                (nip == null || ot.Company.Nip == nip) &&
-                (krs == null || ot.Company.Krs == krs);
-        }
-
-        private static Expression<Func<OfferTemplate, bool>> BuildOtherFilters(
-            IEnumerable<string> searchWords,
-            IEnumerable<int> skillIds,
-            bool showRemoved)
-        {
-            return ot =>
-                (
-                    !searchWords.Any() || searchWords.Any(word =>
-                        ot.Name.Contains(word) ||
-                        ot.Description.Contains(word) ||
-                        (ot.Company.Name != null && ot.Company.Name.Contains(word)) ||
-                        (ot.Company.Description != null && ot.Company.Description.Contains(word))
-                )) &&
-                (
-                    showRemoved
-                        ? ot.Removed != null
-                        : ot.Removed == null
-                ) &&
-                (
-                    !skillIds.Any() ||
-                    skillIds.Any(skillId =>
-                        ot.OfferSkills.Any(skill =>
-                            skill.SkillId == skillId
-                )));
         }
 
         private static IQueryable<OfferTemplate> ApplyOerderBy(
@@ -230,9 +184,9 @@ namespace UseCase.Roles.CompanyUser.Queries.GetOfferTemplates
             return _context.OfferTemplates
 
                 .Include(ot => ot.Company)
-                .ThenInclude(c => c.CompanyPeople.Where(x => x.Deny == null))
+                .ThenInclude(c => c.CompanyPeople)
 
-                .Include(ot => ot.OfferSkills.Where(x => x.Removed == null))
+                .Include(ot => ot.OfferSkills)
                 .ThenInclude(os => os.Skill)
                 .ThenInclude(s => s.SkillType)
                 .AsNoTracking();
@@ -247,44 +201,50 @@ namespace UseCase.Roles.CompanyUser.Queries.GetOfferTemplates
                     os.Removed == null
                 ));
 
+            // For Single OfferTemplate
             if (request.OfferTemplateId.HasValue)
             {
-                var offerTemplatefilter = BuildOfferTemplateFilter(request.OfferTemplateId.Value);
-                return query.Where(offerTemplatefilter);
+                return query
+                    .Where(ot => ot.OfferTemplateId == request.OfferTemplateId.Value);
             }
 
             // Filter Companies if we haven`t access to it 
             if (request.CompanyId.HasValue ||
-                   request.Regon != null ||
-                   request.Nip != null ||
-                   request.Krs != null)
+                request.CompanyParameters.ContainsAny())
             {
-                var filter = BuildCompanyFilter(
-                    request.CompanyId,
-                    request.Regon,
-                    request.Nip,
-                    request.Krs);
-                query = query.Where(filter);
+                query = query.Where(ot => _context.Companies
+                    .IdentificationFilter(personId, request.CompanyParameters)
+                    .Any(company => company.CompanyId == ot.CompanyId));
             }
             // Filter Companies to which we have access and eliminate Removed
             else
             {
-                query = query.Where(ot =>
-                    ot.Company.Removed == null &&
-                    ot.Company.CompanyPeople.Any(role =>
-                        _authorizedRoles.Any(roleId =>
-                            role.PersonId == personId.Value &&
-                            role.RoleId == (int)roleId &&
-                            role.Deny == null
-                )));
+                query = query
+                    .Where(ot => ot.Company.Removed == null)
+                    .Where(ot => _context.CompanyPeople
+                        .WhereAuthorize(personId, _authorizedRoles)
+                        .Any(role => role.CompanyId == ot.CompanyId));
             }
 
+            // Show Removed Part
+            query = query.Where(ot => request.ShowRemoved
+                ? ot.Removed != null
+                : ot.Removed == null);
+
+            // Search text Part
             var searchWords = CustomStringProvider.Split(request.SearchText);
-            var otherFilters = BuildOtherFilters(
-                searchWords,
-                request.SkillIds,
-                request.ShowRemoved);
-            query = query.Where(otherFilters);
+            if (searchWords.Any())
+            {
+                query = query.SearchTextFilter(searchWords);
+            }
+
+            // Skills Part
+            if (request.SkillIds.Any())
+            {
+                query = query.SkillsFilter(request.SkillIds);
+            }
+
+            // Apply Sorting
             query = ApplyOerderBy(
                 query,
                 request.OrderBy,

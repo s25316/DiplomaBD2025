@@ -2,6 +2,7 @@
 
 using UseCase.Roles.CompanyUser.Queries.GetCompanies.Enums;
 using UseCase.Roles.CompanyUser.Queries.GetCompanies.Response;
+using UseCase.Shared.DTOs.QueryParameters;
 using UseCase.Shared.Templates.Requests;
 
 namespace UseCase.Roles.CompanyUser.Queries.GetCompanies.Request
@@ -10,16 +11,13 @@ namespace UseCase.Roles.CompanyUser.Queries.GetCompanies.Request
     {
         // For single company
         public required Guid? CompanyId { get; init; }
-        public required string? Regon { get; init; } = null;
-        public required string? Nip { get; init; } = null;
-        public required string? Krs { get; init; } = null;
+        public required CompanyQueryParametersDto CompanyParameters { get; init; }
 
         // Other Filters
         public required string? SearchText { get; init; } = null;
 
         // Pagination
-        public required int Page { get; init; }
-        public required int ItemsPerPage { get; init; }
+        public required PaginationQueryParametersDto Pagination { get; init; }
 
         // Sorting
         public required CompanyUserCompaniesOrderBy OrderBy { get; init; }

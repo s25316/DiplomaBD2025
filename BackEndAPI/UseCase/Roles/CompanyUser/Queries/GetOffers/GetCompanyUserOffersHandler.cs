@@ -11,7 +11,7 @@ using UseCase.Roles.CompanyUser.Enums;
 using UseCase.Roles.CompanyUser.Queries.GetOffers.Request;
 using UseCase.Roles.CompanyUser.Queries.GetOffers.Response;
 using UseCase.Shared.DTOs.Responses.Companies.Offers;
-using UseCase.Shared.ExtensionMethods;
+using UseCase.Shared.ExtensionMethods.EF;
 using UseCase.Shared.Services.Authentication.Inspectors;
 using UseCase.Shared.Templates.Response.QueryResults;
 

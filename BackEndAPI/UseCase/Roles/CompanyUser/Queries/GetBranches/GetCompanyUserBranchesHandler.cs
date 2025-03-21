@@ -13,7 +13,10 @@ using UseCase.Roles.CompanyUser.Queries.GetBranches.Enums;
 using UseCase.Roles.CompanyUser.Queries.GetBranches.Request;
 using UseCase.Roles.CompanyUser.Queries.GetBranches.Response;
 using UseCase.Shared.DTOs.Responses.Companies;
-using UseCase.Shared.ExtensionMethods;
+using UseCase.Shared.ExtensionMethods.EF;
+using UseCase.Shared.ExtensionMethods.EF.Branches;
+using UseCase.Shared.ExtensionMethods.EF.Companies;
+using UseCase.Shared.ExtensionMethods.EF.CompanyPeople;
 using UseCase.Shared.Services.Authentication.Inspectors;
 using UseCase.Shared.Templates.Response.QueryResults;
 
@@ -48,7 +51,7 @@ namespace UseCase.Roles.CompanyUser.Queries.GetBranches
             var selector = BuildSelector(personId, query);
 
             var selectedValues = await query
-                .Paginate(request.Page, request.ItemsPerPage)
+                .Paginate(request.Pagination)
                 .Select(selector)
                 .ToListAsync(cancellationToken);
 
@@ -73,55 +76,12 @@ namespace UseCase.Roles.CompanyUser.Queries.GetBranches
                 Branch = branch,
                 AuthorizedRolesCount = branch.Company.CompanyPeople.Count(role =>
                     _authorizedRoles.Any(roleId =>
-                        role.RoleId == (int)roleId &&
+                        role.Deny == null &&
                         role.PersonId == personId.Value &&
-                        role.Deny == null
+                        role.RoleId == (int)roleId
                 )),
                 TotalCount = totalCountQuery.Count(),
             };
-        }
-
-        private static Expression<Func<Branch, bool>> BuildBranchFilter(
-            Guid branchId)
-        {
-            return branch => branch.BranchId == branchId;
-        }
-
-        private static Expression<Func<Branch, bool>> BuildCompanyFilters(
-            Guid? companyId,
-            string? regon,
-            string? nip,
-            string? krs)
-        {
-            if (companyId.HasValue)
-            {
-                return branch => branch.Company.CompanyId == companyId;
-            }
-
-            return branch =>
-                (regon == null || branch.Company.Regon == regon) &&
-                (nip == null || branch.Company.Nip == nip) &&
-                (krs == null || branch.Company.Krs == krs);
-        }
-
-        private static Expression<Func<Branch, bool>> BuildOtherFilters(
-            IEnumerable<string> searchWords,
-            bool showRemoved)
-        {
-            return branch =>
-                (
-                    !searchWords.Any() || searchWords.Any(word =>
-                        (branch.Name != null && branch.Name.Contains(word)) ||
-                        (branch.Company.Name != null && branch.Company.Name.Contains(word)) ||
-                        (branch.Description != null && branch.Description.Contains(word)) ||
-                        (branch.Company.Description != null && branch.Company.Description.Contains(word))
-                    )
-                ) &&
-                (
-                     showRemoved
-                        ? branch.Removed != null
-                        : branch.Removed == null
-                );
         }
 
         private static IQueryable<Branch> ApplyOrderBy(
@@ -130,8 +90,7 @@ namespace UseCase.Roles.CompanyUser.Queries.GetBranches
             bool ascending,
             bool showRemoved,
             float? lon,
-            float? lat
-            )
+            float? lat)
         {
             if (orderBy == CompanyUserBranchesOrderBy.Point &&
                 lon != null &&
@@ -216,7 +175,7 @@ namespace UseCase.Roles.CompanyUser.Queries.GetBranches
         {
             return _context.Branches
                 .Include(b => b.Company)
-                .ThenInclude(c => c.CompanyPeople.Where(x => x.Deny == null))
+                .ThenInclude(c => c.CompanyPeople)
 
                 .Include(b => b.Address)
                 .ThenInclude(a => a.Street)
@@ -233,42 +192,39 @@ namespace UseCase.Roles.CompanyUser.Queries.GetBranches
             PersonId personId)
         {
             var query = BuildBaseQuery();
+
             // Choose only One Branch
             if (request.BranchId.HasValue)
             {
-                var filter = BuildBranchFilter(request.BranchId.Value);
-                return query.Where(filter);
+                return query.Where(branch => branch.BranchId == request.BranchId.Value);
             }
 
             // Choose Branches by Company even we haven`t access 
             if (request.CompanyId.HasValue ||
-                    request.Regon != null ||
-                    request.Nip != null ||
-                    request.Krs != null)
+                request.CompanyParameters.ContainsAny())
             {
-                var companyFilter = BuildCompanyFilters(
-                       request.CompanyId,
-                       request.Regon,
-                       request.Nip,
-                       request.Krs);
-                query = query.Where(companyFilter);
+                query = query.Where(branch => _context.Companies
+                    .IdentificationFilter(request.CompanyId, request.CompanyParameters)
+                    .Any(company => company.CompanyId == branch.CompanyId)
+                );
             }
             // Choose Branches where we have access and eliminate Removed Companies 
             else
             {
-                query = query.Where(branch =>
-                    branch.Company.Removed == null &&
-                    branch.Company.CompanyPeople.Any(role =>
-                        _authorizedRoles.Any(roleId =>
-                            role.RoleId == (int)roleId &&
-                            role.PersonId == personId.Value &&
-                            role.Deny == null
-                )));
+                query = query
+                    .Where(branch => branch.Company.Removed == null)
+                    .Where(branch => _context.CompanyPeople
+                        .WhereAuthorize(personId, _authorizedRoles)
+                        .Any(cp => cp.CompanyId == branch.CompanyId));
             }
 
+            // Select Removed or not removed
+            query = query.Where(branch => request.ShowRemoved
+                        ? branch.Removed != null
+                        : branch.Removed == null);
+            // Search Text
             var searchWords = CustomStringProvider.Split(request.SearchText);
-            var otherFilters = BuildOtherFilters(searchWords, request.ShowRemoved);
-            query = query.Where(otherFilters);
+            query = query.SearchTextFilter(searchWords);
 
             query = ApplyOrderBy(
                 query,
@@ -293,10 +249,12 @@ namespace UseCase.Roles.CompanyUser.Queries.GetBranches
             for (int i = 0; i < items.Count; i++)
             {
                 var selectedValue = items[i];
+
                 if (totalCount < 0)
                 {
                     totalCount = selectedValue.TotalCount;
                 }
+                Console.WriteLine(selectedValue.AuthorizedRolesCount);
                 if (selectedValue.AuthorizedRolesCount == 0)
                 {
                     return InvalidResponse(HttpCode.Forbidden);
