@@ -4,7 +4,13 @@ import { useSession } from "next-auth/react";
 import { useRouter, useParams } from "next/navigation";
 
 const PublishOffer = () => {
-  const { data: session } = useSession();
+  const { data: session } = useSession({
+      required: true,
+      onUnauthenticated() {
+        const router = useRouter()
+        router.back()
+      },
+    });
   const router = useRouter();
   const { id, branchId } = useParams(); // Pobieram companyId i branchId z URL-a
 
