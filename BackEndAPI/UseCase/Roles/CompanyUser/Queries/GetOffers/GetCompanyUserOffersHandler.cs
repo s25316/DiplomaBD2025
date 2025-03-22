@@ -61,9 +61,9 @@ namespace UseCase.Roles.CompanyUser.Queries.GetOffers
             return PrepareResponse(
                 selectResults,
                 offer => offer.OfferConnections
-                    .OrderByDescending(oc => oc.Created)
-                    .First(oc => oc.Removed == null)
-                    .OfferTemplate.Company.Removed != null,
+                        .OrderByDescending(oc => oc.Created)
+                        .First(oc => oc.Removed == null)
+                        .OfferTemplate.Company.Removed != null,
                 offer => _mapper.Map<OfferDto>(offer)
                 );
         }
@@ -162,14 +162,18 @@ namespace UseCase.Roles.CompanyUser.Queries.GetOffers
                         .Any(offerTemplate => oc.OfferTemplateId == offerTemplate.OfferTemplateId)
                     ));
             }
-            // Contract Conditions 
-            query = query.Where(offer => offer.OfferConditions.Any(oc =>
-                _context.ContractConditions
-                    .ContractParametersAndSalaryFilter(
-                        request.ContractParameterIds,
-                        request.SalaryParameters)
-                    .Any(cc => cc.ContractConditionId == oc.ContractConditionId)
-            ));
+            // Contract Conditions
+            if (request.ContractParameterIds.Any() ||
+                request.SalaryParameters.ContainsAny())
+            {
+                query = query.Where(offer => offer.OfferConditions.Any(oc =>
+                    _context.ContractConditions
+                        .ContractParametersAndSalaryFilter(
+                            request.ContractParameterIds,
+                            request.SalaryParameters)
+                        .Any(cc => cc.ContractConditionId == oc.ContractConditionId)
+                ));
+            }
 
             // Search text Part
             var searchWords = CustomStringProvider.Split(request.SearchText);
@@ -177,6 +181,8 @@ namespace UseCase.Roles.CompanyUser.Queries.GetOffers
             {
                 query = query.SearchTextFilter(searchWords);
             }
+
+            query = query.OfferParametersFilter(request.OfferParameters);
 
             return query;
         }

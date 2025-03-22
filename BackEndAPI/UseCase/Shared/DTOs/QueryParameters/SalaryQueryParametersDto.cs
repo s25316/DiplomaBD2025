@@ -27,5 +27,20 @@ namespace UseCase.Shared.DTOs.QueryParameters
 
         [Hour]
         public int? HoursMax { get; init; }
+
+
+        // Methods
+        public bool ContainsAny()
+        {
+            return
+                IsNegotiable.HasValue ||
+                IsPaid.HasValue ||
+                SalaryPerHourMin.HasValue ||
+                SalaryPerHourMax.HasValue ||
+                SalaryMin.HasValue ||
+                SalaryMax.HasValue ||
+                HoursMin.HasValue ||
+                HoursMax.HasValue;
+        }
     }
 }

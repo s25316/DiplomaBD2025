@@ -35,30 +35,28 @@ namespace UseCase.Shared.ExtensionMethods.EF.ContractConditions
                     )
                 ) &&
                 (
-                    (
-                        !salaryParameters.SalaryPerHourMin.HasValue ||
-                        ((cc.SalaryMin / cc.HoursPerTerm) >= salaryParameters.SalaryPerHourMin)
-                    ) &&
-                    (
+                    !salaryParameters.SalaryPerHourMin.HasValue ||
+                    ((cc.SalaryMin / cc.HoursPerTerm) >= salaryParameters.SalaryPerHourMin)
+                ) &&
+                (
                         !salaryParameters.SalaryPerHourMax.HasValue ||
-                        ((cc.SalaryMax / cc.HoursPerTerm) <= salaryParameters.SalaryPerHourMax)
-                    ) &&
-                    (
-                        !salaryParameters.SalaryMin.HasValue ||
-                        (cc.SalaryMin >= salaryParameters.SalaryMin)
-                    ) &&
-                    (
-                        !salaryParameters.SalaryMax.HasValue ||
-                        (cc.SalaryMax <= salaryParameters.SalaryMax)
-                    ) &&
-                    (
-                        !salaryParameters.HoursMin.HasValue ||
-                        (cc.HoursPerTerm >= salaryParameters.HoursMin)
-                    ) &&
-                    (
-                        !salaryParameters.HoursMax.HasValue ||
-                        (cc.HoursPerTerm <= salaryParameters.HoursMax)
-                    )
+                    ((cc.SalaryMax / cc.HoursPerTerm) <= salaryParameters.SalaryPerHourMax)
+                ) &&
+                (
+                    !salaryParameters.SalaryMin.HasValue ||
+                    (cc.SalaryMin >= salaryParameters.SalaryMin)
+                ) &&
+                (
+                    !salaryParameters.SalaryMax.HasValue ||
+                    (cc.SalaryMax <= salaryParameters.SalaryMax)
+                ) &&
+                (
+                    !salaryParameters.HoursMin.HasValue ||
+                    (cc.HoursPerTerm >= salaryParameters.HoursMin)
+                ) &&
+                (
+                    !salaryParameters.HoursMax.HasValue ||
+                    (cc.HoursPerTerm <= salaryParameters.HoursMax)
                 );
         }
     }

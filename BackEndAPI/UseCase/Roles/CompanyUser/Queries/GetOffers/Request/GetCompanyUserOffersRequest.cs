@@ -13,6 +13,7 @@ namespace UseCase.Roles.CompanyUser.Queries.GetOffers.Request
     {
         // For Single Offer
         public required Guid? OfferId { get; init; }
+        public required OfferQueryParametersDto OfferParameters { get; init; }
 
         // Company identification
         public required Guid? CompanyId { get; init; }
@@ -37,11 +38,6 @@ namespace UseCase.Roles.CompanyUser.Queries.GetOffers.Request
 
         // Company Branch OfferTemplate
         public required string? SearchText { get; init; } = null;
-
-        // For Offers
-        public required OfferStatus? Status { get; init; } // X
-        //public required DateTime? PublicationStart { get; init; }
-        //public required DateTime? PublicationEnd { get; init; }
 
         // Pagination
         public required PaginationQueryParametersDto Pagination { get; init; }

@@ -207,12 +207,14 @@ namespace BackEndAPI.Controllers.CompanyUser
             [FromQuery] CompanyQueryParametersDto companyParameters,
             [FromQuery] SalaryQueryParametersDto salaryParameters,
             [FromQuery] GeographyPointQueryParametersDto geographyPoint,
+            [FromQuery] OfferQueryParametersDto offerParameters,
             [FromQuery] PaginationQueryParametersDto pagination,
             CancellationToken cancellationToken)
         {
             var request = new GetCompanyUserOffersRequest
             {
                 OfferId = offerId,
+                OfferParameters = offerParameters,
 
                 CompanyId = companyId,
                 CompanyParameters = companyParameters,
@@ -227,7 +229,6 @@ namespace BackEndAPI.Controllers.CompanyUser
                 OfferTemplateId = offerTemplateId,
                 SkillIds = skillIds,
 
-                Status = status,
                 SearchText = searchText,
 
                 Ascending = ascending ?? true,
