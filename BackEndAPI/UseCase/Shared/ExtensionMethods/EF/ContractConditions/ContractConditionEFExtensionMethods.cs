@@ -7,11 +7,11 @@ namespace UseCase.Shared.ExtensionMethods.EF.ContractConditions
     {
         public static IQueryable<ContractCondition> ContractParametersAndSalaryFilter(
            this IQueryable<ContractCondition> query,
-           IEnumerable<int> parameterIds,
-           SalaryQueryParametersDto salary)
+           IEnumerable<int> contractParameterIds,
+           SalaryQueryParametersDto salaryParameters)
         {
             var expression = ContractConditionEFExpressions
-                .ContractParametersAndSalaryExpression(parameterIds, salary);
+                .ContractParametersAndSalaryExpression(contractParameterIds, salaryParameters);
             return query.Where(expression);
         }
     }

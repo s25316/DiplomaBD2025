@@ -8,7 +8,7 @@ namespace UseCase.Shared.ExtensionMethods.EF.ContractConditions
     {
         public static Expression<Func<ContractCondition, bool>> ContractParametersAndSalaryExpression(
            IEnumerable<int> parameterIds,
-           SalaryQueryParametersDto salary)
+           SalaryQueryParametersDto salaryParameters)
         {
             return cc =>
                 (
@@ -19,45 +19,45 @@ namespace UseCase.Shared.ExtensionMethods.EF.ContractConditions
                     ))
                 ) &&
                 (
-                    !salary.IsNegotiable.HasValue ||
+                    !salaryParameters.IsNegotiable.HasValue ||
                     (
-                        salary.IsNegotiable == true
+                        salaryParameters.IsNegotiable == true
                             ? cc.IsNegotiable
                             : !cc.IsNegotiable
                     )
                 ) &&
                 (
-                    !salary.IsPaid.HasValue ||
+                    !salaryParameters.IsPaid.HasValue ||
                     (
-                        salary.IsPaid == true
+                        salaryParameters.IsPaid == true
                             ? cc.SalaryMin > 0
                             : cc.SalaryMax <= 0
                     )
                 ) &&
                 (
                     (
-                        !salary.SalaryPerHourMin.HasValue ||
-                        ((cc.SalaryMin / cc.HoursPerTerm) >= salary.SalaryPerHourMin)
+                        !salaryParameters.SalaryPerHourMin.HasValue ||
+                        ((cc.SalaryMin / cc.HoursPerTerm) >= salaryParameters.SalaryPerHourMin)
                     ) &&
                     (
-                        !salary.SalaryPerHourMax.HasValue ||
-                        ((cc.SalaryMax / cc.HoursPerTerm) <= salary.SalaryPerHourMax)
+                        !salaryParameters.SalaryPerHourMax.HasValue ||
+                        ((cc.SalaryMax / cc.HoursPerTerm) <= salaryParameters.SalaryPerHourMax)
                     ) &&
                     (
-                        !salary.SalaryMin.HasValue ||
-                        (cc.SalaryMin >= salary.SalaryMin)
+                        !salaryParameters.SalaryMin.HasValue ||
+                        (cc.SalaryMin >= salaryParameters.SalaryMin)
                     ) &&
                     (
-                        !salary.SalaryMax.HasValue ||
-                        (cc.SalaryMax <= salary.SalaryMax)
+                        !salaryParameters.SalaryMax.HasValue ||
+                        (cc.SalaryMax <= salaryParameters.SalaryMax)
                     ) &&
                     (
-                        !salary.HoursMin.HasValue ||
-                        (cc.HoursPerTerm >= salary.HoursMin)
+                        !salaryParameters.HoursMin.HasValue ||
+                        (cc.HoursPerTerm >= salaryParameters.HoursMin)
                     ) &&
                     (
-                        !salary.HoursMax.HasValue ||
-                        (cc.HoursPerTerm <= salary.HoursMax)
+                        !salaryParameters.HoursMax.HasValue ||
+                        (cc.HoursPerTerm <= salaryParameters.HoursMax)
                     )
                 );
         }

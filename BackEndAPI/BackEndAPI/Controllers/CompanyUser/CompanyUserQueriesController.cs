@@ -69,8 +69,7 @@ namespace BackEndAPI.Controllers.CompanyUser
         public async Task<IActionResult> GetUserBranchesAsync(
             Guid? branchId,
             Guid? companyId,
-            float? lon,
-            float? lat,
+
             string? searchText,
             bool? showRemoved,
 
@@ -79,6 +78,7 @@ namespace BackEndAPI.Controllers.CompanyUser
 
             [FromQuery] CompanyQueryParametersDto companyParameters,
             [FromQuery] PaginationQueryParametersDto pagination,
+            [FromQuery] GeographyPointQueryParametersDto geographyPoint,
             CancellationToken cancellationToken)
         {
             var result = await _mediator.Send(new GetCompanyUserBranchesRequest
@@ -89,8 +89,8 @@ namespace BackEndAPI.Controllers.CompanyUser
 
                 ShowRemoved = showRemoved ?? false,
                 SearchText = searchText,
-                Lon = lon,
-                Lat = lat,
+
+                GeographyPoint = geographyPoint,
 
                 Ascending = ascending ?? true,
                 OrderBy = orderBy ?? CompanyUserBranchesOrderBy.BranchCreated,
@@ -109,8 +109,10 @@ namespace BackEndAPI.Controllers.CompanyUser
         public async Task<IActionResult> GetCompanyOfferTemplatesAsync(
             Guid? companyId,
             Guid? offerTemplateId,
-            string? searchText,
+
             bool? showRemoved,
+            string? searchText,
+
             bool? ascending,
             CompanyUserOfferTemplatesOrderBy? orderBy,
 
@@ -193,56 +195,44 @@ namespace BackEndAPI.Controllers.CompanyUser
             Guid? branchId,
             Guid? offerTemplateId,
             Guid? contractConditionId,
+
             string? searchText,
-            float? lon,
-            float? lat,
             OfferStatus? status,
 
             bool? ascending,
             CompanyUserOffersOrderBy? orderBy,
 
             [FromHeader] IEnumerable<int> skillIds,
-            [FromHeader] IEnumerable<int> parameterIds,
-            [FromQuery] CompanyQueryParametersDto company,
+            [FromHeader] IEnumerable<int> contractParameterIds,
+            [FromQuery] CompanyQueryParametersDto companyParameters,
+            [FromQuery] SalaryQueryParametersDto salaryParameters,
+            [FromQuery] GeographyPointQueryParametersDto geographyPoint,
             [FromQuery] PaginationQueryParametersDto pagination,
-            [FromQuery] SalaryQueryParametersDto contractConditions,
             CancellationToken cancellationToken)
         {
             var request = new GetCompanyUserOffersRequest
             {
                 OfferId = offerId,
-                OfferTemplateId = offerTemplateId,
-                BranchId = branchId,
-                SearchText = searchText,
-                Lon = lon,
-                Lat = lat,
-                Status = status,
 
+                CompanyId = companyId,
+                CompanyParameters = companyParameters,
+
+                BranchId = branchId,
+                GeographyPoint = geographyPoint,
+
+                ContractConditionId = contractConditionId,
+                SalaryParameters = salaryParameters,
+                ContractParameterIds = contractParameterIds,
+
+                OfferTemplateId = offerTemplateId,
+                SkillIds = skillIds,
+
+                Status = status,
+                SearchText = searchText,
 
                 Ascending = ascending ?? true,
                 OrderBy = orderBy ?? CompanyUserOffersOrderBy.Undefined,
-
-
-                SkillIds = skillIds,
-                ParameterIds = parameterIds,
-
-                CompanyId = companyId,
-                Regon = company.Regon,
-                Nip = company.Nip,
-                Krs = company.Krs,
-
-                Page = pagination.Page,
-                ItemsPerPage = pagination.ItemsPerPage,
-
-                ContractConditionId = contractConditionId,
-                IsNegotiable = contractConditions.IsNegotiable,
-                IsPaid = contractConditions.IsPaid,
-                SalaryPerHourMin = contractConditions.SalaryPerHourMin,
-                SalaryPerHourMax = contractConditions.SalaryPerHourMax,
-                SalaryMin = contractConditions.SalaryMin,
-                SalaryMax = contractConditions.SalaryMax,
-                HoursMin = contractConditions.HoursMin,
-                HoursMax = contractConditions.HoursMax,
+                Pagination = pagination,
 
                 Metadata = HttpContext,
             };

@@ -1,16 +1,16 @@
 ﻿using AutoMapper;
 using Domain.Features.People.ValueObjects;
 using Domain.Shared.CustomProviders;
-using Domain.Shared.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
 using UseCase.RelationalDatabase;
 using UseCase.RelationalDatabase.Models;
 using UseCase.Roles.CompanyUser.Enums;
 using UseCase.Roles.CompanyUser.Queries.GetOfferTemplates.Enums;
 using UseCase.Roles.CompanyUser.Queries.GetOfferTemplates.Request;
 using UseCase.Roles.CompanyUser.Queries.GetOfferTemplates.Response;
+using UseCase.Roles.CompanyUser.Queries.Template;
+using UseCase.Roles.CompanyUser.Queries.Template.Response;
 using UseCase.Shared.DTOs.Responses.Companies;
 using UseCase.Shared.DTOs.Responses.Companies.OfferTemplates;
 using UseCase.Shared.ExtensionMethods.EF;
@@ -18,16 +18,14 @@ using UseCase.Shared.ExtensionMethods.EF.Companies;
 using UseCase.Shared.ExtensionMethods.EF.CompanyPeople;
 using UseCase.Shared.ExtensionMethods.EF.OfferTemplates;
 using UseCase.Shared.Services.Authentication.Inspectors;
-using UseCase.Shared.Templates.Response.QueryResults;
 
 namespace UseCase.Roles.CompanyUser.Queries.GetOfferTemplates
 {
-    public class GetCompanyUserOfferTemplatesHandler : IRequestHandler<GetCompanyUserOfferTemplatesRequest, GetCompanyUserOfferTemplatesResponse>
+    public class GetCompanyUserOfferTemplatesHandler :
+        GetCompanyUserGenericsBase<OfferTemplate, CompanyAndOfferTemplateDto>,
+        IRequestHandler<GetCompanyUserOfferTemplatesRequest, GetCompanyUserGenericItemsResponse<CompanyAndOfferTemplateDto>>
     {
         //Properties
-        private readonly DiplomaBdContext _context;
-        private readonly IMapper _mapper;
-        private readonly IAuthenticationInspectorService _authenticationInspector;
         private static readonly IEnumerable<CompanyUserRoles> _authorizedRoles = [
             CompanyUserRoles.CompanyOwner];
 
@@ -36,52 +34,36 @@ namespace UseCase.Roles.CompanyUser.Queries.GetOfferTemplates
         public GetCompanyUserOfferTemplatesHandler(
             DiplomaBdContext context,
             IMapper mapper,
-            IAuthenticationInspectorService authenticationInspector)
-        {
-            _context = context;
-            _mapper = mapper;
-            _authenticationInspector = authenticationInspector;
-        }
+            IAuthenticationInspectorService authenticationInspector
+            ) : base(context, mapper, authenticationInspector)
+        { }
 
 
         // Methods
-        public async Task<GetCompanyUserOfferTemplatesResponse> Handle(GetCompanyUserOfferTemplatesRequest request, CancellationToken cancellationToken)
+        public async Task<GetCompanyUserGenericItemsResponse<CompanyAndOfferTemplateDto>> Handle(GetCompanyUserOfferTemplatesRequest request, CancellationToken cancellationToken)
         {
-            var personId = GetPersonId(request);
+            var personId = GetPersonId(request.Metadata.Claims);
             var query = BuildQuery(personId, request);
-            var selector = BuldSelector(personId, query);
+
+            var selector = BuildSelector(
+                personId,
+                _authorizedRoles,
+                query,
+                offerTemplate => offerTemplate.Company.CompanyPeople);
 
             var selectedValues = await query
                 .Paginate(request.Pagination)
                 .Select(selector)
                 .ToListAsync(cancellationToken);
 
-            return PrepareResponse(selectedValues);
-        }
-
-        // Private static Methods
-        private sealed class SelectResult
-        {
-            public required OfferTemplate OfferTemplate { get; init; }
-            public required int AuthorizedRolesCount { get; init; }
-            public required int TotalCount { get; init; }
-        }
-
-        private static Expression<Func<OfferTemplate, SelectResult>> BuldSelector(
-            PersonId personId,
-            IQueryable<OfferTemplate> totalCountQuery)
-        {
-            return ot => new SelectResult
-            {
-                OfferTemplate = ot,
-                AuthorizedRolesCount = ot.Company.CompanyPeople.Count(role =>
-                    _authorizedRoles.Any(roleId =>
-                            role.PersonId == personId.Value &&
-                            role.RoleId == (int)roleId &&
-                            role.Deny == null
-                    )),
-                TotalCount = totalCountQuery.Count(),
-            };
+            return PrepareResponse(
+                selectedValues,
+                offerTemplate => offerTemplate.Company.Removed != null,
+                offerTemplate => new CompanyAndOfferTemplateDto
+                {
+                    Company = _mapper.Map<CompanyDto>(offerTemplate.Company),
+                    OfferTemplate = _mapper.Map<OfferTemplateDto>(offerTemplate),
+                });
         }
 
         private static IQueryable<OfferTemplate> ApplyOerderBy(
@@ -144,41 +126,7 @@ namespace UseCase.Roles.CompanyUser.Queries.GetOfferTemplates
             }
         }
 
-        private static GetCompanyUserOfferTemplatesResponse InvalidResponse(HttpCode code)
-        {
-            return new GetCompanyUserOfferTemplatesResponse
-            {
-                Result = new ResponseQueryResultTemplate<CompanyAndOfferTemplateDto>
-                {
-                    Items = [],
-                    TotalCount = 0,
-                },
-                HttpCode = code,
-            };
-        }
-
-        private static GetCompanyUserOfferTemplatesResponse ValidResponse(
-            HttpCode code,
-            IEnumerable<CompanyAndOfferTemplateDto> dtos,
-            int totalCount)
-        {
-            return new GetCompanyUserOfferTemplatesResponse
-            {
-                Result = new ResponseQueryResultTemplate<CompanyAndOfferTemplateDto>
-                {
-                    Items = dtos,
-                    TotalCount = totalCount,
-                },
-                HttpCode = code,
-            };
-        }
-
-        // Private Non Static Methods
-        private PersonId GetPersonId(GetCompanyUserOfferTemplatesRequest request)
-        {
-            return _authenticationInspector.GetPersonId(request.Metadata.Claims);
-        }
-
+        // Private Non Static Methods        
         private IQueryable<OfferTemplate> BuildBaseQuery()
         {
             return _context.OfferTemplates
@@ -213,7 +161,7 @@ namespace UseCase.Roles.CompanyUser.Queries.GetOfferTemplates
                 request.CompanyParameters.ContainsAny())
             {
                 query = query.Where(ot => _context.Companies
-                    .IdentificationFilter(personId, request.CompanyParameters)
+                    .IdentificationFilter(request.CompanyId, request.CompanyParameters)
                     .Any(company => company.CompanyId == ot.CompanyId));
             }
             // Filter Companies to which we have access and eliminate Removed
@@ -252,39 +200,6 @@ namespace UseCase.Roles.CompanyUser.Queries.GetOfferTemplates
                 request.ShowRemoved,
                 request.SkillIds);
             return query;
-        }
-
-        private GetCompanyUserOfferTemplatesResponse PrepareResponse(List<SelectResult> items)
-        {
-            if (!items.Any())
-            {
-                return InvalidResponse(HttpCode.NotFound);
-            }
-
-            var totalCount = -1;
-            var dtos = new List<CompanyAndOfferTemplateDto>();
-            for (int i = 0; i < items.Count; i++)
-            {
-                var selectedValue = items[i];
-                if (totalCount < 0)
-                {
-                    totalCount = selectedValue.TotalCount;
-                }
-                if (selectedValue.AuthorizedRolesCount == 0)
-                {
-                    return InvalidResponse(HttpCode.Forbidden);
-                }
-                if (selectedValue.OfferTemplate.Company.Removed != null)
-                {
-                    return InvalidResponse(HttpCode.Gone);
-                }
-                dtos.Add(new CompanyAndOfferTemplateDto
-                {
-                    Company = _mapper.Map<CompanyDto>(selectedValue.OfferTemplate.Company),
-                    OfferTemplate = _mapper.Map<OfferTemplateDto>(selectedValue.OfferTemplate),
-                });
-            }
-            return ValidResponse(HttpCode.Ok, dtos, totalCount);
         }
     }
 }

@@ -1,32 +1,30 @@
 ﻿using AutoMapper;
 using Domain.Features.People.ValueObjects;
 using Domain.Shared.CustomProviders;
-using Domain.Shared.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
 using UseCase.RelationalDatabase;
 using UseCase.RelationalDatabase.Models;
 using UseCase.Roles.CompanyUser.Enums;
 using UseCase.Roles.CompanyUser.Queries.GetContractConditions.Enums;
 using UseCase.Roles.CompanyUser.Queries.GetContractConditions.Request;
 using UseCase.Roles.CompanyUser.Queries.GetContractConditions.Response;
+using UseCase.Roles.CompanyUser.Queries.Template;
+using UseCase.Roles.CompanyUser.Queries.Template.Response;
 using UseCase.Shared.DTOs.Responses.Companies;
 using UseCase.Shared.ExtensionMethods.EF;
 using UseCase.Shared.ExtensionMethods.EF.Companies;
 using UseCase.Shared.ExtensionMethods.EF.CompanyPeople;
 using UseCase.Shared.ExtensionMethods.EF.ContractConditions;
 using UseCase.Shared.Services.Authentication.Inspectors;
-using UseCase.Shared.Templates.Response.QueryResults;
 
 namespace UseCase.Roles.CompanyUser.Queries.GetContractConditions
 {
-    public class GetCompanyUserContractConditionsHandler : IRequestHandler<GetCompanyUserContractConditionsRequest, GetCompanyUserContractConditionsResponse>
+    public class GetCompanyUserContractConditionsHandler :
+        GetCompanyUserGenericsBase<ContractCondition, CompanyAndContractConditionDto>,
+        IRequestHandler<GetCompanyUserContractConditionsRequest, GetCompanyUserGenericItemsResponse<CompanyAndContractConditionDto>>
     {
         //Properties
-        private readonly DiplomaBdContext _context;
-        private readonly IMapper _mapper;
-        private readonly IAuthenticationInspectorService _authenticationInspector;
         private static readonly IEnumerable<CompanyUserRoles> _authorizedRoles = [
             CompanyUserRoles.CompanyOwner];
 
@@ -35,83 +33,35 @@ namespace UseCase.Roles.CompanyUser.Queries.GetContractConditions
         public GetCompanyUserContractConditionsHandler(
             DiplomaBdContext context,
             IMapper mapper,
-            IAuthenticationInspectorService authenticationInspector)
-        {
-            _context = context;
-            _mapper = mapper;
-            _authenticationInspector = authenticationInspector;
-        }
+            IAuthenticationInspectorService authenticationInspector
+            ) : base(context, mapper, authenticationInspector)
+        { }
 
 
         // Methods
-        public async Task<GetCompanyUserContractConditionsResponse> Handle(GetCompanyUserContractConditionsRequest request, CancellationToken cancellationToken)
+        public async Task<GetCompanyUserGenericItemsResponse<CompanyAndContractConditionDto>> Handle(GetCompanyUserContractConditionsRequest request, CancellationToken cancellationToken)
         {
-            var personId = GetPersonId(request);
+            var personId = GetPersonId(request.Metadata.Claims);
             var query = PrepareQuery(personId, request);
-            var selector = BuildSelector(personId, query);
+            var selector = BuildSelector(
+                personId,
+                _authorizedRoles,
+                query,
+                contractCondition => contractCondition.Company.CompanyPeople);
+
             var selectResult = await query
                 .Paginate(request.Pagination)
                 .Select(selector)
                 .ToListAsync(cancellationToken);
 
-            return PrepareResponse(selectResult);
-        }
-
-        // Private Static Methods 
-        private sealed class SelectResult
-        {
-            public required ContractCondition ContractCondition { get; init; }
-            public required int AuthorizeRolesCount { get; init; }
-            public required int TotalCount { get; init; }
-        }
-
-        private static Expression<Func<ContractCondition, SelectResult>> BuildSelector(
-            PersonId personId,
-            IQueryable<ContractCondition> totalCountQuery)
-        {
-            var personIdValue = personId.Value;
-            var roleIds = _authorizedRoles.Select(r => (int)r);
-            return cc => new SelectResult
-            {
-                ContractCondition = cc,
-                AuthorizeRolesCount = cc.Company.CompanyPeople.Count(role =>
-                    roleIds.Any(roleId =>
-                        role.PersonId == personIdValue &&
-                        role.RoleId == roleId &&
-                        role.Deny == null
-                    )
-                ),
-                TotalCount = totalCountQuery.Count(),
-            };
-        }
-
-        private static GetCompanyUserContractConditionsResponse InvalidResponse(HttpCode code)
-        {
-            return new GetCompanyUserContractConditionsResponse
-            {
-                Result = new ResponseQueryResultTemplate<CompanyAndContractConditionDto>
+            return PrepareResponse(
+                selectResult,
+                contractCondition => contractCondition.Company.Removed != null,
+                contractCondition => new CompanyAndContractConditionDto
                 {
-                    Items = [],
-                    TotalCount = 0,
-                },
-                HttpCode = code,
-            };
-        }
-
-        private static GetCompanyUserContractConditionsResponse ValidResponse(
-            HttpCode code,
-            IEnumerable<CompanyAndContractConditionDto> items,
-            int totalCount)
-        {
-            return new GetCompanyUserContractConditionsResponse
-            {
-                Result = new ResponseQueryResultTemplate<CompanyAndContractConditionDto>
-                {
-                    Items = items,
-                    TotalCount = totalCount,
-                },
-                HttpCode = code,
-            };
+                    Company = _mapper.Map<CompanyDto>(contractCondition.Company),
+                    ContractCondition = _mapper.Map<ContractConditionDto>(contractCondition),
+                });
         }
 
         private static IQueryable<ContractCondition> ApplyOrderBy(
@@ -194,12 +144,7 @@ namespace UseCase.Roles.CompanyUser.Queries.GetContractConditions
             }
         }
 
-        // Private Non Static Methods 
-        private PersonId GetPersonId(GetCompanyUserContractConditionsRequest request)
-        {
-            return _authenticationInspector.GetPersonId(request.Metadata.Claims);
-        }
-
+        // Private Non Static Methods         
         private IQueryable<ContractCondition> BaseQuery()
         {
             return _context.ContractConditions
@@ -268,38 +213,6 @@ namespace UseCase.Roles.CompanyUser.Queries.GetContractConditions
                 request.ShowRemoved);
 
             return query;
-        }
-
-        private GetCompanyUserContractConditionsResponse PrepareResponse(List<SelectResult> items)
-        {
-            if (!items.Any())
-            {
-                return InvalidResponse(HttpCode.NotFound);
-            }
-
-            var totalCount = -1;
-            var dtos = new List<CompanyAndContractConditionDto>();
-            foreach (var item in items)
-            {
-                if (totalCount < 0)
-                {
-                    totalCount = item.TotalCount;
-                }
-                if (item.AuthorizeRolesCount == 0)
-                {
-                    return InvalidResponse(HttpCode.Forbidden);
-                }
-                if (item.ContractCondition.Company.Removed != null)
-                {
-                    return InvalidResponse(HttpCode.Gone);
-                }
-                dtos.Add(new CompanyAndContractConditionDto
-                {
-                    Company = _mapper.Map<CompanyDto>(item.ContractCondition.Company),
-                    ContractCondition = _mapper.Map<ContractConditionDto>(item.ContractCondition),
-                });
-            }
-            return ValidResponse(HttpCode.Ok, dtos, totalCount);
         }
     }
 }

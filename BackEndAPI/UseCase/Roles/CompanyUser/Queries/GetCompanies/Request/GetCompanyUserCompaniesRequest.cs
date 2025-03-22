@@ -1,13 +1,15 @@
 ﻿// Ignore Spelling: Regon Krs
 
 using UseCase.Roles.CompanyUser.Queries.GetCompanies.Enums;
-using UseCase.Roles.CompanyUser.Queries.GetCompanies.Response;
+using UseCase.Roles.CompanyUser.Queries.Template.Response;
 using UseCase.Shared.DTOs.QueryParameters;
+using UseCase.Shared.DTOs.Responses.Companies;
 using UseCase.Shared.Templates.Requests;
 
 namespace UseCase.Roles.CompanyUser.Queries.GetCompanies.Request
 {
-    public class GetCompanyUserCompaniesRequest : RequestTemplate<GetCompanyUserCompaniesResponse>
+    public class GetCompanyUserCompaniesRequest :
+        RequestTemplate<GetCompanyUserGenericItemsResponse<CompanyDto>>
     {
         // For single company
         public required Guid? CompanyId { get; init; }

@@ -1,33 +1,32 @@
 ﻿using AutoMapper;
 using Domain.Features.People.ValueObjects;
 using Domain.Shared.CustomProviders;
-using Domain.Shared.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
-using System.Linq.Expressions;
 using UseCase.RelationalDatabase;
 using UseCase.RelationalDatabase.Models;
 using UseCase.Roles.CompanyUser.Enums;
 using UseCase.Roles.CompanyUser.Queries.GetBranches.Enums;
 using UseCase.Roles.CompanyUser.Queries.GetBranches.Request;
 using UseCase.Roles.CompanyUser.Queries.GetBranches.Response;
+using UseCase.Roles.CompanyUser.Queries.Template;
+using UseCase.Roles.CompanyUser.Queries.Template.Response;
+using UseCase.Shared.DTOs.QueryParameters;
 using UseCase.Shared.DTOs.Responses.Companies;
 using UseCase.Shared.ExtensionMethods.EF;
 using UseCase.Shared.ExtensionMethods.EF.Branches;
 using UseCase.Shared.ExtensionMethods.EF.Companies;
 using UseCase.Shared.ExtensionMethods.EF.CompanyPeople;
 using UseCase.Shared.Services.Authentication.Inspectors;
-using UseCase.Shared.Templates.Response.QueryResults;
 
 namespace UseCase.Roles.CompanyUser.Queries.GetBranches
 {
-    public class GetCompanyUserBranchesHandler : IRequestHandler<GetCompanyUserBranchesRequest, GetCompanyUserBranchesResponse>
+    public class GetCompanyUserBranchesHandler :
+        GetCompanyUserGenericsBase<Branch, CompanyAndBranchDto>,
+        IRequestHandler<GetCompanyUserBranchesRequest, GetCompanyUserGenericItemsResponse<CompanyAndBranchDto>>
     {
         //Properties
-        private readonly DiplomaBdContext _context;
-        private readonly IMapper _mapper;
-        private readonly IAuthenticationInspectorService _authenticationInspector;
         private static readonly IEnumerable<CompanyUserRoles> _authorizedRoles = [
             CompanyUserRoles.CompanyOwner];
 
@@ -36,52 +35,34 @@ namespace UseCase.Roles.CompanyUser.Queries.GetBranches
             DiplomaBdContext context,
             IMapper mapper,
             IAuthenticationInspectorService authenticationInspector)
-        {
-            _context = context;
-            _mapper = mapper;
-            _authenticationInspector = authenticationInspector;
-        }
+            : base(context, mapper, authenticationInspector)
+        { }
 
 
         // Methods
-        public async Task<GetCompanyUserBranchesResponse> Handle(GetCompanyUserBranchesRequest request, CancellationToken cancellationToken)
+        public async Task<GetCompanyUserGenericItemsResponse<CompanyAndBranchDto>> Handle(GetCompanyUserBranchesRequest request, CancellationToken cancellationToken)
         {
-            var personId = GetPersonId(request);
+            var personId = GetPersonId(request.Metadata.Claims);
             var query = BuildQuery(request, personId);
-            var selector = BuildSelector(personId, query);
+            var selector = BuildSelector(
+                personId,
+                _authorizedRoles,
+                query,
+                branch => branch.Company.CompanyPeople);
 
             var selectedValues = await query
                 .Paginate(request.Pagination)
                 .Select(selector)
                 .ToListAsync(cancellationToken);
 
-            return PrepareResponse(selectedValues);
-        }
-
-        // Private Static Methods
-        private sealed class SelectResult
-        {
-            public required Branch Branch { get; init; }
-            public required int AuthorizedRolesCount { get; init; }
-            public required int TotalCount { get; init; }
-
-        }
-
-        private static Expression<Func<Branch, SelectResult>> BuildSelector(
-            PersonId personId,
-            IQueryable<Branch> totalCountQuery)
-        {
-            return branch => new SelectResult
-            {
-                Branch = branch,
-                AuthorizedRolesCount = branch.Company.CompanyPeople.Count(role =>
-                    _authorizedRoles.Any(roleId =>
-                        role.Deny == null &&
-                        role.PersonId == personId.Value &&
-                        role.RoleId == (int)roleId
-                )),
-                TotalCount = totalCountQuery.Count(),
-            };
+            return PrepareResponse(
+                selectedValues,
+                branch => branch.Company.Removed != null,
+                branch => new CompanyAndBranchDto
+                {
+                    Company = _mapper.Map<CompanyDto>(branch.Company),
+                    Branch = _mapper.Map<BranchDto>(branch),
+                });
         }
 
         private static IQueryable<Branch> ApplyOrderBy(
@@ -89,14 +70,17 @@ namespace UseCase.Roles.CompanyUser.Queries.GetBranches
             CompanyUserBranchesOrderBy orderBy,
             bool ascending,
             bool showRemoved,
-            float? lon,
-            float? lat)
+            GeographyPointQueryParametersDto geographyPoint)
         {
             if (orderBy == CompanyUserBranchesOrderBy.Point &&
-                lon != null &&
-                lat != null)
+                geographyPoint.Lon.HasValue &&
+                geographyPoint.Lat.HasValue)
             {
-                var point = new Point(lon.Value, lat.Value) { SRID = 4326 };
+                var point = new Point(
+                    geographyPoint.Lon.Value,
+                    geographyPoint.Lat.Value)
+                { SRID = 4326 };
+
                 return ascending ?
                     query.OrderBy(branch => branch.Address.Point.Distance(point))
                         .ThenBy(branch => branch.Created) :
@@ -134,41 +118,6 @@ namespace UseCase.Roles.CompanyUser.Queries.GetBranches
                         query.OrderBy(branch => branch.Created) :
                         query.OrderByDescending(branch => branch.Created);
             }
-        }
-
-        private static GetCompanyUserBranchesResponse InvalidResponse(HttpCode code)
-        {
-            return new GetCompanyUserBranchesResponse
-            {
-                Result = new ResponseQueryResultTemplate<CompanyAndBranchDto>
-                {
-                    Items = [],
-                    TotalCount = 0,
-                },
-                HttpCode = code,
-            };
-        }
-
-        private static GetCompanyUserBranchesResponse ValidResponse(
-            HttpCode code,
-            IEnumerable<CompanyAndBranchDto> items,
-            int totalCount)
-        {
-            return new GetCompanyUserBranchesResponse
-            {
-                Result = new ResponseQueryResultTemplate<CompanyAndBranchDto>
-                {
-                    Items = items,
-                    TotalCount = totalCount,
-                },
-                HttpCode = code,
-            };
-        }
-
-        // Private Non Static Methods
-        private PersonId GetPersonId(GetCompanyUserBranchesRequest request)
-        {
-            return _authenticationInspector.GetPersonId(request.Metadata.Claims);
         }
 
         private IQueryable<Branch> BuildBaseQuery()
@@ -231,45 +180,9 @@ namespace UseCase.Roles.CompanyUser.Queries.GetBranches
                 request.OrderBy,
                 request.Ascending,
                 request.ShowRemoved,
-                request.Lon,
-                request.Lat);
+                request.GeographyPoint);
 
             return query;
-        }
-
-        private GetCompanyUserBranchesResponse PrepareResponse(List<SelectResult> items)
-        {
-            if (!items.Any())
-            {
-                return InvalidResponse(HttpCode.NotFound);
-            }
-
-            var totalCount = -1;
-            var dtos = new List<CompanyAndBranchDto>();
-            for (int i = 0; i < items.Count; i++)
-            {
-                var selectedValue = items[i];
-
-                if (totalCount < 0)
-                {
-                    totalCount = selectedValue.TotalCount;
-                }
-                Console.WriteLine(selectedValue.AuthorizedRolesCount);
-                if (selectedValue.AuthorizedRolesCount == 0)
-                {
-                    return InvalidResponse(HttpCode.Forbidden);
-                }
-                if (selectedValue.Branch.Company.Removed != null)
-                {
-                    return InvalidResponse(HttpCode.Gone);
-                }
-                dtos.Add(new CompanyAndBranchDto
-                {
-                    Company = _mapper.Map<CompanyDto>(selectedValue.Branch.Company),
-                    Branch = _mapper.Map<BranchDto>(selectedValue.Branch),
-                });
-            }
-            return ValidResponse(HttpCode.Ok, dtos, totalCount);
         }
     }
 }
