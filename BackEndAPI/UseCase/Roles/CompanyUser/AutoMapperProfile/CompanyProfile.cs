@@ -54,7 +54,7 @@ namespace UseCase.Roles.CompanyUser.AutoMapperProfile
                         : domain.EmploymentLength.Value,
                     WebsiteUrl = domain.WebsiteUrl == null
                         ? null
-                        : domain.WebsiteUrl.Value,
+                        : domain.WebsiteUrl.ToString(),
                 });
         }
     }

@@ -28,7 +28,12 @@
 
         public static implicit operator string?(UrlProperty? value)
         {
-            return value?.Value;
+            return value?.Value ?? null;
+        }
+
+        public override string ToString()
+        {
+            return this.Value;
         }
     }
 }
