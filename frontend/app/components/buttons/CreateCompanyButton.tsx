@@ -4,7 +4,7 @@ import React from 'react'
 
 const CreateCompany = () => {
     return (
-        <Link href="/profile/createCompany">Create company</Link>
+        <Link href="/profile/createCompany" className="text-blue-600">Create company</Link>
     )
 }
 

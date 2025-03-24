@@ -20,6 +20,22 @@ interface BranchDetails{
     postCode: string,
   }
 }
+interface Offer {
+  offerId: string;
+  publicationStart: string;
+  publicationEnd: string;
+  employmentLength: number;
+  websiteUrl: string;
+  status: string;
+  offerTemplate: {
+    name: string;
+  };
+  branch: {
+    branchId: string;
+    name: string;
+  };
+}
+
 
 const BranchDetails = async ({ params }: { params: { id: string, branchId: string } }) => {
   // const params = useParams(); // Pobieram dynamiczne parametry z URL
@@ -44,6 +60,24 @@ const BranchDetails = async ({ params }: { params: { id: string, branchId: strin
     branchData = await res.json().then((data) => data.items[0].branch) as BranchDetails
   }
 
+  let offers: Offer[] = [];
+
+  if (session?.user.token) {
+    // Fetch offers
+    const resOffers = await fetch(`http://localhost:8080/api/CompanyUser/branches/${branchId}/offers`, {
+      headers: {
+        Authorization: `Bearer ${session.user.token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (resOffers.ok) {
+      const data = await resOffers.json();
+      offers = data.items.filter((offer: Offer) => offer.branch.branchId === branchId);
+    }
+  
+  }
+
   // if (!params.id || !params.branchId) {
   //   return <div>Loading...</div>; //Gdy params nie są jeszcze dostępne
   // }
@@ -66,8 +100,26 @@ const BranchDetails = async ({ params }: { params: { id: string, branchId: strin
           </div>
         </>
       }
-      <Link href={`/companies/${id}/${branchId}/publishOffer`}>Publish offer</Link>
+      <Link href={`/companies/${id}/${branchId}/publishOffer`} className="text-blue-600">Publish offer</Link>
+      
       {/* <PublishOfferButton companyId={id as string} branchId={branchId as string} /> */}
+      <h2 className="mt-6 mb-2 text-xl font-semibold">Offers in this Branch:</h2>
+      {offers.length > 0 ? (
+        <ul className="list-disc ml-6" >
+          {offers.map((offer) => (
+            <li key={offer.offerId} className="border p-3 rounded my-2">
+              <p><b> {offer.offerTemplate.name}</b></p>
+              <p><b>Status:</b> {offer.status}</p>
+              <p><b>Start:</b> {new Date(offer.publicationStart).toLocaleDateString()}</p>
+              <p><b>End:</b> {new Date(offer.publicationEnd).toLocaleDateString()}</p>
+              <p><b>Website:</b> <a href={offer.websiteUrl.match(/https?:\/\/[^\s]+/)?.[0]} target="_blank">{offer.websiteUrl}</a></p>
+              <br />
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p>No offers published for this branch yet.</p>
+      )}
     </div>
   );
 };

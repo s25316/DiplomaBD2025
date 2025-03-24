@@ -27,6 +27,21 @@ interface CompanyDetails {
   websiteUrl?: string;
   created: string;
 }
+interface ContractCondition {
+  contractConditionId: string;
+  hoursPerTerm: number;
+  salaryMin: number;
+  salaryMax: number;
+  salaryTerm: {
+    name: string;
+  };
+  currency: {
+    name: string;
+  };
+  isNegotiable: boolean;
+  workModes: { name: string }[];
+  employmentTypes: { name: string }[];
+}
 
 const CompanyDetails = async ({ params }: { params: { id: string } }) => {
   const session = await getServerSession(authOptions);
@@ -35,6 +50,8 @@ const CompanyDetails = async ({ params }: { params: { id: string } }) => {
   let companyDetails: CompanyDetails | null = null;
   let branches: BranchesProfile[] = [];
   let offerTemplates: Templates[] = [];
+  let contractConditions: ContractCondition[] = [];
+
 
   if (session?.user.token) {
     // Pobranie danych firmy
@@ -78,6 +95,20 @@ const CompanyDetails = async ({ params }: { params: { id: string } }) => {
         name: item.offerTemplate.name,
       }));
     }
+    const conditionsRes = await fetch(`http://localhost:8080/api/CompanyUser/contractConditions`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${session.user.token}`,
+      },
+    });
+    
+    if (conditionsRes.ok) {
+      const data = await conditionsRes.json();
+      contractConditions = data.items
+        .map((item: any) => item.contractCondition)
+        .filter((cond: any) => cond.companyId === id);
+    }
+    
   }
 
   return (
@@ -104,6 +135,7 @@ const CompanyDetails = async ({ params }: { params: { id: string } }) => {
         <p>Loading company details...</p>
       )}
 
+      <br></br>
       {branches.length > 0 ? (
         <>
           <h2>Branches:</h2>
@@ -118,6 +150,27 @@ const CompanyDetails = async ({ params }: { params: { id: string } }) => {
       ) : (
         <h2>No branches available</h2>
       )}
+      <br></br>
+
+      {contractConditions.length > 0 ? (
+        <>
+          <h2 className="mt-6">Contract Conditions:</h2>
+          <ul>
+            {contractConditions.map((cond) => (
+              <li key={cond.contractConditionId} className="border p-3 rounded my-2">
+                <p><b>Hours/Term:</b> {cond.hoursPerTerm}</p>
+                <p><b>Salary:</b> {cond.salaryMin} – {cond.salaryMax} {cond?.currency?.name} ({cond?.salaryTerm?.name})</p>
+                <p><b>Negotiable:</b> {cond.isNegotiable ? "Yes" : "No"}</p>
+                <p><b>Work Modes:</b> {cond.workModes.map(w => w.name).join(", ")}</p>
+                <p><b>Employment Types:</b> {cond.employmentTypes.map(e => e.name).join(", ")}</p>
+              </li>
+            ))}
+          </ul>
+        </>
+      ) : (
+        <h2 className="mt-6">No contract conditions available</h2>
+      )}
+
 
       {offerTemplates.length > 0 ? (
         <>

@@ -6,7 +6,7 @@ const PublishOfferButton = ({ companyId, branchId }: { companyId: string; branch
 
   return (
     <button
-      onClick={() => router.push(`/companies/${companyId}/${branchId}/publishOffer`)}
+      onClick={() => router.push(`/companies/${companyId}/${branchId}/publishOffer`)} className="text-blue-600"
     >
       Publish Offer
     </button>

@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation'
 
 const CreateBranchButton = () => {
   return (
-    <Link href={`${usePathname()}/createBranch`}>Create branch</Link>
+    <Link href={`${usePathname()}/createBranch`} className="text-blue-600">Create branch</Link>
   )
 }
 
