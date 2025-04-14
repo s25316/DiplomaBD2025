@@ -83,7 +83,7 @@ namespace UseCase.Shared.DTOs.Responses.AutoMapperProfile
             CreateMap<Offer, OfferDto>()
                 .ConstructUsing((db, context) =>
                 {
-                    var now = CustomTimeProvider.GetDateTimeNow();
+                    var now = CustomTimeProvider.Now;
                     OfferStatus status = OfferStatus.Active;
                     if (db.PublicationStart > now)
                     {

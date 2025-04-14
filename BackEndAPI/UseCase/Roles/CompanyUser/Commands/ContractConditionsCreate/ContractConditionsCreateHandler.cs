@@ -1,16 +1,17 @@
-﻿using Domain.Features.People.ValueObjects;
+﻿using Domain.Features.ContractConditions.ValueObjects.Info;
+using Domain.Features.People.ValueObjects.Ids;
 using Domain.Shared.Enums;
 using MediatR;
 using System.Text;
-using UseCase.Roles.CompanyUser.Commands.ContractConditionsCreate.Repositories;
 using UseCase.Roles.CompanyUser.Commands.ContractConditionsCreate.Request;
 using UseCase.Roles.CompanyUser.Commands.ContractConditionsCreate.Response;
+using UseCase.Roles.CompanyUser.Repositories.ContractConditions;
 using UseCase.Shared.Dictionaries.GetContractParameters.Response;
 using UseCase.Shared.Dictionaries.Repositories;
 using UseCase.Shared.Enums;
 using UseCase.Shared.Services.Authentication.Inspectors;
 using UseCase.Shared.Templates.Response.Commands;
-using DomainContractCondition = Domain.Features.ContractConditions.Entities.ContractCondition;
+using DomainContractCondition = Domain.Features.ContractConditions.Aggregates.ContractCondition;
 
 namespace UseCase.Roles.CompanyUser.Commands.ContractConditionsCreate
 {
@@ -88,8 +89,8 @@ namespace UseCase.Roles.CompanyUser.Commands.ContractConditionsCreate
                 .SetContractParameters(
                     command.SalaryTermId,
                     command.CurrencyId,
-                    command.WorkModeIds,
-                    command.EmploymentTypeIds);
+                    command.WorkModeIds.Select(id => (ContractAttributeInfo)id),
+                    command.EmploymentTypeIds.Select(id => (ContractAttributeInfo)id));
         }
 
         private static string CheckContractParamiters(
@@ -130,28 +131,28 @@ namespace UseCase.Roles.CompanyUser.Commands.ContractConditionsCreate
         {
             var stringBuilder = new StringBuilder();
 
-            if (item.SalaryTermId != null)
+            if (item.SalaryTerms.Any())
             {
                 stringBuilder.AppendLine(CheckContractParamiters(
-                    [item.SalaryTermId.Value],
+                    item.SalaryTerms.Values.Select(st => st.ContractParameterId),
                     ContractParameterTypes.SalaryTerm,
                     contractParametersDictionary));
             }
-            if (item.CurrencyId != null)
+            if (item.Currencies.Any())
             {
                 stringBuilder.AppendLine(CheckContractParamiters(
-                    [item.CurrencyId.Value],
+                    item.Currencies.Values.Select(st => st.ContractParameterId),
                     ContractParameterTypes.Currency,
                     contractParametersDictionary));
             }
 
             stringBuilder.AppendLine(CheckContractParamiters(
-                    item.WorkModeIds,
+                    item.WorkModes.Values.Select(st => st.ContractParameterId),
                     ContractParameterTypes.WorkMode,
                     contractParametersDictionary));
 
             stringBuilder.AppendLine(CheckContractParamiters(
-                    item.EmploymentTypeIds,
+                    item.EmploymentTypes.Values.Select(st => st.ContractParameterId),
                     ContractParameterTypes.EmploymentType,
                     contractParametersDictionary));
 

@@ -106,6 +106,15 @@ namespace UseCase {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Company Blocked.
+        /// </summary>
+        internal static string Entity_Company_Status_Blocked {
+            get {
+                return ResourceManager.GetString("Entity_Company_Status_Blocked", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Offer publish start invalid, offer start.
         /// </summary>
         internal static string Entity_Offers_Status_Started {

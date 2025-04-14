@@ -1,10 +1,10 @@
-﻿using Domain.Features.People.ValueObjects;
+﻿using Domain.Features.People.ValueObjects.Ids;
 using Domain.Shared.Enums;
-using Domain.Shared.ValueObjects;
+using Domain.Shared.ValueObjects.Ids;
 using MediatR;
-using UseCase.Roles.CompanyUser.Commands.BranchesCreate.Repositories;
 using UseCase.Roles.CompanyUser.Commands.BranchesCreate.Request;
 using UseCase.Roles.CompanyUser.Commands.BranchesCreate.Response;
+using UseCase.Roles.CompanyUser.Repositories.Branches;
 using UseCase.Shared.DTOs.Requests;
 using UseCase.Shared.Repositories.Addresses;
 using UseCase.Shared.Services.Authentication.Inspectors;
@@ -43,30 +43,23 @@ namespace UseCase.Roles.CompanyUser.Commands.BranchesCreate
             // Domain Part
             if (!buildResult.IsValid)
             {
-                return new BranchesCreateResponse
-                {
-                    Result = request.Commands
-                        .Select(cmd => new ResponseCommandTemplate<BranchCreateCommand>
-                        {
-                            Item = cmd,
-                            IsCorrect = string.IsNullOrWhiteSpace(buildResult.Dictionary[cmd].Error),
-                            Message = buildResult.Dictionary[cmd].Error ?? string.Empty,
-                        }),
-                    HttpCode = HttpCode.BadRequest,
-                };
+                return Invalidresult(buildResult, request);
             }
 
             var dictionary = buildResult.Dictionary
                 .ToDictionary(
                 val => val.Key,
                 val => val.Value.Branch);
+
             var repositoryResult = await _branchRepository.CreateAsync(
                 personId,
                 dictionary.Values,
                 cancellationToken);
 
+            // If is OK or NOT
             return new BranchesCreateResponse
             {
+                HttpCode = repositoryResult.Code,
                 Result = dictionary
                         .Select(cmd => new ResponseCommandTemplate<BranchCreateCommand>
                         {
@@ -74,7 +67,6 @@ namespace UseCase.Roles.CompanyUser.Commands.BranchesCreate
                             IsCorrect = repositoryResult.Dictionary[cmd.Value].IsCorrect,
                             Message = repositoryResult.Dictionary[cmd.Value].Message,
                         }),
-                HttpCode = repositoryResult.Code,
             };
         }
 
@@ -119,6 +111,25 @@ namespace UseCase.Roles.CompanyUser.Commands.BranchesCreate
             {
                 Dictionary = dictionary,
                 IsValid = isValid,
+            };
+        }
+
+        private static BranchesCreateResponse Invalidresult(
+            BulderResult bulderResult,
+            BranchesCreateRequest request)
+        {
+            return new BranchesCreateResponse
+            {
+                HttpCode = HttpCode.BadRequest,
+                Result = request.Commands
+                        .Select(cmd => new ResponseCommandTemplate<BranchCreateCommand>
+                        {
+                            Item = cmd,
+                            IsCorrect = string.IsNullOrWhiteSpace(
+                                bulderResult.Dictionary[cmd].Error),
+                            Message = bulderResult.Dictionary[cmd].Error
+                                ?? string.Empty,
+                        }),
             };
         }
 

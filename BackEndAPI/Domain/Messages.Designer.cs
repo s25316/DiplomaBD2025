@@ -70,6 +70,15 @@ namespace Domain {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Unable change existing KRS.
+        /// </summary>
+        internal static string Entity_Company_ChangeExistingKrs {
+            get {
+                return ResourceManager.GetString("Entity_Company_ChangeExistingKrs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Company name can not be empty.
         /// </summary>
         internal static string Entity_Company_EmptyName {
@@ -124,6 +133,15 @@ namespace Domain {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Unable remove offer status Expired.
+        /// </summary>
+        internal static string Entity_Offer_UnableRemoveExpired {
+            get {
+                return ResourceManager.GetString("Entity_Offer_UnableRemoveExpired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Template description can not be empty.
         /// </summary>
         internal static string Entity_OfferTemplate_EmptyDescription {
@@ -138,6 +156,24 @@ namespace Domain {
         internal static string Entity_OfferTemplate_EmptyName {
             get {
                 return ResourceManager.GetString("Entity_OfferTemplate_EmptyName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Birth date from future.
+        /// </summary>
+        internal static string Record_BirthDate_Future {
+            get {
+                return ResourceManager.GetString("Record_BirthDate_Future", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid e-mail.
+        /// </summary>
+        internal static string Record_Email_Invalid {
+            get {
+                return ResourceManager.GetString("Record_Email_Invalid", resourceCulture);
             }
         }
         
@@ -183,6 +219,15 @@ namespace Domain {
         internal static string Record_Nip_Invalid {
             get {
                 return ResourceManager.GetString("Record_Nip_Invalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Phone number invalid, input only numbers starts &quot;+&quot;.
+        /// </summary>
+        internal static string Record_PhoneNumber_Invalid {
+            get {
+                return ResourceManager.GetString("Record_PhoneNumber_Invalid", resourceCulture);
             }
         }
         

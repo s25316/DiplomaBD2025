@@ -1,14 +1,15 @@
-﻿using Domain.Features.Offers.Enums;
-using Domain.Features.People.ValueObjects;
+﻿using Domain.Features.Offers.ValueObjects.Enums;
+using Domain.Features.Offers.ValueObjects.Info;
+using Domain.Features.People.ValueObjects.Ids;
 using Domain.Shared.Enums;
 using MediatR;
 using System.Text;
-using UseCase.Roles.CompanyUser.Commands.OffersCreate.Repositories;
 using UseCase.Roles.CompanyUser.Commands.OffersCreate.Request;
 using UseCase.Roles.CompanyUser.Commands.OffersCreate.Response;
+using UseCase.Roles.CompanyUser.Repositories.Offers;
 using UseCase.Shared.Services.Authentication.Inspectors;
 using UseCase.Shared.Templates.Response.Commands;
-using DomainOffer = Domain.Features.Offers.Entities.Offer;
+using DomainOffer = Domain.Features.Offers.Aggregates.Offer;
 
 namespace UseCase.Roles.CompanyUser.Commands.OffersCreate
 {
@@ -73,12 +74,14 @@ namespace UseCase.Roles.CompanyUser.Commands.OffersCreate
         private static DomainOffer.Builder PrepareBuilder(OfferCreateCommand command)
         {
             return new DomainOffer.Builder()
-                .SetOfferTemplateId(command.OfferTemplateId)
                 .SetBranchId(command.BranchId)
                 .SetPublicationRange(command.PublicationStart, command.PublicationEnd)
                 .SetEmploymentLength(command.EmploymentLength)
                 .SetWebsiteUrl(command.WebsiteUrl)
-                .SetContractConditionIds(command.ConditionIds);
+                .SetOfferTemplate((TemplateInfo)command.OfferTemplateId)
+                .SetContractConditions(
+                    command.ConditionIds
+                    .Select(id => (ContractInfo)id));
         }
 
         private sealed class BuildResult
@@ -109,7 +112,8 @@ namespace UseCase.Roles.CompanyUser.Commands.OffersCreate
                 {
                     stringBuilder.AppendLine(builder.GetErrors());
                 }
-                if (item.Status == OfferStatus.Started)
+                if (item.Status == OfferStatus.Expired ||
+                    item.Status == OfferStatus.Active)
                 {
                     stringBuilder.AppendLine(Messages.Entity_Offers_Status_Started);
                 }

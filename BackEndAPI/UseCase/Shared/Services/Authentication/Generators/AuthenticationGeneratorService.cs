@@ -64,8 +64,7 @@ namespace UseCase.Shared.Services.Authentication.Generators
         public (string RefreshToken, DateTime ValidTo) GenerateRefreshToken()
         {
             var refresh = GenerateRandomString(1024);
-            var validTo = CustomTimeProvider
-                .GetDateTimeNow()
+            var validTo = CustomTimeProvider.Now
                 .AddDays(_countDaysValidRefreshToken);
             return (refresh, validTo);
         }

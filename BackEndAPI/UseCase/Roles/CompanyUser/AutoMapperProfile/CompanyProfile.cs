@@ -1,4 +1,8 @@
 ﻿using AutoMapper;
+using Domain.Features.ContractConditions.ValueObjects.Info;
+using Domain.Features.Offers.ValueObjects.Info;
+using Domain.Features.OfferTemplates.ValueObjects.Info;
+using UseCase.Shared.Enums;
 using DatabaseBranch = UseCase.RelationalDatabase.Models.Branch;
 using DatabaseCompany = UseCase.RelationalDatabase.Models.Company;
 using DatabaseContractCondition = UseCase.RelationalDatabase.Models.ContractCondition;
@@ -6,9 +10,9 @@ using DatabaseOffer = UseCase.RelationalDatabase.Models.Offer;
 using DatabaseOfferTemplate = UseCase.RelationalDatabase.Models.OfferTemplate;
 using DomainBranch = Domain.Features.Branches.Entities.Branch;
 using DomainCompany = Domain.Features.Companies.Entities.Company;
-using DomainContractCondition = Domain.Features.ContractConditions.Entities.ContractCondition;
-using DomainOffer = Domain.Features.Offers.Entities.Offer;
-using DomainOfferTemplate = Domain.Features.OfferTemplates.Entities.OfferTemplate;
+using DomainContractCondition = Domain.Features.ContractConditions.Aggregates.ContractCondition;
+using DomainOffer = Domain.Features.Offers.Aggregates.Offer;
+using DomainOfferTemplate = Domain.Features.OfferTemplates.Aggregates.OfferTemplate;
 
 namespace UseCase.Roles.CompanyUser.AutoMapperProfile
 {
@@ -16,20 +20,68 @@ namespace UseCase.Roles.CompanyUser.AutoMapperProfile
     {
         public CompanyProfile()
         {
+            // Company Mapping
             CreateMap<DomainCompany, DatabaseCompany>()
                 .ForMember(
                 database => database.CompanyId,
                 opt => opt.Ignore());
 
+            CreateMap<DatabaseCompany, DomainCompany>()
+                .ConstructUsing(db => new DomainCompany.Builder()
+                    .SetId(db.CompanyId)
+                    .SetLogo(db.Logo)
+                    .SetName(db.Name)
+                    .SetDescription(db.Description)
+                    .SetRegon(db.Regon)
+                    .SetNip(db.Nip)
+                    .SetKrs(db.Krs)
+                    .SetWebsiteUrl(db.WebsiteUrl)
+                    .SetCreated(db.Created)
+                    .SetRemoved(db.Removed)
+                    .SetBlocked(db.Blocked)
+                    .Build());
+
+            // Branch Mapping
             CreateMap<DomainBranch, DatabaseBranch>()
                 .ForMember(
                 database => database.BranchId,
                 opt => opt.Ignore());
 
+            CreateMap<DatabaseBranch, DomainBranch>()
+                .ConstructUsing(db => new DomainBranch.Builder()
+                    .SetId(db.BranchId)
+                    .SetCompanyId(db.CompanyId)
+                    .SetAddressId(db.AddressId)
+                    .SetName(db.Name)
+                    .SetDescription(db.Description)
+                    .SetCreated(db.Created)
+                    .SetRemoved(db.Removed)
+                    .Build());
+
+            // OfferTemplate Mapping
             CreateMap<DomainOfferTemplate, DatabaseOfferTemplate>()
                 .ForMember(
                 database => database.OfferTemplateId,
                 opt => opt.Ignore());
+
+            CreateMap<DatabaseOfferTemplate, DomainOfferTemplate>()
+                .ConstructUsing(db => new DomainOfferTemplate.Builder()
+                    .SetId(db.OfferTemplateId)
+                    .SetCompanyId(db.CompanyId)
+                    .SetCreated(db.Created)
+                    .SetRemoved(db.Removed)
+                    .SetName(db.Name)
+                    .SetDescription(db.Description)
+                    .SetSkills(db.OfferSkills
+                        .Where(os => os.Removed == null)
+                        .Select(os => new OfferSkillInfo
+                        {
+                            Id = os.OfferSkillId,
+                            SkillId = os.SkillId,
+                            IsRequired = os.IsRequired,
+                            Created = os.Created,
+                        }))
+                    .Build());
 
             CreateMap<DomainContractCondition, DatabaseContractCondition>()
                 .ConstructUsing(domain => new DatabaseContractCondition
@@ -41,6 +93,47 @@ namespace UseCase.Roles.CompanyUser.AutoMapperProfile
                     IsNegotiable = domain.IsNegotiable,
                     Created = domain.Created,
                 });
+
+            CreateMap<DatabaseContractCondition, DomainContractCondition>()
+                .ConstructUsing(db => new DomainContractCondition.Builder()
+                    .SetId(db.ContractConditionId)
+                    .SetCompanyId(db.CompanyId)
+                    .SetSalaryRange(
+                        (db.SalaryMin == null ? 0 : db.SalaryMin.Value),
+                        (db.SalaryMax == null ? 0 : db.SalaryMax.Value))
+                    .SetHoursPerTerm(db.HoursPerTerm)
+                    .SetIsNegotiable(db.IsNegotiable)
+                    .SetCreated(db.Created)
+                    .SetRemoved(db.Removed)
+                    .SetContractParameters(
+                        (ContractAttributeInfo?)(db.ContractAttributes
+                            .Where(ca =>
+                                ca.ContractParameter.ContractParameterTypeId == (int)ContractParameterTypes.SalaryTerm &&
+                                ca.Removed == null)
+                            .OrderBy(ca => ca.Created)
+                            .Select(ca => ca.ContractParameterId)
+                            .FirstOrDefault()),
+                        (ContractAttributeInfo?)(db.ContractAttributes
+                            .Where(ca =>
+                                ca.ContractParameter.ContractParameterTypeId == (int)ContractParameterTypes.Currency &&
+                                ca.Removed == null)
+                            .OrderBy(ca => ca.Created)
+                            .Select(ca => ca.ContractParameterId)
+                            .FirstOrDefault()),
+                        db.ContractAttributes
+                            .Where(ca =>
+                                ca.ContractParameter.ContractParameterTypeId == (int)ContractParameterTypes.WorkMode &&
+                                ca.Removed == null)
+                            .Select(ca => (ContractAttributeInfo)ca.ContractParameterId)
+                            .ToList(),
+                        db.ContractAttributes
+                            .Where(ca =>
+                                ca.ContractParameter.ContractParameterTypeId == (int)ContractParameterTypes.EmploymentType &&
+                                ca.Removed == null)
+                            .Select(ca => (ContractAttributeInfo)ca.ContractParameterId)
+                            .ToList()
+                            )
+                    .Build());
 
             CreateMap<DomainOffer, DatabaseOffer>()
                 .ConstructUsing(domain => new DatabaseOffer
@@ -56,6 +149,49 @@ namespace UseCase.Roles.CompanyUser.AutoMapperProfile
                         ? null
                         : domain.WebsiteUrl.ToString(),
                 });
+
+            CreateMap<DatabaseOffer, DomainOffer>()
+                .ConstructUsing(db =>
+                    MapDatabaseOfferToDomainOffer(db))
+                .ForAllMembers(opt => opt.Ignore());
+        }
+        private DomainOffer MapDatabaseOfferToDomainOffer(DatabaseOffer db)
+        {
+            var builder = new DomainOffer.Builder()
+                     .SetId(db.OfferId)
+                     .SetBranchId(db.BranchId)
+                     .SetPublicationRange(db.PublicationStart, db.PublicationEnd)
+                     .SetEmploymentLength(db.EmploymentLength)
+                     .SetWebsiteUrl(db.WebsiteUrl)
+                     .SetOfferTemplate(
+                         db.OfferConnections
+                         .Where(oc => oc.Removed == null)
+                         .OrderBy(oc => oc.Created)
+                         .Select(oc => new TemplateInfo
+                         {
+                             Id = oc.OfferConnectionId,
+                             OfferTemplateId = oc.OfferTemplateId,
+                             Removed = oc.Removed,
+                             Created = oc.Created,
+                         })
+                         .First())
+                     .SetContractConditions(
+                         db.OfferConditions
+                         .Where(oc => oc.Removed == null)
+                         .Select(oc => new ContractInfo
+                         {
+                             Id = oc.OfferConditionId,
+                             ContractConditionId = oc.ContractConditionId,
+                             Removed = oc.Removed,
+                             Created = oc.Created,
+                         }));
+            Console.WriteLine("Pass Builder");
+            var item = builder.Build();
+
+            Console.WriteLine("Pass Build");
+            Console.WriteLine($"URL {item.WebsiteUrl}");
+            Console.WriteLine($"URL {builder.GetErrors()}");
+            return item;
         }
     }
 }

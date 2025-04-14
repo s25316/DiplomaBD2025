@@ -1,16 +1,16 @@
-﻿using Domain.Features.OfferTemplates.ValueObjects;
-using Domain.Features.People.ValueObjects;
+﻿using Domain.Features.OfferTemplates.ValueObjects.Info;
+using Domain.Features.People.ValueObjects.Ids;
 using Domain.Shared.Enums;
 using MediatR;
 using System.Text;
-using UseCase.Roles.CompanyUser.Commands.OfferTemplatesCreate.Repositories;
 using UseCase.Roles.CompanyUser.Commands.OfferTemplatesCreate.Request;
 using UseCase.Roles.CompanyUser.Commands.OfferTemplatesCreate.Response;
+using UseCase.Roles.CompanyUser.Repositories.OfferTemplates;
 using UseCase.Shared.Dictionaries.GetSkills.Response;
 using UseCase.Shared.Dictionaries.Repositories;
 using UseCase.Shared.Services.Authentication.Inspectors;
 using UseCase.Shared.Templates.Response.Commands;
-using DomainOfferTemplate = Domain.Features.OfferTemplates.Entities.OfferTemplate;
+using DomainOfferTemplate = Domain.Features.OfferTemplates.Aggregates.OfferTemplate;
 
 namespace UseCase.Roles.CompanyUser.Commands.OfferTemplatesCreate
 {
@@ -86,10 +86,12 @@ namespace UseCase.Roles.CompanyUser.Commands.OfferTemplatesCreate
                 .SetCompanyId(companyId)
                 .SetName(command.Name)
                 .SetDescription(command.Description)
-                .SetSkillsIds(command.Skills.Select(skill => new OfferSkill
+                .SetSkills(command.Skills.Select(skill => new OfferSkillInfo
                 {
+                    Id = null,
                     SkillId = skill.SkillId,
                     IsRequired = skill.IsRequired,
+                    Created = null,
                 }));
         }
 

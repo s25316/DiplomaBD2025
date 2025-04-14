@@ -1,8 +1,9 @@
 ﻿using Domain.Features.Branches.ValueObjects;
-using Domain.Features.Companies.ValueObjects;
+using Domain.Features.Companies.ValueObjects.Ids;
 using Domain.Shared.CustomProviders;
 using Domain.Shared.Templates;
-using Domain.Shared.ValueObjects;
+using Domain.Shared.Templates.Builders;
+using Domain.Shared.ValueObjects.Ids;
 using System.Text;
 
 namespace Domain.Features.Branches.Entities
@@ -61,7 +62,7 @@ namespace Domain.Features.Branches.Entities
                 {
                     if (branch.Created == DateTime.MinValue)
                     {
-                        branch.Created = CustomTimeProvider.GetDateTimeNow();
+                        branch.Created = CustomTimeProvider.Now;
                     }
                 };
             }

@@ -1,4 +1,4 @@
-﻿using Domain.Features.People.ValueObjects;
+﻿using Domain.Features.People.ValueObjects.Ids;
 using UseCase.RelationalDatabase.Models;
 using UseCase.Roles.CompanyUser.Enums;
 

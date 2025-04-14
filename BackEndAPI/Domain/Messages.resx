@@ -120,6 +120,9 @@
   <data name="Enitity_Branch_EmptyName" xml:space="preserve">
     <value>Branch name can not be empty</value>
   </data>
+  <data name="Entity_Company_ChangeExistingKrs" xml:space="preserve">
+    <value>Unable change existing KRS</value>
+  </data>
   <data name="Entity_Company_EmptyName" xml:space="preserve">
     <value>Company name can not be empty</value>
   </data>
@@ -144,6 +147,15 @@
   <data name="Entity_Offer_EmptyPublicationEndForWorkRange" xml:space="preserve">
     <value>For inserting work range need insert Publication End </value>
   </data>
+  <data name="Entity_Offer_UnableRemoveExpired" xml:space="preserve">
+    <value>Unable remove offer status Expired</value>
+  </data>
+  <data name="Record_BirthDate_Future" xml:space="preserve">
+    <value>Birth date from future</value>
+  </data>
+  <data name="Record_Email_Invalid" xml:space="preserve">
+    <value>Invalid e-mail</value>
+  </data>
   <data name="Record_EmploymentLength_Invalid" xml:space="preserve">
     <value>Employment Length can not be less or 0</value>
   </data>
@@ -158,6 +170,9 @@
   </data>
   <data name="Record_Nip_Invalid" xml:space="preserve">
     <value>NIP need to contain 9 or 14 numbers, value invalid</value>
+  </data>
+  <data name="Record_PhoneNumber_Invalid" xml:space="preserve">
+    <value>Phone number invalid, input only numbers starts "+"</value>
   </data>
   <data name="Record_Regon_Invalid" xml:space="preserve">
     <value>REGON  need to contain 10 numbers, value invalid</value>

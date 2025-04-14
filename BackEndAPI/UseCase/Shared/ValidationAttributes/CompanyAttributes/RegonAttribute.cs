@@ -1,6 +1,6 @@
 ﻿// Ignore Spelling: Regon
 
-using Domain.Features.Companies.ValueObjects;
+using Domain.Features.Companies.ValueObjects.Regons;
 using System.ComponentModel.DataAnnotations;
 using UseCase.Shared.Templates.ValidationAttributes;
 

@@ -1,8 +1,9 @@
 ﻿// Ignore Spelling: regon krs
 
-using Domain.Features.Companies.ValueObjects;
+using Domain.Features.Companies.ValueObjects.Ids;
 using Domain.Shared.CustomProviders;
 using Domain.Shared.Templates;
+using Domain.Shared.Templates.Builders;
 using System.Text;
 
 namespace Domain.Features.Companies.Entities
@@ -50,7 +51,7 @@ namespace Domain.Features.Companies.Entities
 
             public Builder SetKrs(string? krs)
             {
-                SetProperty(company => company.Krs = krs);
+                SetProperty(company => company.SetKrs(krs));
                 return this;
             }
 
@@ -85,7 +86,7 @@ namespace Domain.Features.Companies.Entities
                 {
                     if (company.Created == DateTime.MinValue)
                     {
-                        company.Created = CustomTimeProvider.GetDateTimeNow();
+                        company.Created = CustomTimeProvider.Now;
                     }
                 };
             }

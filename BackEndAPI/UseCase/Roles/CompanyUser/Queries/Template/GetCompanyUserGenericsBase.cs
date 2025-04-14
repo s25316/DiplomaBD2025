@@ -1,7 +1,7 @@
 ﻿// Ignore Spelling: Dto
 
 using AutoMapper;
-using Domain.Features.People.ValueObjects;
+using Domain.Features.People.ValueObjects.Ids;
 using Domain.Shared.Enums;
 using System.Linq.Expressions;
 using System.Security.Claims;

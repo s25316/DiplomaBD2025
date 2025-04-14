@@ -1,5 +1,5 @@
 ﻿// Ignore Spelling: Validator, Validators
-using Domain.Features.People.ValueObjects;
+using Domain.Features.People.ValueObjects.Ids;
 using System.Security.Claims;
 
 namespace UseCase.Shared.Services.Authentication.Inspectors

@@ -1,9 +1,9 @@
-﻿using Domain.Features.People.ValueObjects;
+﻿using Domain.Features.People.ValueObjects.Ids;
 using Domain.Shared.Enums;
 using MediatR;
-using UseCase.Roles.CompanyUser.Commands.CompaniesCreate.Repositories;
 using UseCase.Roles.CompanyUser.Commands.CompaniesCreate.Request;
 using UseCase.Roles.CompanyUser.Commands.CompaniesCreate.Response;
+using UseCase.Roles.CompanyUser.Repositories.Companies;
 using UseCase.Shared.Services.Authentication.Inspectors;
 using UseCase.Shared.Templates.Response.Commands;
 using DomainCompany = Domain.Features.Companies.Entities.Company;
@@ -31,31 +31,24 @@ namespace UseCase.Roles.CompanyUser.Commands.CompaniesCreate
         public async Task<CompaniesCreateResponse> Handle(CompaniesCreateRequest request, CancellationToken cancellationToken)
         {
             var personId = GetPersonId(request);
-            var domainData = Build(request);
+            var buildersResult = Build(request);
 
-            if (!domainData.IsValid)
+            // Handle Domain Invalid results
+            if (!buildersResult.IsValid)
             {
-                return new CompaniesCreateResponse
-                {
-                    Result = domainData.Dictionary
-                    .Select(pair => new ResponseCommandTemplate<CompanyCreateCommand>
-                    {
-                        Item = pair.Key,
-                        IsCorrect = string.IsNullOrWhiteSpace(pair.Value.Error),
-                        Message = pair.Value.Error ?? string.Empty,
-                    }),
-                    HttpCode = HttpCode.BadRequest,
-                };
+                return InvalidResponse(buildersResult);
             }
 
-            var dictionary = domainData.Dictionary.ToDictionary(
+            var dictionary = buildersResult.Dictionary.ToDictionary(
                 val => val.Key,
                 val => val.Value.Item);
+
             var createResult = await _companyRepository.CreateAsync(
                 personId,
                 dictionary.Values,
                 cancellationToken);
 
+            // Handle Repository Result Valid or Not 
             return new CompaniesCreateResponse
             {
                 Result = dictionary.Select(pair => new ResponseCommandTemplate<CompanyCreateCommand>
@@ -113,6 +106,22 @@ namespace UseCase.Roles.CompanyUser.Commands.CompaniesCreate
             {
                 Dictionary = dictionary,
                 IsValid = isValid,
+            };
+        }
+
+        private static CompaniesCreateResponse InvalidResponse(
+            BuildersResult builders)
+        {
+            return new CompaniesCreateResponse
+            {
+                Result = builders.Dictionary
+                    .Select(pair => new ResponseCommandTemplate<CompanyCreateCommand>
+                    {
+                        Item = pair.Key,
+                        IsCorrect = string.IsNullOrWhiteSpace(pair.Value.Error),
+                        Message = pair.Value.Error ?? string.Empty,
+                    }),
+                HttpCode = HttpCode.BadRequest,
             };
         }
 

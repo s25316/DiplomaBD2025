@@ -1,7 +1,12 @@
 ﻿// Ignore Spelling: Regon Krs
 
 using Domain.Features.Companies.Exceptions;
-using Domain.Features.Companies.ValueObjects;
+using Domain.Features.Companies.ValueObjects.Ids;
+using Domain.Features.Companies.ValueObjects.Krss;
+using Domain.Features.Companies.ValueObjects.Nips;
+using Domain.Features.Companies.ValueObjects.Regons;
+using Domain.Shared.CustomProviders;
+using Domain.Shared.CustomProviders.StringProvider;
 using Domain.Shared.Templates;
 using Domain.Shared.ValueObjects.Urls;
 
@@ -22,19 +27,37 @@ namespace Domain.Features.Companies.Entities
         public DateTime? Blocked { get; private set; }
 
 
-        // Methods
+        // Public Methods
+        public void Remove()
+        {
+            Removed = Removed.HasValue
+                ? null
+                : CustomTimeProvider.Now;
+        }
+
+        // Private Methods
         private void SetName(string? name)
         {
+            name = CustomStringProvider.NormalizeWhitespace(
+                name,
+                WhiteSpace.All);
+
             if (string.IsNullOrWhiteSpace(name))
             {
                 throw new CompanyException(Messages.Entity_Company_EmptyName);
             }
-            Name = name.Trim();
+            Name = name;
         }
 
         private void SetDescription(string? description)
         {
-            Description = string.IsNullOrWhiteSpace(description) ? null : description.Trim();
+            description = CustomStringProvider.NormalizeWhitespace(
+                description,
+                WhiteSpace.AllExceptNewLine);
+
+            Description = string.IsNullOrWhiteSpace(description)
+                ? null
+                : description;
         }
 
         private void SetLogo(string? logo)
@@ -63,6 +86,15 @@ namespace Domain.Features.Companies.Entities
                 throw new CompanyException(Messages.Entity_Company_EmptyNip);
             }
             Nip = nip;
+        }
+
+        private void SetKrs(string? krs)
+        {
+            if (Krs != null)
+            {
+                throw new CompanyException(Messages.Entity_Company_ChangeExistingKrs);
+            }
+            Krs = krs;
         }
     }
 }

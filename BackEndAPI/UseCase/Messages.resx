@@ -117,9 +117,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Entity_Branch_SkillIds_NotFound" xml:space="preserve">
-    <value>SkillIds Not Found</value>
-  </data>
   <data name="Entity_Company_Krs_Conflict" xml:space="preserve">
     <value>Duplicate Company KRS</value>
   </data>
@@ -158,5 +155,11 @@
   </data>
   <data name="UserSecrets_NotFound_Secret" xml:space="preserve">
     <value>NotFound Secret</value>
+  </data>
+  <data name="Entity_Branch_SkillIds_NotFound" xml:space="preserve">
+    <value>SkillIds Not Found</value>
+  </data>
+  <data name="Entity_Company_Status_Blocked" xml:space="preserve">
+    <value>Company Blocked</value>
   </data>
 </root>

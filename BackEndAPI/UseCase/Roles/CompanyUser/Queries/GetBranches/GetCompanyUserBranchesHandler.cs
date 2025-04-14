@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using Domain.Features.People.ValueObjects;
-using Domain.Shared.CustomProviders;
+using Domain.Features.People.ValueObjects.Ids;
+using Domain.Shared.CustomProviders.StringProvider;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;

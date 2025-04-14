@@ -44,7 +44,7 @@ namespace UseCase.Shared.ExtensionMethods.EF.Offers
         public static Expression<Func<Offer, bool>> OfferParametersExpression(
             OfferQueryParametersDto offerParameters)
         {
-            var now = CustomTimeProvider.GetDateTimeNow();
+            var now = CustomTimeProvider.Now;
             return offer =>
                 (
                     !offerParameters.PublicationStartFrom.HasValue ||

@@ -1,6 +1,6 @@
 ﻿// Ignore Spelling: Krs
 
-using Domain.Features.Companies.ValueObjects;
+using Domain.Features.Companies.ValueObjects.Krss;
 using System.ComponentModel.DataAnnotations;
 using UseCase.Shared.Templates.ValidationAttributes;
 

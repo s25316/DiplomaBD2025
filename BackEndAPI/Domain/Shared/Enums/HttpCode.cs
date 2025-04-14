@@ -63,8 +63,10 @@ namespace Domain.Shared.Enums
 
         [Description("Not Found")]
         NotFound = 404,
-        /*MethodNotAllowed = 405,
-        NotAcceptable = 406,
+
+        [Description("Method Not Allowed")]
+        MethodNotAllowed = 405,
+        /*NotAcceptable = 406,
         ProxyAuthenticationRequired = 407,
         RequestTimeout = 408,*/
 

@@ -1,4 +1,4 @@
-﻿using Domain.Features.Companies.ValueObjects;
+﻿using Domain.Features.Companies.ValueObjects.Nips;
 using System.ComponentModel.DataAnnotations;
 using UseCase.Shared.Templates.ValidationAttributes;
 

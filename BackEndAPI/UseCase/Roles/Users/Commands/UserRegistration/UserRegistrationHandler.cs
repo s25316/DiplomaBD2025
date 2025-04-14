@@ -47,7 +47,7 @@ namespace UseCase.Roles.Users.Commands.UserRegistration
                 Login = request.Command.Login,
                 Salt = hashData.Salt,
                 Password = hashData.HashedPassword,
-                Created = CustomTimeProvider.GetDateTimeNow(),
+                Created = CustomTimeProvider.Now,
 
             };
             await _context.People.AddAsync(person, cancellationToken);

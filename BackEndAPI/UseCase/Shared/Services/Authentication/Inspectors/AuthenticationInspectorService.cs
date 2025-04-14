@@ -1,6 +1,6 @@
 ﻿// Ignore Spelling: jwt
 using Domain.Features.People.Exceptions;
-using Domain.Features.People.ValueObjects;
+using Domain.Features.People.ValueObjects.Ids;
 using Domain.Shared.Enums;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;

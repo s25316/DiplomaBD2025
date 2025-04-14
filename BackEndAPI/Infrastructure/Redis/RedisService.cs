@@ -38,8 +38,7 @@ namespace Infrastructure.Redis
                 return;
             }
 
-            var universalTimeExpiration = CustomTimeProvider
-                .GetDateTimeNow()
+            var universalTimeExpiration = CustomTimeProvider.Now
                 .AddHours(_countHoursExpiration)
                 .ToUniversalTime();
             var unixTimestamp = (long)(universalTimeExpiration - DateTime.UnixEpoch).TotalSeconds;

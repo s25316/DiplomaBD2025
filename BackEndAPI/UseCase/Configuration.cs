@@ -2,11 +2,11 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
-using UseCase.Roles.CompanyUser.Commands.BranchesCreate.Repositories;
-using UseCase.Roles.CompanyUser.Commands.CompaniesCreate.Repositories;
-using UseCase.Roles.CompanyUser.Commands.ContractConditionsCreate.Repositories;
-using UseCase.Roles.CompanyUser.Commands.OffersCreate.Repositories;
-using UseCase.Roles.CompanyUser.Commands.OfferTemplatesCreate.Repositories;
+using UseCase.Roles.CompanyUser.Repositories.Branches;
+using UseCase.Roles.CompanyUser.Repositories.Companies;
+using UseCase.Roles.CompanyUser.Repositories.ContractConditions;
+using UseCase.Roles.CompanyUser.Repositories.Offers;
+using UseCase.Roles.CompanyUser.Repositories.OfferTemplates;
 using UseCase.Shared.Dictionaries.Repositories;
 using UseCase.Shared.Exceptions;
 using UseCase.Shared.Repositories.Addresses;
