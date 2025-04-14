@@ -120,6 +120,15 @@
   <data name="Enitity_Branch_EmptyName" xml:space="preserve">
     <value>Branch name can not be empty</value>
   </data>
+  <data name="Enitity_Person_EmptyLogin" xml:space="preserve">
+    <value>Empty Login</value>
+  </data>
+  <data name="Enitity_Person_EmptyName" xml:space="preserve">
+    <value>Empty Name</value>
+  </data>
+  <data name="Enitity_Person_EmptySurname" xml:space="preserve">
+    <value>Empty Surname</value>
+  </data>
   <data name="Entity_Company_ChangeExistingKrs" xml:space="preserve">
     <value>Unable change existing KRS</value>
   </data>

@@ -70,6 +70,33 @@ namespace Domain {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Empty Login.
+        /// </summary>
+        internal static string Enitity_Person_EmptyLogin {
+            get {
+                return ResourceManager.GetString("Enitity_Person_EmptyLogin", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Empty Name.
+        /// </summary>
+        internal static string Enitity_Person_EmptyName {
+            get {
+                return ResourceManager.GetString("Enitity_Person_EmptyName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Empty Surname.
+        /// </summary>
+        internal static string Enitity_Person_EmptySurname {
+            get {
+                return ResourceManager.GetString("Enitity_Person_EmptySurname", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Unable change existing KRS.
         /// </summary>
         internal static string Entity_Company_ChangeExistingKrs {

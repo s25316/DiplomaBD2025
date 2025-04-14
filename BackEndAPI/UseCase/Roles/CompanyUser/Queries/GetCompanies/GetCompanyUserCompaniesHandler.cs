@@ -102,7 +102,9 @@ namespace UseCase.Roles.CompanyUser.Queries.GetCompanies
             }
 
             // Companies
-            var searchWords = CustomStringProvider.Split(request.SearchText);
+            var searchWords = CustomStringProvider
+                .Split(request.SearchText, WhiteSpace.All);
+
             query = query.SearchTextFilter(searchWords);
 
             query = query

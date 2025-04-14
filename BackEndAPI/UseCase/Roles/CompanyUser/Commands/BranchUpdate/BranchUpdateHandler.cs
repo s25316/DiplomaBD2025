@@ -111,7 +111,7 @@ namespace UseCase.Roles.CompanyUser.Commands.BranchUpdate
                 var addressId = await CreateAddressAsync(command.Address);
                 updater.SetAddressId(addressId.Value);
             }
-            if (string.IsNullOrWhiteSpace(command.Name))
+            if (!string.IsNullOrWhiteSpace(command.Name))
             {
                 updater.SetName(command.Name);
             }

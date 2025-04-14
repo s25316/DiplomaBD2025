@@ -193,7 +193,9 @@ namespace UseCase.Roles.CompanyUser.Queries.GetContractConditions
                 : cc.Removed == null);
 
             // Search Text Filter 
-            var searchWords = CustomStringProvider.Split(request.SearchText);
+            var searchWords = CustomStringProvider
+                .Split(request.SearchText, WhiteSpace.All);
+
             if (searchWords.Any())
             {
                 query = query.Where(cc => _context.Companies

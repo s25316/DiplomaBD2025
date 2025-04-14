@@ -180,7 +180,9 @@ namespace UseCase.Roles.CompanyUser.Queries.GetOfferTemplates
                 : ot.Removed == null);
 
             // Search text Part
-            var searchWords = CustomStringProvider.Split(request.SearchText);
+            var searchWords = CustomStringProvider
+                .Split(request.SearchText, WhiteSpace.All);
+
             if (searchWords.Any())
             {
                 query = query.SearchTextFilter(searchWords);

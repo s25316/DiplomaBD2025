@@ -64,7 +64,7 @@ namespace Domain.Features.OfferTemplates.Aggregates
             {
                 foreach (var input in inputs)
                 {
-                    var offferSkill = Map(input);
+                    var offferSkill = input;
                     _skillsDictionary[offferSkill.SkillId] = offferSkill;
                 }
             }
@@ -95,21 +95,10 @@ namespace Domain.Features.OfferTemplates.Aggregates
 
                 foreach (var key in newKeys)
                 {
-                    var offferSkill = Map(inputsDictionary[key]);
+                    var offferSkill = inputsDictionary[key];
                     _skillsDictionary[offferSkill.SkillId] = offferSkill;
                 }
             }
-        }
-
-        private OfferSkill Map(OfferSkillInfo info)
-        {
-            return new OfferSkill
-            {
-                Id = info.Id,
-                SkillId = info.SkillId,
-                Created = info.Created ?? CustomTimeProvider.Now,
-                IsRequired = info.IsRequired
-            };
         }
     }
 }

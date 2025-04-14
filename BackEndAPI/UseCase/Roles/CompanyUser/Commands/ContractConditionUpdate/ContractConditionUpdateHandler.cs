@@ -65,7 +65,7 @@ namespace UseCase.Roles.CompanyUser.Commands.ContractConditionUpdate
             {
                 return PrepareResponse(
                             HttpCode.NotFound,
-                            string.Join(", ", notFondIds),
+                            $"Contract Parameters not found: {string.Join(", ", notFondIds)}",
                             request);
             }
 

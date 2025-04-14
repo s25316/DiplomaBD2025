@@ -176,7 +176,9 @@ namespace UseCase.Roles.CompanyUser.Queries.GetOffers
             }
 
             // Search text Part
-            var searchWords = CustomStringProvider.Split(request.SearchText);
+            var searchWords = CustomStringProvider
+                .Split(request.SearchText, WhiteSpace.All);
+
             if (searchWords.Any())
             {
                 query = query.SearchTextFilter(searchWords);

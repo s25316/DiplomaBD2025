@@ -172,7 +172,9 @@ namespace UseCase.Roles.CompanyUser.Queries.GetBranches
                         ? branch.Removed != null
                         : branch.Removed == null);
             // Search Text
-            var searchWords = CustomStringProvider.Split(request.SearchText);
+            var searchWords = CustomStringProvider
+                .Split(request.SearchText, WhiteSpace.All);
+
             query = query.SearchTextFilter(searchWords);
 
             query = ApplyOrderBy(

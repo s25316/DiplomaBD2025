@@ -39,7 +39,8 @@ namespace UseCase.Roles.CompanyUser.AutoMapperProfile
                     .SetCreated(db.Created)
                     .SetRemoved(db.Removed)
                     .SetBlocked(db.Blocked)
-                    .Build());
+                    .Build())
+                .ForAllMembers(opt => opt.Ignore());
 
             // Branch Mapping
             CreateMap<DomainBranch, DatabaseBranch>()
@@ -56,7 +57,8 @@ namespace UseCase.Roles.CompanyUser.AutoMapperProfile
                     .SetDescription(db.Description)
                     .SetCreated(db.Created)
                     .SetRemoved(db.Removed)
-                    .Build());
+                    .Build())
+                .ForAllMembers(opt => opt.Ignore());
 
             // OfferTemplate Mapping
             CreateMap<DomainOfferTemplate, DatabaseOfferTemplate>()
@@ -81,7 +83,8 @@ namespace UseCase.Roles.CompanyUser.AutoMapperProfile
                             IsRequired = os.IsRequired,
                             Created = os.Created,
                         }))
-                    .Build());
+                    .Build())
+                .ForAllMembers(opt => opt.Ignore());
 
             CreateMap<DomainContractCondition, DatabaseContractCondition>()
                 .ConstructUsing(domain => new DatabaseContractCondition
@@ -92,7 +95,8 @@ namespace UseCase.Roles.CompanyUser.AutoMapperProfile
                     HoursPerTerm = domain.HoursPerTerm.Value,
                     IsNegotiable = domain.IsNegotiable,
                     Created = domain.Created,
-                });
+                })
+                .ForAllMembers(opt => opt.Ignore());
 
             CreateMap<DatabaseContractCondition, DomainContractCondition>()
                 .ConstructUsing(db => new DomainContractCondition.Builder()
@@ -133,7 +137,8 @@ namespace UseCase.Roles.CompanyUser.AutoMapperProfile
                             .Select(ca => (ContractAttributeInfo)ca.ContractParameterId)
                             .ToList()
                             )
-                    .Build());
+                    .Build())
+                .ForAllMembers(opt => opt.Ignore());
 
             CreateMap<DomainOffer, DatabaseOffer>()
                 .ConstructUsing(domain => new DatabaseOffer
@@ -148,16 +153,18 @@ namespace UseCase.Roles.CompanyUser.AutoMapperProfile
                     WebsiteUrl = domain.WebsiteUrl == null
                         ? null
                         : domain.WebsiteUrl.ToString(),
-                });
+                })
+                .ForAllMembers(opt => opt.Ignore());
 
             CreateMap<DatabaseOffer, DomainOffer>()
                 .ConstructUsing(db =>
                     MapDatabaseOfferToDomainOffer(db))
                 .ForAllMembers(opt => opt.Ignore());
         }
+
         private DomainOffer MapDatabaseOfferToDomainOffer(DatabaseOffer db)
         {
-            var builder = new DomainOffer.Builder()
+            return new DomainOffer.Builder()
                      .SetId(db.OfferId)
                      .SetBranchId(db.BranchId)
                      .SetPublicationRange(db.PublicationStart, db.PublicationEnd)
@@ -184,14 +191,8 @@ namespace UseCase.Roles.CompanyUser.AutoMapperProfile
                              ContractConditionId = oc.ContractConditionId,
                              Removed = oc.Removed,
                              Created = oc.Created,
-                         }));
-            Console.WriteLine("Pass Builder");
-            var item = builder.Build();
-
-            Console.WriteLine("Pass Build");
-            Console.WriteLine($"URL {item.WebsiteUrl}");
-            Console.WriteLine($"URL {builder.GetErrors()}");
-            return item;
+                         }))
+                     .Build();
         }
     }
 }

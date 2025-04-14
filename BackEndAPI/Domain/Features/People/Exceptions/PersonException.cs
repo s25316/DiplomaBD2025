@@ -6,7 +6,7 @@ namespace Domain.Features.People.Exceptions
     public class PersonException : TemplateException
     {
         // Constructor
-        public PersonException(string? message, HttpCode code) : base(message, code)
+        public PersonException(string? message, HttpCode code = HttpCode.BadRequest) : base(message, code)
         {
         }
     }

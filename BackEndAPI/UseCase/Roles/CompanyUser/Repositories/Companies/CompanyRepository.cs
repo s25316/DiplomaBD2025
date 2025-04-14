@@ -112,13 +112,13 @@ namespace UseCase.Roles.CompanyUser.Repositories.Companies
             // Prepare Data
             var companyId = item.Id?.Value ?? throw new KeyNotFoundException();
             // Because Only KRS is unique and updating in Domain
-            var krs = item.Krs?.Value;
+            var krs = item.Krs?.Value ?? null;
 
             // select from DB data
             var dbCompanies = await _context.Companies
                 .Where(company =>
-                    company.CompanyId == companyId ||
-                    (krs == null || company.Krs == krs)
+                    (krs == null && company.CompanyId == companyId) ||
+                    (krs != null && (company.CompanyId == companyId || company.Krs == krs))
                 )
                 .ToListAsync(cancellationToken);
 

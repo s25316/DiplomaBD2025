@@ -3,15 +3,22 @@
     public static class CustomStringProvider
     {
         // Public Methods
-        public static char[] GetSeparators()
-        {
-            char[] separators = { ' ', ',', '\n', '\t' };
-            return separators;
-        }
 
-        public static IEnumerable<string> Split(string? text)
+        public static IEnumerable<string> Split(
+            string? text,
+            WhiteSpace splitStrategy = WhiteSpace.All)
         {
-            var separators = GetSeparators();
+            char[] separators;
+            switch (splitStrategy)
+            {
+                case WhiteSpace.AllExceptNewLine:
+                    separators = GetAllSeparatorsExceptNewLine();
+                    break;
+                default:
+                    separators = GetAllSeparators();
+                    break;
+            }
+
             return string.IsNullOrWhiteSpace(text)
                 ? []
                 : text.Split(separators, StringSplitOptions.RemoveEmptyEntries);
@@ -21,21 +28,7 @@
             string? text,
             WhiteSpace whitespaceRemovalStrategy)
         {
-            switch (whitespaceRemovalStrategy)
-            {
-                case WhiteSpace.All:
-                    return NormalizeWhitespaceRemoveAll(text);
-                case WhiteSpace.AllExceptNewLine:
-                    return NormalizeWhitespaceKeepNewLines(text);
-                default:
-                    throw new NotImplementedException();
-            }
-        }
-
-        // Private Methods
-        private static string NormalizeWhitespaceRemoveAll(string? text)
-        {
-            var array = Split(text);
+            var array = Split(text, whitespaceRemovalStrategy);
             if (!array.Any())
             {
                 return string.Empty;
@@ -43,22 +36,18 @@
             return string.Join(" ", array);
         }
 
-        private static string NormalizeWhitespaceKeepNewLines(string? text)
+        // Private Methods
+        private static char[] GetAllSeparators()
         {
-            if (string.IsNullOrEmpty(text))
-            {
-                return string.Empty;
-            }
+            char[] separators = { ' ', ',', '\n', '\t' };
+            return separators;
+        }
 
-            System.Text.StringBuilder sb = new System.Text.StringBuilder();
-            foreach (char c in text)
-            {
-                if (c == '\n' || !char.IsWhiteSpace(c))
-                {
-                    sb.Append(c);
-                }
-            }
-            return sb.ToString();
+        private static char[] GetAllSeparatorsExceptNewLine()
+        {
+            // !char.IsWhiteSpace(c)
+            char[] separators = { ' ', ',', '\t' };
+            return separators;
         }
     }
 }
