@@ -7,7 +7,7 @@ namespace Domain.Features.People.Entities
 {
     public class PersonUrl : TemplateEntity<PersonUrlId>
     {
-        public int UrlId { get; init; }
+        public int UrlTypeId { get; init; }
 
         public required DateTime Created { get; init; }
 
@@ -28,7 +28,7 @@ namespace Domain.Features.People.Entities
             return new PersonUrl
             {
                 Id = item.Id,
-                UrlId = item.UrlId,
+                UrlTypeId = item.UrlTypeId,
                 Created = item.Created ?? CustomTimeProvider.Now,
                 Removed = item.Removed,
             };

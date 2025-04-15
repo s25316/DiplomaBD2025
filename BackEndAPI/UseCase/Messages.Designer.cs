@@ -124,6 +124,42 @@ namespace UseCase {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Account Blocked check email.
+        /// </summary>
+        internal static string Entity_Person_Account_Blocked {
+            get {
+                return ResourceManager.GetString("Entity_Person_Account_Blocked", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Choose another Contact Email.
+        /// </summary>
+        internal static string Entity_Person_ContactEmail_Duplicate {
+            get {
+                return ResourceManager.GetString("Entity_Person_ContactEmail_Duplicate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Choose another Contact Phone Number.
+        /// </summary>
+        internal static string Entity_Person_ContactPhoneNumber_Duplicate {
+            get {
+                return ResourceManager.GetString("Entity_Person_ContactPhoneNumber_Duplicate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Choose another Login.
+        /// </summary>
+        internal static string Entity_Person_Login_Duplicate {
+            get {
+                return ResourceManager.GetString("Entity_Person_Login_Duplicate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Procedure_Address_Create_InvalidResult.
         /// </summary>
         internal static string Procedure_Address_Create_InvalidResult {

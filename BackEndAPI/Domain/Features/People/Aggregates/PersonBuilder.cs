@@ -12,6 +12,12 @@ namespace Domain.Features.People.Aggregates
         public class Builder : TemplateBuilder<Person>
         {
             // Public Methods
+            public Builder SetId(Guid id)
+            {
+                SetProperty(person => person.Id = id);
+                return this;
+            }
+
             public Builder SetAddressId(Guid? addressId)
             {
                 SetProperty(person => person.AddressId = addressId);
@@ -72,13 +78,13 @@ namespace Domain.Features.People.Aggregates
                 return this;
             }
 
-            public Builder SetName(string name)
+            public Builder SetName(string? name)
             {
                 SetProperty(person => person.SetName(name));
                 return this;
             }
 
-            public Builder SetSurname(string surname)
+            public Builder SetSurname(string? surname)
             {
                 SetProperty(person => person.SetSurname(surname));
                 return this;
@@ -90,13 +96,13 @@ namespace Domain.Features.People.Aggregates
                 return this;
             }
 
-            public Builder SetContactEmail(string contactEmail)
+            public Builder SetContactEmail(string? contactEmail)
             {
                 SetProperty(person => person.ContactEmail = contactEmail);
                 return this;
             }
 
-            public Builder SetContactPhoneNumber(string contactPhoneNumber)
+            public Builder SetContactPhoneNumber(string? contactPhoneNumber)
             {
                 SetProperty(person => person.ContactPhoneNumber = contactPhoneNumber);
                 return this;

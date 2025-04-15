@@ -75,7 +75,7 @@ namespace Domain.Features.People.Aggregates
         }
 
         // Private Methods
-        private void SetLogin(string login)
+        private void SetLogin(string? login)
         {
             if (string.IsNullOrWhiteSpace(login))
             {
@@ -90,7 +90,7 @@ namespace Domain.Features.People.Aggregates
             Password = password;
         }
 
-        private void SetName(string name)
+        private void SetName(string? name)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
@@ -101,7 +101,7 @@ namespace Domain.Features.People.Aggregates
                 WhiteSpace.All);
         }
 
-        private void SetSurname(string surname)
+        private void SetSurname(string? surname)
         {
             if (string.IsNullOrWhiteSpace(surname))
             {
@@ -126,13 +126,13 @@ namespace Domain.Features.People.Aggregates
                 foreach (var item in items)
                 {
                     var personUrl = (PersonUrl)item;
-                    _urls[personUrl.UrlId] = personUrl;
+                    _urls[personUrl.UrlTypeId] = personUrl;
                 }
             }
             else
             {
                 var itemsDictionary = items.ToDictionary(
-                    i => i.UrlId);
+                    i => i.UrlTypeId);
 
                 var existingKeys = _urls.Keys.ToHashSet();
                 var itemsKeys = itemsDictionary.Keys.ToHashSet();

@@ -1,13 +1,29 @@
-﻿namespace Domain.Features.People.ValueObjects.Info
+﻿using Domain.Shared.CustomProviders;
+
+namespace Domain.Features.People.ValueObjects.Info
 {
     public class PersonSkillInfo
     {
-        public Guid? Id { get; init; }
+        // Properties
+        public required Guid? Id { get; init; }
 
-        public int SkillId { get; init; }
+        public required int SkillId { get; init; }
 
-        public DateTime? Created { get; init; }
+        public required DateTime? Created { get; init; }
 
-        public DateTime? Removed { get; init; }
+        public required DateTime? Removed { get; init; }
+
+
+        // Methods
+        public static implicit operator PersonSkillInfo(int skillId)
+        {
+            return new PersonSkillInfo
+            {
+                Id = null,
+                SkillId = skillId,
+                Created = CustomTimeProvider.Now,
+                Removed = null,
+            };
+        }
     }
 }

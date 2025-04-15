@@ -162,4 +162,16 @@
   <data name="Entity_Company_Status_Blocked" xml:space="preserve">
     <value>Company Blocked</value>
   </data>
+  <data name="Entity_Person_Account_Blocked" xml:space="preserve">
+    <value>Account Blocked check email</value>
+  </data>
+  <data name="Entity_Person_Login_Duplicate" xml:space="preserve">
+    <value>Choose another Login</value>
+  </data>
+  <data name="Entity_Person_ContactEmail_Duplicate" xml:space="preserve">
+    <value>Choose another Contact Email</value>
+  </data>
+  <data name="Entity_Person_ContactPhoneNumber_Duplicate" xml:space="preserve">
+    <value>Choose another Contact Phone Number</value>
+  </data>
 </root>

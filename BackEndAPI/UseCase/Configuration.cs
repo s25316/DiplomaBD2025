@@ -7,6 +7,7 @@ using UseCase.Roles.CompanyUser.Repositories.Companies;
 using UseCase.Roles.CompanyUser.Repositories.ContractConditions;
 using UseCase.Roles.CompanyUser.Repositories.Offers;
 using UseCase.Roles.CompanyUser.Repositories.OfferTemplates;
+using UseCase.Roles.Users.Repositories;
 using UseCase.Shared.Dictionaries.Repositories;
 using UseCase.Shared.Exceptions;
 using UseCase.Shared.Repositories.Addresses;
@@ -65,6 +66,9 @@ namespace UseCase
             services.AddTransient<IOfferTemplateRepository, OfferTemplateRepository>();
             services.AddTransient<IContractConditionRepository, ContractConditionRepository>();
             services.AddTransient<IOfferRepository, OfferRepository>();
+
+            // User
+            services.AddTransient<IPersonRepository, PersonRepository>();
 
             // Guest
 
