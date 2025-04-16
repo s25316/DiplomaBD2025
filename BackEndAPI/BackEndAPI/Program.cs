@@ -42,7 +42,7 @@ namespace BackEndAPI
         private static async Task CreateKafkaTopicsAsync(WebApplication app)
         {
             var producer = app.Services.GetRequiredService<IProducer<Null, string>>();
-            var topic = "application-start";
+            var topic = "user-logs";
 
             try
             {

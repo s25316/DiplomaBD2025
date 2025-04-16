@@ -8,7 +8,7 @@ namespace BackEndAPI.Controllers
     public class KafkaController : ControllerBase
     {
         private readonly IProducer<Null, string> _producer;
-        private const string TopicName = "application-start";
+        private const string TopicName = "user-logs";
 
         public KafkaController(IProducer<Null, string> producer)
         {

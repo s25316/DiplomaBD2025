@@ -16,8 +16,7 @@ services:
       KafkaTopics: "user-logs"
       KafkaMaxBatchSizeMB: "1"
       KafkaMaxPollIntervalSeconds: "30"
-      MongoConnectionString: "mongodb://myuser:mypassword@Diploma_MongoDb:27017/"
-      MongoDatabase: "DiplomaBD"
+      MongoConnectionString: "Diploma_MongoDb:27017"
     init: true
     stop_signal: SIGINT
     stop_grace_period: 30s
