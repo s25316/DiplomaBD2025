@@ -196,6 +196,24 @@ namespace UseCase {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Not found MongoDB Connections string.
+        /// </summary>
+        internal static string UserSecrets_NotFound_MongoDb {
+            get {
+                return ResourceManager.GetString("UserSecrets_NotFound_MongoDb", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to MongoDB database name not found.
+        /// </summary>
+        internal static string UserSecrets_NotFound_MongoDbDatabase {
+            get {
+                return ResourceManager.GetString("UserSecrets_NotFound_MongoDbDatabase", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to NotFound Redis.
         /// </summary>
         internal static string UserSecrets_NotFound_Redis {

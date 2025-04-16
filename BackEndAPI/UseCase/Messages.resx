@@ -174,4 +174,10 @@
   <data name="Entity_Person_ContactPhoneNumber_Duplicate" xml:space="preserve">
     <value>Choose another Contact Phone Number</value>
   </data>
+  <data name="UserSecrets_NotFound_MongoDb" xml:space="preserve">
+    <value>Not found MongoDB Connections string</value>
+  </data>
+  <data name="UserSecrets_NotFound_MongoDbDatabase" xml:space="preserve">
+    <value>MongoDB database name not found</value>
+  </data>
 </root>

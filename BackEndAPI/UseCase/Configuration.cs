@@ -1,4 +1,4 @@
-﻿// Ignore Spelling: Jwt, Redis, Sql
+﻿// Ignore Spelling: Jwt, Redis, Sql, Mongo
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
@@ -23,6 +23,9 @@ namespace UseCase
         public static string RedisConnectionString { get; private set; } = null!;
         public static string KafkaConnectionString { get; private set; } = null!;
         public static string RelationalDatabaseConnectionString { get; private set; } = null!;
+        public static string MongoDbConnectionString { get; private set; } = null!;
+        public static string MongoDbDatabase { get; private set; } = null!;
+
 
         public static string JwtIssuer { get; private set; } = null!;
         public static string JwtAudience { get; private set; } = null!;
@@ -40,6 +43,11 @@ namespace UseCase
                 throw new UseCaseLayerException(Messages.UserSecrets_NotFound_Kafka);
             RelationalDatabaseConnectionString = configuration.GetSection("ConnectionStrings")["RelationalDatabase"] ??
                 throw new UseCaseLayerException(Messages.UserSecrets_NotFound_RelationalDatabase);
+            // MongoDb
+            MongoDbConnectionString = configuration.GetSection("ConnectionStrings")["MongoDb"] ??
+                throw new UseCaseLayerException(Messages.UserSecrets_NotFound_MongoDb);
+            MongoDbDatabase = configuration.GetSection("ConnectionStrings")["MongoDbDatabase"] ??
+                throw new UseCaseLayerException(Messages.UserSecrets_NotFound_MongoDbDatabase);
 
             JwtIssuer = configuration.GetSection("Authentication")["Issuer"] ??
                 throw new UseCaseLayerException(Messages.UserSecrets_NotFound_Issuer);

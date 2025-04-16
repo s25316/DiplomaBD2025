@@ -11,10 +11,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="NonRelationalDatabase\" />
     <Folder Include="Roles\Administrators\Commands\" />
     <Folder Include="Roles\Administrators\Queries\" />
     <Folder Include="Roles\Guests\Commands\" />
-    <Folder Include="NonRelationalDatabase\" />
     <Folder Include="Roles\Guests\Queries\" />
     <Folder Include="Roles\Users\Queries\" />
   </ItemGroup>
@@ -28,6 +28,7 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer.NetTopologySuite" Version="9.0.2" />
+    <PackageReference Include="MongoDB.Driver" Version="3.3.0" />
   </ItemGroup>
 
   <ItemGroup>

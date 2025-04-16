@@ -15,21 +15,23 @@ namespace KafkaToMongoBroker
         static async Task Main(string[] args)
         {
             ConfigureData();
-            var cancellationToken = new CancellationTokenSource();
-
-            Console.CancelKeyPress += (sender, e) =>
+            var inputParamiters = new InputParameters();
+            using (var cancellationToken = new CancellationTokenSource())
             {
-                Console.WriteLine("\nGot signal Ctrl+C. Closing...");
-                cancellationToken.Cancel();
-                e.Cancel = true;
-            };
+                Console.CancelKeyPress += (sender, e) =>
+                {
+                    Console.WriteLine("\nGot signal Ctrl+C. Closing...");
+                    cancellationToken.Cancel();
+                    e.Cancel = true;
+                };
 
-            await RunTopicsAsync(_topics, cancellationToken.Token);
-            _exitEvent.WaitOne();
+                await RunTopicsAsync(_topics, cancellationToken.Token);
+                _exitEvent.WaitOne();
+            }
         }
 
-        //Private Methods
-        public static void ConfigureData()
+        //Private Static Methods
+        private static void ConfigureData()
         {
             //Connection with Services
             _kafka = Environment.GetEnvironmentVariable("Kafka") ??
@@ -40,6 +42,7 @@ namespace KafkaToMongoBroker
             //Get Topics from string and Parse
             var topicsString = Environment.GetEnvironmentVariable("Topics") ??
                 throw new Exception("Not configured Topics to: Mongo");
+
             _topics = topicsString
                 .Split(",", StringSplitOptions.RemoveEmptyEntries)
                 .Select(topic => topic.Trim());
@@ -84,26 +87,6 @@ namespace KafkaToMongoBroker
             await Task.WhenAll(tasks);
             Console.WriteLine("\nApplication successfully completed.");
         }
-
-        /*private static async Task RunTopic(string topic, CancellationToken cancellationToken)
-        {
-            //Simulation of tasks
-            Console.WriteLine($"Start topic: {topic}");
-            int counter = 1;
-
-            while (!cancellationToken.IsCancellationRequested)
-            {
-                Console.WriteLine($"Start topic: {topic}-{counter++}");
-                for (int i = 1; i <= 30; i++)
-                {
-                    Console.WriteLine($"Topic: {topic}{counter++}, Iteration - {i}");
-                    await Task.Delay(500);
-                }
-                Console.WriteLine($"Completed topic: {topic}{counter++}");
-            }
-
-            Console.WriteLine($"Completed topic: {topic}");
-        }*/
 
         private static async Task RunTopic(string topic, CancellationToken cancellationToken)
         {
