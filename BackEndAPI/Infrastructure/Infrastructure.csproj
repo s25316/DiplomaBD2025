@@ -13,6 +13,7 @@
   <ItemGroup>
     <Folder Include="Email\" />
     <Folder Include="Exceptions\" />
+    <Folder Include="Kafka\" />
   </ItemGroup>
 
   <ItemGroup>

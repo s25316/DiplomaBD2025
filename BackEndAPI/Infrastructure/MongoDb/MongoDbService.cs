@@ -10,8 +10,7 @@ namespace Infrastructure.MongoDb
         // Properties
         private static readonly string _connectionString = UseCase.Configuration.MongoDbConnectionString;
         private static readonly string _database = UseCase.Configuration.MongoDbDatabase;
-        private static readonly string _userLogs = "user-logs";
-        private static readonly string _companyLogs = "company-logs";
+        private static readonly string _userLogs = UseCase.Configuration.MongoCollectionUserLogs;
 
 
 

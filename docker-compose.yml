@@ -46,7 +46,7 @@ services:
       ConnectionStrings__Kafka: "Diploma_Kafka:9092"
 
       ConnectionStrings__MongoDb: "mongodb://myuser:mypassword@Diploma_MongoDb:27017/"
-      ConnectionStrings__MongoDbDatabase: "DiplomaDB"
+      ConnectionStrings__MongoDbDatabase: "DiplomaBD"
   Diploma_MsSQL:
     container_name: Diploma_MsSQL
     image: mcr.microsoft.com/mssql/server:2022-latest

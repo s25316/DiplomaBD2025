@@ -20,11 +20,18 @@ namespace UseCase
     public static class Configuration
     {
         // Properties
+        public static string RelationalDatabaseConnectionString { get; private set; } = null!;
         public static string RedisConnectionString { get; private set; } = null!;
         public static string KafkaConnectionString { get; private set; } = null!;
-        public static string RelationalDatabaseConnectionString { get; private set; } = null!;
+        public static string KafkaTopicUserLogs { get; private set; } = "user-logs";
+        // If You create new Kafka topic add here for automatically creating by side Kafka
+        public static IEnumerable<string> KafkaTopics { get; private set; } = new List<string>
+        {
+            KafkaTopicUserLogs,
+        };
         public static string MongoDbConnectionString { get; private set; } = null!;
         public static string MongoDbDatabase { get; private set; } = null!;
+        public static string MongoCollectionUserLogs { get; private set; } = "user-logs";
 
 
         public static string JwtIssuer { get; private set; } = null!;

@@ -7,11 +7,13 @@ namespace KafkaToMongoBroker
     {
         // Properties
         private static ManualResetEvent _exitEvent = new ManualResetEvent(false);
-
+        private static int _timeDelayingRunApp = 2000;
 
         // Main
         static async Task Main(string[] args)
         {
+            // This Need for running Kafka and Mongo
+            await Task.Delay(_timeDelayingRunApp);
             _ = MongoDb.ConnectionString;
 
             using (var cancellationToken = new CancellationTokenSource())
