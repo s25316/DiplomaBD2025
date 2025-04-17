@@ -1,11 +1,9 @@
 ﻿// Ignore Spelling: Redis, jwt
-using Confluent.Kafka;
 using Domain;
 using Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using StackExchange.Redis;
 using System.Text;
 using UseCase;
 
@@ -22,21 +20,6 @@ namespace BackEndAPI
             services.AddDomainConfiguration();
             services.AddUseCaseConfiguration();
             services.AddInfrastructureConfiguration(configuration);
-
-            // Redis Dependencies
-            services.AddSingleton<IConnectionMultiplexer>(
-                ConnectionMultiplexer.Connect(UseCase.Configuration.RedisConnectionString)
-                );
-
-            // Kafka Dependencies
-            services.AddSingleton<IProducer<Null, string>>(provider =>
-            {
-                var config = new ProducerConfig
-                {
-                    BootstrapServers = UseCase.Configuration.KafkaConnectionString,
-                };
-                return new ProducerBuilder<Null, string>(config).Build();
-            });
 
             // JWT configuration
             services.AddAuthentication(opt =>

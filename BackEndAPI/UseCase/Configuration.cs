@@ -24,7 +24,7 @@ namespace UseCase
         public static string RedisConnectionString { get; private set; } = null!;
         public static string KafkaConnectionString { get; private set; } = null!;
         public static string KafkaTopicUserLogs { get; private set; } = "user-logs";
-        // If You create new Kafka topic add here for automatically creating by side Kafka
+        // If You create new Kafka TOPIC add here for automatically creating by side Kafka
         public static IEnumerable<string> KafkaTopics { get; private set; } = new List<string>
         {
             KafkaTopicUserLogs,

@@ -5,12 +5,12 @@ using UseCase.Kafka.Enums;
 
 namespace UseCase.Kafka.Models.ServiceActions
 {
-    public class ApplicationRunAction : ActionTemplate
+    public class ApplicationRunKafkaEvent : KafkaEventTemplate
     {
         // Public Static Methods
-        public static ApplicationRunAction Prepare()
+        public static ApplicationRunKafkaEvent Prepare()
         {
-            return new ApplicationRunAction
+            return new ApplicationRunKafkaEvent
             {
                 ActionId = KafkaMongoAction.ApplicationRun,
                 Description = KafkaMongoAction.ApplicationRun.Description(),

@@ -5,7 +5,7 @@ using UseCase.Kafka.Enums;
 
 namespace UseCase.Kafka.Models
 {
-    public abstract class ActionTemplate
+    public abstract class KafkaEventTemplate
     {
         // Properties
         public required KafkaMongoAction ActionId { get; init; }

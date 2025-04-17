@@ -1,5 +1,5 @@
 // Scaffold-DbContext "ConnectionString" Microsoft.EntityFrameworkCore.SqlServer -OutputDir RelationalDatabase -Project UseCase
-using Confluent.Kafka;
+using UseCase.Kafka;
 using UseCase.Kafka.Models.ServiceActions;
 
 namespace BackEndAPI
@@ -42,25 +42,14 @@ namespace BackEndAPI
         //Private Methods
         private static async Task CreateKafkaTopicsAsync(WebApplication app)
         {
-            var producer = app.Services.GetRequiredService<IProducer<Null, string>>();
-            var json = ApplicationRunAction.Prepare().ToJson();
+            var producer = app.Services.GetRequiredService<IKafkaService>();
+            var applicationRun = ApplicationRunKafkaEvent.Prepare();
 
             foreach (var topic in UseCase.Configuration.KafkaTopics)
             {
-                try
-                {
-                    var message = new Message<Null, string>
-                    {
-                        Value = json,
-                    };
-
-                    _ = await producer.ProduceAsync(topic, message);
-                }
-                catch (ProduceException<Null, string> e)
-                {
-                    Console.WriteLine(e);
-                    throw;
-                }
+                await producer.SendUserLogAsync(
+                    applicationRun,
+                    CancellationToken.None);
             }
         }
         //=================================================================================================
