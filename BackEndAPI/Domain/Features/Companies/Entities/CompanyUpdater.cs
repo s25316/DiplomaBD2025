@@ -11,7 +11,7 @@ namespace Domain.Features.Companies.Entities
     public partial class Company : TemplateEntity<CompanyId>
     {
         public static Updater Update(Company company) => new Updater(company);
-        public class Updater : TemplateUpdater<Company>
+        public class Updater : TemplateUpdater<Company, CompanyId>
         {
             // Constructor
             public Updater(Company company) : base(company)

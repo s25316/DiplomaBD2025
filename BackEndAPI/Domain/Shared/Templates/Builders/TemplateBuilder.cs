@@ -3,7 +3,7 @@ using System.Text;
 
 namespace Domain.Shared.Templates.Builders
 {
-    public abstract class TemplateBuilder<T> where T : class, new()
+    public abstract class TemplateBuilder<T, TId> where T : TemplateEntity<TId>, new()
     {
         //Properties
         protected T _value = new T();
@@ -29,13 +29,16 @@ namespace Domain.Shared.Templates.Builders
                     throw new TemplateBuilderException(message.ToString());
                 }
             }
+
+            // Default false
+            _value.AllowRegistrationEvents();
             return _value;
         }
 
         // Protected Methods
         protected abstract Action<T> SetDefaultValues();
         protected abstract Func<T, string> CheckIsObjectComplete();
-        protected TemplateBuilder<T> SetProperty(Action<T> propertySetter)
+        protected TemplateBuilder<T, TId> SetProperty(Action<T> propertySetter)
         {
             try
             {

@@ -1,7 +1,9 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using UseCase.Roles.Users.Commands.UserLoginIn.Request;
-using UseCase.Roles.Users.Commands.UserRegistration.Request;
+using UseCase.Roles.Users.Commands.AuthenticationCommands.UserAuthorizationLoginInAnd2Stage.Request.UserAuthorization2Stage;
+using UseCase.Roles.Users.Commands.AuthenticationCommands.UserAuthorizationLoginInAnd2Stage.Request.UserAuthorizationLoginIn;
+using UseCase.Roles.Users.Commands.ProfileCommands.UserProfileActivate.Request;
+using UseCase.Roles.Users.Commands.ProfileCommands.UserProfileCreate.Request;
 using UseCase.Shared.Templates.Requests;
 
 namespace BackEndAPI.Controllers
@@ -19,33 +21,74 @@ namespace BackEndAPI.Controllers
 
         [HttpPost("registration")]
         public async Task<IActionResult> PersonRegistrationAsync(
-            UserRegistrationCommand command,
+            UserProfileCreateCommand command,
             CancellationToken cancellationToken)
         {
-            var request = new UserRegistrationRequest
+            var request = new UserProfileCreateRequest
             {
                 Command = command,
                 Metadata = (RequestMetadata)HttpContext,
             };
 
             var result = await _mediator.Send(request, cancellationToken);
-            return result.IsCreated ? Ok(result.Message) : BadRequest(result.Message);
+            return StatusCode((int)result.HttpCode, result.Result);
         }
 
-        [HttpPost("login")]
-        public async Task<IActionResult> PersonLoginInAsync(
-            UserLoginInCommand command,
+        [HttpPost("activation/{userId:guid}/{activationUrlSegment}")]
+        public async Task<IActionResult> UserProfileActivateAsync(
+            Guid userId,
+            string activationUrlSegment,
             CancellationToken cancellationToken)
         {
-            var request = new UserLoginInRequest
+            var request = new UserProfileActivateRequest
             {
-                Command = command,
-                Metadata = HttpContext,
+                Command = new UserProfileActivateCommand
+                {
+                    UserId = userId,
+                    ActivationUrlSegment = activationUrlSegment,
+                },
+                Metadata = (RequestMetadata)HttpContext,
             };
 
             var result = await _mediator.Send(request, cancellationToken);
-            return result.IsSuccess ? Ok(new { result.Token, result.ValidTo }) : StatusCode(401);
+            return StatusCode((int)result.HttpCode, result.Result);
         }
 
+        [HttpPost("login")]
+        public async Task<IActionResult> UserAuthorizationLoginInAsync(
+            UserAuthorizationLoginInCommand command,
+            CancellationToken cancellationToken)
+        {
+            var request = new UserAuthorizationLoginInRequest
+            {
+                Command = command,
+                Metadata = (RequestMetadata)HttpContext,
+            };
+
+            var result = await _mediator.Send(request, cancellationToken);
+            return StatusCode((int)result.HttpCode, result.Result);
+        }
+
+        [HttpPost("handPart/{urlSegmentPart1}/{urlSegmentPart2}")]
+        public async Task<IActionResult> UserAuthorization2StageAsync(
+            Guid urlSegmentPart1,
+            string urlSegmentPart2,
+            UserAuthorization2StageCodeDto code,
+            CancellationToken cancellationToken)
+        {
+            var request = new UserAuthorization2StageRequest
+            {
+                Command = new UserAuthorization2StageCommand
+                {
+                    UrlSegmentPart1 = urlSegmentPart1,
+                    UrlSegmentPart2 = urlSegmentPart2,
+                    CodeDto = code,
+                },
+                Metadata = (RequestMetadata)HttpContext,
+            };
+
+            var result = await _mediator.Send(request, cancellationToken);
+            return StatusCode((int)result.HttpCode, result.Result);
+        }
     }
 }

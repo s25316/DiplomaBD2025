@@ -8,7 +8,7 @@ namespace Domain.Features.Offers.Aggregates
 {
     public partial class Offer : TemplateEntity<OfferId>
     {
-        public class Builder : TemplateBuilder<Offer>
+        public class Builder : TemplateBuilder<Offer, OfferId>
         {
             //Public Methods
             public Builder SetId(Guid id)

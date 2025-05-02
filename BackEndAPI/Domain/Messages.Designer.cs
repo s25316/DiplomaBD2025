@@ -97,6 +97,15 @@ namespace Domain {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Not set ID.
+        /// </summary>
+        internal static string Enitity_Person_NotInitializedId {
+            get {
+                return ResourceManager.GetString("Enitity_Person_NotInitializedId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Unable change existing KRS.
         /// </summary>
         internal static string Entity_Company_ChangeExistingKrs {

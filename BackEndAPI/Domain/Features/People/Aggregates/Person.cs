@@ -1,4 +1,6 @@
-﻿using Domain.Features.People.Entities;
+﻿// Ignore Spelling: Jwt
+using Domain.Features.People.DomainEvents;
+using Domain.Features.People.Entities;
 using Domain.Features.People.Exceptions;
 using Domain.Features.People.ValueObjects.BirthDates;
 using Domain.Features.People.ValueObjects.Ids;
@@ -45,11 +47,23 @@ namespace Domain.Features.People.Aggregates
             string.IsNullOrWhiteSpace(Name) ||
             string.IsNullOrWhiteSpace(Surname) ||
             string.IsNullOrWhiteSpace(ContactEmail);
-        public bool IsRemoved => Removed.HasValue;
-        public bool IsBlocked => Blocked.HasValue;
+        public bool HasRemoved => Removed.HasValue;
+        public bool HasBlocked => Blocked.HasValue;
 
 
         // Public Methods
+        public void RaiseProfileCreatedEvent(Guid dbPersonId)
+        {
+            this.Id = dbPersonId;
+            AddDomainEvent((PersonProfileCreatedEvent)(this));
+        }
+
+        public void RaiseProfileActivatedEvent()
+        {
+            AddDomainEvent((PersonProfileActivatedEvent)(this));
+        }
+
+
         public void Remove()
         {
             if (Removed.HasValue)
@@ -72,6 +86,37 @@ namespace Domain.Features.People.Aggregates
             {
                 Blocked = CustomTimeProvider.Now;
             }
+        }
+
+        public void RaiseAuthorization2StageEvent(
+            string urlSegment,
+            string code,
+            DateTime codeValidTo)
+        {
+            AddDomainEvent(PersonAuthorization2StageEvent.Prepare(
+                this,
+                urlSegment,
+                code,
+                codeValidTo));
+        }
+
+        public void RaiseAuthorizationInvalidEvent(string reason)
+        {
+            AddDomainEvent(PersonAuthorizationInvalid.Prepare(
+                this,
+                reason));
+        }
+
+        public void RaiseAuthorizationLoginInEvent(
+            string jwt,
+            string refreshToken,
+            DateTime refreshTokenValidTo)
+        {
+            AddDomainEvent(PersonAuthorizationLoginInEvent.Prepare(
+                this,
+                jwt,
+                refreshToken,
+                refreshTokenValidTo));
         }
 
         // Private Methods

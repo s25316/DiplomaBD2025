@@ -9,7 +9,7 @@ namespace Domain.Features.OfferTemplates.Aggregates
 {
     public partial class OfferTemplate : TemplateEntity<OfferTemplateId>
     {
-        public class Updater : TemplateUpdater<OfferTemplate>
+        public class Updater : TemplateUpdater<OfferTemplate, OfferTemplateId>
         {
             public Updater(OfferTemplate value) : base(value)
             {

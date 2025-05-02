@@ -133,6 +133,33 @@ namespace UseCase {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Invalid password.
+        /// </summary>
+        internal static string Entity_Person_Account_InvalidPassword {
+            get {
+                return ResourceManager.GetString("Entity_Person_Account_InvalidPassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You need activate need click on url on your email.
+        /// </summary>
+        internal static string Entity_Person_Account_NotActivated {
+            get {
+                return ResourceManager.GetString("Entity_Person_Account_NotActivated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Account removed, for login in need restore, click on url on your email.
+        /// </summary>
+        internal static string Entity_Person_Account_Removed {
+            get {
+                return ResourceManager.GetString("Entity_Person_Account_Removed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Choose another Contact Email.
         /// </summary>
         internal static string Entity_Person_ContactEmail_Duplicate {
@@ -156,6 +183,15 @@ namespace UseCase {
         internal static string Entity_Person_Login_Duplicate {
             get {
                 return ResourceManager.GetString("Entity_Person_Login_Duplicate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Needs 2 factor input code.
+        /// </summary>
+        internal static string Entity_Person_LoginIn_Need2Factor {
+            get {
+                return ResourceManager.GetString("Entity_Person_LoginIn_Need2Factor", resourceCulture);
             }
         }
         

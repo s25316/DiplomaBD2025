@@ -10,7 +10,7 @@ namespace Domain.Features.ContractConditions.Aggregates
 {
     public partial class ContractCondition : TemplateEntity<ContractConditionId>
     {
-        public class Builder : TemplateBuilder<ContractCondition>
+        public class Builder : TemplateBuilder<ContractCondition, ContractConditionId>
         {
             public Builder SetId(Guid contractConditionId)
             {

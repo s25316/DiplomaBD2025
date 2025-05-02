@@ -10,7 +10,7 @@ namespace Domain.Features.ContractConditions.Aggregates
 {
     public partial class ContractCondition : TemplateEntity<ContractConditionId>
     {
-        public class Updater : TemplateUpdater<ContractCondition>
+        public class Updater : TemplateUpdater<ContractCondition, ContractConditionId>
         {
             // Constructor
             public Updater(ContractCondition value) : base(value)

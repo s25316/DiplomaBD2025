@@ -4,7 +4,9 @@
     {
         // Properties
         private TId? _id;
-        public IEnumerable<DomainEvent> DomainEvents { get; set; } = new List<DomainEvent>();
+        protected bool AllowedRegistrationEvents { get; set; } = false;
+        private List<DomainEvent> _domainEvents { get; set; } = new List<DomainEvent>();
+        public IReadOnlyList<DomainEvent> DomainEvents => _domainEvents;
 
 
         // Methods
@@ -19,6 +21,22 @@
                 {
                     _id = value;
                 }
+            }
+        }
+
+        public void AllowRegistrationEvents()
+        {
+            if (!AllowedRegistrationEvents)
+            {
+                AllowedRegistrationEvents = true;
+            }
+        }
+
+        public void AddDomainEvent(DomainEvent @event)
+        {
+            if (AllowedRegistrationEvents)
+            {
+                _domainEvents.Add(@event);
             }
         }
     }

@@ -9,7 +9,7 @@ namespace Domain.Features.People.Aggregates
 {
     public partial class Person : TemplateEntity<PersonId>
     {
-        public class Builder : TemplateBuilder<Person>
+        public class Builder : TemplateBuilder<Person, PersonId>
         {
             // Public Methods
             public Builder SetId(Guid id)

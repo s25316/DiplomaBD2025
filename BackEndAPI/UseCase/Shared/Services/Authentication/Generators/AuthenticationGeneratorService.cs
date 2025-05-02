@@ -12,19 +12,45 @@ namespace UseCase.Shared.Services.Authentication.Generators
     public class AuthenticationGeneratorService : IAuthenticationGeneratorService
     {
         // Properties
+        private readonly static int _countSaltBytes = 128 / 8;
+        private readonly static int _countPasswordBytes = 256 / 8;
+        private readonly static int _countRefreshTokenBytes = 1024;
+        private readonly static int _countUrlSegmentBytes = 256;
+
+        private readonly static int _countCodeNumber = 10;
         private readonly static int _countPasswordHashIteration = 10_000;
         private readonly static int _countDaysValidRefreshToken = 2;
         private readonly static int _countMinutesValidJwt = 300;
+
         private static readonly string _jwtIssuer = Configuration.JwtIssuer;
         private static readonly string _jwtAudience = Configuration.JwtAudience;
         private static readonly string _jwtSecret = Configuration.JwtSecret;
 
         // Methods
+        public DateTime ValidToRefreshToken(DateTime created) => created.AddDays(_countDaysValidRefreshToken);
+
+        public string GenerateUrlSegment()
+        {
+            var randomString = GenerateRandomString(_countUrlSegmentBytes);
+            return Uri.EscapeDataString(randomString);
+        }
+
+        public string GenerateCode()
+        {
+            var random = new Random();
+            var randomNumbers = Enumerable
+                .Range(0, _countCodeNumber)
+                .Select(_ => random.Next(0, 9))
+                .ToList();
+
+            return string.Join("", randomNumbers);
+        }
+
         /// <summary>
         /// Generate a 128-bit salt using secure PRNG
         /// </summary>
         /// <returns></returns>
-        public string GenerateSalt() => GenerateRandomString(128 / 8);
+        public string GenerateSalt() => GenerateRandomString(_countSaltBytes);
 
         /// <summary>
         /// Password base key derivation function [Standard] - Pbkdf2
@@ -39,7 +65,7 @@ namespace UseCase.Shared.Services.Authentication.Generators
                salt: Convert.FromBase64String(salt),
                prf: KeyDerivationPrf.HMACSHA1,
                iterationCount: _countPasswordHashIteration,
-               numBytesRequested: 256 / 8
+               numBytesRequested: _countPasswordBytes
                ));
         }
 
@@ -51,21 +77,14 @@ namespace UseCase.Shared.Services.Authentication.Generators
         public (string Salt, string HashedPassword) HashPassword(string password)
         {
             var salt = GenerateSalt();
-            var hashedPassword = Convert.ToBase64String(KeyDerivation.Pbkdf2(
-               password: password,
-               salt: Convert.FromBase64String(salt),
-               prf: KeyDerivationPrf.HMACSHA1,
-               iterationCount: _countPasswordHashIteration,
-               numBytesRequested: 256 / 8
-               ));
+            var hashedPassword = HashPassword(salt, password);
             return (salt, hashedPassword);
         }
 
         public (string RefreshToken, DateTime ValidTo) GenerateRefreshToken()
         {
-            var refresh = GenerateRandomString(1024);
-            var validTo = CustomTimeProvider.Now
-                .AddDays(_countDaysValidRefreshToken);
+            var refresh = GenerateRandomString(_countRefreshTokenBytes);
+            var validTo = ValidToRefreshToken(CustomTimeProvider.Now);
             return (refresh, validTo);
         }
 
@@ -93,7 +112,7 @@ namespace UseCase.Shared.Services.Authentication.Generators
                 issuer: _jwtIssuer,
                 audience: _jwtAudience,
                 claims: claims.ToArray(),
-                expires: DateTime.Now.ToLocalTime().AddMinutes(_countMinutesValidJwt),
+                expires: DateTime.Now.AddMinutes(_countMinutesValidJwt),
                 signingCredentials: signing
              );
         }
@@ -104,9 +123,10 @@ namespace UseCase.Shared.Services.Authentication.Generators
             var token = GenerateJwt(claims);
 
             var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
-            var validTo = token.ValidTo.ToLocalTime();
+            var validTo = CustomTimeProvider.ConvertToPoland(token.ValidTo.ToLocalTime());
             return (tokenString, validTo);
         }
+
 
         // Private Methods 
         private static string GenerateRandomString(int byteSize)

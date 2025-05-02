@@ -2,6 +2,7 @@
 using Confluent.Kafka;
 using Infrastructure.Exceptions;
 using Infrastructure.Kafka;
+using Infrastructure.MongoDb;
 using Infrastructure.Redis;
 using Infrastructure.RelationalDatabase;
 using Microsoft.Extensions.Configuration;
@@ -9,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
 using StackExchange.Redis;
 using UseCase.Kafka;
+using UseCase.MongoDb;
 using UseCase.RelationalDatabase;
 using UseCase.Shared.Interfaces;
 
@@ -43,11 +45,13 @@ namespace Infrastructure
                     UseCase.Configuration.MongoDbDatabase)
                 ?? throw new InfrastructureLayerException("Not configured IMongoClient"));
 
-
             // Services and Repository Dependencies
-            services.AddTransient<DiplomaBdContext, MsSqlDiplomaBdContext>();
+            services.AddDbContext<DiplomaBdContext, MsSqlDiplomaBdContext>();
             services.AddTransient<IRedisService, RedisService>();
             services.AddTransient<IKafkaService, KafkaService>();
+            services.AddTransient<IMongoDbService, MongoDbService>();
+
+
             return services;
         }
     }

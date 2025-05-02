@@ -1,6 +1,6 @@
 // Scaffold-DbContext "ConnectionString" Microsoft.EntityFrameworkCore.SqlServer -OutputDir RelationalDatabase -Project UseCase
 using UseCase.Kafka;
-using UseCase.Kafka.Models.ServiceActions;
+using UseCase.MongoDb.UserLogs.Models.ServiceEvents;
 
 namespace BackEndAPI
 {
@@ -43,7 +43,7 @@ namespace BackEndAPI
         private static async Task CreateKafkaTopicsAsync(WebApplication app)
         {
             var producer = app.Services.GetRequiredService<IKafkaService>();
-            var applicationRun = ApplicationRunKafkaEvent.Prepare();
+            var applicationRun = ApplicationRunMongoDb.Prepare();
 
             foreach (var topic in UseCase.Configuration.KafkaTopics)
             {

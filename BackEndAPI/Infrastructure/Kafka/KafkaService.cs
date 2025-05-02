@@ -1,7 +1,7 @@
 ﻿using Confluent.Kafka;
 using Infrastructure.Exceptions;
 using UseCase.Kafka;
-using UseCase.Kafka.Models;
+using UseCase.MongoDb;
 
 namespace Infrastructure.Kafka
 {
@@ -20,7 +20,7 @@ namespace Infrastructure.Kafka
 
 
         // Methods
-        public async Task SendUserLogAsync(KafkaEventTemplate item, CancellationToken cancellationToken)
+        public async Task SendUserLogAsync(BaseLogMongoDb item, CancellationToken cancellationToken)
         {
             try
             {

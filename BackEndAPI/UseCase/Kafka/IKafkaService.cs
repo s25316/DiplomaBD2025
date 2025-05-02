@@ -1,9 +1,9 @@
-﻿using UseCase.Kafka.Models;
+﻿using UseCase.MongoDb;
 
 namespace UseCase.Kafka
 {
     public interface IKafkaService
     {
-        Task SendUserLogAsync(KafkaEventTemplate item, CancellationToken cancellationToken);
+        Task SendUserLogAsync(BaseLogMongoDb item, CancellationToken cancellationToken);
     }
 }

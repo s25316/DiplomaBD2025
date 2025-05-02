@@ -10,7 +10,7 @@ namespace Domain.Features.Companies.Entities
 {
     public partial class Company : TemplateEntity<CompanyId>
     {
-        public class Builder : TemplateBuilder<Company>
+        public class Builder : TemplateBuilder<Company, CompanyId>
         {
             // Public Methods
             public Builder SetId(Guid companyId)

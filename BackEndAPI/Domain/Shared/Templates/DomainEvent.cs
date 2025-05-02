@@ -1,6 +1,9 @@
-﻿namespace Domain.Shared.Templates
+﻿using MediatR;
+
+namespace Domain.Shared.Templates
 {
-    public class DomainEvent
+    public record DomainEvent : INotification
     {
+
     }
 }

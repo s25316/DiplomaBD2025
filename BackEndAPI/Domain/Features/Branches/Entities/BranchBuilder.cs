@@ -10,7 +10,7 @@ namespace Domain.Features.Branches.Entities
 {
     public partial class Branch : TemplateEntity<BranchId>
     {
-        public class Builder : TemplateBuilder<Branch>
+        public class Builder : TemplateBuilder<Branch, BranchId>
         {
             // Public Methods
             public Builder SetId(Guid branchId)

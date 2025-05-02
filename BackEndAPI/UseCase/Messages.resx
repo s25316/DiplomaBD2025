@@ -180,4 +180,16 @@
   <data name="UserSecrets_NotFound_MongoDbDatabase" xml:space="preserve">
     <value>MongoDB database name not found</value>
   </data>
+  <data name="Entity_Person_LoginIn_Need2Factor" xml:space="preserve">
+    <value>Needs 2 factor input code</value>
+  </data>
+  <data name="Entity_Person_Account_Removed" xml:space="preserve">
+    <value>Account removed, for login in need restore, click on url on your email</value>
+  </data>
+  <data name="Entity_Person_Account_NotActivated" xml:space="preserve">
+    <value>You need activate need click on url on your email</value>
+  </data>
+  <data name="Entity_Person_Account_InvalidPassword" xml:space="preserve">
+    <value>Invalid password</value>
+  </data>
 </root>

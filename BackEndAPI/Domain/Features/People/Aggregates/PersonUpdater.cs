@@ -9,7 +9,7 @@ namespace Domain.Features.People.Aggregates
 {
     public partial class Person : TemplateEntity<PersonId>
     {
-        public class Updater : TemplateUpdater<Person>
+        public class Updater : TemplateUpdater<Person, PersonId>
         {
             // Constructor
             public Updater(Person value) : base(value)

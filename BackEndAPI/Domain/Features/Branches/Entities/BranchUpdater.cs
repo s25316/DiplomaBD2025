@@ -9,7 +9,7 @@ namespace Domain.Features.Branches.Entities
 {
     public partial class Branch : TemplateEntity<BranchId>
     {
-        public class Updater : TemplateUpdater<Branch>
+        public class Updater : TemplateUpdater<Branch, BranchId>
         {
             // Constructor
             public Updater(Branch value) : base(value)

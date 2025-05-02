@@ -15,6 +15,18 @@
     <Folder Include="Roles\Administrators\Queries\" />
     <Folder Include="Roles\Guests\Commands\" />
     <Folder Include="Roles\Guests\Queries\" />
+    <Folder Include="Roles\Users\Commands\AuthenticationCommands\UserLoginInAnd2Stage\Request\User2Stage\" />
+    <Folder Include="Roles\Users\Commands\AuthenticationCommands\UserLoginInAnd2Stage\Request\UserLoginIn\" />
+    <Folder Include="Roles\Users\Commands\AuthenticationCommands\UserLoginInAnd2Stage\Response\UserLoginIn\" />
+    <Folder Include="Roles\Users\Commands\AuthenticationCommands\UserLogOut\Request\" />
+    <Folder Include="Roles\Users\Commands\AuthenticationCommands\UserLogOut\Response\" />
+    <Folder Include="Roles\Users\Commands\AuthenticationCommands\UserRefreshToken\Request\" />
+    <Folder Include="Roles\Users\Commands\AuthenticationCommands\UserRefreshToken\Response\" />
+    <Folder Include="Roles\Users\Commands\ProfileCommands\UserProfileRestore\Request\" />
+    <Folder Include="Roles\Users\Commands\ProfileCommands\UserProfileRestore\Response\" />
+    <Folder Include="Roles\Users\Commands\ProfileCommands\UserProfileRemove\Request\" />
+    <Folder Include="Roles\Users\Commands\ProfileCommands\UserProfileRemove\Response\" />
+    <Folder Include="Roles\Users\DomainEventHandlers\" />
     <Folder Include="Roles\Users\Queries\" />
   </ItemGroup>
 

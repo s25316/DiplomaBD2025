@@ -8,7 +8,7 @@ namespace Domain.Features.Offers.Aggregates
 {
     public partial class Offer : TemplateEntity<OfferId>
     {
-        public class Updater : TemplateUpdater<Offer>
+        public class Updater : TemplateUpdater<Offer, OfferId>
         {
             // Constructor
             public Updater(Offer value) : base(value) { }

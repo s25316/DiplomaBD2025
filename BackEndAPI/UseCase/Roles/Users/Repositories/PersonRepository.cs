@@ -43,13 +43,15 @@ namespace UseCase.Roles.Users.Repositories
             if (duplicatesCount != 0)
             {
                 return RepositoryCreateSingleResponse.InvalidResponse(
-                    HttpCode.Conflict);
+                    HttpCode.Conflict,
+                    Messages.Entity_Person_Login_Duplicate);
             }
 
             var dbPerson = _mapper.Map<DatabasePerson>(item);
             await _context.People.AddAsync(dbPerson, cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
 
+            item.RaiseProfileCreatedEvent(dbPerson.PersonId);
             return RepositoryCreateSingleResponse.ValidResponse();
         }
 
@@ -261,13 +263,13 @@ namespace UseCase.Roles.Users.Repositories
             {
                 return InvalidSelect(HttpCode.NotFound);
             }
-            if (dbPerson.Removed != null)
+            if (string.IsNullOrWhiteSpace(dbPerson.Login))
             {
                 return InvalidSelect(HttpCode.Gone);
             }
 
             var domainPerson = _mapper.Map<DomainPerson>(dbPerson);
-            if (domainPerson.IsBlocked)
+            if (domainPerson.HasBlocked)
             {
                 return InvalidSelect(HttpCode.Forbidden, Messages.Entity_Person_Account_Blocked);
             }

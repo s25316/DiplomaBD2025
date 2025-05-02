@@ -5,6 +5,9 @@ namespace UseCase.Shared.Services.Authentication.Generators
 {
     public interface IAuthenticationGeneratorService
     {
+        DateTime ValidToRefreshToken(DateTime created);
+        string GenerateUrlSegment();
+        string GenerateCode();
         string GenerateSalt();
         string HashPassword(string salt, string password);
         (string Salt, string HashedPassword) HashPassword(string password);

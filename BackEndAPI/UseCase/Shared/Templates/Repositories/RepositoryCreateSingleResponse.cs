@@ -20,7 +20,7 @@ namespace UseCase.Shared.Templates.Repositories
                 Metadata = new ResponseCommandMetadata
                 {
                     IsCorrect = true,
-                    Message = HttpCode.Ok.Description()
+                    Message = HttpCode.Created.Description()
                 },
             };
         }
