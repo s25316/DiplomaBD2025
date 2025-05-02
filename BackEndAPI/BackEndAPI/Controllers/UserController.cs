@@ -34,18 +34,18 @@ namespace BackEndAPI.Controllers
             return StatusCode((int)result.HttpCode, result.Result);
         }
 
-        [HttpPost("activation/{userId:guid}/{activationUrlSegment}")]
+        [HttpPost("activation/{urlSegmentPart1:guid}/{urlSegmentPart2}")]
         public async Task<IActionResult> UserProfileActivateAsync(
-            Guid userId,
-            string activationUrlSegment,
+            Guid urlSegmentPart1,
+            string urlSegmentPart2,
             CancellationToken cancellationToken)
         {
             var request = new UserProfileActivateRequest
             {
                 Command = new UserProfileActivateCommand
                 {
-                    UserId = userId,
-                    ActivationUrlSegment = activationUrlSegment,
+                    UserId = urlSegmentPart1,
+                    ActivationUrlSegment = urlSegmentPart2,
                 },
                 Metadata = (RequestMetadata)HttpContext,
             };

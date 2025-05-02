@@ -37,10 +37,6 @@ namespace UseCase.Roles.Users.Commands.AuthenticationCommands.UserAuthorizationL
         // Methods
         public async Task<UserAuthorization2StageResponse> Handle(UserAuthorization2StageRequest request, CancellationToken cancellationToken)
         {
-
-            Console.WriteLine(request.Command.UrlSegmentPart1);
-            Console.WriteLine(request.Command.UrlSegmentPart2);
-            Console.WriteLine(request.Command.CodeDto.Code);
             var mongoDto = await _mongoDbService.Get2StageAuthorizationAsync(
                 request.Command.UrlSegmentPart1,
                 request.Command.UrlSegmentPart2,

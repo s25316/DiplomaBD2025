@@ -9,6 +9,7 @@ namespace UseCase.MongoDb.UserLogs.Models.UserEvents.AuthenticationEvents
         public required string UrlSegment { get; init; }
         public required string Code { get; init; }
         public required DateTime CodeValidTo { get; init; }
+        public bool IsDeactivated { get; private set; } = false;
 
 
         // Methods
