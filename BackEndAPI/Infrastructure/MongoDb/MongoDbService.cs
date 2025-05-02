@@ -171,23 +171,16 @@ namespace Infrastructure.MongoDb
                 new BsonDocument(
                     _userIdPropertyName,
                     userId.ToString().ToLower()));
-            /*
-            var typeIdMatchStage = new BsonDocument("$match",
-                new BsonDocument(_typeIdPropertyName,
-                    new BsonDocument("$in",
-                    new BsonArray(documentIds))));*/
 
             var typeIdMatchStage = new BsonDocument("$match",
                 new BsonDocument("$or", new BsonArray
                 {
-                    // Warunek 1: TypeId jest w liście documentIds I NIE jest równy UserAuthorization2Stage
                     new BsonDocument("$and", new BsonArray
                     {
                         new BsonDocument(_typeIdPropertyName, new BsonDocument("$in", new BsonArray(documentIds))),
                         new BsonDocument(_typeIdPropertyName, new BsonDocument("$ne", (int)MongoLogs.UserAuthorization2Stage))
                     }),
 
-                    // Warunek 2: TypeId jest równy UserAuthorization2Stage I IsDeactivated2Stage jest true
                     new BsonDocument("$and", new BsonArray
                     {
                         new BsonDocument(_typeIdPropertyName, (int)MongoLogs.UserAuthorization2Stage),

@@ -29,6 +29,16 @@ namespace UseCase.Roles.CompanyUser.Commands.CompanyUpdate
         // Methods
         public async Task<CompanyUpdateResponse> Handle(CompanyUpdateRequest request, CancellationToken cancellationToken)
         {
+            if (string.IsNullOrWhiteSpace(request.Command.Krs) &&
+                string.IsNullOrWhiteSpace(request.Command.Description) &&
+                string.IsNullOrWhiteSpace(request.Command.WebsiteUrl))
+            {
+                return PrepareResponse(
+                    HttpCode.Ok,
+                    HttpCode.Ok.Description(),
+                    request);
+            }
+
             // Get from DB
             var personId = GetPersonId(request);
             var getResult = await _companyRepository.GetAsync(
@@ -86,10 +96,20 @@ namespace UseCase.Roles.CompanyUser.Commands.CompanyUpdate
             DomainCompany domain,
             CompanyUpdateCommand command)
         {
-            return new DomainCompany.Updater(domain)
-                .SetKrs(command.Krs)
-                .SetDescription(command.Description)
-                .SetWebsiteUrl(command.WebsiteUrl);
+            var updater = new DomainCompany.Updater(domain);
+            if (!string.IsNullOrWhiteSpace(command.Krs))
+            {
+                updater.SetKrs(command.Krs);
+            }
+            if (!string.IsNullOrWhiteSpace(command.Description))
+            {
+                updater.SetDescription(command.Description);
+            }
+            if (!string.IsNullOrWhiteSpace(command.WebsiteUrl))
+            {
+                updater.SetWebsiteUrl(command.WebsiteUrl);
+            }
+            return updater;
         }
 
         // Private Non Static Methods

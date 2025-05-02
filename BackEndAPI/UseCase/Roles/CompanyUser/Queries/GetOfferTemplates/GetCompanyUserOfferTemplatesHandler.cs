@@ -144,6 +144,7 @@ namespace UseCase.Roles.CompanyUser.Queries.GetOfferTemplates
             PersonId personId,
             GetCompanyUserOfferTemplatesRequest request)
         {
+            ///Tu problklem !!!
             var query = BuildBaseQuery()
                 .Where(ot => ot.OfferSkills.Any(os =>
                     os.Removed == null
