@@ -1,6 +1,5 @@
 ﻿// Ignore Spelling: Mongo, Dto
 using Domain.Shared.CustomProviders;
-using UseCase.MongoDb.Enums;
 using UseCase.MongoDb.UserLogs.Models.UserEvents.UserAuthorizationEvents;
 
 namespace UseCase.MongoDb.UserLogs.DTOs
@@ -8,9 +7,9 @@ namespace UseCase.MongoDb.UserLogs.DTOs
     public class UserAuthorization2StageMongoDbDto
     {
         // Static Properties
-        public static readonly int TypeId = (int)MongoLog.UserAuthorization2Stage;
+        public static readonly int TypeId = (int)UserAuthorization2StageMongoDb.MongoLogType;
 
-        // Properties
+        // Non Static Properties
         public UserAuthorization2StageMongoDb? Item { get; init; }
 
         // Computed Properties

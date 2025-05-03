@@ -21,18 +21,6 @@ namespace Infrastructure.MongoDb
         private static readonly string _userIdPropertyName = nameof(BaseUserLogMongoDb.UserId);
         private static readonly string _isDeactivated2StagePropertyName = nameof(UserAuthorization2StageMongoDb.IsDeactivated);
 
-        private static readonly List<int> _loginInDtoIds = new()
-            {
-                (int)MongoLog.UserProfileActivated,
-                (int)MongoLog.UserAuthorization2Stage,
-
-                (int)MongoLog.UserProfileRemoved,
-                (int)MongoLog.UserProfileRestored,
-
-                (int)MongoLog.UserProfileBlocked,
-                (int)MongoLog.UserProfileUnBlocked,
-            };
-
         // Non Static Properties
         private readonly IMongoDatabase _database;
 
@@ -63,7 +51,7 @@ namespace Infrastructure.MongoDb
         {
             var logs = await GetLastLogsAsync(
                 userId,
-                _loginInDtoIds,
+                UserLoginInMongoDbDto.TypeIds,
                 cancellationToken);
             return (UserLoginInMongoDbDto)logs;
         }

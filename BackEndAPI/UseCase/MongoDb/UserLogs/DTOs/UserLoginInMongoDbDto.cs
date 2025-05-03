@@ -8,7 +8,19 @@ namespace UseCase.MongoDb.UserLogs.DTOs
 {
     public class UserLoginInMongoDbDto : BaseUserDataMongoDbDto
     {
-        // Properties
+        // Static Properties
+        public static readonly IReadOnlyCollection<int> TypeIds = [
+                (int)UserProfileRemovedMongoDb.MongoLogType,
+                (int)UserProfileRestoredMongoDb.MongoLogType,
+
+                (int)UserProfileBlockedMongoDb.MongoLogType,
+                (int)UserProfileUnBlockedMongoDb.MongoLogType,
+
+                (int)UserProfileActivatedMongoDb.MongoLogType,
+                (int)UserAuthorization2StageMongoDb.MongoLogType,
+            ];
+
+        // Non Static Properties
         private UserProfileActivatedMongoDb? _activated;
         public UserProfileActivatedMongoDb? Activated
         {

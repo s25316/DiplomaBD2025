@@ -1,11 +1,25 @@
 ﻿// Ignore Spelling: Dto, Mongo, Admin, Middleware
 using UseCase.MongoDb.UserLogs.Models.UserEvents.UserAuthorizationEvents;
 using UseCase.MongoDb.UserLogs.Models.UserEvents.UserProfileEvents.AdminEvents;
+using UseCase.MongoDb.UserLogs.Models.UserEvents.UserProfileEvents.BlockEvents;
+using UseCase.MongoDb.UserLogs.Models.UserEvents.UserProfileEvents.RemoveEvents;
 
 namespace UseCase.MongoDb.UserLogs.DTOs
 {
     public class UserMiddlewareMongoDbDto : BaseUserDataMongoDbDto
     {
+        // Static Properties
+        public static readonly IReadOnlyCollection<int> TypeIds = [
+                (int)UserProfileRemovedMongoDb.MongoLogType,
+                (int)UserProfileRestoredMongoDb.MongoLogType,
+
+                (int)UserProfileBlockedMongoDb.MongoLogType,
+                (int)UserProfileUnBlockedMongoDb.MongoLogType,
+
+                // Add 
+            ];
+
+        // Non Static Properties
         private UserProfileGrantAdminMongoDb? _grantAdmin;
         public UserProfileGrantAdminMongoDb? GrantAdmin
         {
