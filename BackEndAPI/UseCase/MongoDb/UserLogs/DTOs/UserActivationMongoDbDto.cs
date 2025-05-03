@@ -1,10 +1,17 @@
 ﻿// Ignore Spelling: Dto, Mongo
+using UseCase.MongoDb.Enums;
 using UseCase.MongoDb.UserLogs.Models.UserEvents.UserProfileEvents.RegistrationEvents;
 
 namespace UseCase.MongoDb.UserLogs.DTOs
 {
     public class UserActivationMongoDbDto
     {
+        // Static Properties
+        public static readonly IEnumerable<int> TypeIds = [
+                (int)MongoLog.UserProfileCreated,
+                (int)MongoLog.UserProfileActivated
+            ];
+
         // Properties
         private UserProfileCreatedMongoDb? _created;
         public UserProfileCreatedMongoDb? Created

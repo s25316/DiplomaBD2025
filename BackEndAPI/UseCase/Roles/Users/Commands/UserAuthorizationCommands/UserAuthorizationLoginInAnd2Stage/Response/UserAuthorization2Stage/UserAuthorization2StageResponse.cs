@@ -1,7 +1,8 @@
 ﻿// Ignore Spelling: Dto
+using UseCase.Roles.Users.Commands.UserAuthorizationCommands.UserAuthorizationLoginInAnd2Stage.Response;
 using UseCase.Shared.Templates.Response.Responses;
 
-namespace UseCase.Roles.Users.Commands.AuthenticationCommands.UserAuthorizationLoginInAnd2Stage.Response.UserAuthorization2Stage
+namespace UseCase.Roles.Users.Commands.UserAuthorizationCommands.UserAuthorizationLoginInAnd2Stage.Response.UserAuthorization2Stage
 {
     public class UserAuthorization2StageResponse : ResponseMetaData
     {

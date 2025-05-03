@@ -1,5 +1,5 @@
 ﻿// Ignore Spelling: Dto, JWt
-namespace UseCase.Roles.Users.Commands.AuthenticationCommands.UserAuthorizationLoginInAnd2Stage.Response
+namespace UseCase.Roles.Users.Commands.UserAuthorizationCommands.UserAuthorizationLoginInAnd2Stage.Response
 {
     public class UserLoginInDataDto
     {

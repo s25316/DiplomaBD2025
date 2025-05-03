@@ -9,19 +9,15 @@ namespace UseCase.MongoDb.UserLogs.Models.UserEvents.UserProfileEvents.ResetPass
         public required string ResetPasswordUrlSegment { get; init; }
 
 
-        // Methods
-        public static UserProfileInitiatedResetPasswordMongoDb Prepare(
-            Guid userId,
-            string urlSegment)
+        // Static Constructor
+        static UserProfileInitiatedResetPasswordMongoDb()
         {
-            return new UserProfileInitiatedResetPasswordMongoDb
-            {
-                ResetPasswordUrlSegment = urlSegment,
-                UserId = userId,
-                TypeId = MongoLogs.UserProfileInitiatedResetPassword,
-            };
+            MongoLogType = MongoLog.UserProfileInitiatedResetPassword;
+            SetPairMongoLogAndType(MongoLogType, typeof(UserProfileInitiatedResetPasswordMongoDb));
         }
 
+
+        // Methods
         public override string ToJson()
         {
             return ToJson(this);

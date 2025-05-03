@@ -1,5 +1,5 @@
 ﻿// Ignore Spelling: Dto, Mongo, Admin
-using UseCase.MongoDb.UserLogs.Models.UserEvents.AuthenticationEvents;
+using UseCase.MongoDb.UserLogs.Models.UserEvents.UserAuthorizationEvents;
 using UseCase.MongoDb.UserLogs.Models.UserEvents.UserProfileEvents.BlockEvents;
 using UseCase.MongoDb.UserLogs.Models.UserEvents.UserProfileEvents.RegistrationEvents;
 using UseCase.MongoDb.UserLogs.Models.UserEvents.UserProfileEvents.RemoveEvents;

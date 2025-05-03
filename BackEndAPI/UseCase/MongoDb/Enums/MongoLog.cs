@@ -6,7 +6,7 @@ namespace UseCase.MongoDb.Enums
     /// <summary>
     /// Kafka Mongo Action
     /// </summary>
-    public enum MongoLogs
+    public enum MongoLog
     {
         [Description("Application Run")]
         ApplicationRun = 1,

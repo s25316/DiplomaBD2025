@@ -1,5 +1,5 @@
 ﻿// Ignore Spelling: Dto
-namespace UseCase.Roles.Users.Commands.AuthenticationCommands.UserAuthorizationLoginInAnd2Stage.Request.UserAuthorization2Stage
+namespace UseCase.Roles.Users.Commands.UserAuthorizationCommands.UserAuthorizationLoginInAnd2Stage.Request.UserAuthorization2Stage
 {
     public class UserAuthorization2StageCommand
     {

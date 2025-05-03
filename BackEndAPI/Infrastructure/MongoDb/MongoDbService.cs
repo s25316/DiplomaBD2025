@@ -5,39 +5,36 @@ using UseCase.MongoDb;
 using UseCase.MongoDb.Enums;
 using UseCase.MongoDb.UserLogs;
 using UseCase.MongoDb.UserLogs.DTOs;
-using UseCase.MongoDb.UserLogs.Models.UserEvents.AuthenticationEvents;
+using UseCase.MongoDb.UserLogs.Models.UserEvents.UserAuthorizationEvents;
 
 namespace Infrastructure.MongoDb
 {
     public class MongoDbService : IMongoDbService
     {
-        // Properties
-        private readonly IMongoDatabase _database;
-
+        // Static Properties
         private static readonly string _userLogs = UseCase.Configuration.MongoCollectionUserLogs;
 
         private static readonly string _idPropertyName = "_id";
         private static readonly string _typeIdPropertyName = nameof(BaseLogMongoDb.TypeId);
         private static readonly string _createdPropertyName = nameof(BaseLogMongoDb.Created);
+
         private static readonly string _userIdPropertyName = nameof(BaseUserLogMongoDb.UserId);
         private static readonly string _isDeactivated2StagePropertyName = nameof(UserAuthorization2StageMongoDb.IsDeactivated);
 
-        private static readonly List<int> _activationDtoIds = new()
-            {
-                (int)MongoLogs.UserProfileCreated,
-                (int)MongoLogs.UserProfileActivated
-            };
         private static readonly List<int> _loginInDtoIds = new()
             {
-                (int)MongoLogs.UserProfileActivated,
-                (int)MongoLogs.UserAuthorization2Stage,
+                (int)MongoLog.UserProfileActivated,
+                (int)MongoLog.UserAuthorization2Stage,
 
-                (int)MongoLogs.UserProfileRemoved,
-                (int)MongoLogs.UserProfileRestored,
+                (int)MongoLog.UserProfileRemoved,
+                (int)MongoLog.UserProfileRestored,
 
-                (int)MongoLogs.UserProfileBlocked,
-                (int)MongoLogs.UserProfileUnBlocked,
+                (int)MongoLog.UserProfileBlocked,
+                (int)MongoLog.UserProfileUnBlocked,
             };
+
+        // Non Static Properties
+        private readonly IMongoDatabase _database;
 
 
         // Constructor
@@ -55,7 +52,7 @@ namespace Infrastructure.MongoDb
         {
             var logs = await GetLastLogsAsync(
                 userId,
-                _activationDtoIds,
+                UserActivationMongoDbDto.TypeIds,
                 cancellationToken);
             return (UserActivationMongoDbDto)logs;
         }
@@ -101,7 +98,7 @@ namespace Infrastructure.MongoDb
             var typeIdMatchStage = new BsonDocument("$match",
                 new BsonDocument(
                     _typeIdPropertyName,
-                    (int)MongoLogs.UserAuthorization2Stage));
+                    (int)MongoLog.UserAuthorization2Stage));
 
             var isDeactivatedMatchStage = new BsonDocument("$match",
                 new BsonDocument(
@@ -139,7 +136,6 @@ namespace Infrastructure.MongoDb
             if (baseLog is UserAuthorization2StageMongoDb log)
             {
                 // Update Making Invalid
-                Console.WriteLine(log.Id.ToString());
                 var update = Builders<BsonDocument>.Update.Set(_isDeactivated2StagePropertyName, true);
                 var filter = Builders<BsonDocument>.Filter.Eq(_idPropertyName, bsonDocument[_idPropertyName]);
                 var updateResult = await collection.UpdateOneAsync(filter, update);
@@ -162,7 +158,7 @@ namespace Infrastructure.MongoDb
         // Private Methods
         private async Task<List<BaseLogMongoDb>> GetLastLogsAsync(
             Guid userId,
-            List<int> documentIds,
+            IEnumerable<int> documentIds,
             CancellationToken cancellationToken)
         {
             var collection = _database.GetCollection<BsonDocument>(_userLogs);
@@ -178,12 +174,12 @@ namespace Infrastructure.MongoDb
                     new BsonDocument("$and", new BsonArray
                     {
                         new BsonDocument(_typeIdPropertyName, new BsonDocument("$in", new BsonArray(documentIds))),
-                        new BsonDocument(_typeIdPropertyName, new BsonDocument("$ne", (int)MongoLogs.UserAuthorization2Stage))
+                        new BsonDocument(_typeIdPropertyName, new BsonDocument("$ne", (int)MongoLog.UserAuthorization2Stage))
                     }),
 
                     new BsonDocument("$and", new BsonArray
                     {
-                        new BsonDocument(_typeIdPropertyName, (int)MongoLogs.UserAuthorization2Stage),
+                        new BsonDocument(_typeIdPropertyName, (int)MongoLog.UserAuthorization2Stage),
                         new BsonDocument(_isDeactivated2StagePropertyName, true)
                     })
                 }));

@@ -1,8 +1,9 @@
 ﻿// Ignore Spelling: Dto
 using Domain.Shared.Enums;
+using UseCase.Roles.Users.Commands.UserAuthorizationCommands.UserAuthorizationLoginInAnd2Stage.Response;
 using UseCase.Shared.Templates.Response.Responses;
 
-namespace UseCase.Roles.Users.Commands.AuthenticationCommands.UserAuthorizationLoginInAnd2Stage.Response.UserAuthorizationLoginIn
+namespace UseCase.Roles.Users.Commands.UserAuthorizationCommands.UserAuthorizationLoginInAnd2Stage.Response.UserAuthorizationLoginIn
 {
     public class UserAuthorizationLoginInResponse : ResponseTemplate<UserAuthorizationLoginInCommandResult>
     {

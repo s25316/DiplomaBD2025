@@ -8,7 +8,7 @@ namespace UseCase.MongoDb.UserLogs.Models.ServiceEvents
         // Methods
         public static ApplicationRunMongoDb Prepare()
         {
-            return new ApplicationRunMongoDb { TypeId = MongoLogs.ApplicationRun };
+            return new ApplicationRunMongoDb { TypeId = MongoLog.ApplicationRun };
         }
 
         public override string ToJson()

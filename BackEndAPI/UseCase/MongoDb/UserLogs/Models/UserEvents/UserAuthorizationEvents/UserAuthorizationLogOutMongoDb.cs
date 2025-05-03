@@ -1,5 +1,7 @@
 ﻿// Ignore Spelling: Mongo, Json, Jwt
-namespace UseCase.MongoDb.UserLogs.Models.UserEvents.AuthenticationEvents
+using UseCase.MongoDb.Enums;
+
+namespace UseCase.MongoDb.UserLogs.Models.UserEvents.UserAuthorizationEvents
 {
     public class UserAuthorizationLogOutMongoDb : BaseUserLogMongoDb
     {
@@ -7,6 +9,14 @@ namespace UseCase.MongoDb.UserLogs.Models.UserEvents.AuthenticationEvents
         public required string Jwt { get; init; }
         public required string RefreshToken { get; init; }
         public required DateTime RefreshTokenValidTo { get; init; }
+
+
+        // Static Constructor
+        static UserAuthorizationLogOutMongoDb()
+        {
+            MongoLogType = MongoLog.UserAuthorizationLogOut;
+            SetPairMongoLogAndType(MongoLogType, typeof(UserAuthorizationLogOutMongoDb));
+        }
 
 
         // Methods

@@ -1,5 +1,5 @@
 ﻿// Ignore Spelling: Dto, Mongo, Admin, Middleware
-using UseCase.MongoDb.UserLogs.Models.UserEvents.AuthenticationEvents;
+using UseCase.MongoDb.UserLogs.Models.UserEvents.UserAuthorizationEvents;
 using UseCase.MongoDb.UserLogs.Models.UserEvents.UserProfileEvents.AdminEvents;
 
 namespace UseCase.MongoDb.UserLogs.DTOs

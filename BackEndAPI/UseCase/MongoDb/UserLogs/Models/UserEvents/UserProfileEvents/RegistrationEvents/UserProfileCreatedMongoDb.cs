@@ -1,6 +1,4 @@
 ﻿// Ignore Spelling: Mongo, Json
-
-// Ignore Spelling: Mongo, Json
 using Domain.Features.People.DomainEvents;
 using UseCase.MongoDb.Enums;
 
@@ -14,7 +12,14 @@ namespace UseCase.MongoDb.UserLogs.Models.UserEvents.UserProfileEvents.Registrat
         public required string Salt { get; init; }
 
 
-        // Methods
+        // Static Constructor
+        static UserProfileCreatedMongoDb()
+        {
+            MongoLogType = MongoLog.UserProfileCreated;
+            SetPairMongoLogAndType(MongoLogType, typeof(UserProfileCreatedMongoDb));
+        }
+
+        // Static Methods
         public static implicit operator UserProfileCreatedMongoDb(
             PersonProfileCreatedEvent @event)
         {
@@ -24,11 +29,12 @@ namespace UseCase.MongoDb.UserLogs.Models.UserEvents.UserProfileEvents.Registrat
                 Password = @event.Password,
                 Salt = @event.Salt,
                 Created = @event.Created,
-                TypeId = MongoLogs.UserProfileCreated,
+                TypeId = MongoLogType,
                 UrlSegment = @event.UrlSegment,
             };
         }
 
+        // Non Static Methods
         public override string ToJson()
         {
             return ToJson(this);

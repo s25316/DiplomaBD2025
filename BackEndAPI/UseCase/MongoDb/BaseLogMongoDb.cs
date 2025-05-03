@@ -8,26 +8,31 @@ using MongoDB.Bson.Serialization.Attributes;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using UseCase.MongoDb.Enums;
-using UseCase.MongoDb.UserLogs.Models.UserEvents.AuthenticationEvents;
-using UseCase.MongoDb.UserLogs.Models.UserEvents.UserProfileEvents.AdminEvents;
-using UseCase.MongoDb.UserLogs.Models.UserEvents.UserProfileEvents.BlockEvents;
-using UseCase.MongoDb.UserLogs.Models.UserEvents.UserProfileEvents.RegistrationEvents;
-using UseCase.MongoDb.UserLogs.Models.UserEvents.UserProfileEvents.RemoveEvents;
-using UseCase.MongoDb.UserLogs.Models.UserEvents.UserProfileEvents.ResetPasswordEvents;
 
 namespace UseCase.MongoDb
 {
     public abstract class BaseLogMongoDb
     {
-        // Properties
+        // Static Properties
+        public static MongoLog MongoLogType { get; protected set; }
+
+        private static Dictionary<MongoLog, Type> _mongoLogsToTypeDictionary = [];
+        public static IReadOnlyDictionary<MongoLog, Type> MongoLogsToTypeDictionary => _mongoLogsToTypeDictionary;
+
+        private static Dictionary<Type, MongoLog> _typeToMongoLogsDictionary = [];
+        public static IReadOnlyDictionary<Type, MongoLog> TypeToMongoLogsDictionary => _typeToMongoLogsDictionary;
+
+        // Non Static Properties
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         [JsonPropertyName("id")]
         [JsonIgnore]
         public string Id { get; init; } = null!;
+        public string Description { get; init; } = null!;
+        public DateTime Created { get; init; } = CustomTimeProvider.Now;
 
-        private MongoLogs _typeId;
-        public required MongoLogs TypeId
+        private MongoLog _typeId;
+        public required MongoLog TypeId
         {
             get { return _typeId; }
             init
@@ -37,53 +42,30 @@ namespace UseCase.MongoDb
             }
         }
 
-        public string Description { get; init; } = null!;
-        public DateTime Created { get; init; } = CustomTimeProvider.Now;
 
 
-        // Methods
+        // Abstract Methods
         public abstract string ToJson();
+
+        // Static Methods
         protected static string ToJson(object item)
         {
             return JsonSerializer.Serialize(item);
         }
 
+        protected static void SetPairMongoLogAndType(MongoLog log, Type type)
+        {
+            _mongoLogsToTypeDictionary.Add(log, type);
+            _typeToMongoLogsDictionary.Add(type, log);
+        }
+
         public static BaseLogMongoDb Map(BsonDocument document)
         {
             var typeIdPropertyName = nameof(BaseLogMongoDb.TypeId);
-            var dictionary = new Dictionary<MongoLogs, Type>()
-            {
-                // RegistrationEvents
-                { MongoLogs.UserProfileCreated,typeof(UserProfileCreatedMongoDb)},
-                { MongoLogs.UserProfileActivated, typeof(UserProfileActivatedMongoDb)},
-
-                // BlockEvents
-                { MongoLogs.UserProfileBlocked, typeof(UserProfileBlockedMongoDb)},
-                { MongoLogs.UserProfileUnBlocked, typeof(UserProfileUnBlockedMongoDb)},
-
-                // RemoveEvents
-                { MongoLogs.UserProfileRemoved, typeof(UserProfileRemovedMongoDb)},
-                { MongoLogs.UserProfileRestored, typeof(UserProfileRestoredMongoDb)},
-
-                // ResetPasswordEvents
-                { MongoLogs.UserProfileUpdatedPassword, typeof(UserProfileUpdatedPasswordMongoDb)},
-                { MongoLogs.UserProfileInitiatedResetPassword, typeof(UserProfileInitiatedResetPasswordMongoDb)},
-                
-                // ResetPasswordEvents
-                { MongoLogs.UserProfileGrantAdmin, typeof(UserProfileGrantAdminMongoDb)},
-                { MongoLogs.UserProfileRevokeAdmin, typeof(UserProfileRevokeAdminMongoDb)},
-
-                // AuthenticationEvents
-                { MongoLogs.UserAuthorization2Stage, typeof(UserAuthorization2StageMongoDb)},
-                { MongoLogs.UserAuthorizationLoginIn, typeof(UserAuthorizationLoginInMongoDb)},
-                { MongoLogs.UserAuthorizationLogOut, typeof(UserAuthorizationLogOutMongoDb)},
-                { MongoLogs.UserAuthorizationRefreshToken, typeof(UserAuthorizationRefreshTokenMongoDb)},
-            };
-
             if (document.Contains(typeIdPropertyName))
             {
-                var typeId = document[typeIdPropertyName].ToInt32();
-                if (dictionary.TryGetValue((MongoLogs)typeId, out var type))
+                var typeId = (MongoLog)document[typeIdPropertyName].ToInt32();
+                if (MongoLogsToTypeDictionary.TryGetValue(typeId, out var type))
                 {
                     var dto = BsonSerializer.Deserialize(document, type);
                     if (dto is BaseLogMongoDb baseLog)

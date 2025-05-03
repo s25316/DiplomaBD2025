@@ -1,9 +1,9 @@
 ﻿using Domain.Features.People.DomainEvents;
 using MediatR;
 using UseCase.Kafka;
-using UseCase.MongoDb.UserLogs.Models.UserEvents.AuthenticationEvents;
+using UseCase.MongoDb.UserLogs.Models.UserEvents.UserAuthorizationEvents;
 
-namespace UseCase.Roles.Users.Commands.AuthenticationCommands.UserAuthorizationLoginInAnd2Stage.DomainEvents.PersonAuthorizationLoginIn
+namespace UseCase.Roles.Users.Commands.UserAuthorizationCommands.UserAuthorizationLoginInAnd2Stage.DomainEvents.PersonAuthorizationLoginIn
 {
     public class PersonAuthorizationLoginInEventHandler : INotificationHandler<PersonAuthorizationLoginInEvent>
     {

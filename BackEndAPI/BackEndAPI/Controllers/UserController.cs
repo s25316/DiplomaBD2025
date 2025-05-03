@@ -1,9 +1,9 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using UseCase.Roles.Users.Commands.AuthenticationCommands.UserAuthorizationLoginInAnd2Stage.Request.UserAuthorization2Stage;
-using UseCase.Roles.Users.Commands.AuthenticationCommands.UserAuthorizationLoginInAnd2Stage.Request.UserAuthorizationLoginIn;
 using UseCase.Roles.Users.Commands.ProfileCommands.UserProfileActivate.Request;
 using UseCase.Roles.Users.Commands.ProfileCommands.UserProfileCreate.Request;
+using UseCase.Roles.Users.Commands.UserAuthorizationCommands.UserAuthorizationLoginInAnd2Stage.Request.UserAuthorization2Stage;
+using UseCase.Roles.Users.Commands.UserAuthorizationCommands.UserAuthorizationLoginInAnd2Stage.Request.UserAuthorizationLoginIn;
 using UseCase.Shared.Templates.Requests;
 
 namespace BackEndAPI.Controllers

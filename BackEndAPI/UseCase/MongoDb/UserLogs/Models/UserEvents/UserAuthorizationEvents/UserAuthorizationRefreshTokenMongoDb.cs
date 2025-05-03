@@ -1,10 +1,20 @@
 ﻿// Ignore Spelling: Mongo, Json
-namespace UseCase.MongoDb.UserLogs.Models.UserEvents.AuthenticationEvents
+using UseCase.MongoDb.Enums;
+
+namespace UseCase.MongoDb.UserLogs.Models.UserEvents.UserAuthorizationEvents
 {
     public class UserAuthorizationRefreshTokenMongoDb : UserAuthorizationLogOutMongoDb
     {
         // Properties
         public bool IsDeactivated { get; private set; } = false;
+
+
+        // Static Constructor
+        static UserAuthorizationRefreshTokenMongoDb()
+        {
+            MongoLogType = MongoLog.UserAuthorizationRefreshToken;
+            SetPairMongoLogAndType(MongoLogType, typeof(UserAuthorizationRefreshTokenMongoDb));
+        }
 
 
         // Methods

@@ -2,14 +2,23 @@
 using Domain.Features.People.DomainEvents;
 using UseCase.MongoDb.Enums;
 
-namespace UseCase.MongoDb.UserLogs.Models.UserEvents.AuthenticationEvents
+namespace UseCase.MongoDb.UserLogs.Models.UserEvents.UserAuthorizationEvents
 {
     public class UserAuthorization2StageMongoDb : BaseUserLogMongoDb
     {
+        // Properties
         public required string UrlSegment { get; init; }
         public required string Code { get; init; }
         public required DateTime CodeValidTo { get; init; }
         public bool IsDeactivated { get; private set; } = false;
+
+
+        // Static Constructor
+        static UserAuthorization2StageMongoDb()
+        {
+            MongoLogType = MongoLog.UserAuthorization2Stage;
+            SetPairMongoLogAndType(MongoLogType, typeof(UserAuthorization2StageMongoDb));
+        }
 
 
         // Methods
@@ -22,7 +31,7 @@ namespace UseCase.MongoDb.UserLogs.Models.UserEvents.AuthenticationEvents
                 UrlSegment = @event.UrlSegment,
                 Code = @event.Code,
                 CodeValidTo = @event.CodeValidTo,
-                TypeId = MongoLogs.UserAuthorization2Stage,
+                TypeId = MongoLogType,
             };
         }
 
