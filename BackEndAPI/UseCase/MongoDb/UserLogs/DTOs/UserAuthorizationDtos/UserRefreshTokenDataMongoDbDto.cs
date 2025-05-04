@@ -37,7 +37,6 @@ namespace UseCase.MongoDb.UserLogs.DTOs.UserAuthorizationDtos
             set => _refreshToken ??= value;
         }
         // Computed Properties
-        public bool HasLoggedOut => _loginIn == null && _refreshToken == null;
         public bool HasRefreshTokenExpired =>
             (
                 _loginIn == null && _refreshToken == null

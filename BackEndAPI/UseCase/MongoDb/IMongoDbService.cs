@@ -19,5 +19,10 @@ namespace UseCase.MongoDb
             string urlSegment,
             string code,
             CancellationToken cancellationToken);
+
+        Task<UserRefreshTokenDataMongoDbDto> GetUserRefreshTokenDataAsync(
+            Guid userId,
+            string jwt,
+            CancellationToken cancellationToken);
     }
 }

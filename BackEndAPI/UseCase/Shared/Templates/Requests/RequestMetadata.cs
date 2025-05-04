@@ -17,11 +17,20 @@ namespace UseCase.Shared.Templates.Requests
         // Methods
         public static implicit operator RequestMetadata(HttpContext context)
         {
+            var jwt = (string?)context.Request.Headers["Authorization"];
+            if (!string.IsNullOrWhiteSpace(jwt))
+            {
+                jwt = jwt
+                    .Replace("Bearer", "")
+                    .Trim();
+            }
+
             return new RequestMetadata
             {
                 IP = context.Connection.RemoteIpAddress?.ToString(),
                 Browser = context.Request.Headers["User-Agent"].ToString(),
-                Authorization = context.Request.Headers["Authorization"],
+
+                Authorization = jwt,
                 Claims = context.User.Claims ?? [],
             };
         }

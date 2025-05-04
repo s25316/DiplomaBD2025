@@ -17,8 +17,6 @@
     <Folder Include="Roles\Guests\Queries\" />
     <Folder Include="Roles\Users\Commands\UserAuthorizationCommands\UserLogOut\Request\" />
     <Folder Include="Roles\Users\Commands\UserAuthorizationCommands\UserLogOut\Response\" />
-    <Folder Include="Roles\Users\Commands\UserAuthorizationCommands\UserRefreshToken\Request\" />
-    <Folder Include="Roles\Users\Commands\UserAuthorizationCommands\UserRefreshToken\Response\" />
     <Folder Include="Roles\Users\Commands\ProfileCommands\UserProfileRestore\Request\" />
     <Folder Include="Roles\Users\Commands\ProfileCommands\UserProfileRestore\Response\" />
     <Folder Include="Roles\Users\Commands\ProfileCommands\UserProfileRemove\Request\" />

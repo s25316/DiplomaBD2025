@@ -4,6 +4,7 @@ using UseCase.Roles.Users.Commands.ProfileCommands.UserProfileActivate.Request;
 using UseCase.Roles.Users.Commands.ProfileCommands.UserProfileCreate.Request;
 using UseCase.Roles.Users.Commands.UserAuthorizationCommands.UserAuthorizationLoginInAnd2Stage.Request.UserAuthorization2Stage;
 using UseCase.Roles.Users.Commands.UserAuthorizationCommands.UserAuthorizationLoginInAnd2Stage.Request.UserAuthorizationLoginIn;
+using UseCase.Roles.Users.Commands.UserAuthorizationCommands.UserAuthorizationRefreshToken.Request;
 using UseCase.Shared.Templates.Requests;
 
 namespace BackEndAPI.Controllers
@@ -84,6 +85,22 @@ namespace BackEndAPI.Controllers
                     UrlSegmentPart2 = urlSegmentPart2,
                     CodeDto = code,
                 },
+                Metadata = (RequestMetadata)HttpContext,
+            };
+
+            var result = await _mediator.Send(request, cancellationToken);
+            return StatusCode((int)result.HttpCode, result.Result);
+        }
+
+
+        [HttpPost("refreshToken")]
+        public async Task<IActionResult> UserAuthorizationRefreshTokenAsync(
+            UserAuthorizationRefreshTokenCommand command,
+            CancellationToken cancellationToken)
+        {
+            var request = new UserAuthorizationRefreshTokenRequest
+            {
+                Command = command,
                 Metadata = (RequestMetadata)HttpContext,
             };
 
