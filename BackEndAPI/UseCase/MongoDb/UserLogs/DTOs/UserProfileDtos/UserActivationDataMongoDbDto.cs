@@ -1,17 +1,18 @@
 ﻿// Ignore Spelling: Dto, Mongo
+using UseCase.MongoDb.Enums;
 using UseCase.MongoDb.UserLogs.Models.UserEvents.UserProfileEvents.RegistrationEvents;
 
 namespace UseCase.MongoDb.UserLogs.DTOs
 {
-    public class UserActivationMongoDbDto
+    public class UserActivationDataMongoDbDto
     {
         // Static Properties
         public static readonly IReadOnlyCollection<int> TypeIds = [
-                (int)UserProfileCreatedMongoDb.MongoLogType,
-                (int)UserProfileActivatedMongoDb.MongoLogType
+                (int)typeof(UserProfileCreatedMongoDb).GetMongoLog(),
+                (int)typeof(UserProfileActivatedMongoDb).GetMongoLog(),
             ];
 
-        // Non Static Properties
+        // Properties
         private UserProfileCreatedMongoDb? _created;
         public UserProfileCreatedMongoDb? Created
         {
@@ -32,10 +33,10 @@ namespace UseCase.MongoDb.UserLogs.DTOs
         public string? ActivationUrlSegment => Created?.UrlSegment;
 
 
-        // Static Methods
-        public static implicit operator UserActivationMongoDbDto(List<BaseLogMongoDb> logs)
+        // Methods
+        public static implicit operator UserActivationDataMongoDbDto(List<BaseLogMongoDb> logs)
         {
-            var dto = new UserActivationMongoDbDto();
+            var dto = new UserActivationDataMongoDbDto();
             foreach (var log in logs)
             {
                 if (log is UserProfileCreatedMongoDb dtoCreated)

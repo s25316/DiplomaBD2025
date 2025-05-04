@@ -1,6 +1,4 @@
 ﻿// Ignore Spelling: Mongo, Json
-using UseCase.MongoDb.Enums;
-
 namespace UseCase.MongoDb.UserLogs.Models.UserEvents.UserProfileEvents.ResetPasswordEvents
 {
     public class UserProfileInitiatedResetPasswordMongoDb : BaseUserLogMongoDb
@@ -9,18 +7,8 @@ namespace UseCase.MongoDb.UserLogs.Models.UserEvents.UserProfileEvents.ResetPass
         public required string ResetPasswordUrlSegment { get; init; }
 
 
-        // Static Constructor
-        static UserProfileInitiatedResetPasswordMongoDb()
-        {
-            MongoLogType = MongoLog.UserProfileInitiatedResetPassword;
-            SetPairMongoLogAndType(MongoLogType, typeof(UserProfileInitiatedResetPasswordMongoDb));
-        }
-
-
-        // Methods
-        public override string ToJson()
-        {
-            return ToJson(this);
-        }
+        // Static Methods
+        // Non Static Methods
+        public override string ToJson() => ToJson(this);
     }
 }

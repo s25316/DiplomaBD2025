@@ -13,15 +13,7 @@ namespace UseCase.MongoDb.UserLogs.Models.UserEvents.UserAuthorizationEvents
         public bool IsDeactivated { get; private set; } = false;
 
 
-        // Static Constructor
-        static UserAuthorization2StageMongoDb()
-        {
-            MongoLogType = MongoLog.UserAuthorization2Stage;
-            SetPairMongoLogAndType(MongoLogType, typeof(UserAuthorization2StageMongoDb));
-        }
-
-
-        // Methods
+        // Static Methods
         public static explicit operator UserAuthorization2StageMongoDb(
             PersonAuthorization2StageEvent @event)
         {
@@ -31,13 +23,11 @@ namespace UseCase.MongoDb.UserLogs.Models.UserEvents.UserAuthorizationEvents
                 UrlSegment = @event.UrlSegment,
                 Code = @event.Code,
                 CodeValidTo = @event.CodeValidTo,
-                TypeId = MongoLogType,
+                TypeId = typeof(UserAuthorization2StageMongoDb).GetMongoLog(),
             };
         }
 
-        public override string ToJson()
-        {
-            return ToJson(this);
-        }
+        // Non Static Methods
+        public override string ToJson() => ToJson(this);
     }
 }

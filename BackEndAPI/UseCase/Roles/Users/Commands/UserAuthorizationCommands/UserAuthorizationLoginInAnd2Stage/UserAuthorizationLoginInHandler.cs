@@ -4,7 +4,7 @@ using Domain.Shared.Enums;
 using Domain.Shared.ValueObjects.Emails;
 using MediatR;
 using UseCase.MongoDb;
-using UseCase.MongoDb.UserLogs.DTOs;
+using UseCase.MongoDb.UserLogs.DTOs.UserAuthorizationDtos;
 using UseCase.Roles.Users.Commands.UserAuthorizationCommands.UserAuthorizationLoginInAnd2Stage.Request.UserAuthorizationLoginIn;
 using UseCase.Roles.Users.Commands.UserAuthorizationCommands.UserAuthorizationLoginInAnd2Stage.Response;
 using UseCase.Roles.Users.Commands.UserAuthorizationCommands.UserAuthorizationLoginInAnd2Stage.Response.UserAuthorizationLoginIn;
@@ -62,7 +62,7 @@ namespace UseCase.Roles.Users.Commands.UserAuthorizationCommands.UserAuthorizati
 
             // Check Is Blocked, Removed, Activated
             var personId = GetPersonId(domainPerson);
-            var personLoginInMongoDto = await _mongoDbService.GetLoginInDataAsync(personId, cancellationToken);
+            var personLoginInMongoDto = await _mongoDbService.GetUserLoginInDataAsync(personId, cancellationToken);
             if (!IsAllowedLoginIn(domainPerson, personLoginInMongoDto))
             {
                 await PublishAsync(domainPerson, cancellationToken);
@@ -93,7 +93,7 @@ namespace UseCase.Roles.Users.Commands.UserAuthorizationCommands.UserAuthorizati
                 ?? throw new KeyNotFoundException("Problem with mapping from DB");
         }
 
-        private static bool IsAllowedLoginIn(DomainPerson domain, UserLoginInMongoDbDto mongo)
+        private static bool IsAllowedLoginIn(DomainPerson domain, UserLoginInDataMongoDbDto mongo)
         {
             if (domain.HasBlocked ||
                 domain.HasRemoved ||

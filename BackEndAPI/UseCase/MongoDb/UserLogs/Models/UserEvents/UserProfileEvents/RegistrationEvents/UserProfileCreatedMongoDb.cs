@@ -12,13 +12,6 @@ namespace UseCase.MongoDb.UserLogs.Models.UserEvents.UserProfileEvents.Registrat
         public required string Salt { get; init; }
 
 
-        // Static Constructor
-        static UserProfileCreatedMongoDb()
-        {
-            MongoLogType = MongoLog.UserProfileCreated;
-            SetPairMongoLogAndType(MongoLogType, typeof(UserProfileCreatedMongoDb));
-        }
-
         // Static Methods
         public static implicit operator UserProfileCreatedMongoDb(
             PersonProfileCreatedEvent @event)
@@ -29,15 +22,12 @@ namespace UseCase.MongoDb.UserLogs.Models.UserEvents.UserProfileEvents.Registrat
                 Password = @event.Password,
                 Salt = @event.Salt,
                 Created = @event.Created,
-                TypeId = MongoLogType,
+                TypeId = typeof(UserProfileCreatedMongoDb).GetMongoLog(),
                 UrlSegment = @event.UrlSegment,
             };
         }
 
         // Non Static Methods
-        public override string ToJson()
-        {
-            return ToJson(this);
-        }
+        public override string ToJson() => ToJson(this);
     }
 }

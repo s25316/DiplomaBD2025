@@ -1,8 +1,8 @@
-﻿// Ignore Spelling: Dto, Mongo
+﻿// Ignore Spelling: Dto, Dtos, Mongo
 using UseCase.MongoDb.UserLogs.Models.UserEvents.UserProfileEvents.BlockEvents;
 using UseCase.MongoDb.UserLogs.Models.UserEvents.UserProfileEvents.RemoveEvents;
 
-namespace UseCase.MongoDb.UserLogs.DTOs
+namespace UseCase.MongoDb.UserLogs.DTOs.UserAuthorizationDtos.AbstractClasses
 {
     public abstract class BaseUserDataMongoDbDto
     {
@@ -36,24 +36,24 @@ namespace UseCase.MongoDb.UserLogs.DTOs
 
         // Computed Properties
         public bool HasRemoved =>
-           (
+
                _removed != null &&
                _restored == null
-           ) ||
-           (
+            ||
+
                _removed != null &&
                _restored != null &&
                _removed.Created > _restored.Created
-           );
+           ;
         public bool HasBlocked =>
-            (
+
                 _blocked != null &&
                 _unBlocked == null
-            ) ||
-            (
+             ||
+
                 _blocked != null &&
                 _unBlocked != null &&
                 _blocked.Created > _unBlocked.Created
-            );
+            ;
     }
 }

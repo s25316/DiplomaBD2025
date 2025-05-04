@@ -13,16 +13,7 @@ namespace UseCase.MongoDb
 {
     public abstract class BaseLogMongoDb
     {
-        // Static Properties
-        public static MongoLog MongoLogType { get; protected set; }
-
-        private static Dictionary<MongoLog, Type> _mongoLogsToTypeDictionary = [];
-        public static IReadOnlyDictionary<MongoLog, Type> MongoLogsToTypeDictionary => _mongoLogsToTypeDictionary;
-
-        private static Dictionary<Type, MongoLog> _typeToMongoLogsDictionary = [];
-        public static IReadOnlyDictionary<Type, MongoLog> TypeToMongoLogsDictionary => _typeToMongoLogsDictionary;
-
-        // Non Static Properties
+        // Properties
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         [JsonPropertyName("id")]
@@ -43,21 +34,11 @@ namespace UseCase.MongoDb
         }
 
 
-
         // Abstract Methods
         public abstract string ToJson();
 
         // Static Methods
-        protected static string ToJson(object item)
-        {
-            return JsonSerializer.Serialize(item);
-        }
-
-        protected static void SetPairMongoLogAndType(MongoLog log, Type type)
-        {
-            _mongoLogsToTypeDictionary.Add(log, type);
-            _typeToMongoLogsDictionary.Add(type, log);
-        }
+        protected static string ToJson(object item) => JsonSerializer.Serialize(item);
 
         public static BaseLogMongoDb Map(BsonDocument document)
         {
@@ -65,21 +46,16 @@ namespace UseCase.MongoDb
             if (document.Contains(typeIdPropertyName))
             {
                 var typeId = (MongoLog)document[typeIdPropertyName].ToInt32();
-                if (MongoLogsToTypeDictionary.TryGetValue(typeId, out var type))
+                var type = typeId.GetClassType();
+
+                var dto = BsonSerializer.Deserialize(document, type);
+                if (dto is BaseLogMongoDb baseLog)
                 {
-                    var dto = BsonSerializer.Deserialize(document, type);
-                    if (dto is BaseLogMongoDb baseLog)
-                    {
-                        return baseLog;
-                    }
-                    else
-                    {
-                        throw new Exception();
-                    }
+                    return baseLog;
                 }
                 else
                 {
-                    throw new Exception();
+                    throw new Exception("Impossible");
                 }
             }
             else
@@ -87,6 +63,5 @@ namespace UseCase.MongoDb
                 throw new Exception();
             }
         }
-
     }
 }

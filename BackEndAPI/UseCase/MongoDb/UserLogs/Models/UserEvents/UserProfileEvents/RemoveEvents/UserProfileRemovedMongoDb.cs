@@ -9,14 +9,6 @@ namespace UseCase.MongoDb.UserLogs.Models.UserEvents.UserProfileEvents.RemoveEve
         public required string RestoreUrlSegment { get; init; }
 
 
-        // Static Constructor
-        static UserProfileRemovedMongoDb()
-        {
-            MongoLogType = MongoLog.UserProfileRemoved;
-            SetPairMongoLogAndType(MongoLogType, typeof(UserProfileRemovedMongoDb));
-        }
-
-
         // Static Methods
         public static UserProfileRemovedMongoDb Prepare(Guid userId, string urlSegment)
         {
@@ -24,14 +16,11 @@ namespace UseCase.MongoDb.UserLogs.Models.UserEvents.UserProfileEvents.RemoveEve
             {
                 RestoreUrlSegment = urlSegment,
                 UserId = userId,
-                TypeId = MongoLogType,
+                TypeId = typeof(UserProfileRemovedMongoDb).GetMongoLog(),
             };
         }
 
         // Non Static Methods
-        public override string ToJson()
-        {
-            return ToJson(this);
-        }
+        public override string ToJson() => ToJson(this);
     }
 }

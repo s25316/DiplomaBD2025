@@ -5,28 +5,17 @@ namespace UseCase.MongoDb.UserLogs.Models.UserEvents.UserProfileEvents.BlockEven
 {
     public class UserProfileUnBlockedMongoDb : BaseUserLogMongoDb
     {
-        // Static Constructor
-        static UserProfileUnBlockedMongoDb()
-        {
-            MongoLogType = MongoLog.UserProfileUnBlocked;
-            SetPairMongoLogAndType(MongoLogType, typeof(UserProfileUnBlockedMongoDb));
-        }
-
-
         // Static Methods
         public static UserProfileUnBlockedMongoDb Prepare(Guid userId)
         {
             return new UserProfileUnBlockedMongoDb
             {
                 UserId = userId,
-                TypeId = MongoLogType,
+                TypeId = typeof(UserProfileUnBlockedMongoDb).GetMongoLog(),
             };
         }
 
         // Non Static Methods
-        public override string ToJson()
-        {
-            return ToJson(this);
-        }
+        public override string ToJson() => ToJson(this);
     }
 }

@@ -1,19 +1,20 @@
 ﻿// Ignore spelling: Mongo
 using UseCase.MongoDb.UserLogs.DTOs;
+using UseCase.MongoDb.UserLogs.DTOs.UserAuthorizationDtos;
 
 namespace UseCase.MongoDb
 {
     public interface IMongoDbService
     {
-        Task<UserActivationMongoDbDto> GetUserProfileActivationData(
+        Task<UserActivationDataMongoDbDto> GetUserActivationDataAsync(
             Guid userId,
             CancellationToken cancellationToken);
 
-        Task<UserLoginInMongoDbDto> GetLoginInDataAsync(
+        Task<UserLoginInDataMongoDbDto> GetUserLoginInDataAsync(
             Guid userId,
             CancellationToken cancellationToken);
 
-        Task<UserAuthorization2StageMongoDbDto> Get2StageAuthorizationAsync(
+        Task<User2StageDataMongoDbDto> GetUser2StageDataAsync(
             Guid userId,
             string urlSegment,
             string code,

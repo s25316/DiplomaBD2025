@@ -5,15 +5,16 @@ namespace UseCase.MongoDb.UserLogs.Models.ServiceEvents
 {
     public class ApplicationRunMongoDb : BaseLogMongoDb
     {
-        // Methods
+        // Static Methods
         public static ApplicationRunMongoDb Prepare()
         {
-            return new ApplicationRunMongoDb { TypeId = MongoLog.ApplicationRun };
+            return new ApplicationRunMongoDb
+            {
+                TypeId = typeof(ApplicationRunMongoDb).GetMongoLog()
+            };
         }
 
-        public override string ToJson()
-        {
-            return ToJson(this);
-        }
+        // Non Static Methods
+        public override string ToJson() => ToJson(this);
     }
 }

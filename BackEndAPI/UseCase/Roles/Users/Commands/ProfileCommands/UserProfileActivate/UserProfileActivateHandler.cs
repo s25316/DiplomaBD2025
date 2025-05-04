@@ -31,7 +31,7 @@ namespace UseCase.Roles.Users.Commands.ProfileCommands.UserProfileActivate
         {
             // MongoDB Part
             var userId = request.Command.UserId;
-            var activationData = await _mongo.GetUserProfileActivationData(
+            var activationData = await _mongo.GetUserActivationDataAsync(
                 userId,
                 cancellationToken);
 

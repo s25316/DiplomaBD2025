@@ -39,7 +39,7 @@ namespace UseCase.Roles.Users.Commands.UserAuthorizationCommands.UserAuthorizati
         public async Task<UserAuthorization2StageResponse> Handle(UserAuthorization2StageRequest request, CancellationToken cancellationToken)
         {
             // Get Data From MongoDb
-            var mongo2StageAuthorizationDto = await _mongoDbService.Get2StageAuthorizationAsync(
+            var mongo2StageAuthorizationDto = await _mongoDbService.GetUser2StageDataAsync(
                 request.Command.UrlSegmentPart1,
                 request.Command.UrlSegmentPart2,
                 request.Command.CodeDto.Code,

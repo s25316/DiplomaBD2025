@@ -1,23 +1,25 @@
-﻿// Ignore Spelling: Dto, Mongo, Admin
+﻿// Ignore Spelling: Dto, Dtos, Mongo, Admin
+using UseCase.MongoDb.Enums;
+using UseCase.MongoDb.UserLogs.DTOs.UserAuthorizationDtos.AbstractClasses;
 using UseCase.MongoDb.UserLogs.Models.UserEvents.UserAuthorizationEvents;
 using UseCase.MongoDb.UserLogs.Models.UserEvents.UserProfileEvents.BlockEvents;
 using UseCase.MongoDb.UserLogs.Models.UserEvents.UserProfileEvents.RegistrationEvents;
 using UseCase.MongoDb.UserLogs.Models.UserEvents.UserProfileEvents.RemoveEvents;
 
-namespace UseCase.MongoDb.UserLogs.DTOs
+namespace UseCase.MongoDb.UserLogs.DTOs.UserAuthorizationDtos
 {
-    public class UserLoginInMongoDbDto : BaseUserDataMongoDbDto
+    public class UserLoginInDataMongoDbDto : BaseUserDataMongoDbDto
     {
         // Static Properties
         public static readonly IReadOnlyCollection<int> TypeIds = [
-                (int)UserProfileRemovedMongoDb.MongoLogType,
-                (int)UserProfileRestoredMongoDb.MongoLogType,
+                (int)typeof(UserProfileRemovedMongoDb).GetMongoLog(),
+                (int)typeof(UserProfileRestoredMongoDb).GetMongoLog(),
 
-                (int)UserProfileBlockedMongoDb.MongoLogType,
-                (int)UserProfileUnBlockedMongoDb.MongoLogType,
+                (int)typeof(UserProfileBlockedMongoDb).GetMongoLog(),
+                (int)typeof(UserProfileUnBlockedMongoDb).GetMongoLog(),
 
-                (int)UserProfileActivatedMongoDb.MongoLogType,
-                (int)UserAuthorization2StageMongoDb.MongoLogType,
+                (int)typeof(UserProfileActivatedMongoDb).GetMongoLog(),
+                (int)typeof(UserAuthorization2StageMongoDb).GetMongoLog(),
             ];
 
         // Non Static Properties
@@ -40,10 +42,10 @@ namespace UseCase.MongoDb.UserLogs.DTOs
         public DateTime? LastHandStage => _handStage?.Created;
 
 
-        // Methods
-        public static explicit operator UserLoginInMongoDbDto(List<BaseLogMongoDb> logs)
+        // Static Methods
+        public static explicit operator UserLoginInDataMongoDbDto(List<BaseLogMongoDb> logs)
         {
-            var dto = new UserLoginInMongoDbDto();
+            var dto = new UserLoginInDataMongoDbDto();
             foreach (var log in logs)
             {
                 if (log is UserProfileActivatedMongoDb dtoActivated)

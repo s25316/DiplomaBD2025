@@ -1,4 +1,4 @@
-﻿// Ignore Spelling: Mongo, Json
+﻿// Ignore Spelling: Mongo, Json, GetMongoLog
 using Domain.Features.People.DomainEvents;
 using UseCase.MongoDb.Enums;
 
@@ -6,14 +6,6 @@ namespace UseCase.MongoDb.UserLogs.Models.UserEvents.UserAuthorizationEvents
 {
     public class UserAuthorizationLoginInMongoDb : UserAuthorizationRefreshTokenMongoDb
     {
-        // Static Constructor
-        static UserAuthorizationLoginInMongoDb()
-        {
-            MongoLogType = MongoLog.UserAuthorizationLoginIn;
-            SetPairMongoLogAndType(MongoLogType, typeof(UserAuthorizationLoginInMongoDb));
-        }
-
-
         // Static Methods
         public static explicit operator UserAuthorizationLoginInMongoDb(
             PersonAuthorizationLoginInEvent @event)
@@ -21,7 +13,7 @@ namespace UseCase.MongoDb.UserLogs.Models.UserEvents.UserAuthorizationEvents
             return new UserAuthorizationLoginInMongoDb
             {
                 UserId = @event.UserId,
-                TypeId = MongoLogType,
+                TypeId = typeof(UserAuthorizationLoginInMongoDb).GetMongoLog(),
                 Jwt = @event.Jwt,
                 RefreshToken = @event.RefreshToken,
                 RefreshTokenValidTo = @event.RefreshTokenValidTo,
@@ -29,9 +21,6 @@ namespace UseCase.MongoDb.UserLogs.Models.UserEvents.UserAuthorizationEvents
         }
 
         // Non Static Methods
-        public override string ToJson()
-        {
-            return ToJson(this);
-        }
+        public override string ToJson() => ToJson(this);
     }
 }

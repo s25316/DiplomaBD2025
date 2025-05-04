@@ -1,6 +1,4 @@
 ﻿// Ignore Spelling: Mongo, Json, Jwt
-using UseCase.MongoDb.Enums;
-
 namespace UseCase.MongoDb.UserLogs.Models.UserEvents.UserAuthorizationEvents
 {
     public class UserAuthorizationLogOutMongoDb : BaseUserLogMongoDb
@@ -11,18 +9,8 @@ namespace UseCase.MongoDb.UserLogs.Models.UserEvents.UserAuthorizationEvents
         public required DateTime RefreshTokenValidTo { get; init; }
 
 
-        // Static Constructor
-        static UserAuthorizationLogOutMongoDb()
-        {
-            MongoLogType = MongoLog.UserAuthorizationLogOut;
-            SetPairMongoLogAndType(MongoLogType, typeof(UserAuthorizationLogOutMongoDb));
-        }
-
-
-        // Methods
-        public override string ToJson()
-        {
-            return ToJson(this);
-        }
+        // Static Methods
+        // Non Static Methods
+        public override string ToJson() => ToJson(this);
     }
 }

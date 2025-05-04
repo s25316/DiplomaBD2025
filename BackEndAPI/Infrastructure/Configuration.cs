@@ -51,7 +51,6 @@ namespace Infrastructure
             services.AddTransient<IKafkaService, KafkaService>();
             services.AddTransient<IMongoDbService, MongoDbService>();
 
-
             return services;
         }
     }

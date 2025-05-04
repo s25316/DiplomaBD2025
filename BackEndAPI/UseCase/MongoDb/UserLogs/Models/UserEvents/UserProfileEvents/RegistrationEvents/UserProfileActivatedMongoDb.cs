@@ -6,14 +6,6 @@ namespace UseCase.MongoDb.UserLogs.Models.UserEvents.UserProfileEvents.Registrat
 {
     public class UserProfileActivatedMongoDb : BaseUserLogMongoDb
     {
-        // Static Constructor
-        static UserProfileActivatedMongoDb()
-        {
-            MongoLogType = MongoLog.UserProfileActivated;
-            SetPairMongoLogAndType(MongoLogType, typeof(UserProfileActivatedMongoDb));
-        }
-
-
         // Static  Methods
         public static implicit operator UserProfileActivatedMongoDb(
             PersonProfileActivatedEvent @event)
@@ -21,14 +13,11 @@ namespace UseCase.MongoDb.UserLogs.Models.UserEvents.UserProfileEvents.Registrat
             return new UserProfileActivatedMongoDb
             {
                 UserId = @event.UserId,
-                TypeId = MongoLogType,
+                TypeId = typeof(UserProfileActivatedMongoDb).GetMongoLog(),
             };
         }
 
         // Non Static Methods
-        public override string ToJson()
-        {
-            return ToJson(this);
-        }
+        public override string ToJson() => ToJson(this);
     }
 }

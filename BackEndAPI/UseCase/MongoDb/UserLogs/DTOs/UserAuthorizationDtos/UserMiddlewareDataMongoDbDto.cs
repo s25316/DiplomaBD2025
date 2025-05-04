@@ -1,20 +1,25 @@
 ﻿// Ignore Spelling: Dto, Mongo, Admin, Middleware
+using UseCase.MongoDb.Enums;
+using UseCase.MongoDb.UserLogs.DTOs.UserAuthorizationDtos.AbstractClasses;
 using UseCase.MongoDb.UserLogs.Models.UserEvents.UserAuthorizationEvents;
 using UseCase.MongoDb.UserLogs.Models.UserEvents.UserProfileEvents.AdminEvents;
 using UseCase.MongoDb.UserLogs.Models.UserEvents.UserProfileEvents.BlockEvents;
 using UseCase.MongoDb.UserLogs.Models.UserEvents.UserProfileEvents.RemoveEvents;
 
-namespace UseCase.MongoDb.UserLogs.DTOs
+namespace UseCase.MongoDb.UserLogs.DTOs.UserAuthorizationDtos
 {
-    public class UserMiddlewareMongoDbDto : BaseUserDataMongoDbDto
+    public class UserMiddlewareDataMongoDbDto : BaseUserDataMongoDbDto
     {
         // Static Properties
         public static readonly IReadOnlyCollection<int> TypeIds = [
-                (int)UserProfileRemovedMongoDb.MongoLogType,
-                (int)UserProfileRestoredMongoDb.MongoLogType,
+                (int)typeof(UserProfileRemovedMongoDb).GetMongoLog(),
+                (int)typeof(UserProfileRestoredMongoDb).GetMongoLog(),
 
-                (int)UserProfileBlockedMongoDb.MongoLogType,
-                (int)UserProfileUnBlockedMongoDb.MongoLogType,
+                (int)typeof(UserProfileBlockedMongoDb).GetMongoLog(),
+                (int)typeof(UserProfileUnBlockedMongoDb).GetMongoLog(),
+
+                (int)typeof(UserProfileGrantAdminMongoDb).GetMongoLog(),
+                (int)typeof(UserProfileRevokeAdminMongoDb).GetMongoLog(),
 
                 // Add 
             ];
@@ -43,15 +48,15 @@ namespace UseCase.MongoDb.UserLogs.DTOs
 
         // Computed Properties
         public bool IsAdmin =>
-            (
+
                 _grantAdmin != null &&
                 _revokeAdmin == null
-            ) ||
-            (
+             ||
+
                 _grantAdmin != null &&
                 _revokeAdmin != null &&
                 _grantAdmin.Created > _revokeAdmin.Created
-            );
+            ;
         public bool IsLogOut => _logOut != null;
     }
 }
