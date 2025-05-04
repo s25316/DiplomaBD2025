@@ -1,7 +1,4 @@
- // Dodaje "use client", bo `useParams` działa tylko w komponentach klienckich
 import React from "react";
-// import { useParams } from "next/navigation";
-import PublishOfferButton from "@/app/components/buttons/PublishOfferButton";
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { getServerSession } from 'next-auth';
 import Link from 'next/link';
@@ -108,7 +105,10 @@ const BranchDetails = async ({ params }: { params: { id: string, branchId: strin
         <ul className="list-disc ml-6" >
           {offers.map((offer) => (
             <li key={offer.offerId} className="border p-3 rounded my-2">
-              <p><b> {offer.offerTemplate.name}</b></p>
+              <Link href={`/companies/${id}/${branchId}/offer/${offer.offerId}`}>
+              <b>{offer.offerTemplate.name}</b>
+            </Link>
+              {/* <p><b> {offer.offerTemplate.name}</b></p> */}
               <p><b>Status:</b> {offer.status}</p>
               <p><b>Start:</b> {new Date(offer.publicationStart).toLocaleDateString()}</p>
               <p><b>End:</b> {new Date(offer.publicationEnd).toLocaleDateString()}</p>

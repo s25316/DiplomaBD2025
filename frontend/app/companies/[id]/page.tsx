@@ -1,196 +1,91 @@
+'use client';
+import React, { useEffect, useState } from 'react';
+import { useSession } from 'next-auth/react';
+import { useParams } from 'next/navigation';
+
+import CompanyInfo from './components/CompanyInfo';
+import BranchesList from './components/BranchesList';
+import ContractConditionsList from './components/ContractConditionsList';
+import OfferTemplatesList from './components/OfferTemplatesList';
 import CreateBranchButton from '@/app/components/buttons/CreateBranchButton';
-import React from 'react';
 import CreateOfferTemplateButton from '@/app/components/buttons/CreateOfferTemplateButton';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import Link from 'next/link';
+import CreateContractConditionButton from '@/app/components/buttons/CreateContractConditionButton';
 
-interface BranchesProfile {
-  branch: {
-    branchId: string;
-    name: string;
-  }
-}
-
-interface Templates {
+interface OfferTemplate {
   offerTemplateId: string;
   name: string;
-}
-
-interface CompanyDetails {
-  companyId: string;
-  name: string;
-  description: string;
-  regon: string;
-  nip: string;
-  krs: string;
-  websiteUrl?: string;
-  created: string;
 }
 interface ContractCondition {
   contractConditionId: string;
   hoursPerTerm: number;
   salaryMin: number;
   salaryMax: number;
-  salaryTerm: {
-    name: string;
-  };
-  currency: {
-    name: string;
-  };
   isNegotiable: boolean;
-  workModes: { name: string }[];
-  employmentTypes: { name: string }[];
+  salaryTerm: { name: string };
+  currency: { name: string };
+  workModes?: { name: string }[];
+  employmentTypes?: { name: string }[];
 }
 
-const CompanyDetails = async ({ params }: { params: { id: string } }) => {
-  const session = await getServerSession(authOptions);
-  const { id } = await params;
 
-  let companyDetails: CompanyDetails | null = null;
-  let branches: BranchesProfile[] = [];
-  let offerTemplates: Templates[] = [];
-  let contractConditions: ContractCondition[] = [];
+const CompanyDetails = () => {
+  const { data: session } = useSession();
+  const { id } = useParams();
 
+  const [company, setCompany] = useState(null);
+  const [branches, setBranches] = useState([]);
+  const [templates, setTemplates] = useState<OfferTemplate[]>([]);
+  const [conditions, setConditions] = useState<ContractCondition[]>([]);
 
-  if (session?.user.token) {
-    // Pobranie danych firmy
-    const companyRes = await fetch(`http://localhost:8080/api/CompanyUser/companies/${id}`, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${session?.user.token}`,
-      },
-    });
+  useEffect(() => {
+    if (!session?.user?.token || !id) return;
 
-    if (companyRes.ok) {
-      const data = await companyRes.json();
-      companyDetails = data.items[0]; // Pobieramy pierwszy obiekt z `items`
-    }
+    const headers = {
+      Authorization: `Bearer ${session.user.token}`,
+    };
 
-    // Pobranie oddziałów
-    const branchesRes = await fetch(`http://localhost:8080/api/CompanyUser/companies/${id}/branches`, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${session?.user.token}`,
-      },
-    });
+    const fetchAll = async () => {
+      const [c, b, t, cond] = await Promise.all([
+        fetch(`http://localhost:8080/api/CompanyUser/companies/${id}`, { headers }),
+        fetch(`http://localhost:8080/api/CompanyUser/companies/${id}/branches`, { headers }),
+        fetch(`http://localhost:8080/api/CompanyUser/companies/${id}/offerTemplates`, { headers }),
+        fetch(`http://localhost:8080/api/CompanyUser/contractConditions`, { headers }),
+      ]);
 
-    if (branchesRes.ok) {
-      let tmp = await branchesRes.json();
-      branches = tmp.items;
-    }
+      if (c.ok) setCompany((await c.json()).items[0]);
+      if (b.ok) setBranches((await b.json()).items);
+      if (t.ok) setTemplates((await t.json()).items.map((item: any) => item.offerTemplate));
+      if (cond.ok) {
+        const all = (await cond.json()).items.map((item: any) => item.contractCondition);
+        setConditions(all.filter((cc: any) => cc.companyId === id));
+      }
+    };
 
-    // Pobranie szablonów ofert
-    const templatesRes = await fetch(`http://localhost:8080/api/CompanyUser/companies/${id}/offerTemplates`, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${session?.user.token}`,
-      },
-    });
-
-    if (templatesRes.ok) {
-      const data = await templatesRes.json();
-      offerTemplates = data.items.map((item: any) => ({
-        offerTemplateId: item.offerTemplate.offerTemplateId,
-        name: item.offerTemplate.name,
-      }));
-    }
-    const conditionsRes = await fetch(`http://localhost:8080/api/CompanyUser/contractConditions`, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${session.user.token}`,
-      },
-    });
-    
-    if (conditionsRes.ok) {
-      const data = await conditionsRes.json();
-      contractConditions = data.items
-        .map((item: any) => item.contractCondition)
-        .filter((cond: any) => cond.companyId === id);
-    }
-    
-  }
+    fetchAll();
+  }, [session, id]);
 
   return (
     <div>
       <h1>Company Details</h1>
-      {companyDetails ? (
-        <>
-          <p><b>Name:</b> {companyDetails.name}</p>
-          <p><b>Description:</b> {companyDetails.description}</p>
-          <p><b>REGON:</b> {companyDetails.regon}</p>
-          <p><b>NIP:</b> {companyDetails.nip}</p>
-          <p><b>KRS:</b> {companyDetails.krs}</p>
-          <p><b>Created:</b> {new Date(companyDetails.created).toLocaleDateString()}</p>
-          {companyDetails.websiteUrl && (
-            <p>
-              <b>Website:</b>{" "}
-              <a href={companyDetails.websiteUrl.match(/https?:\/\/[^\s]+/g)?.[0]} target="_blank" rel="noopener noreferrer">
-                {companyDetails.websiteUrl.match(/https?:\/\/[^\s]+/g)?.[0]}
-              </a>
-            </p>
-          )}
-        </>
-      ) : (
-        <p>Loading company details...</p>
-      )}
-
-      <br></br>
-      {branches.length > 0 ? (
-        <>
-          <h2>Branches:</h2>
-          <ul>
-            {branches.map((value) => (
-              <li key={value.branch.branchId}>
-                <Link href={`/companies/${id}/${value.branch.branchId}`}><b>Name: {value.branch.name}</b></Link>
-              </li>
-            ))}
-          </ul>
-        </>
-      ) : (
-        <h2>No branches available</h2>
-      )}
-      <br></br>
-
-      {contractConditions.length > 0 ? (
-        <>
-          <h2 className="mt-6">Contract Conditions:</h2>
-          <ul>
-            {contractConditions.map((cond) => (
-              <li key={cond.contractConditionId} className="border p-3 rounded my-2">
-                <p><b>Hours/Term:</b> {cond.hoursPerTerm}</p>
-                <p><b>Salary:</b> {cond.salaryMin} – {cond.salaryMax} {cond?.currency?.name} ({cond?.salaryTerm?.name})</p>
-                <p><b>Negotiable:</b> {cond.isNegotiable ? "Yes" : "No"}</p>
-                <p><b>Work Modes:</b> {cond.workModes.map(w => w.name).join(", ")}</p>
-                <p><b>Employment Types:</b> {cond.employmentTypes.map(e => e.name).join(", ")}</p>
-              </li>
-            ))}
-          </ul>
-        </>
-      ) : (
-        <h2 className="mt-6">No contract conditions available</h2>
-      )}
-
-
-      {offerTemplates.length > 0 ? (
-        <>
-          <h2>Offer Templates:</h2>
-          <ul>
-            {offerTemplates.map((value) => (
-              <li key={value.offerTemplateId}>
-                <Link href={`/companies/${id}/templates/${value.offerTemplateId}`}><b>Name: {value.name}</b></Link>
-              </li>
-            ))}
-          </ul>
-        </>
-      ) : (
-        <h2>No templates available</h2>
-      )}
-
+      <CompanyInfo company={company} />
       <br />
-      <CreateBranchButton />
+      <BranchesList branches={branches} companyId={id as string} />
       <br />
-      <CreateOfferTemplateButton />
+      
+
+      <ContractConditionsList
+        contractConditions={conditions}
+        onDelete={(id: string) => setConditions(prev => prev.filter(c => c.contractConditionId !== id))}
+      />
+
+      <OfferTemplatesList
+        templates={templates}
+        onDelete={(id: string) => setTemplates(prev => prev.filter(t => t.offerTemplateId !== id))}
+      />
+
+      <CreateBranchButton /><br/>
+      <CreateOfferTemplateButton /><br/>
+      <CreateContractConditionButton />
     </div>
   );
 };
