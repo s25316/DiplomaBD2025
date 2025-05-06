@@ -10,17 +10,28 @@ namespace UseCase.MongoDb
             Guid userId,
             CancellationToken cancellationToken);
 
-        Task<UserLoginInDataMongoDbDto> GetUserLoginInDataAsync(
+        Task<UserLoginInMongoDbDto> GetUserLoginInDataAsync(
             Guid userId,
             CancellationToken cancellationToken);
 
-        Task<User2StageDataMongoDbDto> GetUser2StageDataAsync(
+        Task<User2StageMongoDbDto> GetUser2StageDataAsync(
             Guid userId,
             string urlSegment,
             string code,
             CancellationToken cancellationToken);
 
-        Task<UserRefreshTokenDataMongoDbDto> GetUserRefreshTokenDataAsync(
+        Task<UserRefreshTokenMongoDbDto> GetUserRefreshTokenDataAsync(
+            Guid userId,
+            string jwt,
+            string refreshToken,
+            CancellationToken cancellationToken);
+
+        Task<UserLogOutMongoDbDto> GetUserLogOutDataAsync(
+            Guid userId,
+            string jwt,
+            CancellationToken cancellationToken);
+
+        Task<UserMiddlewareMongoDbDto> GetUserMiddlewareDataAsync(
             Guid userId,
             string jwt,
             CancellationToken cancellationToken);

@@ -1,4 +1,4 @@
-﻿// Ignore Spelling: Mongo, Bson, Jwt
+﻿// Ignore Spelling: Mongo, Bson, Jwt, Middleware
 using MongoDB.Bson;
 using MongoDB.Driver;
 using UseCase.MongoDb;
@@ -24,18 +24,25 @@ namespace Infrastructure.MongoDb
         private static readonly string _isDeactivated2StagePropertyName = nameof(UserAuthorization2StageMongoDb.IsDeactivated);
         // UserAuthorizationLogOutMongoDb
         private static readonly string _jwtAuthorizationPropertyName = nameof(UserAuthorizationLogOutMongoDb.Jwt);
+        private static readonly string _refreshTokenAuthorizationPropertyName = nameof(UserAuthorizationLogOutMongoDb.RefreshToken);
         // UserAuthorizationRefreshTokenMongoDb
         private static readonly string _isDeactivatedAuthorizationPropertyName = nameof(UserAuthorizationRefreshTokenMongoDb.IsDeactivated);
 
-        // PrepareUserLoginInDataPipeline
-        private static readonly IEnumerable<int> _typeIdsUserLoginInData = UserLoginInDataMongoDbDto.TypeIds;
-        private static readonly int _handStageId = (int)typeof(UserAuthorization2StageMongoDb).GetMongoLog();
-        // PrepareUserRefreshTokenDataPipeline
         private static readonly IEnumerable<int> _typeIdsWithJwt = [
                 (int)typeof(UserAuthorizationLoginInMongoDb).GetMongoLog(),
                 (int)typeof(UserAuthorizationRefreshTokenMongoDb).GetMongoLog()
             ];
-        private static readonly IEnumerable<int> _typeIdsUserRefreshTokenData = UserRefreshTokenDataMongoDbDto.TypeIds;
+        // GetUserActivationDataAsync
+        private static readonly IEnumerable<int> _typeIdsUserActivation = UserActivationDataMongoDbDto.TypeIds;
+        // PrepareUserLoginInDataPipeline
+        private static readonly IEnumerable<int> _typeIdsUserLoginIn = UserLoginInMongoDbDto.TypeIds;
+        private static readonly int _handStageId = (int)typeof(UserAuthorization2StageMongoDb).GetMongoLog();
+        // GetUserRefreshTokenDataAsync
+        private static readonly IEnumerable<int> _typeIdsUserRefreshToken = UserRefreshTokenMongoDbDto.TypeIds;
+        // PrepareUserLogOutDataPipeline
+        private static readonly IEnumerable<int> _typeIdsUserLogOut = UserLogOutMongoDbDto.TypeIds;
+        // GetUserMiddlewareDataAsync
+        private static readonly IEnumerable<int> _typeIdsUserMiddleware = UserMiddlewareMongoDbDto.TypeIds;
 
         // Non Static Properties
         private readonly IMongoCollection<BsonDocument> _userLogsCollection;
@@ -55,23 +62,21 @@ namespace Infrastructure.MongoDb
             Guid userId,
             CancellationToken cancellationToken)
         {
-
-            Console.WriteLine(string.Join(", ", UserActivationDataMongoDbDto.TypeIds));
-            var pipeline = PrepareLastUserDataPipeline(userId, UserActivationDataMongoDbDto.TypeIds);
+            var pipeline = PrepareLastUserDataPipeline(userId, _typeIdsUserActivation);
             var logs = await GetUserLogsAsync(pipeline, cancellationToken);
             return (UserActivationDataMongoDbDto)logs.ToList();
         }
 
-        public async Task<UserLoginInDataMongoDbDto> GetUserLoginInDataAsync(
+        public async Task<UserLoginInMongoDbDto> GetUserLoginInDataAsync(
             Guid userId,
             CancellationToken cancellationToken)
         {
             var pipeline = PrepareUserLoginInDataPipeline(userId);
             var logs = await GetUserLogsAsync(pipeline, cancellationToken);
-            return (UserLoginInDataMongoDbDto)logs.ToList();
+            return (UserLoginInMongoDbDto)logs.ToList();
         }
 
-        public async Task<User2StageDataMongoDbDto> GetUser2StageDataAsync(
+        public async Task<User2StageMongoDbDto> GetUser2StageDataAsync(
             Guid userId,
             string urlSegment,
             string code,
@@ -81,7 +86,7 @@ namespace Infrastructure.MongoDb
             var bsonDocument = await GetBsonDocumentAsync(pipeline, cancellationToken);
             if (bsonDocument == null)
             {
-                return User2StageDataMongoDbDto.PrepareEmpty();
+                return User2StageMongoDbDto.PrepareEmpty();
             }
 
             var baseLog = BaseLogMongoDb.Map(bsonDocument);
@@ -91,21 +96,46 @@ namespace Infrastructure.MongoDb
             }
 
             await DeactivateUser2StageDataAsync(bsonDocument, cancellationToken);
-            return User2StageDataMongoDbDto.PrepareNotEmpty(log2Stage);
+            return User2StageMongoDbDto.PrepareNotEmpty(log2Stage);
         }
 
-        public async Task<UserRefreshTokenDataMongoDbDto> GetUserRefreshTokenDataAsync(
+        public async Task<UserRefreshTokenMongoDbDto> GetUserRefreshTokenDataAsync(
+            Guid userId,
+            string jwt,
+            string refreshToken,
+            CancellationToken cancellationToken)
+        {
+            var pipeline = PrepareRefreshTokenDataPipeline(userId, jwt, refreshToken, _typeIdsUserRefreshToken);
+            var bsonDocuments = await GetBsonDocumentsAsync(pipeline, cancellationToken);
+
+            await DeactivateAuthorizationDataAsync(bsonDocuments, cancellationToken);
+            return (UserRefreshTokenMongoDbDto)bsonDocuments
+                .Select(BaseLogMongoDb.Map)
+                .ToList();
+        }
+
+        public async Task<UserLogOutMongoDbDto> GetUserLogOutDataAsync(
             Guid userId,
             string jwt,
             CancellationToken cancellationToken)
         {
-            var pipeline = PrepareUserRefreshTokenDataPipeline(userId, jwt);
+            var pipeline = PrepareUserLogOutDataPipeline(userId, jwt);
             var bsonDocuments = await GetBsonDocumentsAsync(pipeline, cancellationToken);
 
             await DeactivateAuthorizationDataAsync(bsonDocuments, cancellationToken);
-            return (UserRefreshTokenDataMongoDbDto)bsonDocuments
+            return (UserLogOutMongoDbDto)bsonDocuments
                 .Select(BaseLogMongoDb.Map)
                 .ToList();
+        }
+
+        public async Task<UserMiddlewareMongoDbDto> GetUserMiddlewareDataAsync(
+            Guid userId,
+            string jwt,
+            CancellationToken cancellationToken)
+        {
+            var pipeline = PrepareIdsWithJwtPipeline(userId, jwt, _typeIdsUserMiddleware);
+            var baseLogs = await GetUserLogsAsync(pipeline, cancellationToken);
+            return (UserMiddlewareMongoDbDto)baseLogs.ToList();
         }
 
         // Private Static Methods
@@ -169,7 +199,7 @@ namespace Infrastructure.MongoDb
             var typeIdMatchStage = new BsonDocument("$match",
                 new BsonDocument(
                     _typeIdPropertyName,
-                    User2StageDataMongoDbDto.TypeId));
+                    User2StageMongoDbDto.TypeId));
 
             var isDeactivatedMatchStage = new BsonDocument("$match",
                 new BsonDocument(
@@ -206,7 +236,7 @@ namespace Infrastructure.MongoDb
                     {
                         new BsonDocument(_typeIdPropertyName,
                             new BsonDocument("$in",
-                                new BsonArray(_typeIdsUserLoginInData))),
+                                new BsonArray(_typeIdsUserLoginIn))),
                         new BsonDocument(_typeIdPropertyName,
                             new BsonDocument("$ne", _handStageId))
                     }),
@@ -241,9 +271,11 @@ namespace Infrastructure.MongoDb
                 replaceRootStage];
         }
 
-        private static BsonDocument[] PrepareUserRefreshTokenDataPipeline(
+        private static BsonDocument[] PrepareRefreshTokenDataPipeline(
            Guid userId,
-           string jwt)
+           string jwt,
+           string refreshToken,
+           IEnumerable<int> typeIds)
         {
             // Prepare pipeline
             var userIdMatchStage = new BsonDocument("$match",
@@ -258,7 +290,65 @@ namespace Infrastructure.MongoDb
                     {
                         new BsonDocument(_typeIdPropertyName,
                             new BsonDocument("$in",
-                                new BsonArray(_typeIdsUserRefreshTokenData))),
+                                new BsonArray(typeIds))),
+                        new BsonDocument(_typeIdPropertyName,
+                            new BsonDocument("$nin",
+                                new BsonArray(_typeIdsWithJwt)))
+                    }),
+
+                    new BsonDocument("$and", new BsonArray
+                    {
+                        new BsonDocument(_typeIdPropertyName,
+                            new BsonDocument("$in",
+                                new BsonArray(_typeIdsWithJwt))),
+                        new BsonDocument(_jwtAuthorizationPropertyName, jwt),
+                        new BsonDocument(_refreshTokenAuthorizationPropertyName, refreshToken),
+                        new BsonDocument(_isDeactivatedAuthorizationPropertyName, false)
+                    })
+                }));
+
+            var sortByCreatedStage = new BsonDocument("$sort",
+                new BsonDocument(
+                    _createdPropertyName,
+                    -1));
+
+            var groupByTypeIdStage = new BsonDocument("$group",
+                new BsonDocument
+                {
+                    { "_id", $"${_typeIdPropertyName}" },
+                    { "lastDocument", new BsonDocument("$first", "$$ROOT") }
+                });
+
+            var replaceRootStage = new BsonDocument("$replaceRoot",
+                new BsonDocument("newRoot", "$lastDocument"));
+
+            return [
+                userIdMatchStage,
+                typeIdMatchStage,
+                sortByCreatedStage,
+                groupByTypeIdStage,
+                replaceRootStage];
+        }
+
+        private static BsonDocument[] PrepareIdsWithJwtPipeline(
+           Guid userId,
+           string jwt,
+           IEnumerable<int> typeIds)
+        {
+            // Prepare pipeline
+            var userIdMatchStage = new BsonDocument("$match",
+                new BsonDocument(
+                    _userIdPropertyName,
+                    userId.ToString().ToLower()));
+
+            var typeIdMatchStage = new BsonDocument("$match",
+                new BsonDocument("$or", new BsonArray
+                {
+                    new BsonDocument("$and", new BsonArray
+                    {
+                        new BsonDocument(_typeIdPropertyName,
+                            new BsonDocument("$in",
+                                new BsonArray(typeIds))),
                         new BsonDocument(_typeIdPropertyName,
                             new BsonDocument("$nin",
                                 new BsonArray(_typeIdsWithJwt)))
@@ -297,8 +387,52 @@ namespace Infrastructure.MongoDb
                 replaceRootStage];
         }
 
+        private static BsonDocument[] PrepareUserLogOutDataPipeline(
+           Guid userId,
+           string jwt)
+        {
+            var userIdMatchStage = new BsonDocument("$match",
+                new BsonDocument(
+                    _userIdPropertyName,
+                    userId.ToString().ToLower()));
+
+            var jwtMatchStage = new BsonDocument("$match",
+                new BsonDocument(
+                    _jwtAuthorizationPropertyName,
+                    jwt));
+
+            var typeIdMatchStage = new BsonDocument("$match",
+                new BsonDocument(_typeIdPropertyName,
+                    new BsonDocument("$in",
+                        new BsonArray(_typeIdsUserLogOut))));
+
+            var sortByCreatedStage = new BsonDocument("$sort",
+                new BsonDocument(
+                    _createdPropertyName,
+                    -1));
+
+            var groupByTypeIdStage = new BsonDocument("$group",
+                new BsonDocument
+                {
+                    { "_id", $"${_typeIdPropertyName}" },
+                    { "lastDocument", new BsonDocument("$first", "$$ROOT") }
+                });
+
+            var replaceRootStage = new BsonDocument("$replaceRoot",
+                new BsonDocument("newRoot", "$lastDocument"));
+
+            return [
+                userIdMatchStage,
+                jwtMatchStage,
+                typeIdMatchStage,
+                sortByCreatedStage,
+                groupByTypeIdStage,
+                replaceRootStage];
+        }
+
+
         // Private Non Static Methods
-        public async Task<IEnumerable<BsonDocument>> GetBsonDocumentsAsync(
+        private async Task<IEnumerable<BsonDocument>> GetBsonDocumentsAsync(
             BsonDocument[] pipeline,
             CancellationToken cancellationToken)
         {
@@ -307,7 +441,7 @@ namespace Infrastructure.MongoDb
                 .ToListAsync(cancellationToken);
         }
 
-        public async Task<BsonDocument?> GetBsonDocumentAsync(
+        private async Task<BsonDocument?> GetBsonDocumentAsync(
             BsonDocument[] pipeline,
             CancellationToken cancellationToken)
         {
@@ -316,7 +450,7 @@ namespace Infrastructure.MongoDb
                 .FirstOrDefaultAsync(cancellationToken);
         }
 
-        public async Task<IEnumerable<BaseLogMongoDb>> GetUserLogsAsync(
+        private async Task<IEnumerable<BaseLogMongoDb>> GetUserLogsAsync(
             BsonDocument[] pipeline,
             CancellationToken cancellationToken)
         {
@@ -324,7 +458,7 @@ namespace Infrastructure.MongoDb
             return bsonDocuments.Select(BaseLogMongoDb.Map);
         }
 
-        public async Task DeactivateUser2StageDataAsync(
+        private async Task DeactivateUser2StageDataAsync(
             BsonDocument bsonDocument,
             CancellationToken cancellationToken)
         {
@@ -341,16 +475,20 @@ namespace Infrastructure.MongoDb
             }
         }
 
-        public async Task DeactivateAuthorizationDataAsync(
+        private async Task DeactivateAuthorizationDataAsync(
           IEnumerable<BsonDocument> bsonDocuments,
           CancellationToken cancellationToken)
         {
             foreach (var bsonDocument in bsonDocuments)
             {
                 var typeId = (int)bsonDocument[_typeIdPropertyName];
-                var isDeactivated = (bool)bsonDocument[_isDeactivatedAuthorizationPropertyName];
-                if (_typeIdsWithJwt.Contains(typeId) && !isDeactivated)
+                if (_typeIdsWithJwt.Contains(typeId))
                 {
+                    var isDeactivated = (bool)bsonDocument[_isDeactivatedAuthorizationPropertyName];
+                    if (isDeactivated)
+                    {
+                        continue;
+                    }
                     // For rule should be 1
                     var update = Builders<BsonDocument>.Update
                         .Set(_isDeactivatedAuthorizationPropertyName, true);

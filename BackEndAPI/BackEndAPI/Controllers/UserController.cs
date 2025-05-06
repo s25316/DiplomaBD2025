@@ -1,10 +1,12 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using UseCase.Roles.Users.Commands.ProfileCommands.UserProfileActivate.Request;
 using UseCase.Roles.Users.Commands.ProfileCommands.UserProfileCreate.Request;
-using UseCase.Roles.Users.Commands.UserAuthorizationCommands.UserAuthorizationLoginInAnd2Stage.Request.UserAuthorization2Stage;
-using UseCase.Roles.Users.Commands.UserAuthorizationCommands.UserAuthorizationLoginInAnd2Stage.Request.UserAuthorizationLoginIn;
+using UseCase.Roles.Users.Commands.UserAuthorizationCommands.UserAuthorization2Stage.Request;
+using UseCase.Roles.Users.Commands.UserAuthorizationCommands.UserAuthorizationLoginIn.Request;
 using UseCase.Roles.Users.Commands.UserAuthorizationCommands.UserAuthorizationRefreshToken.Request;
+using UseCase.Roles.Users.Commands.UserAuthorizationCommands.UserLogOut.Request;
 using UseCase.Shared.Templates.Requests;
 
 namespace BackEndAPI.Controllers
@@ -106,6 +108,20 @@ namespace BackEndAPI.Controllers
 
             var result = await _mediator.Send(request, cancellationToken);
             return StatusCode((int)result.HttpCode, result.Result);
+        }
+
+        [Authorize]
+        [HttpPost("logOut")]
+        public async Task<IActionResult> UserLogOutAsync(
+            CancellationToken cancellationToken)
+        {
+            var request = new UserLogOutRequest
+            {
+                Metadata = (RequestMetadata)HttpContext,
+            };
+
+            var result = await _mediator.Send(request, cancellationToken);
+            return StatusCode((int)result.HttpCode);
         }
     }
 }

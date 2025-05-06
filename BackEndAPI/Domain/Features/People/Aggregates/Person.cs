@@ -1,5 +1,6 @@
 ﻿// Ignore Spelling: Jwt
 using Domain.Features.People.DomainEvents;
+using Domain.Features.People.DomainEvents.AuthorizationEvents;
 using Domain.Features.People.Entities;
 using Domain.Features.People.Exceptions;
 using Domain.Features.People.ValueObjects.BirthDates;
@@ -113,6 +114,18 @@ namespace Domain.Features.People.Aggregates
             DateTime refreshTokenValidTo)
         {
             AddDomainEvent(PersonAuthorizationLoginInEvent.Prepare(
+                this,
+                jwt,
+                refreshToken,
+                refreshTokenValidTo));
+        }
+
+        public void RaiseAuthorizationLogOutEvent(
+           string jwt,
+           string refreshToken,
+           DateTime refreshTokenValidTo)
+        {
+            AddDomainEvent(PersonAuthorizationLogOutEvent.Prepare(
                 this,
                 jwt,
                 refreshToken,

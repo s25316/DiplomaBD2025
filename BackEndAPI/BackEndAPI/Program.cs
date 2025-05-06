@@ -1,4 +1,5 @@
 // Scaffold-DbContext "ConnectionString" Microsoft.EntityFrameworkCore.SqlServer -OutputDir RelationalDatabase -Project UseCase
+using BackEndAPI.Middlewares;
 using UseCase.Kafka;
 using UseCase.MongoDb.UserLogs.Models.ServiceEvents;
 
@@ -24,6 +25,9 @@ namespace BackEndAPI
                 .AllowAnyHeader()
                 .SetIsOriginAllowed(origin => true)
                 .AllowCredentials());
+
+            // Custom Middlewares
+            app.UseUserAuthorizationMiddleware();
 
             // Configure the HTTP request pipeline.
             app.UseSwagger();

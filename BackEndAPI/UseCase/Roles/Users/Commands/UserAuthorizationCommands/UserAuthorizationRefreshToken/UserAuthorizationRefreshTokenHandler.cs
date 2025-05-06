@@ -4,15 +4,14 @@ using MediatR;
 using UseCase.Kafka;
 using UseCase.MongoDb;
 using UseCase.MongoDb.UserLogs.Models.UserEvents.UserAuthorizationEvents;
-using UseCase.Roles.Users.Commands.UserAuthorizationCommands.UserAuthorizationLoginInAnd2Stage.Response;
+using UseCase.Roles.Users.Commands.UserAuthorizationCommands.Response;
 using UseCase.Roles.Users.Commands.UserAuthorizationCommands.UserAuthorizationRefreshToken.Request;
-using UseCase.Roles.Users.Commands.UserAuthorizationCommands.UserAuthorizationRefreshToken.Response;
 using UseCase.Shared.Services.Authentication.Generators;
 using UseCase.Shared.Services.Authentication.Inspectors;
 
 namespace UseCase.Roles.Users.Commands.UserAuthorizationCommands.UserAuthorizationRefreshToken
 {
-    public class UserAuthorizationRefreshTokenHandler : IRequestHandler<UserAuthorizationRefreshTokenRequest, UserAuthorizationRefreshTokenResponse>
+    public class UserAuthorizationRefreshTokenHandler : IRequestHandler<UserAuthorizationRefreshTokenRequest, UserAuthorizationResponse>
     {
         // Properties
         private readonly IAuthenticationGeneratorService _authenticationGenerator;
@@ -36,7 +35,7 @@ namespace UseCase.Roles.Users.Commands.UserAuthorizationCommands.UserAuthorizati
 
 
         // Methods
-        public async Task<UserAuthorizationRefreshTokenResponse> Handle(UserAuthorizationRefreshTokenRequest request, CancellationToken cancellationToken)
+        public async Task<UserAuthorizationResponse> Handle(UserAuthorizationRefreshTokenRequest request, CancellationToken cancellationToken)
         {
             var jwtInput = request.Metadata.Authorization;
             if (string.IsNullOrWhiteSpace(jwtInput) ||
@@ -46,16 +45,21 @@ namespace UseCase.Roles.Users.Commands.UserAuthorizationCommands.UserAuthorizati
             }
 
             var jwtName = _authenticationInspector.GetClaimsName(jwtInput, true);
-            if (string.IsNullOrWhiteSpace(jwtName))
+            if (string.IsNullOrWhiteSpace(jwtName) ||
+                !Guid.TryParse(jwtName, out var personId))
             {
                 throw new Exception("Something Changed in Generation JWT");
             }
 
-            var personId = Guid.Parse(jwtName);
+            // MongoDB Part
             var refreshTokenData = await _mongoDbService
-                .GetUserRefreshTokenDataAsync(personId, jwtInput, cancellationToken);
+                .GetUserRefreshTokenDataAsync(
+                personId,
+                jwtInput,
+                request.Command.RefreshToken,
+                cancellationToken);
 
-            if ((refreshTokenData.LoginIn == null && refreshTokenData.RefreshToken == null) ||
+            if (refreshTokenData.AuthorizationData == null ||
                 refreshTokenData.HasBlocked ||
                 refreshTokenData.HasRemoved ||
                 refreshTokenData.HasRefreshTokenExpired)
@@ -65,46 +69,34 @@ namespace UseCase.Roles.Users.Commands.UserAuthorizationCommands.UserAuthorizati
 
 
             var (jwt, jwtValidTo) = _authenticationGenerator.GenerateJwt(jwtName, []);
-            string refreshToken;
-            DateTime refreshTokenValidTo;
-            if (refreshTokenData.LoginIn != null)
-            {
-                refreshToken = refreshTokenData.LoginIn.RefreshToken;
-                refreshTokenValidTo = refreshTokenData.LoginIn.RefreshTokenValidTo;
-            }
-            else
-            {
-                refreshToken = refreshTokenData.RefreshToken.RefreshToken;
-                refreshTokenValidTo = refreshTokenData.RefreshToken.RefreshTokenValidTo;
-            }
-
-            var mongoDto = UserAuthorizationRefreshTokenMongoDb.Prepare(
-                personId,
-                jwt,
-                refreshToken,
-                refreshTokenValidTo);
-
-
-            await _kafka.SendUserLogAsync(mongoDto, cancellationToken);
-            return ValidResponse(new UserLoginInDataDto
+            var loginInData = new UserAuthorizationDataDto
             {
                 Jwt = jwt,
                 JwtValidTo = CustomTimeProvider.ConvertToPoland(jwtValidTo),
-                RefreshToken = refreshToken,
-                RefreshTokenValidTo = refreshTokenValidTo,
-            });
+                RefreshToken = refreshTokenData.AuthorizationData.RefreshToken,
+                RefreshTokenValidTo = refreshTokenData.AuthorizationData.RefreshTokenValidTo,
+            };
+            var mongoDto = UserAuthorizationRefreshTokenMongoDb.Prepare(
+                personId,
+                jwt,
+                loginInData.RefreshToken,
+                loginInData.RefreshTokenValidTo);
+
+
+            await _kafka.SendUserLogAsync(mongoDto, cancellationToken);
+            return ValidResponse(loginInData);
         }
 
         // Private Static Methods
-        public static UserAuthorizationRefreshTokenResponse InvalidResponse()
+        private static UserAuthorizationResponse InvalidResponse()
         {
-            return UserAuthorizationRefreshTokenResponse.InvalidResponse();
+            return UserAuthorizationResponse.InvalidResponse();
         }
 
-        public static UserAuthorizationRefreshTokenResponse ValidResponse(
-           UserLoginInDataDto item)
+        private static UserAuthorizationResponse ValidResponse(
+           UserAuthorizationDataDto item)
         {
-            return UserAuthorizationRefreshTokenResponse.ValidResponse(item);
+            return UserAuthorizationResponse.ValidResponse(item);
         }
     }
 }

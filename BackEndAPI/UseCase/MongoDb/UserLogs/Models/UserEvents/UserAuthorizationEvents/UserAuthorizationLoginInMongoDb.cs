@@ -1,5 +1,5 @@
 ﻿// Ignore Spelling: Mongo, Json, GetMongoLog
-using Domain.Features.People.DomainEvents;
+using Domain.Features.People.DomainEvents.AuthorizationEvents;
 using UseCase.MongoDb.Enums;
 
 namespace UseCase.MongoDb.UserLogs.Models.UserEvents.UserAuthorizationEvents
