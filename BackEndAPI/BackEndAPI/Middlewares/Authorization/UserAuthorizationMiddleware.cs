@@ -1,4 +1,4 @@
-﻿// Ignore Spelling: Middlewares, Middleware
+﻿// Ignore Spelling: Middlewares, Middleware, Mongo
 using UseCase.MongoDb;
 using UseCase.Shared.Services.Authentication.Inspectors;
 

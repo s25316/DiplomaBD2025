@@ -6,6 +6,7 @@ using UseCase.MongoDb;
 using UseCase.Roles.Users.Commands.UserAuthorizationCommands.Response;
 using UseCase.Roles.Users.Commands.UserAuthorizationCommands.UserAuthorization2Stage.Request;
 using UseCase.Roles.Users.Repositories;
+using UseCase.Shared.Exceptions;
 using UseCase.Shared.Services.Authentication.Generators;
 using DomainPerson = Domain.Features.People.Aggregates.Person;
 
@@ -66,7 +67,7 @@ namespace UseCase.Roles.Users.Commands.UserAuthorizationCommands.UserAuthorizati
         private static Guid GetPersonId(DomainPerson item)
         {
             return item.Id?.Value
-                ?? throw new KeyNotFoundException("Problem with mapping from DB");
+                ?? throw new UseCaseLayerException("Problem with mapping from DB");
         }
 
         public static UserAuthorizationResponse InvalidResponse()

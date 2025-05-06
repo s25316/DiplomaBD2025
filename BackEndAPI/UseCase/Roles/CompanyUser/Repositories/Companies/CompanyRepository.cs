@@ -7,6 +7,7 @@ using System.Text;
 using UseCase.RelationalDatabase;
 using UseCase.RelationalDatabase.Models;
 using UseCase.Roles.CompanyUser.Enums;
+using UseCase.Shared.Exceptions;
 using UseCase.Shared.Templates.Repositories;
 using UseCase.Shared.Templates.Response.Commands;
 using DatabaseCompany = UseCase.RelationalDatabase.Models.Company;
@@ -110,7 +111,8 @@ namespace UseCase.Roles.CompanyUser.Repositories.Companies
             CancellationToken cancellationToken)
         {
             // Prepare Data
-            var companyId = item.Id?.Value ?? throw new KeyNotFoundException();
+            var companyId = item.Id?.Value
+                ?? throw new UseCaseLayerException();
             // Because Only KRS is unique and updating in Domain
             var krs = item.Krs?.Value ?? null;
 

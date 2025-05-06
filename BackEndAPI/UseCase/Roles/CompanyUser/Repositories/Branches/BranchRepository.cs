@@ -4,6 +4,7 @@ using Domain.Shared.Enums;
 using Microsoft.EntityFrameworkCore;
 using UseCase.RelationalDatabase;
 using UseCase.Roles.CompanyUser.Enums;
+using UseCase.Shared.Exceptions;
 using UseCase.Shared.Templates.Repositories;
 using DatabaseBranch = UseCase.RelationalDatabase.Models.Branch;
 using DomainBranch = Domain.Features.Branches.Entities.Branch;
@@ -109,7 +110,8 @@ namespace UseCase.Roles.CompanyUser.Repositories.Branches
             CancellationToken cancellationToken)
         {
             // Adapt Data
-            var branchId = item.Id?.Value ?? throw new KeyNotFoundException();
+            var branchId = item.Id?.Value
+                ?? throw new UseCaseLayerException();
 
             // Select from DB
             var dbBranch = await _context.Branches

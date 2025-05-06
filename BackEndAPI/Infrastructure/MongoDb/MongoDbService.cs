@@ -1,4 +1,5 @@
 ﻿// Ignore Spelling: Mongo, Bson, Jwt, Middleware
+using Infrastructure.Exceptions;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using UseCase.MongoDb;
@@ -92,7 +93,7 @@ namespace Infrastructure.MongoDb
             var baseLog = BaseLogMongoDb.Map(bsonDocument);
             if (baseLog is not UserAuthorization2StageMongoDb log2Stage)
             {
-                throw new Exception();
+                throw new InfrastructureLayerException("Something Changed in mapping");
             }
 
             await DeactivateUser2StageDataAsync(bsonDocument, cancellationToken);
@@ -468,10 +469,10 @@ namespace Infrastructure.MongoDb
             var filter = Builders<BsonDocument>
                 .Filter.Eq(_idPropertyName, bsonDocument[_idPropertyName]);
             var updateResult = await _userLogsCollection
-                .UpdateOneAsync(filter, update);
+                .UpdateOneAsync(filter, update, cancellationToken: cancellationToken);
             if (updateResult.ModifiedCount == 0)
             {
-                throw new Exception("Have no update");
+                throw new InfrastructureLayerException("Have no update");
             }
         }
 
@@ -495,10 +496,10 @@ namespace Infrastructure.MongoDb
                     var filter = Builders<BsonDocument>
                         .Filter.Eq(_idPropertyName, bsonDocument[_idPropertyName]);
                     var updateResult = await _userLogsCollection
-                        .UpdateOneAsync(filter, update);
+                        .UpdateOneAsync(filter, update, cancellationToken: cancellationToken);
                     if (updateResult.ModifiedCount == 0)
                     {
-                        throw new Exception("Have no update");
+                        throw new InfrastructureLayerException("Have no update");
                     }
                 }
             }

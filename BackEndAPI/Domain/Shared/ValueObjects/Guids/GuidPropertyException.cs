@@ -1,4 +1,5 @@
-﻿namespace Domain.Shared.ValueObjects.Guids
+﻿// Ignore Spelling: Guids
+namespace Domain.Shared.ValueObjects.Guids
 {
     public class GuidPropertyException : Exception
     {

@@ -6,6 +6,7 @@ using Domain.Shared.ValueObjects.Ids;
 using Microsoft.EntityFrameworkCore;
 using UseCase.RelationalDatabase;
 using UseCase.Roles.CompanyUser.Enums;
+using UseCase.Shared.Exceptions;
 using UseCase.Shared.Templates.Repositories;
 using DatabaseOfferSkill = UseCase.RelationalDatabase.Models.OfferSkill;
 using DatabaseOfferTemplate = UseCase.RelationalDatabase.Models.OfferTemplate;
@@ -112,7 +113,8 @@ namespace UseCase.Roles.CompanyUser.Repositories.OfferTemplates
         {
             // Prepare data
             var now = CustomTimeProvider.Now;
-            var idValue = item.Id?.Value ?? throw new KeyNotFoundException();
+            var idValue = item.Id?.Value
+                ?? throw new UseCaseLayerException();
 
             var selectResult = await _context.OfferTemplates
                 .Include(ot => ot.Company)
@@ -201,7 +203,8 @@ namespace UseCase.Roles.CompanyUser.Repositories.OfferTemplates
             CancellationToken cancellationToken)
         {
             // Prepare data
-            var idValue = item.Id?.Value ?? throw new KeyNotFoundException();
+            var idValue = item.Id?.Value
+                ?? throw new UseCaseLayerException();
 
             var dbOfferTemplate = await _context.OfferTemplates
                 .Where(ot => ot.OfferTemplateId == idValue)

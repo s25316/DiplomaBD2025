@@ -5,6 +5,7 @@ using Domain.Shared.Enums;
 using Microsoft.EntityFrameworkCore;
 using UseCase.RelationalDatabase;
 using UseCase.Roles.CompanyUser.Enums;
+using UseCase.Shared.Exceptions;
 using UseCase.Shared.Templates.Repositories;
 using DatabaseContractAttribute = UseCase.RelationalDatabase.Models.ContractAttribute;
 using DatabaseContractCondition = UseCase.RelationalDatabase.Models.ContractCondition;
@@ -112,7 +113,8 @@ namespace UseCase.Roles.CompanyUser.Repositories.ContractConditions
         {
             // Prepare Data
             var now = CustomTimeProvider.Now;
-            var idValue = item.Id?.Value ?? throw new KeyNotFoundException();
+            var idValue = item.Id?.Value
+                ?? throw new UseCaseLayerException();
 
             // Select From DB
             var selectResult = await _context.ContractConditions
@@ -297,7 +299,8 @@ namespace UseCase.Roles.CompanyUser.Repositories.ContractConditions
             DomainContractCondition item,
             CancellationToken cancellationToken)
         {
-            var itemId = item.Id?.Value ?? throw new KeyNotFoundException();
+            var itemId = item.Id?.Value
+                ?? throw new UseCaseLayerException();
 
             var dbContractCondition = await _context.ContractConditions
                 .Where(cc => cc.ContractConditionId == itemId)

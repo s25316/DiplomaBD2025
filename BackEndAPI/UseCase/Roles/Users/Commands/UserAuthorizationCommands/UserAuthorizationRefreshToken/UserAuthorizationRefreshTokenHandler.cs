@@ -6,6 +6,7 @@ using UseCase.MongoDb;
 using UseCase.MongoDb.UserLogs.Models.UserEvents.UserAuthorizationEvents;
 using UseCase.Roles.Users.Commands.UserAuthorizationCommands.Response;
 using UseCase.Roles.Users.Commands.UserAuthorizationCommands.UserAuthorizationRefreshToken.Request;
+using UseCase.Shared.Exceptions;
 using UseCase.Shared.Services.Authentication.Generators;
 using UseCase.Shared.Services.Authentication.Inspectors;
 
@@ -48,7 +49,7 @@ namespace UseCase.Roles.Users.Commands.UserAuthorizationCommands.UserAuthorizati
             if (string.IsNullOrWhiteSpace(jwtName) ||
                 !Guid.TryParse(jwtName, out var personId))
             {
-                throw new Exception("Something Changed in Generation JWT");
+                throw new UseCaseLayerException("Something Changed in Generation JWT");
             }
 
             // MongoDB Part

@@ -8,6 +8,7 @@ using MongoDB.Bson.Serialization.Attributes;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using UseCase.MongoDb.Enums;
+using UseCase.Shared.Exceptions;
 
 namespace UseCase.MongoDb
 {
@@ -55,12 +56,12 @@ namespace UseCase.MongoDb
                 }
                 else
                 {
-                    throw new Exception("Impossible");
+                    throw new UseCaseLayerException("Impossible, probably something changed in mapping");
                 }
             }
             else
             {
-                throw new Exception();
+                throw new UseCaseLayerException("Something changed in structure MongoLogs");
             }
         }
     }

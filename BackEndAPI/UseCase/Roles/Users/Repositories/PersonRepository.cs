@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using System.Text;
 using UseCase.RelationalDatabase;
+using UseCase.Shared.Exceptions;
 using UseCase.Shared.Templates.Repositories;
 using DatabasePerson = UseCase.RelationalDatabase.Models.Person;
 using DatabasePersonSkill = UseCase.RelationalDatabase.Models.PersonSkill;
@@ -84,7 +85,8 @@ namespace UseCase.Roles.Users.Repositories
             DomainPerson item,
             CancellationToken cancellationToken)
         {
-            var itemId = item.Id?.Value ?? throw new KeyNotFoundException();
+            var itemId = item.Id?.Value
+                ?? throw new UseCaseLayerException();
             var itemLogin = item.Login.Value;
             var itemContactEmail = item.ContactEmail?.Value;
             var itemContactPhoneNumber = item.ContactPhoneNumber?.Value;

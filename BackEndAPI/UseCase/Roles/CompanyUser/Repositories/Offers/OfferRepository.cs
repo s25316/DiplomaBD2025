@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Text;
 using UseCase.RelationalDatabase;
 using UseCase.Roles.CompanyUser.Enums;
+using UseCase.Shared.Exceptions;
 using UseCase.Shared.Templates.Repositories;
 using UseCase.Shared.Templates.Response.Commands;
 using DatabaseOffer = UseCase.RelationalDatabase.Models.Offer;
@@ -114,7 +115,8 @@ namespace UseCase.Roles.CompanyUser.Repositories.Offers
                 return InvalidUpdate(result.Code, result.Dictionary[item].Message);
             }
 
-            var offerId = item.Id?.Value ?? throw new KeyNotFoundException();
+            var offerId = item.Id?.Value
+                ?? throw new UseCaseLayerException();
             var dbOffer = await _context.Offers
                 .Include(o => o.OfferConnections)
                 .Include(o => o.OfferConditions)
@@ -194,7 +196,8 @@ namespace UseCase.Roles.CompanyUser.Repositories.Offers
             DomainOffer item,
             CancellationToken cancellationToken)
         {
-            var itemId = item.Id?.Value ?? throw new KeyNotFoundException();
+            var itemId = item.Id?.Value
+                ?? throw new UseCaseLayerException();
 
             var dbOffer = await _context.Offers
                 .Where(o => o.OfferId == itemId)
