@@ -7,7 +7,9 @@ using UseCase.MongoDb.Enums;
 using UseCase.MongoDb.UserLogs;
 using UseCase.MongoDb.UserLogs.DTOs;
 using UseCase.MongoDb.UserLogs.DTOs.UserAuthorizationDtos;
+using UseCase.MongoDb.UserLogs.DTOs.UserProfileDtos;
 using UseCase.MongoDb.UserLogs.Models.UserEvents.UserAuthorizationEvents;
+using UseCase.MongoDb.UserLogs.Models.UserEvents.UserProfileEvents.ResetPasswordEvents;
 
 namespace Infrastructure.MongoDb
 {
@@ -28,6 +30,9 @@ namespace Infrastructure.MongoDb
         private static readonly string _refreshTokenAuthorizationPropertyName = nameof(UserAuthorizationLogOutMongoDb.RefreshToken);
         // UserAuthorizationRefreshTokenMongoDb
         private static readonly string _isDeactivatedAuthorizationPropertyName = nameof(UserAuthorizationRefreshTokenMongoDb.IsDeactivated);
+        // UserProfileInitiatedResetPasswordMongoDb
+        private static readonly string _urlSegmentInitResetPasswordPropertyName = nameof(UserProfileInitiatedResetPasswordMongoDb.UrlSegment);
+        private static readonly string _isDeactivatedInitResetPasswordPropertyName = nameof(UserProfileInitiatedResetPasswordMongoDb.IsDeactivated);
 
         private static readonly IEnumerable<int> _typeIdsWithJwt = [
                 (int)typeof(UserAuthorizationLoginInMongoDb).GetMongoLog(),
@@ -44,6 +49,8 @@ namespace Infrastructure.MongoDb
         private static readonly IEnumerable<int> _typeIdsUserLogOut = UserLogOutMongoDbDto.TypeIds;
         // GetUserMiddlewareDataAsync
         private static readonly IEnumerable<int> _typeIdsUserMiddleware = UserMiddlewareMongoDbDto.TypeIds;
+        // PrepareUserResetPasswordInitiationPipeline
+        private static readonly int _typeIdResetPasswordInitiation = UserResetPasswordInitiationMongoDbDto.TypeId;
 
         // Non Static Properties
         private readonly IMongoCollection<BsonDocument> _userLogsCollection;
@@ -137,6 +144,23 @@ namespace Infrastructure.MongoDb
             var pipeline = PrepareIdsWithJwtPipeline(userId, jwt, _typeIdsUserMiddleware);
             var baseLogs = await GetUserLogsAsync(pipeline, cancellationToken);
             return (UserMiddlewareMongoDbDto)baseLogs.ToList();
+        }
+
+
+        public async Task<UserResetPasswordInitiationMongoDbDto> GeUserResetPasswordInitiationAsync(
+            Guid userId,
+            string urlSegment,
+            CancellationToken cancellationToken)
+        {
+            var pipeline = PrepareUserResetPasswordInitiationPipeline(userId, urlSegment);
+            var bsonDocument = await GetBsonDocumentAsync(pipeline, cancellationToken);
+            if (bsonDocument == null)
+            {
+                return new UserResetPasswordInitiationMongoDbDto { };
+            }
+
+            await DeactivateResetPasswordInitiationAsync(bsonDocument, cancellationToken);
+            return UserResetPasswordInitiationMongoDbDto.Prepare(bsonDocument);
         }
 
         // Private Static Methods
@@ -431,7 +455,43 @@ namespace Infrastructure.MongoDb
                 replaceRootStage];
         }
 
+        private static BsonDocument[] PrepareUserResetPasswordInitiationPipeline(
+            Guid userId,
+            string urlSegment)
+        {
+            var typeIdMatchStage = new BsonDocument("$match",
+                new BsonDocument(
+                    _typeIdPropertyName,
+                    _typeIdResetPasswordInitiation));
 
+            var userIdMatchStage = new BsonDocument("$match",
+                new BsonDocument(
+                    _userIdPropertyName,
+                    userId.ToString().ToLower()));
+
+            var urlSegmentMatchStage = new BsonDocument("$match",
+                new BsonDocument(
+                    _urlSegmentInitResetPasswordPropertyName,
+                    urlSegment));
+
+            var isDeactivatedMatchStage = new BsonDocument("$match",
+                new BsonDocument(
+                    _isDeactivatedInitResetPasswordPropertyName,
+                    false));
+
+            var sortByCreatedStage = new BsonDocument("$sort",
+                new BsonDocument(
+                    _createdPropertyName,
+                    -1));
+
+            return [
+                typeIdMatchStage,
+                userIdMatchStage,
+                urlSegmentMatchStage,
+                isDeactivatedMatchStage,
+                sortByCreatedStage
+            ];
+        }
         // Private Non Static Methods
         private async Task<IEnumerable<BsonDocument>> GetBsonDocumentsAsync(
             BsonDocument[] pipeline,
@@ -501,6 +561,30 @@ namespace Infrastructure.MongoDb
                     {
                         throw new InfrastructureLayerException("Have no update");
                     }
+                }
+            }
+        }
+
+
+        private async Task DeactivateResetPasswordInitiationAsync(
+          BsonDocument bsonDocument,
+          CancellationToken cancellationToken)
+        {
+            var typeId = (int)bsonDocument[_typeIdPropertyName];
+            var isDeactivated = (bool)bsonDocument[_isDeactivatedInitResetPasswordPropertyName];
+
+            if (typeId == _typeIdResetPasswordInitiation && !isDeactivated)
+            {
+                // For rule should be 1
+                var update = Builders<BsonDocument>.Update
+                    .Set(_isDeactivatedInitResetPasswordPropertyName, true);
+                var filter = Builders<BsonDocument>
+                    .Filter.Eq(_idPropertyName, bsonDocument[_idPropertyName]);
+                var updateResult = await _userLogsCollection
+                    .UpdateOneAsync(filter, update, cancellationToken: cancellationToken);
+                if (updateResult.ModifiedCount == 0)
+                {
+                    throw new InfrastructureLayerException("Have no update");
                 }
             }
         }

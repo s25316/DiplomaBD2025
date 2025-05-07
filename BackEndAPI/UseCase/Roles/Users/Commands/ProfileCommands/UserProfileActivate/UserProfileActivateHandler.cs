@@ -27,6 +27,8 @@ namespace UseCase.Roles.Users.Commands.ProfileCommands.UserProfileActivate
             _personRepository = personRepository;
         }
 
+
+        // Methods
         public async Task<UserProfileActivateResponse> Handle(UserProfileActivateRequest request, CancellationToken cancellationToken)
         {
             // MongoDB Part
@@ -50,8 +52,9 @@ namespace UseCase.Roles.Users.Commands.ProfileCommands.UserProfileActivate
             }
 
             // MSSQL Part
-            var selectData = await _personRepository
-                .GetAsync(userId, cancellationToken);
+            var selectData = await _personRepository.GetAsync(
+                userId,
+                cancellationToken);
             if (selectData.Code != HttpCode.Ok)
             {
                 return PrepareResponse(selectData.Code);
@@ -60,15 +63,16 @@ namespace UseCase.Roles.Users.Commands.ProfileCommands.UserProfileActivate
             // Domain Event Handling
             var domainPerson = selectData.Item;
             domainPerson.RaiseProfileActivatedEvent();
-
             foreach (var @event in domainPerson.DomainEvents)
             {
                 await _mediator.Publish(@event);
             }
+
             return PrepareResponse(HttpCode.Ok);
         }
 
-        public static UserProfileActivateResponse PrepareResponse(
+        // Static Methods
+        private static UserProfileActivateResponse PrepareResponse(
             HttpCode code,
             string? message = null)
         {

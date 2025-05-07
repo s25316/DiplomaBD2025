@@ -1,10 +1,10 @@
-﻿using Domain.Features.People.DomainEvents;
+﻿using Domain.Features.People.DomainEvents.ProfileEvents;
 using MediatR;
 using UseCase.Kafka;
 using UseCase.MongoDb.UserLogs.Models.UserEvents.UserProfileEvents.RegistrationEvents;
 using UseCase.Shared.Services.Authentication.Generators;
 
-namespace UseCase.Roles.Users.Commands.ProfileCommands.UserProfileCreate.DomainEvents.PersonProfileCreated
+namespace UseCase.Roles.Users.Commands.ProfileCommands.DomainEvents.PersonProfileCreated
 {
     public class PersonProfileCreatedEventHandler : INotificationHandler<PersonProfileCreatedEvent>
     {

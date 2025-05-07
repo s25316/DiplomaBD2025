@@ -1,5 +1,5 @@
 ﻿// Ignore Spelling: Mongo, Json
-using Domain.Features.People.DomainEvents;
+using Domain.Features.People.DomainEvents.ProfileEvents;
 using UseCase.MongoDb.Enums;
 
 namespace UseCase.MongoDb.UserLogs.Models.UserEvents.UserProfileEvents.RegistrationEvents

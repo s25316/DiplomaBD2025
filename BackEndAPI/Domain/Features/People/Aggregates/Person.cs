@@ -1,6 +1,6 @@
 ﻿// Ignore Spelling: Jwt
-using Domain.Features.People.DomainEvents;
 using Domain.Features.People.DomainEvents.AuthorizationEvents;
+using Domain.Features.People.DomainEvents.ProfileEvents;
 using Domain.Features.People.Entities;
 using Domain.Features.People.Exceptions;
 using Domain.Features.People.ValueObjects.BirthDates;
@@ -132,6 +132,25 @@ namespace Domain.Features.People.Aggregates
                 refreshTokenValidTo));
         }
 
+        public void RaiseInitiateResetPasswordEvent()
+        {
+            AddDomainEvent(PersonProfileInitiateResetPasswordEvent.Prepare(
+                this));
+        }
+
+        public void SetAuthenticationData(string salt, string password)
+        {
+            Salt = salt;
+            Password = password;
+            if (AllowedRegistrationEvents)
+            {
+                AddDomainEvent(PersonProfileResetPasswordEvent.Prepare(
+                this,
+                salt,
+                password));
+            }
+        }
+
         // Private Methods
         private void SetLogin(string? login)
         {
@@ -142,11 +161,6 @@ namespace Domain.Features.People.Aggregates
             Login = new Email(login);
         }
 
-        private void SetAuthenticationData(string salt, string password)
-        {
-            Salt = salt;
-            Password = password;
-        }
 
         private void SetName(string? name)
         {

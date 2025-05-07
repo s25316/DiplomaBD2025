@@ -71,15 +71,14 @@ namespace UseCase.Roles.Users.Commands.ProfileCommands.UserProfileCreate
         // Private Non Static Methods
         private DomainPerson.Builder PrepareBuilder(UserProfileCreateRequest request)
         {
-            var (Salt, HashedPassword) = _authenticationGenerator
+            var (salt, hashedPassword) = _authenticationGenerator
                 .HashPassword(request.Command.Password);
 
             return new DomainPerson.Builder()
                 .SetLogin(request.Command.Email)
                 .SetAuthenticationData(
-                Salt,
-                HashedPassword
-                )
+                salt,
+                hashedPassword)
                 .SetHasTwoFactorAuthentication(false)
                 .SetIsAdministrator(false)
                 .SetIsStudent(false);

@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using UseCase.Roles.Users.Commands.ProfileCommands.UserProfileActivate.Request;
 using UseCase.Roles.Users.Commands.ProfileCommands.UserProfileCreate.Request;
+using UseCase.Roles.Users.Commands.ProfileCommands.UserProfileResetPasswordAuthorize.Request;
+using UseCase.Roles.Users.Commands.ProfileCommands.UserProfileResetPasswordInitiate.Request;
+using UseCase.Roles.Users.Commands.ProfileCommands.UserProfileResetPasswordUnAuthorize.Request;
 using UseCase.Roles.Users.Commands.UserAuthorizationCommands.UserAuthorization2Stage.Request;
 using UseCase.Roles.Users.Commands.UserAuthorizationCommands.UserAuthorizationLoginIn.Request;
 using UseCase.Roles.Users.Commands.UserAuthorizationCommands.UserAuthorizationRefreshToken.Request;
@@ -117,6 +120,56 @@ namespace BackEndAPI.Controllers
         {
             var request = new UserLogOutRequest
             {
+                Metadata = (RequestMetadata)HttpContext,
+            };
+
+            var result = await _mediator.Send(request, cancellationToken);
+            return StatusCode((int)result.HttpCode);
+        }
+
+
+        [HttpPut("password/initiate")]
+        public async Task<IActionResult> UserAuthorizationRefreshTokenAsync(
+            UserProfileResetPasswordInitiateCommand command,
+            CancellationToken cancellationToken)
+        {
+            var request = new UserProfileResetPasswordInitiateRequest
+            {
+                Command = command,
+                Metadata = (RequestMetadata)HttpContext,
+            };
+
+            var result = await _mediator.Send(request, cancellationToken);
+            return StatusCode((int)result.HttpCode);
+        }
+
+        [HttpPut("password/{urlSegmentPart1:guid}/{urlSegmentPart2}")]
+        public async Task<IActionResult> UserAuthorizationRefreshTokenAsync(
+            Guid urlSegmentPart1,
+            string urlSegmentPart2,
+            UserProfileResetPasswordUnAuthorizeCommand command,
+            CancellationToken cancellationToken)
+        {
+            var request = new UserProfileResetPasswordUnAuthorizeRequest
+            {
+                UrlSegment1 = urlSegmentPart1,
+                UrlSegment2 = urlSegmentPart2,
+                Command = command,
+                Metadata = (RequestMetadata)HttpContext,
+            };
+
+            var result = await _mediator.Send(request, cancellationToken);
+            return StatusCode((int)result.HttpCode);
+        }
+
+        [HttpPut("password")]
+        public async Task<IActionResult> UserAuthorizationRefreshTokenAsync(
+            UserProfileResetPasswordAuthorizeCommand command,
+            CancellationToken cancellationToken)
+        {
+            var request = new UserProfileResetPasswordAuthorizeRequest
+            {
+                Command = command,
                 Metadata = (RequestMetadata)HttpContext,
             };
 

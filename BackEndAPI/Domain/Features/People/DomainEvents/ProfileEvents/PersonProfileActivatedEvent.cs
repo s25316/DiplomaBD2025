@@ -3,7 +3,7 @@ using Domain.Features.People.Exceptions;
 using Domain.Shared.Enums;
 using Domain.Shared.Templates;
 
-namespace Domain.Features.People.DomainEvents
+namespace Domain.Features.People.DomainEvents.ProfileEvents
 {
     public record PersonProfileActivatedEvent : DomainEvent
     {

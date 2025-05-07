@@ -1,9 +1,9 @@
-﻿using Domain.Features.People.DomainEvents;
+﻿using Domain.Features.People.DomainEvents.ProfileEvents;
 using MediatR;
 using UseCase.Kafka;
 using UseCase.MongoDb.UserLogs.Models.UserEvents.UserProfileEvents.RegistrationEvents;
 
-namespace UseCase.Roles.Users.Commands.ProfileCommands.UserProfileActivate.DomainEvents.PersonProfileActivated
+namespace UseCase.Roles.Users.Commands.ProfileCommands.DomainEvents.PersonProfileActivated
 {
     public class PersonProfileActivatedHandler : INotificationHandler<PersonProfileActivatedEvent>
     {

@@ -1,6 +1,7 @@
 ﻿// Ignore spelling: Mongo
 using UseCase.MongoDb.UserLogs.DTOs;
 using UseCase.MongoDb.UserLogs.DTOs.UserAuthorizationDtos;
+using UseCase.MongoDb.UserLogs.DTOs.UserProfileDtos;
 
 namespace UseCase.MongoDb
 {
@@ -34,6 +35,11 @@ namespace UseCase.MongoDb
         Task<UserMiddlewareMongoDbDto> GetUserMiddlewareDataAsync(
             Guid userId,
             string jwt,
+            CancellationToken cancellationToken);
+
+        Task<UserResetPasswordInitiationMongoDbDto> GeUserResetPasswordInitiationAsync(
+            Guid userId,
+            string urlSegment,
             CancellationToken cancellationToken);
     }
 }
