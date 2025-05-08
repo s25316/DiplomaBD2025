@@ -46,6 +46,7 @@ namespace UseCase.Roles.Users.Commands.ProfileCommands.UserProfileRemove
             {
                 await _mediator.Publish(@event, cancellationToken);
             }
+
             var updateResult = await _personRepository.UpdateAsync(domainPreson, cancellationToken);
             if (updateResult.Code != HttpCode.Ok)
             {

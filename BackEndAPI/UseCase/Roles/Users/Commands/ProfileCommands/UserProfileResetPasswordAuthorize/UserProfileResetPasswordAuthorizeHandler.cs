@@ -4,6 +4,7 @@ using MediatR;
 using UseCase.Roles.Users.Commands.ProfileCommands.Response;
 using UseCase.Roles.Users.Commands.ProfileCommands.UserProfileResetPasswordAuthorize.Request;
 using UseCase.Roles.Users.Repositories;
+using UseCase.Shared.Exceptions;
 using UseCase.Shared.Services.Authentication.Generators;
 using UseCase.Shared.Services.Authentication.Inspectors;
 
@@ -59,7 +60,12 @@ namespace UseCase.Roles.Users.Commands.ProfileCommands.UserProfileResetPasswordA
             {
                 await _mediator.Publish(@event, cancellationToken);
             }
-            await _personRepository.UpdateAsync(domainPerson, cancellationToken);
+            var updateResult = await _personRepository.UpdateAsync(domainPerson, cancellationToken);
+            if (updateResult.Code != HttpCode.Ok)
+            {
+                throw new UseCaseLayerException(updateResult.Metadata.Message);
+            }
+
             return PrepareValid();
         }
 

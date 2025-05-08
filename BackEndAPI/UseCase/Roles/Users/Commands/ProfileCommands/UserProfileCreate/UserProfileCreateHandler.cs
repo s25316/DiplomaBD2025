@@ -55,9 +55,7 @@ namespace UseCase.Roles.Users.Commands.ProfileCommands.UserProfileCreate
                 await _mediator.Publish(domainEvent);
             }
 
-            return PrepareResponse(
-                    createResult.Code,
-                    createResult.Metadata.Message);
+            return PrepareResponse(createResult.Code, createResult.Metadata.Message);
         }
 
         // Private Static Methods

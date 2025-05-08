@@ -1,11 +1,12 @@
-﻿using Domain.Shared.CustomProviders;
+﻿// Ignore Spelling: Mongo, Dto
+using Domain.Shared.CustomProviders;
 using Domain.Shared.Enums;
 using MediatR;
 using UseCase.MongoDb;
 using UseCase.Roles.Users.Commands.ProfileCommands.Response;
 using UseCase.Roles.Users.Commands.ProfileCommands.UserProfileRestore.Request;
-// Ignore Spelling: Mongo, Dto
 using UseCase.Roles.Users.Repositories;
+using UseCase.Shared.Exceptions;
 
 namespace UseCase.Roles.Users.Commands.ProfileCommands.UserProfileRestore
 {
@@ -54,13 +55,17 @@ namespace UseCase.Roles.Users.Commands.ProfileCommands.UserProfileRestore
 
 
             doaminPerson.Restore();
-            Console.WriteLine($"Data {doaminPerson.Removed}");
-            Console.WriteLine(doaminPerson.DomainEvents.Count);
             foreach (var @event in doaminPerson.DomainEvents)
             {
                 await _mediator.Publish(@event, cancellationToken);
             }
-            await _personRepository.UpdateAsync(doaminPerson, cancellationToken);
+
+            var updateResult = await _personRepository.UpdateAsync(doaminPerson, cancellationToken);
+            if (updateResult.Code != HttpCode.Ok)
+            {
+                throw new UseCaseLayerException(updateResult.Metadata.Message);
+            }
+
             return PrepareValid();
         }
 
