@@ -2,14 +2,14 @@
 using Domain.Shared.Enums;
 using MediatR;
 using UseCase.MongoDb;
+using UseCase.Roles.Users.Commands.ProfileCommands.Response;
 using UseCase.Roles.Users.Commands.ProfileCommands.UserProfileResetPasswordUnAuthorize.Request;
-using UseCase.Roles.Users.Commands.ProfileCommands.UserProfileResetPasswordUnAuthorize.Response;
 using UseCase.Roles.Users.Repositories;
 using UseCase.Shared.Services.Authentication.Generators;
 
 namespace UseCase.Roles.Users.Commands.ProfileCommands.UserProfileResetPasswordUnAuthorize
 {
-    public class UserProfileResetPasswordUnAuthorizeHandler : IRequestHandler<UserProfileResetPasswordUnAuthorizeRequest, UserProfileResetPasswordUnAuthorizeResponse>
+    public class UserProfileResetPasswordUnAuthorizeHandler : IRequestHandler<UserProfileResetPasswordUnAuthorizeRequest, ProfileCommandResponse>
     {
         // Properties
         private readonly IAuthenticationGeneratorService _authenticationGenerator;
@@ -33,7 +33,7 @@ namespace UseCase.Roles.Users.Commands.ProfileCommands.UserProfileResetPasswordU
 
 
         // Methods
-        public async Task<UserProfileResetPasswordUnAuthorizeResponse> Handle(UserProfileResetPasswordUnAuthorizeRequest request, CancellationToken cancellationToken)
+        public async Task<ProfileCommandResponse> Handle(UserProfileResetPasswordUnAuthorizeRequest request, CancellationToken cancellationToken)
         {
             var resetPasswordInitiationDto = await _mongoService.GeUserResetPasswordInitiationAsync(
                 request.UrlSegment1,
@@ -69,14 +69,14 @@ namespace UseCase.Roles.Users.Commands.ProfileCommands.UserProfileResetPasswordU
         }
 
         //Static Methods
-        public static UserProfileResetPasswordUnAuthorizeResponse PrepareValid()
+        public static ProfileCommandResponse PrepareValid()
         {
-            return UserProfileResetPasswordUnAuthorizeResponse.PrepareValid();
+            return ProfileCommandResponse.PrepareResponse(HttpCode.Ok);
         }
 
-        public static UserProfileResetPasswordUnAuthorizeResponse PrepareInvalid()
+        public static ProfileCommandResponse PrepareInvalid()
         {
-            return UserProfileResetPasswordUnAuthorizeResponse.PrepareInvalid();
+            return ProfileCommandResponse.PrepareResponse(HttpCode.BadRequest);
         }
     }
 }

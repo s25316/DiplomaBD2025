@@ -19,15 +19,14 @@ namespace BackEndAPI
 
             var app = builder.Build();
             await CreateKafkaTopicsAsync(app);
+            // Custom Middlewares
+            app.UseUserAuthorizationMiddleware();
 
             // Configure the requesting from any host
             app.UseCors(x => x.AllowAnyMethod()
                 .AllowAnyHeader()
                 .SetIsOriginAllowed(origin => true)
                 .AllowCredentials());
-
-            // Custom Middlewares
-            app.UseUserAuthorizationMiddleware();
 
             // Configure the HTTP request pipeline.
             app.UseSwagger();

@@ -36,24 +36,22 @@ namespace UseCase.MongoDb.UserLogs.DTOs.UserAuthorizationDtos.AbstractClasses
 
         // Computed Properties
         public bool HasRemoved =>
-
-               _removed != null &&
+            (
+                _removed != null &&
                _restored == null
-            ||
-
-               _removed != null &&
+            ) || (
+                _removed != null &&
                _restored != null &&
                _removed.Created > _restored.Created
-           ;
+            );
         public bool HasBlocked =>
-
+            (
                 _blocked != null &&
                 _unBlocked == null
-             ||
-
+            ) || (
                 _blocked != null &&
                 _unBlocked != null &&
                 _blocked.Created > _unBlocked.Created
-            ;
+            );
     }
 }

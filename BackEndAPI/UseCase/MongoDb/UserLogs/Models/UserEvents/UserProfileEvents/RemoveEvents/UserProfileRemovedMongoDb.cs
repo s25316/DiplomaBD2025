@@ -1,4 +1,5 @@
 ﻿// Ignore Spelling: Mongo, Json
+using Domain.Features.People.DomainEvents.ProfileEvents;
 using UseCase.MongoDb.Enums;
 
 namespace UseCase.MongoDb.UserLogs.Models.UserEvents.UserProfileEvents.RemoveEvents
@@ -6,17 +7,22 @@ namespace UseCase.MongoDb.UserLogs.Models.UserEvents.UserProfileEvents.RemoveEve
     public class UserProfileRemovedMongoDb : BaseUserLogMongoDb
     {
         // Properties
-        public required string RestoreUrlSegment { get; init; }
+        public required string UrlSegment { get; init; }
+        public required DateTime ValidTo { get; init; }
+        public bool IsDeactivated { get; init; } = false;
 
 
         // Static Methods
-        public static UserProfileRemovedMongoDb Prepare(Guid userId, string urlSegment)
+        public static implicit operator UserProfileRemovedMongoDb(
+            PersonProfileRemovedEvent @event)
         {
             return new UserProfileRemovedMongoDb
             {
-                RestoreUrlSegment = urlSegment,
-                UserId = userId,
+                UserId = @event.UserId,
                 TypeId = typeof(UserProfileRemovedMongoDb).GetMongoLog(),
+                UrlSegment = @event.UrlSegment,
+                ValidTo = @event.ValidTo,
+                Created = @event.Created,
             };
         }
 

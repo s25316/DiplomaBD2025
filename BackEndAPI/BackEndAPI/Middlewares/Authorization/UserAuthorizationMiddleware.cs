@@ -1,4 +1,5 @@
 ﻿// Ignore Spelling: Middlewares, Middleware, Mongo
+using System.Security.Claims;
 using UseCase.MongoDb;
 using UseCase.Shared.Services.Authentication.Inspectors;
 
@@ -6,6 +7,7 @@ namespace BackEndAPI.Middlewares.Authorization
 {
     public class UserAuthorizationMiddleware
     {
+        private static readonly string _authorizationHeader = "Authorization";
         private readonly RequestDelegate _next;
 
 
@@ -16,23 +18,22 @@ namespace BackEndAPI.Middlewares.Authorization
         }
 
         public async Task Invoke(
-
             HttpContext context,
             IMongoDbService mongoService,
             IAuthenticationInspectorService authenticationInspector)
         {
+
             context.Items["IsAdmin"] = null;
-            if (context.Request.Headers.TryGetValue("Authorization", out var authorizationHeader))
+            if (context.Request.Headers.TryGetValue(_authorizationHeader, out var authorizationHeader))
             {
                 var jwt = authorizationHeader
                     .ToString()
-                    .Replace("Bearer ", "")
+                    .Replace("Bearer", "")
                     .Trim();
 
                 if (!authenticationInspector.IsValidJwt(jwt, true))
                 {
-                    context.Response.StatusCode = 401;
-                    return;
+                    RemoveHeader(context, _authorizationHeader);
                 }
 
                 var personId = authenticationInspector.GetClaimsName(jwt, true)
@@ -47,16 +48,25 @@ namespace BackEndAPI.Middlewares.Authorization
                     userMiddlewareData.HasBlocked ||
                     userMiddlewareData.HasLogOut)
                 {
-                    context.Response.StatusCode = 401;
-                    return;
+                    RemoveHeader(context, _authorizationHeader);
+
+                    Console.WriteLine(context.Request.Headers.ContainsKey(_authorizationHeader));
                 }
                 if (userMiddlewareData.IsAdmin)
                 {
                     context.Items["IsAdmin"] = true;
                 }
-
             }
             await _next(context);
+        }
+
+        private static void RemoveHeader(HttpContext context, string header)
+        {
+            if (context.Request.Headers.ContainsKey(header))
+            {
+                context.Request.Headers.Remove(header);
+                context.User = new ClaimsPrincipal(new ClaimsIdentity());
+            }
         }
     }
 }

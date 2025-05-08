@@ -67,15 +67,23 @@ namespace Domain.Features.People.Aggregates
 
         public void Remove()
         {
+            if (!Removed.HasValue)
+            {
+                var now = CustomTimeProvider.Now;
+                Removed = now;
+                AddDomainEvent(PersonProfileRemovedEvent.Prepare(this, now));
+            }
+        }
+
+        public void Restore()
+        {
             if (Removed.HasValue)
             {
                 Removed = null;
-            }
-            else
-            {
-                Removed = CustomTimeProvider.Now;
+                AddDomainEvent((PersonProfileRestoredEvent)(this));
             }
         }
+
 
         public void Block()
         {

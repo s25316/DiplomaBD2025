@@ -9,6 +9,7 @@ using UseCase.MongoDb.UserLogs.DTOs;
 using UseCase.MongoDb.UserLogs.DTOs.UserAuthorizationDtos;
 using UseCase.MongoDb.UserLogs.DTOs.UserProfileDtos;
 using UseCase.MongoDb.UserLogs.Models.UserEvents.UserAuthorizationEvents;
+using UseCase.MongoDb.UserLogs.Models.UserEvents.UserProfileEvents.RemoveEvents;
 using UseCase.MongoDb.UserLogs.Models.UserEvents.UserProfileEvents.ResetPasswordEvents;
 
 namespace Infrastructure.MongoDb
@@ -33,6 +34,9 @@ namespace Infrastructure.MongoDb
         // UserProfileInitiatedResetPasswordMongoDb
         private static readonly string _urlSegmentInitResetPasswordPropertyName = nameof(UserProfileInitiatedResetPasswordMongoDb.UrlSegment);
         private static readonly string _isDeactivatedInitResetPasswordPropertyName = nameof(UserProfileInitiatedResetPasswordMongoDb.IsDeactivated);
+        // UserProfileRemovedMongoDb
+        private static readonly string _urlSegmentProfileRemoved = nameof(UserProfileRemovedMongoDb.UrlSegment);
+        private static readonly string _isDeactivatedProfileRemoved = nameof(UserProfileRemovedMongoDb.IsDeactivated);
 
         private static readonly IEnumerable<int> _typeIdsWithJwt = [
                 (int)typeof(UserAuthorizationLoginInMongoDb).GetMongoLog(),
@@ -51,6 +55,8 @@ namespace Infrastructure.MongoDb
         private static readonly IEnumerable<int> _typeIdsUserMiddleware = UserMiddlewareMongoDbDto.TypeIds;
         // PrepareUserResetPasswordInitiationPipeline
         private static readonly int _typeIdResetPasswordInitiation = UserResetPasswordInitiationMongoDbDto.TypeId;
+        // PrepareUserProfileRemovedPipeline
+        private static readonly int _typeIdUserRemoved = UserRemovedMongoDbDto.TypeId;
 
         // Non Static Properties
         private readonly IMongoCollection<BsonDocument> _userLogsCollection;
@@ -161,6 +167,21 @@ namespace Infrastructure.MongoDb
 
             await DeactivateResetPasswordInitiationAsync(bsonDocument, cancellationToken);
             return UserResetPasswordInitiationMongoDbDto.Prepare(bsonDocument);
+        }
+
+        public async Task<UserRemovedMongoDbDto> GeUserRemovedAsync(
+            Guid userId,
+            string urlSegment,
+            CancellationToken cancellationToken)
+        {
+            var pipeline = PrepareUserProfileRemovedPipeline(userId, urlSegment);
+            var bsonDocument = await GetBsonDocumentAsync(pipeline, cancellationToken);
+            if (bsonDocument == null)
+            {
+                return new UserRemovedMongoDbDto { };
+            }
+            await DeactivateProfileRemovedAsync(bsonDocument, cancellationToken);
+            return UserRemovedMongoDbDto.Prepare(bsonDocument);
         }
 
         // Private Static Methods
@@ -492,6 +513,44 @@ namespace Infrastructure.MongoDb
                 sortByCreatedStage
             ];
         }
+
+        private static BsonDocument[] PrepareUserProfileRemovedPipeline(
+            Guid userId,
+            string urlSegment)
+        {
+            var typeIdMatchStage = new BsonDocument("$match",
+                new BsonDocument(
+                    _typeIdPropertyName,
+                    _typeIdUserRemoved));
+
+            var userIdMatchStage = new BsonDocument("$match",
+                new BsonDocument(
+                    _userIdPropertyName,
+                    userId.ToString().ToLower()));
+
+            var urlSegmentMatchStage = new BsonDocument("$match",
+                new BsonDocument(
+                    _urlSegmentProfileRemoved,
+                    urlSegment));
+
+            var isDeactivatedMatchStage = new BsonDocument("$match",
+                new BsonDocument(
+                    _isDeactivatedProfileRemoved,
+                    false));
+
+            var sortByCreatedStage = new BsonDocument("$sort",
+                new BsonDocument(
+                    _createdPropertyName,
+                    -1));
+
+            return [
+                typeIdMatchStage,
+                userIdMatchStage,
+                urlSegmentMatchStage,
+                isDeactivatedMatchStage,
+                sortByCreatedStage
+            ];
+        }
         // Private Non Static Methods
         private async Task<IEnumerable<BsonDocument>> GetBsonDocumentsAsync(
             BsonDocument[] pipeline,
@@ -574,6 +633,30 @@ namespace Infrastructure.MongoDb
             var isDeactivated = (bool)bsonDocument[_isDeactivatedInitResetPasswordPropertyName];
 
             if (typeId == _typeIdResetPasswordInitiation && !isDeactivated)
+            {
+                // For rule should be 1
+                var update = Builders<BsonDocument>.Update
+                    .Set(_isDeactivatedInitResetPasswordPropertyName, true);
+                var filter = Builders<BsonDocument>
+                    .Filter.Eq(_idPropertyName, bsonDocument[_idPropertyName]);
+                var updateResult = await _userLogsCollection
+                    .UpdateOneAsync(filter, update, cancellationToken: cancellationToken);
+                if (updateResult.ModifiedCount == 0)
+                {
+                    throw new InfrastructureLayerException("Have no update");
+                }
+            }
+        }
+
+
+        private async Task DeactivateProfileRemovedAsync(
+          BsonDocument bsonDocument,
+          CancellationToken cancellationToken)
+        {
+            var typeId = (int)bsonDocument[_typeIdPropertyName];
+            var isDeactivated = (bool)bsonDocument[_isDeactivatedProfileRemoved];
+
+            if (typeId == _typeIdUserRemoved && !isDeactivated)
             {
                 // For rule should be 1
                 var update = Builders<BsonDocument>.Update

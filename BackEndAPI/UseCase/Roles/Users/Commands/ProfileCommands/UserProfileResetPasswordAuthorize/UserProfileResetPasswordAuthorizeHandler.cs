@@ -1,15 +1,15 @@
 ﻿using Domain.Features.People.ValueObjects.Ids;
 using Domain.Shared.Enums;
 using MediatR;
+using UseCase.Roles.Users.Commands.ProfileCommands.Response;
 using UseCase.Roles.Users.Commands.ProfileCommands.UserProfileResetPasswordAuthorize.Request;
-using UseCase.Roles.Users.Commands.ProfileCommands.UserProfileResetPasswordAuthorize.Response;
 using UseCase.Roles.Users.Repositories;
 using UseCase.Shared.Services.Authentication.Generators;
 using UseCase.Shared.Services.Authentication.Inspectors;
 
 namespace UseCase.Roles.Users.Commands.ProfileCommands.UserProfileResetPasswordAuthorize
 {
-    public class UserProfileResetPasswordAuthorizeHandler : IRequestHandler<UserProfileResetPasswordAuthorizeRequest, UserProfileResetPasswordAuthorizeResponse>
+    public class UserProfileResetPasswordAuthorizeHandler : IRequestHandler<UserProfileResetPasswordAuthorizeRequest, ProfileCommandResponse>
     {
         // Properties
         private readonly IAuthenticationGeneratorService _authenticationGeneratorService;
@@ -33,7 +33,7 @@ namespace UseCase.Roles.Users.Commands.ProfileCommands.UserProfileResetPasswordA
 
 
         // Methods
-        public async Task<UserProfileResetPasswordAuthorizeResponse> Handle(UserProfileResetPasswordAuthorizeRequest request, CancellationToken cancellationToken)
+        public async Task<ProfileCommandResponse> Handle(UserProfileResetPasswordAuthorizeRequest request, CancellationToken cancellationToken)
         {
             var userId = GetPersonId(request);
             var selectResult = await _personRepository.GetAsync(userId, cancellationToken);
@@ -64,14 +64,14 @@ namespace UseCase.Roles.Users.Commands.ProfileCommands.UserProfileResetPasswordA
         }
 
         //Static Methods
-        public static UserProfileResetPasswordAuthorizeResponse PrepareValid()
+        public static ProfileCommandResponse PrepareValid()
         {
-            return UserProfileResetPasswordAuthorizeResponse.PrepareValid();
+            return ProfileCommandResponse.PrepareResponse(HttpCode.Ok);
         }
 
-        public static UserProfileResetPasswordAuthorizeResponse PrepareInvalid()
+        public static ProfileCommandResponse PrepareInvalid()
         {
-            return UserProfileResetPasswordAuthorizeResponse.PrepareInvalid();
+            return ProfileCommandResponse.PrepareResponse(HttpCode.BadRequest);
         }
 
         // Non Static Methods

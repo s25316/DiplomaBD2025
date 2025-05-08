@@ -2,13 +2,13 @@
 using Domain.Shared.Enums;
 using MediatR;
 using UseCase.MongoDb;
+using UseCase.Roles.Users.Commands.ProfileCommands.Response;
 using UseCase.Roles.Users.Commands.ProfileCommands.UserProfileActivate.Request;
-using UseCase.Roles.Users.Commands.ProfileCommands.UserProfileActivate.Response;
 using UseCase.Roles.Users.Repositories;
 
 namespace UseCase.Roles.Users.Commands.ProfileCommands.UserProfileActivate
 {
-    public class UserProfileActivateHandler : IRequestHandler<UserProfileActivateRequest, UserProfileActivateResponse>
+    public class UserProfileActivateHandler : IRequestHandler<UserProfileActivateRequest, ProfileCommandResponse>
     {
         // Properties
         private readonly IMediator _mediator;
@@ -29,7 +29,7 @@ namespace UseCase.Roles.Users.Commands.ProfileCommands.UserProfileActivate
 
 
         // Methods
-        public async Task<UserProfileActivateResponse> Handle(UserProfileActivateRequest request, CancellationToken cancellationToken)
+        public async Task<ProfileCommandResponse> Handle(UserProfileActivateRequest request, CancellationToken cancellationToken)
         {
             // MongoDB Part
             var userId = request.Command.UserId;
@@ -41,8 +41,7 @@ namespace UseCase.Roles.Users.Commands.ProfileCommands.UserProfileActivate
             {
                 return PrepareResponse(HttpCode.NotFound);
             }
-            if (activationData.ActivationUrlSegment !=
-                request.Command.ActivationUrlSegment)
+            if (activationData.ActivationUrlSegment != request.Command.ActivationUrlSegment)
             {
                 return PrepareResponse(HttpCode.BadRequest);
             }
@@ -52,31 +51,27 @@ namespace UseCase.Roles.Users.Commands.ProfileCommands.UserProfileActivate
             }
 
             // MSSQL Part
-            var selectData = await _personRepository.GetAsync(
-                userId,
-                cancellationToken);
+            var selectData = await _personRepository.GetAsync(userId, cancellationToken);
             if (selectData.Code != HttpCode.Ok)
             {
                 return PrepareResponse(selectData.Code);
             }
+            var domainPerson = selectData.Item;
+
 
             // Domain Event Handling
-            var domainPerson = selectData.Item;
             domainPerson.RaiseProfileActivatedEvent();
             foreach (var @event in domainPerson.DomainEvents)
             {
                 await _mediator.Publish(@event);
             }
-
             return PrepareResponse(HttpCode.Ok);
         }
 
         // Static Methods
-        private static UserProfileActivateResponse PrepareResponse(
-            HttpCode code,
-            string? message = null)
+        private static ProfileCommandResponse PrepareResponse(HttpCode code, string? message = null)
         {
-            return UserProfileActivateResponse.PrepareResponse(code, message);
+            return ProfileCommandResponse.PrepareResponse(code, message);
         }
     }
 }

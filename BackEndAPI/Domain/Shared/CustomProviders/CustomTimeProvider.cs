@@ -33,6 +33,6 @@
                 GetDateOnly(dateTime1).DayNumber;
         }
 
-        //public static DateTime GetDateTime(DateOnly dateOnly) => dateOnly.ToDateTime(TimeOnly.MinValue);
+        public static DateTime GetDateTime(DateOnly dateOnly) => dateOnly.ToDateTime(TimeOnly.MinValue);
     }
 }

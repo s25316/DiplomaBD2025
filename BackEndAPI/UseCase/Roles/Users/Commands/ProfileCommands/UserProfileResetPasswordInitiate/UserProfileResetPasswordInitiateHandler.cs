@@ -1,12 +1,13 @@
-﻿using Domain.Shared.ValueObjects.Emails;
+﻿using Domain.Shared.Enums;
+using Domain.Shared.ValueObjects.Emails;
 using MediatR;
+using UseCase.Roles.Users.Commands.ProfileCommands.Response;
 using UseCase.Roles.Users.Commands.ProfileCommands.UserProfileResetPasswordInitiate.Request;
-using UseCase.Roles.Users.Commands.ProfileCommands.UserProfileResetPasswordInitiate.Response;
 using UseCase.Roles.Users.Repositories;
 
 namespace UseCase.Roles.Users.Commands.ProfileCommands.UserProfileResetPasswordInitiate
 {
-    public class UserProfileResetPasswordInitiateHandler : IRequestHandler<UserProfileResetPasswordInitiateRequest, UserProfileResetPasswordInitiateResponse>
+    public class UserProfileResetPasswordInitiateHandler : IRequestHandler<UserProfileResetPasswordInitiateRequest, ProfileCommandResponse>
     {
         // Properties
         private readonly IPersonRepository _personRepository;
@@ -24,7 +25,7 @@ namespace UseCase.Roles.Users.Commands.ProfileCommands.UserProfileResetPasswordI
 
 
         // Methods
-        public async Task<UserProfileResetPasswordInitiateResponse> Handle(UserProfileResetPasswordInitiateRequest request, CancellationToken cancellationToken)
+        public async Task<ProfileCommandResponse> Handle(UserProfileResetPasswordInitiateRequest request, CancellationToken cancellationToken)
         {
             try
             {
@@ -52,14 +53,14 @@ namespace UseCase.Roles.Users.Commands.ProfileCommands.UserProfileResetPasswordI
         }
 
         // Static Methods
-        public static UserProfileResetPasswordInitiateResponse PrepareValid()
+        public static ProfileCommandResponse PrepareValid()
         {
-            return UserProfileResetPasswordInitiateResponse.PrepareValid();
+            return ProfileCommandResponse.PrepareResponse(HttpCode.Ok);
         }
 
-        public static UserProfileResetPasswordInitiateResponse PrepareInvalid()
+        public static ProfileCommandResponse PrepareInvalid()
         {
-            return UserProfileResetPasswordInitiateResponse.PrepareInvalid();
+            return ProfileCommandResponse.PrepareResponse(HttpCode.BadRequest);
         }
         // Non Static Methods
     }

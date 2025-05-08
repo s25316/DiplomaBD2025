@@ -19,6 +19,7 @@ namespace UseCase.Roles.Users.Commands.ProfileCommands.DomainEvents.PersonProfil
         }
 
 
+        // Methods
         public async Task Handle(PersonProfileResetPasswordEvent notification, CancellationToken cancellationToken)
         {
             var log = (UserProfileUpdatedPasswordMongoDb)notification;

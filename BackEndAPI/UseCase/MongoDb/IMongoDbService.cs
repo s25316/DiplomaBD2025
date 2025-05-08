@@ -41,5 +41,10 @@ namespace UseCase.MongoDb
             Guid userId,
             string urlSegment,
             CancellationToken cancellationToken);
+
+        Task<UserRemovedMongoDbDto> GeUserRemovedAsync(
+            Guid userId,
+            string urlSegment,
+            CancellationToken cancellationToken);
     }
 }

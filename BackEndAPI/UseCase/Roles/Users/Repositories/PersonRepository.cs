@@ -95,11 +95,11 @@ namespace UseCase.Roles.Users.Repositories
                 person.PersonId == itemId ||
                 person.Login == itemLogin ||
                 (
-                    itemContactEmail == null ||
+                    itemContactEmail != null &&
                     person.ContactEmail == itemContactEmail
                 ) ||
                 (
-                    itemContactPhoneNumber == null ||
+                    itemContactPhoneNumber != null &&
                     person.PhoneNum == itemContactPhoneNumber
                 );
 
@@ -132,7 +132,6 @@ namespace UseCase.Roles.Users.Repositories
                     if (!string.IsNullOrWhiteSpace(itemContactEmail) &&
                         itemContactEmail == dbItem.ContactEmail)
                     {
-
                         stringBuilder.AppendLine(
                             Messages.Entity_Person_ContactEmail_Duplicate);
                     }
@@ -151,6 +150,7 @@ namespace UseCase.Roles.Users.Repositories
             var dbPerson = people[0];
             UpdatePerson(dbPerson, item);
             await _context.SaveChangesAsync(cancellationToken);
+
             return ValidUpdate();
         }
 
