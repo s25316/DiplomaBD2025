@@ -15,6 +15,7 @@ using UseCase.Roles.Users.Commands.UserAuthorizationCommands.UserAuthorization2S
 using UseCase.Roles.Users.Commands.UserAuthorizationCommands.UserAuthorizationLoginIn.Request;
 using UseCase.Roles.Users.Commands.UserAuthorizationCommands.UserAuthorizationRefreshToken.Request;
 using UseCase.Roles.Users.Commands.UserAuthorizationCommands.UserLogOut.Request;
+using UseCase.Roles.Users.Queries.GetPersonProfile.Request;
 using UseCase.Shared.Templates.Requests;
 
 namespace BackEndAPI.Controllers
@@ -260,6 +261,19 @@ namespace BackEndAPI.Controllers
 
             var result = await _mediator.Send(request, cancellationToken);
             return StatusCode((int)result.HttpCode, result.Result);
+        }
+
+        [Authorize]
+        [HttpGet()]
+        public async Task<IActionResult> GetPersonProfileAsync(
+            CancellationToken cancellationToken)
+        {
+            var request = new GetPersonProfileRequest
+            {
+                Metadata = (RequestMetadata)HttpContext,
+            };
+            var result = await _mediator.Send(request, cancellationToken);
+            return Ok(result);
         }
     }
 }

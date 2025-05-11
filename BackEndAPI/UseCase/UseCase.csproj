@@ -16,7 +16,6 @@
     <Folder Include="Roles\Guests\Commands\" />
     <Folder Include="Roles\Guests\Queries\" />
     <Folder Include="Roles\Users\Commands\ProfileCommands\UserProfileUpdateLogin\Response\" />
-    <Folder Include="Roles\Users\Queries\" />
   </ItemGroup>
 
   <ItemGroup>
