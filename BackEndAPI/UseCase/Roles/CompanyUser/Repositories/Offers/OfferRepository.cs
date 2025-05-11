@@ -480,7 +480,6 @@ namespace UseCase.Roles.CompanyUser.Repositories.Offers
                         Offer = newDbOffer,
                         OfferTemplateId = template.OfferTemplateId.Value,
                         Created = template.Created,
-                        Removed = template.Removed,
                     });
                 }
                 foreach (var contract in item.Contracts.Values.Where(t => t.Removed == null))
@@ -488,9 +487,8 @@ namespace UseCase.Roles.CompanyUser.Repositories.Offers
                     offerConditions.Add(new DatabaseOfferCondition
                     {
                         Offer = newDbOffer,
-                        OfferConditionId = contract.ContractConditionId.Value,
+                        ContractConditionId = contract.ContractConditionId.Value,
                         Created = contract.Created,
-                        Removed = contract.Removed,
                     });
                 }
                 databaseOffers.Add(newDbOffer);

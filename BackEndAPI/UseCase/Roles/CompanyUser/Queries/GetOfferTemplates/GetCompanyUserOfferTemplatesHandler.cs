@@ -145,10 +145,7 @@ namespace UseCase.Roles.CompanyUser.Queries.GetOfferTemplates
             GetCompanyUserOfferTemplatesRequest request)
         {
             ///Tu problklem !!!
-            var query = BuildBaseQuery()
-                .Where(ot => ot.OfferSkills.Any(os =>
-                    os.Removed == null
-                ));
+            var query = BuildBaseQuery();
 
             // For Single OfferTemplate
             if (request.OfferTemplateId.HasValue)
