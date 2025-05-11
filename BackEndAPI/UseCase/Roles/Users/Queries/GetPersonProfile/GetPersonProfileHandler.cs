@@ -60,11 +60,6 @@ namespace UseCase.Roles.Users.Queries.GetPersonProfile
             dbPerson.Urls = dbPersonData.Urls;
             dbPerson.PersonSkills = dbPersonData.Sklills;
 
-            Console.WriteLine(dbPerson.Urls.Count);
-            Console.WriteLine(dbPerson.PersonSkills.Count);
-
-            Console.WriteLine(dbPersonData.Urls.Count);
-            Console.WriteLine(dbPersonData.Sklills.Count);
             return _mapper.Map<FullPersonProfile>(dbPerson);
         }
 

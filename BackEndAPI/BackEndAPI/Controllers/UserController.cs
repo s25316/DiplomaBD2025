@@ -93,7 +93,7 @@ namespace BackEndAPI.Controllers
                 Command = new UserAuthorization2StageCommand
                 {
                     UrlSegmentPart1 = urlSegmentPart1,
-                    UrlSegmentPart2 = urlSegmentPart2,
+                    UrlSegmentPart2 = Map(urlSegmentPart2),
                     CodeDto = code,
                 },
                 Metadata = (RequestMetadata)HttpContext,
@@ -159,7 +159,7 @@ namespace BackEndAPI.Controllers
             var request = new UserProfileResetPasswordUnAuthorizeRequest
             {
                 UrlSegment1 = urlSegmentPart1,
-                UrlSegment2 = urlSegmentPart2,
+                UrlSegment2 = Map(urlSegmentPart2),
                 Command = command,
                 Metadata = (RequestMetadata)HttpContext,
             };
@@ -206,7 +206,7 @@ namespace BackEndAPI.Controllers
             var request = new UserProfileRestoreRequest
             {
                 UrlSegment1 = urlSegmentPart1,
-                UrlSegment2 = urlSegmentPart2,
+                UrlSegment2 = Map(urlSegmentPart2),
                 Metadata = (RequestMetadata)HttpContext,
             };
 
@@ -274,6 +274,30 @@ namespace BackEndAPI.Controllers
             };
             var result = await _mediator.Send(request, cancellationToken);
             return Ok(result);
+        }
+
+
+        private static string Map(string urlSegment)
+        {
+            return urlSegment
+                .Replace("!", "%21")
+                .Replace("#", "%23")
+                .Replace("$", "%24")
+                .Replace("&", "%26")
+                .Replace("'", "%27")
+                .Replace("(", "%28")
+                .Replace(")", "%29")
+                .Replace("*", "%2A")
+                .Replace("+", "%2B")
+                .Replace(",", "%2C")
+                .Replace("/", "%2F")
+                .Replace(":", "%3A")
+                .Replace(";", "%3B")
+                .Replace("=", "%3D")
+                .Replace("?", "%3F")
+                .Replace("@", "%40")
+                .Replace("[", "%5B")
+                .Replace("]", "%5D");
         }
     }
 }

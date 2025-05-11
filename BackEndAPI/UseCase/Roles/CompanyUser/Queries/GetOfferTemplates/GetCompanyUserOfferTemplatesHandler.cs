@@ -144,7 +144,6 @@ namespace UseCase.Roles.CompanyUser.Queries.GetOfferTemplates
             PersonId personId,
             GetCompanyUserOfferTemplatesRequest request)
         {
-            ///Tu problklem !!!
             var query = BuildBaseQuery();
 
             // For Single OfferTemplate
