@@ -8,6 +8,9 @@ using UseCase.Roles.Users.Commands.ProfileCommands.UserProfileResetPasswordAutho
 using UseCase.Roles.Users.Commands.ProfileCommands.UserProfileResetPasswordInitiate.Request;
 using UseCase.Roles.Users.Commands.ProfileCommands.UserProfileResetPasswordUnAuthorize.Request;
 using UseCase.Roles.Users.Commands.ProfileCommands.UserProfileRestore.Request;
+using UseCase.Roles.Users.Commands.ProfileCommands.UserProfileSetBaseData.Request;
+using UseCase.Roles.Users.Commands.ProfileCommands.UserProfileSetRegularData.Request;
+using UseCase.Roles.Users.Commands.ProfileCommands.UserProfileUpdateLogin.Request;
 using UseCase.Roles.Users.Commands.UserAuthorizationCommands.UserAuthorization2Stage.Request;
 using UseCase.Roles.Users.Commands.UserAuthorizationCommands.UserAuthorizationLoginIn.Request;
 using UseCase.Roles.Users.Commands.UserAuthorizationCommands.UserAuthorizationRefreshToken.Request;
@@ -208,6 +211,55 @@ namespace BackEndAPI.Controllers
 
             var result = await _mediator.Send(request, cancellationToken);
             return StatusCode((int)result.HttpCode);
+        }
+
+        [Authorize]
+        [HttpPut("login")]
+        public async Task<IActionResult> UserProfileRemoveAsync(
+            UserProfileUpdateLoginCommand command,
+            CancellationToken cancellationToken)
+        {
+            var request = new UserProfileUpdateLoginRequest
+            {
+                Command = command,
+                Metadata = (RequestMetadata)HttpContext,
+            };
+
+            var result = await _mediator.Send(request, cancellationToken);
+            return StatusCode((int)result.HttpCode, result.Result);
+        }
+
+        [Authorize]
+        [HttpPut("baseData")]
+        public async Task<IActionResult> UserProfileSetBaseDataAsync(
+            UserProfileSetBaseDataCommand command,
+            CancellationToken cancellationToken)
+        {
+            var request = new UserProfileSetBaseDataRequest
+            {
+                Command = command,
+                Metadata = (RequestMetadata)HttpContext,
+            };
+
+            var result = await _mediator.Send(request, cancellationToken);
+            return StatusCode((int)result.HttpCode, result.Result);
+        }
+
+
+        [Authorize]
+        [HttpPut("regularData")]
+        public async Task<IActionResult> UserProfileSetRegularDataAsync(
+            UserProfileSetRegularDataCommand command,
+            CancellationToken cancellationToken)
+        {
+            var request = new UserProfileSetRegularDataRequest
+            {
+                Command = command,
+                Metadata = (RequestMetadata)HttpContext,
+            };
+
+            var result = await _mediator.Send(request, cancellationToken);
+            return StatusCode((int)result.HttpCode, result.Result);
         }
     }
 }

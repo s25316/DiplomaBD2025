@@ -9,6 +9,8 @@ namespace Domain.Features.People.Entities
     {
         public int UrlTypeId { get; init; }
 
+        public string Value { get; init; } = null!;
+
         public required DateTime Created { get; init; }
 
         public DateTime? Removed { get; private set; } = null;
@@ -28,6 +30,7 @@ namespace Domain.Features.People.Entities
             return new PersonUrl
             {
                 Id = item.Id,
+                Value = item.Value,
                 UrlTypeId = item.UrlTypeId,
                 Created = item.Created ?? CustomTimeProvider.Now,
                 Removed = item.Removed,

@@ -73,6 +73,7 @@ namespace UseCase.Roles.Users.AutoMapperProfile
                         .Select(url => new PersonUrlInfo
                         {
                             Id = url.UrlId,
+                            Value = url.Value ?? "",
                             UrlTypeId = url.UrlTypeId,
                             Created = url.Created,
                             Removed = url.Removed,

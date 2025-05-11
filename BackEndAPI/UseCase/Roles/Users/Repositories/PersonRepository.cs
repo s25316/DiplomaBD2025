@@ -114,6 +114,7 @@ namespace UseCase.Roles.Users.Repositories
                 return InvalidUpdate(HttpCode.NotFound);
             }
 
+            Console.WriteLine(people.Count);
             if (people.Count > 1)
             {
                 var stringBuilder = new StringBuilder();

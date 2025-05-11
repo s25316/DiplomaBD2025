@@ -7,6 +7,8 @@ namespace Domain.Features.People.ValueObjects.Info
         // Properties
         public required Guid? Id { get; init; }
 
+        public required string Value { get; init; }
+
         public required int UrlTypeId { get; init; }
 
         public required DateTime? Created { get; init; }
@@ -15,12 +17,13 @@ namespace Domain.Features.People.ValueObjects.Info
 
 
         // Methods
-        public static implicit operator PersonUrlInfo(int urlId)
+        public static PersonUrlInfo Prepare(int urlId, string value)
         {
             return new PersonUrlInfo
             {
                 Id = null,
                 UrlTypeId = urlId,
+                Value = value,
                 Created = CustomTimeProvider.Now,
                 Removed = null,
             };

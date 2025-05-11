@@ -38,13 +38,13 @@ namespace Domain.Features.People.Aggregates
         public PhoneNumber? ContactPhoneNumber { get; private set; } = null!;
         public BirthDate? BirthDate { get; private set; } = null;
         // Collections
-        private readonly Dictionary<int, PersonUrl> _urls = [];
-        public IReadOnlyDictionary<int, PersonUrl> Urls => _urls;
+        private readonly Dictionary<string, PersonUrl> _urls = [];
+        public IReadOnlyDictionary<string, PersonUrl> Urls => _urls;
 
         private readonly Dictionary<SkillId, PersonSkill> _skills = [];
         public IReadOnlyDictionary<SkillId, PersonSkill> Skills => _skills;
         // Derived Data
-        public bool IsCompleteProfile =>
+        public bool IsNotCompleteProfile =>
             string.IsNullOrWhiteSpace(Name) ||
             string.IsNullOrWhiteSpace(Surname) ||
             string.IsNullOrWhiteSpace(ContactEmail);
@@ -206,13 +206,13 @@ namespace Domain.Features.People.Aggregates
                 foreach (var item in items)
                 {
                     var personUrl = (PersonUrl)item;
-                    _urls[personUrl.UrlTypeId] = personUrl;
+                    _urls[personUrl.Value] = personUrl;
                 }
             }
             else
             {
                 var itemsDictionary = items.ToDictionary(
-                    i => i.UrlTypeId);
+                    i => i.Value);
 
                 var existingKeys = _urls.Keys.ToHashSet();
                 var itemsKeys = itemsDictionary.Keys.ToHashSet();
@@ -234,7 +234,7 @@ namespace Domain.Features.People.Aggregates
 
         private void SetSkills(IEnumerable<PersonSkillInfo> items)
         {
-            if (!_urls.Any())
+            if (!_skills.Any())
             {
                 foreach (var item in items)
                 {
@@ -256,7 +256,7 @@ namespace Domain.Features.People.Aggregates
 
                 foreach (var key in removedKeys)
                 {
-                    _urls[key].Remove();
+                    _skills[key].Remove();
                 }
                 foreach (var key in newKeys)
                 {

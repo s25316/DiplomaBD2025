@@ -84,7 +84,7 @@ namespace Domain.Features.People.Aggregates
                 return this;
             }
 
-            public Updater SetContactPhoneNumber(string contactPhoneNumber)
+            public Updater SetContactPhoneNumber(string? contactPhoneNumber)
             {
                 SetProperty(person => person.ContactPhoneNumber = contactPhoneNumber);
                 return this;
