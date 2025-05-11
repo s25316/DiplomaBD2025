@@ -149,7 +149,7 @@ namespace UseCase.Roles.Users.Repositories
             }
 
             var dbPerson = people[0];
-            UpdatePerson(dbPerson, item);
+            await UpdatePerson(dbPerson, item, cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
 
             return ValidUpdate();
@@ -189,7 +189,7 @@ namespace UseCase.Roles.Users.Repositories
             return RepositoryUpdateResponse.InvalidResponse(code, message);
         }
 
-        private static void UpdatePerson(DatabasePerson database, DomainPerson domain)
+        private async Task UpdatePerson(DatabasePerson database, DomainPerson domain, CancellationToken cancellationToken)
         {
             database.AddressId = domain.AddressId?.Value;
             database.Login = domain.Login.Value;
@@ -226,9 +226,9 @@ namespace UseCase.Roles.Users.Repositories
                 {
                     newSkills.Add(new DatabasePersonSkill
                     {
+                        Person = database,
                         SkillId = item.SkillId,
                         Created = item.Created,
-                        Removed = item.Removed,
                     });
                 }
             }
@@ -250,12 +250,16 @@ namespace UseCase.Roles.Users.Repositories
                 {
                     newUrls.Add(new DatabasePersonUrl
                     {
+                        Person = database,
                         UrlTypeId = item.UrlTypeId,
+                        Value = item.Value,
                         Created = item.Created,
-                        Removed = item.Removed,
                     });
                 }
             }
+
+            await _context.Urls.AddRangeAsync(newUrls, cancellationToken);
+            await _context.PersonSkills.AddRangeAsync(newSkills, cancellationToken);
         }
 
         // Private Non Static Methods

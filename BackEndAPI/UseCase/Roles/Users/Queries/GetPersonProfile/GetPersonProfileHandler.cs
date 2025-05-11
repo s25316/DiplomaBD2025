@@ -33,9 +33,38 @@ namespace UseCase.Roles.Users.Queries.GetPersonProfile
         public async Task<FullPersonProfile> Handle(GetPersonProfileRequest request, CancellationToken cancellationToken)
         {
             var personId = GetPersonId(request);
-            var dbPerson = await _context.People
+            var dbPersonData = await _context.People
                 .Where(p => p.PersonId == personId.Value)
+                .Select(person => new
+                {
+                    Person = person,
+                    Sklills = _context.PersonSkills
+                        .Include(x => x.Skill)
+                        .ThenInclude(x => x.SkillType)
+                        .Where(ps =>
+                            ps.PersonId == person.PersonId &&
+                            ps.Removed == null
+                        ).ToList(),
+                    Urls = _context.Urls
+                        .Include(x => x.UrlType)
+                        .Where(url =>
+                            url.PersonId == person.PersonId &&
+                            url.Removed == null)
+                        .ToList()
+                })
+                .AsNoTracking()
                 .FirstAsync(cancellationToken);
+
+
+            var dbPerson = dbPersonData.Person;
+            dbPerson.Urls = dbPersonData.Urls;
+            dbPerson.PersonSkills = dbPersonData.Sklills;
+
+            Console.WriteLine(dbPerson.Urls.Count);
+            Console.WriteLine(dbPerson.PersonSkills.Count);
+
+            Console.WriteLine(dbPersonData.Urls.Count);
+            Console.WriteLine(dbPersonData.Sklills.Count);
             return _mapper.Map<FullPersonProfile>(dbPerson);
         }
 

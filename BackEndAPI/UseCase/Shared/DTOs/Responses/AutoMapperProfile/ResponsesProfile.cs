@@ -167,10 +167,10 @@ namespace UseCase.Shared.DTOs.Responses.AutoMapperProfile
                     Removed = db.Removed,
                     Address = context.Mapper.Map<AddressResponseDto>(db.Address),
                     Skills = db.PersonSkills
-                        .Where(x => x.Removed != null)
+                        .Where(x => x.Removed == null)
                         .Select(skill => context.Mapper.Map<SkillDto>(skill.Skill)),
                     Urls = db.Urls
-                        .Where(x => x.Removed != null)
+                        .Where(x => x.Removed == null)
                         .Select(x => context.Mapper.Map<UrlDto>(x)),
                 })
                 .ForAllMembers(x => x.Ignore());
