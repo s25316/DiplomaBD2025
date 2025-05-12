@@ -14,7 +14,7 @@ const AppBar = () => {
       <ReturnButton/>
       <ThemeToggle/>
 
-      {session?.user ? (
+      {session?.user? (
         <>
         <button onClick={() => { window.location.href = '/profile' }}>Profile</button>
         <button onClick={() => signOut()}>Sign Out</button>

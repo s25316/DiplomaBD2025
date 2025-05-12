@@ -14,10 +14,16 @@ import NextAuth, { DefaultSession, DefaultUser } from "next-auth";
 
 declare module "next-auth" {
   interface User extends DefaultUser {
-    token: string;
-    refreshToken: string;
-    jwtValidTo: string;
-    refreshTokenValidTo: string;
+    isNeed2Stage: boolean;
+    user2StageData?: {
+      urlSegmentPart1: string;
+      urlSegmentPart2: string;
+      validTo: Date;
+    };
+    token?: string;
+    refreshToken?: string;
+    jwtValidTo?: Date;
+    refreshTokenValidTo?: string;
   }
 
   interface Session extends DefaultSession {
@@ -29,7 +35,7 @@ declare module "next-auth/jwt" {
   interface JWT {
     accessToken: string;
     refreshToken?: string;
-    jwtValidTo?: string;
+    jwtValidTo?: Date;
     refreshTokenValidTo?: string;
   }
 }

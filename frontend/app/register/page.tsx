@@ -14,12 +14,15 @@ const Register = () => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        login: email,
+        email: email,
         password: password
       })
     })
-    if(await res.text() === "Created"){
+    if(res.ok){
       redirect("/api/auth/signin")
+    }
+    else{
+      alert("Registration faild")
     }
   }
   return (
@@ -29,7 +32,7 @@ const Register = () => {
         <input name='email' type='email' required placeholder='example@gmail.com' onChange={e => setEmail(e.target.value)} />
         <label htmlFor='password'>Password:</label>
         <input name='password' type='password' required placeholder='****' onChange={e => setPassword(e.target.value)} />
-        <input type='submit' value='Sign Up' />
+        <button type='submit'>Sign Up</button>
       </form>
     </div>
   )
