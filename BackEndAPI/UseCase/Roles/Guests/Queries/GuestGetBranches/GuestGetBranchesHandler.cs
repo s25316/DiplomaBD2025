@@ -14,33 +14,31 @@ using UseCase.Shared.ExtensionMethods.EF.Companies;
 using UseCase.Shared.Responses.BaseResponses;
 using UseCase.Shared.Responses.BaseResponses.CompanyUser;
 using UseCase.Shared.Responses.ItemsResponse;
-using UseCase.Shared.Services.Authentication.Inspectors;
 
 namespace UseCase.Roles.Guests.Queries.GuestGetBranches
 {
-    public class GuestGetBranchesHandler : IRequestHandler<GuestGetBranchesRequest, ItemsResponse<GuestGetBranchAndCompanyDto>>
+    public class GuestGetBranchesHandler : IRequestHandler<GuestGetBranchesRequest, ItemsResponse<GuestBranchAndCompanyDto>>
     {
         // Properties
         private readonly IMapper _mapper;
         private readonly DiplomaBdContext _context;
-        private readonly IAuthenticationInspectorService _authenticationInspector;
+        //private readonly IAuthenticationInspectorService _authenticationInspector;
 
 
         // Constructor
         public GuestGetBranchesHandler(
             IMapper mapper,
-            DiplomaBdContext context,
-            IAuthenticationInspectorService authenticationInspector)
+            DiplomaBdContext context)
         {
             _mapper = mapper;
             _context = context;
-            _authenticationInspector = authenticationInspector;
         }
 
 
         // Methods
-        public async Task<ItemsResponse<GuestGetBranchAndCompanyDto>> Handle(GuestGetBranchesRequest request, CancellationToken cancellationToken)
+        public async Task<ItemsResponse<GuestBranchAndCompanyDto>> Handle(GuestGetBranchesRequest request, CancellationToken cancellationToken)
         {
+            // Prepare Data
             var now = CustomTimeProvider.Now;
             Expression<Func<Offer, bool>> getActiveOffers = offer =>
                 offer.PublicationStart < now &&
@@ -71,22 +69,20 @@ namespace UseCase.Roles.Guests.Queries.GuestGetBranches
                 return PrepareResponse(HttpCode.NotFound, [], 0);
             }
 
-
             var totalCount = selectResult.FirstOrDefault()?.TotalCount ?? 0;
-            var items = new List<GuestGetBranchAndCompanyDto>();
+            var items = new List<GuestBranchAndCompanyDto>();
             foreach (var item in selectResult)
             {
                 if (item.Item.Company.Removed != null ||
-                    (item.Item.Removed != null && item.OfferCount == 0))
+                    (item.Item.Removed.HasValue && item.OfferCount == 0))
                 {
                     return PrepareResponse(HttpCode.Gone, [], 0);
                 }
-
-                if (item.Item.Company.Blocked != null)
+                if (item.Item.Company.Blocked.HasValue)
                 {
                     return PrepareResponse(HttpCode.Forbidden, [], 0);
                 }
-                items.Add(new GuestGetBranchAndCompanyDto
+                items.Add(new GuestBranchAndCompanyDto
                 {
                     Company = _mapper.Map<CompanyDto>(item.Item.Company),
                     Branch = _mapper.Map<GuestBranchDto>(item.Item),
@@ -98,12 +94,12 @@ namespace UseCase.Roles.Guests.Queries.GuestGetBranches
         }
 
         // Static Methods
-        private static ItemsResponse<GuestGetBranchAndCompanyDto> PrepareResponse(
+        private static ItemsResponse<GuestBranchAndCompanyDto> PrepareResponse(
             HttpCode code,
-            IEnumerable<GuestGetBranchAndCompanyDto> items,
+            IEnumerable<GuestBranchAndCompanyDto> items,
             int totalCount)
         {
-            return ItemsResponse<GuestGetBranchAndCompanyDto>.PrepareResponse(code, items, totalCount);
+            return ItemsResponse<GuestBranchAndCompanyDto>.PrepareResponse(code, items, totalCount);
         }
 
         // Non Static Methods
@@ -154,7 +150,9 @@ namespace UseCase.Roles.Guests.Queries.GuestGetBranches
                     branch.Removed == null ||
                     (
                         branch.Removed != null &&
-                        _context.Offers.Any(getActiveOffers)
+                        _context.Offers
+                        .Where(offer => offer.BranchId == branch.BranchId)
+                        .Any(getActiveOffers)
                     ));
             }
 

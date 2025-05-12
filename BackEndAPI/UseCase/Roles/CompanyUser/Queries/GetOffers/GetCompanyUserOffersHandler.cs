@@ -164,13 +164,12 @@ namespace UseCase.Roles.CompanyUser.Queries.GetOffers
             }
             // Contract Conditions
             if (request.ContractParameterIds.Any() ||
-                request.SalaryParameters.ContainsAny())
+                request.SalaryParameters.HasValue)
             {
                 query = query.Where(offer => offer.OfferConditions.Any(oc =>
                     _context.ContractConditions
-                        .ContractParametersAndSalaryFilter(
-                            request.ContractParameterIds,
-                            request.SalaryParameters)
+                        .WhereContractParameters(
+                            request.ContractParameterIds)
                         .Any(cc => cc.ContractConditionId == oc.ContractConditionId)
                 ));
             }

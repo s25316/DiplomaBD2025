@@ -1,8 +1,7 @@
 ﻿// Ignore Spelling: Dto
-
 using UseCase.Shared.Dictionaries.GetSkills.Response;
 
-namespace UseCase.Shared.DTOs.Responses.Companies.OfferTemplates
+namespace UseCase.Shared.Responses.BaseResponses
 {
     public class OfferSkillDto
     {

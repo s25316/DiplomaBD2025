@@ -13,12 +13,14 @@ using UseCase.Shared.ExtensionMethods.EF;
 using UseCase.Shared.ExtensionMethods.EF.Branches;
 using UseCase.Shared.ExtensionMethods.EF.Companies;
 using UseCase.Shared.ExtensionMethods.EF.CompanyPeople;
+using UseCase.Shared.Responses.BaseResponses;
+using UseCase.Shared.Responses.BaseResponses.CompanyUser;
 using UseCase.Shared.Responses.ItemsResponse;
 using UseCase.Shared.Services.Authentication.Inspectors;
 
 namespace UseCase.Roles.CompanyUser.Queries.CompanyUserGetBranches
 {
-    public class CompanyUserGetBranchesHandler : IRequestHandler<CompanyUserGetBranchesRequest, ItemsResponse<CompanyUserGetBranchAndCompanyDto>>
+    public class CompanyUserGetBranchesHandler : IRequestHandler<CompanyUserGetBranchesRequest, ItemsResponse<CompanyUserBranchAndCompanyDto>>
     {
         // Properties
         private static readonly IEnumerable<CompanyUserRoles> _authorizedRoles = [
@@ -42,7 +44,7 @@ namespace UseCase.Roles.CompanyUser.Queries.CompanyUserGetBranches
 
 
         // Methods
-        public Task<ItemsResponse<CompanyUserGetBranchAndCompanyDto>> Handle(CompanyUserGetBranchesRequest request, CancellationToken cancellationToken)
+        public async Task<ItemsResponse<CompanyUserBranchAndCompanyDto>> Handle(CompanyUserGetBranchesRequest request, CancellationToken cancellationToken)
         {
             // Prepare Data
             var personId = GetPersonId(request.Metadata.Claims);
@@ -55,16 +57,53 @@ namespace UseCase.Roles.CompanyUser.Queries.CompanyUserGetBranches
                 request.Pagination.Page,
                 request.Pagination.ItemsPerPage);
 
-            throw new NotImplementedException();
+            // Execute Query
+            var selectResult = await paginatedQuery.Select(item => new
+            {
+                Item = item,
+                TotalCount = baseQuery.Count(),
+                RolesCount = _context.CompanyPeople.Count(role => roleIds.Any(roleId =>
+                    role.CompanyId == item.CompanyId &&
+                    role.PersonId == personIdValue &&
+                    role.RoleId == roleId &&
+                    role.Deny == null
+                )),
+            }).ToListAsync(cancellationToken);
+
+            // Prepare Response
+            if (!selectResult.Any())
+            {
+                return PrepareResponse(HttpCode.NotFound, [], 0);
+            }
+
+            var totalCount = selectResult.FirstOrDefault()?.TotalCount ?? 0;
+            var items = new List<CompanyUserBranchAndCompanyDto>();
+            foreach (var item in selectResult)
+            {
+                if (item.Item.Company.Removed != null)
+                {
+                    return PrepareResponse(HttpCode.Gone, [], 0);
+                }
+                if (item.RolesCount == 0)
+                {
+                    return PrepareResponse(HttpCode.Forbidden, [], 0);
+                }
+                items.Add(new CompanyUserBranchAndCompanyDto
+                {
+                    Company = _mapper.Map<CompanyDto>(item.Item.Company),
+                    Branch = _mapper.Map<CompanyUserBranchDto>(item.Item),
+                });
+            }
+            return PrepareResponse(HttpCode.Ok, items, totalCount);
         }
 
         // Static Methods
-        private static ItemsResponse<CompanyUserGetBranchAndCompanyDto> PrepareResponse(
+        private static ItemsResponse<CompanyUserBranchAndCompanyDto> PrepareResponse(
             HttpCode code,
-            IEnumerable<CompanyUserGetBranchAndCompanyDto> items,
+            IEnumerable<CompanyUserBranchAndCompanyDto> items,
             int totalCount)
         {
-            return ItemsResponse<CompanyUserGetBranchAndCompanyDto>.PrepareResponse(code, items, totalCount);
+            return ItemsResponse<CompanyUserBranchAndCompanyDto>.PrepareResponse(code, items, totalCount);
         }
 
         // Non Static Methods
@@ -72,7 +111,6 @@ namespace UseCase.Roles.CompanyUser.Queries.CompanyUserGetBranches
         {
             return _authenticationInspector.GetPersonId(claims);
         }
-
 
         private IQueryable<Branch> PrepareBaseQuery()
         {

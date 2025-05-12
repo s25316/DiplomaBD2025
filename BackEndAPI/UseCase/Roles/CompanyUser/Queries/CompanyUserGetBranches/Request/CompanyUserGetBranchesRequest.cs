@@ -4,7 +4,7 @@ using UseCase.Shared.Responses.ItemsResponse;
 
 namespace UseCase.Roles.CompanyUser.Queries.CompanyUserGetBranches.Request
 {
-    public class CompanyUserGetBranchesRequest : GetBranchesRequest<ItemsResponse<CompanyUserGetBranchAndCompanyDto>>
+    public class CompanyUserGetBranchesRequest : GetBranchesRequest<ItemsResponse<CompanyUserBranchAndCompanyDto>>
     {
         // Other Parameters
         public required bool ShowRemoved { get; init; }

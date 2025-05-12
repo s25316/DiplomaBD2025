@@ -4,7 +4,7 @@ using UseCase.Shared.Responses.ItemsResponse;
 
 namespace UseCase.Roles.Guests.Queries.GuestGetBranches.Request
 {
-    public class GuestGetBranchesRequest : GetBranchesRequest<ItemsResponse<GuestGetBranchAndCompanyDto>>
+    public class GuestGetBranchesRequest : GetBranchesRequest<ItemsResponse<GuestBranchAndCompanyDto>>
     {
         // Sorting: Order By
         public required GuestBranchOrderBy OrderBy { get; init; }

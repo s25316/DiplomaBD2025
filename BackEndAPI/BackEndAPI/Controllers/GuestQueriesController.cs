@@ -3,6 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 using UseCase.Roles.Guests.Queries.GuestGetBranches;
 using UseCase.Roles.Guests.Queries.GuestGetBranches.Request;
 using UseCase.Roles.Guests.Queries.GuestGetCompanies.Request;
+using UseCase.Roles.Guests.Queries.GuestGetContractConditions;
+using UseCase.Roles.Guests.Queries.GuestGetContractConditions.Request;
+using UseCase.Roles.Guests.Queries.GuestGetOfferTemplates;
+using UseCase.Roles.Guests.Queries.GuestGetOfferTemplates.Request;
 using UseCase.Shared.Enums;
 using UseCase.Shared.Requests.QueryParameters;
 
@@ -53,7 +57,6 @@ namespace BackEndAPI.Controllers
             return StatusCode((int)result.HttpCode, result.Result);
         }
 
-
         [HttpGet("branches")]
         [HttpGet("branches/{branchId:guid}")]
         [HttpGet("companies/{companyId:guid}/branches")]
@@ -84,6 +87,82 @@ namespace BackEndAPI.Controllers
 
                 Metadata = HttpContext,
             }, cancellationToken);
+            return StatusCode((int)result.HttpCode, result.Result);
+        }
+
+        [HttpGet("offerTemplates")]
+        [HttpGet("offerTemplates/{offerTemplateId:guid}")]
+        [HttpGet("companies/{companyId:guid}/offerTemplates")]
+        public async Task<IActionResult> GetCompanyOfferTemplatesAsync(
+            Guid? companyId,
+            Guid? offerTemplateId,
+
+            bool? showRemoved,
+            string? searchText,
+
+            bool? ascending,
+            GuestOfferTemplateOrderBy? orderBy,
+
+            [FromHeader] IEnumerable<int> skillIds,
+            [FromQuery] CompanyQueryParametersDto companyParameters,
+            [FromQuery] PaginationQueryParametersDto pagination,
+            CancellationToken cancellationToken)
+        {
+            var request = new GuestGetOfferTemplatesRequest
+            {
+                OfferTemplateId = offerTemplateId,
+
+                CompanyId = companyId,
+                CompanyQueryParameters = companyParameters,
+
+                SearchText = searchText,
+                SkillIds = skillIds,
+
+                Ascending = ascending ?? true,
+                OrderBy = orderBy ?? GuestOfferTemplateOrderBy.OfferTemplateCreated,
+                Pagination = pagination,
+
+                Metadata = HttpContext,
+            };
+            var result = await _mediator.Send(request, cancellationToken);
+            return StatusCode((int)result.HttpCode, result.Result);
+        }
+
+        [HttpGet("contractConditions")]
+        [HttpGet("contractConditions/{contractConditionId:guid}")]
+        [HttpGet("companies/{companyId:guid}/contractConditions")]
+        public async Task<IActionResult> GetCompanyUserContractConditionsAsync(
+            Guid? companyId,
+            Guid? contractConditionId,
+            string? searchText,
+            bool? showRemoved,
+            bool? ascending,
+            GuestContractConditionOrderBy? orderBy,
+
+            [FromHeader] IEnumerable<int> parameterIds,
+            [FromQuery] CompanyQueryParametersDto companyParameters,
+            [FromQuery] PaginationQueryParametersDto pagination,
+            [FromQuery] SalaryQueryParametersDto salaryParameters,
+            CancellationToken cancellationToken)
+        {
+            var request = new GuestGetContractConditionsRequest
+            {
+                ContractConditionId = contractConditionId,
+
+                CompanyId = companyId,
+                CompanyQueryParameters = companyParameters,
+
+                SearchText = searchText,
+                SalaryParameters = salaryParameters,
+                ContractParameterIds = parameterIds,
+
+                Ascending = ascending ?? true,
+                OrderBy = orderBy ?? GuestContractConditionOrderBy.ContractConditionCreated,
+                Pagination = pagination,
+
+                Metadata = HttpContext,
+            };
+            var result = await _mediator.Send(request, cancellationToken);
             return StatusCode((int)result.HttpCode, result.Result);
         }
     }

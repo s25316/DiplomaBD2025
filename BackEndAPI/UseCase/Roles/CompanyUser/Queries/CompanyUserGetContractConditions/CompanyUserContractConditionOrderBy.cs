@@ -2,9 +2,9 @@
 
 using System.ComponentModel;
 
-namespace UseCase.Roles.CompanyUser.Queries.GetContractConditions.Enums
+namespace UseCase.Roles.CompanyUser.Queries.CompanyUserGetContractConditions
 {
-    public enum CompanyUserContractConditionsOrderBy
+    public enum CompanyUserContractConditionOrderBy
     {
         [Description("By Company Name")]
         CompanyName = 1,
@@ -35,5 +35,8 @@ namespace UseCase.Roles.CompanyUser.Queries.GetContractConditions.Enums
 
         [Description("By Per Hour AVG Salary")]
         SalaryPerHourAvg = 10,
+
+        [Description("By Contract Parameters Count")]
+        ContractParameters = 11,
     }
 }

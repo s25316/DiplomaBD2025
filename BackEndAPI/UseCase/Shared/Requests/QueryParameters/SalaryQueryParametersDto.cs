@@ -30,17 +30,14 @@ namespace UseCase.Shared.Requests.QueryParameters
 
 
         // Methods
-        public bool ContainsAny()
-        {
-            return
-                IsNegotiable.HasValue ||
-                IsPaid.HasValue ||
-                SalaryPerHourMin.HasValue ||
-                SalaryPerHourMax.HasValue ||
-                SalaryMin.HasValue ||
-                SalaryMax.HasValue ||
-                HoursMin.HasValue ||
-                HoursMax.HasValue;
-        }
+        public bool HasValue =>
+            IsNegotiable.HasValue ||
+            IsPaid.HasValue ||
+            SalaryPerHourMin.HasValue ||
+            SalaryPerHourMax.HasValue ||
+            SalaryMin.HasValue ||
+            SalaryMax.HasValue ||
+            HoursMin.HasValue ||
+            HoursMax.HasValue;
     }
 }

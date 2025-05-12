@@ -8,6 +8,7 @@ namespace UseCase.Shared.Responses.BaseResponses.AutoMapperProfile
         public BaseResponsesProfile()
         {
             CreateMap<Company, CompanyDto>();
+            CreateMap<OfferSkill, OfferSkillDto>();
 
             CreateMap<Address, AddressResponseDto>()
                 .ConstructUsing(db => new AddressResponseDto

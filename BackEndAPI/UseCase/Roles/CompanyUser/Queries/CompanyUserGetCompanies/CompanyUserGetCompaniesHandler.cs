@@ -29,6 +29,7 @@ namespace UseCase.Roles.CompanyUser.Queries.CompanyUserGetCompanies
         private readonly DiplomaBdContext _context;
         private readonly IAuthenticationInspectorService _authenticationInspector;
 
+
         // Constructor
         public CompanyUserGetCompaniesHandler(
             IMapper mapper,

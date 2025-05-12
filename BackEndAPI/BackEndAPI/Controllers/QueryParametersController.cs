@@ -1,8 +1,8 @@
 ﻿using Domain.Shared.Enums;
 using Microsoft.AspNetCore.Mvc;
 using UseCase.Roles.CompanyUser.Queries.CompanyUserGetBranches;
-using UseCase.Roles.CompanyUser.Queries.GetContractConditions.Enums;
-using UseCase.Roles.CompanyUser.Queries.GetOfferTemplates.Enums;
+using UseCase.Roles.CompanyUser.Queries.CompanyUserGetContractConditions;
+using UseCase.Roles.CompanyUser.Queries.CompanyUserGetOfferTemplates;
 using UseCase.Shared.DTOs.Responses.Companies.Offers;
 using UseCase.Shared.Enums;
 
@@ -29,7 +29,7 @@ namespace BackEndAPI.Controllers
         [ProducesResponseType(typeof(IEnumerable<object>), StatusCodes.Status200OK)]
         public IActionResult GetOfferTemplatesOrderBy()
         {
-            var list = EnumExtensionMethods.GetList<CompanyUserOfferTemplatesOrderBy>()
+            var list = EnumExtensionMethods.GetList<CompanyUserOfferTemplateOrderBy>()
                 .Select(@enum => new
                 {
                     Id = (int)@enum,
@@ -55,7 +55,7 @@ namespace BackEndAPI.Controllers
         [ProducesResponseType(typeof(IEnumerable<object>), StatusCodes.Status200OK)]
         public IActionResult GetCompanyUserContractConditionsOrderBy()
         {
-            var list = EnumExtensionMethods.GetList<CompanyUserContractConditionsOrderBy>()
+            var list = EnumExtensionMethods.GetList<CompanyUserContractConditionOrderBy>()
                 .Select(@enum => new
                 {
                     Id = (int)@enum,

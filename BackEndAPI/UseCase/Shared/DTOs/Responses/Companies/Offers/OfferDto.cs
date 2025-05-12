@@ -1,7 +1,6 @@
 ﻿// Ignore Spelling: Dto
 
 using System.Text.Json.Serialization;
-using UseCase.Shared.DTOs.Responses.Companies.OfferTemplates;
 using UseCase.Shared.JsonConverters;
 using UseCase.Shared.Responses.BaseResponses;
 using UseCase.Shared.Responses.BaseResponses.CompanyUser;
@@ -27,8 +26,8 @@ namespace UseCase.Shared.DTOs.Responses.Companies.Offers
 
         public CompanyUserBranchDto? Branch { get; init; }
 
-        public required OfferTemplateDto OfferTemplate { get; init; }
+        public required CompanyUserOfferTemplateDto OfferTemplate { get; init; }
 
-        public IEnumerable<ContractConditionDto> ContractConditions { get; init; } = [];
+        public IEnumerable<CompanyUserContractConditionDto> ContractConditions { get; init; } = [];
     }
 }

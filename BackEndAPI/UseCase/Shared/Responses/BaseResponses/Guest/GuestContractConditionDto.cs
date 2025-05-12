@@ -1,13 +1,8 @@
-﻿// Ignore Spelling: Dto
+﻿using UseCase.Shared.Dictionaries.GetContractParameters.Response;
 
-
-// Ignore Spelling: Dto
-
-using UseCase.Shared.Dictionaries.GetContractParameters.Response;
-
-namespace UseCase.Shared.DTOs.Responses.Companies
+namespace UseCase.Shared.Responses.BaseResponses.Guest
 {
-    public class ContractConditionDto
+    public class GuestContractConditionDto
     {
         public Guid ContractConditionId { get; init; }
 
@@ -33,8 +28,6 @@ namespace UseCase.Shared.DTOs.Responses.Companies
 
         public DateTime Created { get; set; }
 
-        public DateTime? Removed { get; set; }
-
         // ContractParameters
         public ContractParameterDto? SalaryTerm { get; init; }
 
@@ -43,5 +36,6 @@ namespace UseCase.Shared.DTOs.Responses.Companies
         public IEnumerable<ContractParameterDto> WorkModes { get; init; } = [];
 
         public IEnumerable<ContractParameterDto> EmploymentTypes { get; init; } = [];
+
     }
 }

@@ -9,7 +9,6 @@ using UseCase.Shared.ExtensionMethods.EF;
 using UseCase.Shared.ExtensionMethods.EF.Companies;
 using UseCase.Shared.Responses.BaseResponses;
 using UseCase.Shared.Responses.ItemsResponse;
-using UseCase.Shared.Services.Authentication.Inspectors;
 
 namespace UseCase.Roles.Guests.Queries.GuestGetCompanies
 {
@@ -18,18 +17,16 @@ namespace UseCase.Roles.Guests.Queries.GuestGetCompanies
         // Properties
         private readonly IMapper _mapper;
         private readonly DiplomaBdContext _context;
-        private readonly IAuthenticationInspectorService _authenticationInspector;
+        //private readonly IAuthenticationInspectorService _authenticationInspector;
 
 
         // Constructor
         public GuestGetCompaniesHandler(
             IMapper mapper,
-            DiplomaBdContext context,
-            IAuthenticationInspectorService authenticationInspector)
+            DiplomaBdContext context)
         {
             _mapper = mapper;
             _context = context;
-            _authenticationInspector = authenticationInspector;
         }
 
 

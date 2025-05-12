@@ -3,7 +3,7 @@ using UseCase.Shared.Responses.BaseResponses.CompanyUser;
 
 namespace UseCase.Roles.Guests.Queries.GuestGetBranches.Response
 {
-    public class GuestGetBranchAndCompanyDto
+    public class GuestBranchAndCompanyDto
     {
         public required CompanyDto Company { get; init; }
 

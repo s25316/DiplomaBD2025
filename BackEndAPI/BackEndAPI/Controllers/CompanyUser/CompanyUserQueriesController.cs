@@ -3,14 +3,14 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using UseCase.Roles.CompanyUser.Queries.CompanyUserGetBranches;
+using UseCase.Roles.CompanyUser.Queries.CompanyUserGetBranches.Request;
 using UseCase.Roles.CompanyUser.Queries.CompanyUserGetCompanies.Request;
-using UseCase.Roles.CompanyUser.Queries.GetBranches.Request;
-using UseCase.Roles.CompanyUser.Queries.GetContractConditions.Enums;
-using UseCase.Roles.CompanyUser.Queries.GetContractConditions.Request;
+using UseCase.Roles.CompanyUser.Queries.CompanyUserGetContractConditions;
+using UseCase.Roles.CompanyUser.Queries.CompanyUserGetContractConditions.Request;
+using UseCase.Roles.CompanyUser.Queries.CompanyUserGetOfferTemplates;
+using UseCase.Roles.CompanyUser.Queries.CompanyUserGetOfferTemplates.Request;
 using UseCase.Roles.CompanyUser.Queries.GetOffers.Enums;
 using UseCase.Roles.CompanyUser.Queries.GetOffers.Request;
-using UseCase.Roles.CompanyUser.Queries.GetOfferTemplates.Enums;
-using UseCase.Roles.CompanyUser.Queries.GetOfferTemplates.Request;
 using UseCase.Shared.DTOs.Responses.Companies.Offers;
 using UseCase.Shared.Enums;
 using UseCase.Shared.Requests.QueryParameters;
@@ -81,11 +81,11 @@ namespace BackEndAPI.Controllers.CompanyUser
             [FromQuery] GeographyPointQueryParametersDto geographyPoint,
             CancellationToken cancellationToken)
         {
-            var result = await _mediator.Send(new GetCompanyUserBranchesRequest
+            var result = await _mediator.Send(new CompanyUserGetBranchesRequest
             {
                 BranchId = branchId,
                 CompanyId = companyId,
-                CompanyParameters = companyParameters,
+                CompanyQueryParameters = companyParameters,
 
                 ShowRemoved = showRemoved ?? false,
                 SearchText = searchText,
@@ -114,26 +114,26 @@ namespace BackEndAPI.Controllers.CompanyUser
             string? searchText,
 
             bool? ascending,
-            CompanyUserOfferTemplatesOrderBy? orderBy,
+            CompanyUserOfferTemplateOrderBy? orderBy,
 
             [FromHeader] IEnumerable<int> skillIds,
             [FromQuery] CompanyQueryParametersDto companyParameters,
             [FromQuery] PaginationQueryParametersDto pagination,
             CancellationToken cancellationToken)
         {
-            var request = new GetCompanyUserOfferTemplatesRequest
+            var request = new CompanyUserGetOfferTemplatesRequest
             {
                 OfferTemplateId = offerTemplateId,
 
                 CompanyId = companyId,
-                CompanyParameters = companyParameters,
+                CompanyQueryParameters = companyParameters,
 
                 ShowRemoved = showRemoved ?? false,
                 SearchText = searchText,
                 SkillIds = skillIds,
 
                 Ascending = ascending ?? true,
-                OrderBy = orderBy ?? CompanyUserOfferTemplatesOrderBy.OfferTemplateCreated,
+                OrderBy = orderBy ?? CompanyUserOfferTemplateOrderBy.OfferTemplateCreated,
                 Pagination = pagination,
 
                 Metadata = HttpContext,
@@ -152,7 +152,7 @@ namespace BackEndAPI.Controllers.CompanyUser
             string? searchText,
             bool? showRemoved,
             bool? ascending,
-            CompanyUserContractConditionsOrderBy? orderBy,
+            CompanyUserContractConditionOrderBy? orderBy,
 
             [FromHeader] IEnumerable<int> parameterIds,
             [FromQuery] CompanyQueryParametersDto companyParameters,
@@ -160,12 +160,12 @@ namespace BackEndAPI.Controllers.CompanyUser
             [FromQuery] SalaryQueryParametersDto salaryParameters,
             CancellationToken cancellationToken)
         {
-            var request = new GetCompanyUserContractConditionsRequest
+            var request = new CompanyUserGetContractConditionsRequest
             {
                 ContractConditionId = contractConditionId,
 
                 CompanyId = companyId,
-                CompanyParameters = companyParameters,
+                CompanyQueryParameters = companyParameters,
 
                 ShowRemoved = showRemoved ?? false,
                 SearchText = searchText,
@@ -173,7 +173,7 @@ namespace BackEndAPI.Controllers.CompanyUser
                 ContractParameterIds = parameterIds,
 
                 Ascending = ascending ?? true,
-                OrderBy = orderBy ?? CompanyUserContractConditionsOrderBy.ContractConditionCreated,
+                OrderBy = orderBy ?? CompanyUserContractConditionOrderBy.ContractConditionCreated,
                 Pagination = pagination,
 
                 Metadata = HttpContext,

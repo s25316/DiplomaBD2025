@@ -2,9 +2,9 @@
 
 using System.ComponentModel;
 
-namespace UseCase.Roles.CompanyUser.Queries.GetOfferTemplates.Enums
+namespace UseCase.Roles.CompanyUser.Queries.CompanyUserGetOfferTemplates
 {
-    public enum CompanyUserOfferTemplatesOrderBy
+    public enum CompanyUserOfferTemplateOrderBy
     {
         [Description("By Company Name")]
         CompanyName = 1,

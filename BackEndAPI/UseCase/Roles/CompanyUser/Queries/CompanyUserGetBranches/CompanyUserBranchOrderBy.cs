@@ -1,5 +1,4 @@
-﻿// Ignore Spelling: Enums, Lan
-
+﻿// Ignore Spelling: Lan
 using System.ComponentModel;
 
 namespace UseCase.Roles.CompanyUser.Queries.CompanyUserGetBranches

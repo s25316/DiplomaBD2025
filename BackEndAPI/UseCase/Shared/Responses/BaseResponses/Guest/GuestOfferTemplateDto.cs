@@ -1,8 +1,6 @@
-﻿// Ignore Spelling: Dto
-
-namespace UseCase.Shared.DTOs.Responses.Companies.OfferTemplates
+﻿namespace UseCase.Shared.Responses.BaseResponses.Guest
 {
-    public class OfferTemplateDto
+    public class GuestOfferTemplateDto
     {
         public Guid OfferTemplateId { get; set; }
 
@@ -13,8 +11,6 @@ namespace UseCase.Shared.DTOs.Responses.Companies.OfferTemplates
         public string Description { get; set; } = null!;
 
         public DateTime Created { get; set; }
-
-        public DateTime? Removed { get; set; }
 
         public IEnumerable<OfferSkillDto> Skills { get; init; } = [];
     }
