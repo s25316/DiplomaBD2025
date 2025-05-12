@@ -1,12 +1,12 @@
 ﻿using UseCase.Roles.CompanyUser.Queries.GetContractConditions.Enums;
 using UseCase.Roles.CompanyUser.Queries.GetContractConditions.Response;
 using UseCase.Roles.CompanyUser.Queries.Template.Response;
-using UseCase.Shared.DTOs.QueryParameters;
-using UseCase.Shared.Templates.Requests;
+using UseCase.Shared.Requests;
+using UseCase.Shared.Requests.QueryParameters;
 
 namespace UseCase.Roles.CompanyUser.Queries.GetContractConditions.Request
 {
-    public class GetCompanyUserContractConditionsRequest : RequestTemplate<GetCompanyUserGenericItemsResponse<CompanyAndContractConditionDto>>
+    public class GetCompanyUserContractConditionsRequest : BaseRequest<GetCompanyUserGenericItemsResponse<CompanyAndContractConditionDto>>
     {
         // For single ContractCondition
         public required Guid? ContractConditionId { get; init; }

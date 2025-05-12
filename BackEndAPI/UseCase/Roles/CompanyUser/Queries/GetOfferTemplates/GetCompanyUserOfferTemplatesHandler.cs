@@ -11,12 +11,12 @@ using UseCase.Roles.CompanyUser.Queries.GetOfferTemplates.Request;
 using UseCase.Roles.CompanyUser.Queries.GetOfferTemplates.Response;
 using UseCase.Roles.CompanyUser.Queries.Template;
 using UseCase.Roles.CompanyUser.Queries.Template.Response;
-using UseCase.Shared.DTOs.Responses.Companies;
 using UseCase.Shared.DTOs.Responses.Companies.OfferTemplates;
 using UseCase.Shared.ExtensionMethods.EF;
 using UseCase.Shared.ExtensionMethods.EF.Companies;
 using UseCase.Shared.ExtensionMethods.EF.CompanyPeople;
 using UseCase.Shared.ExtensionMethods.EF.OfferTemplates;
+using UseCase.Shared.Responses.BaseResponses;
 using UseCase.Shared.Services.Authentication.Inspectors;
 
 namespace UseCase.Roles.CompanyUser.Queries.GetOfferTemplates
@@ -155,10 +155,10 @@ namespace UseCase.Roles.CompanyUser.Queries.GetOfferTemplates
 
             // Filter Companies if we haven`t access to it 
             if (request.CompanyId.HasValue ||
-                request.CompanyParameters.ContainsAny())
+                request.CompanyParameters.HasValue)
             {
                 query = query.Where(ot => _context.Companies
-                    .IdentificationFilter(request.CompanyId, request.CompanyParameters)
+                    .WhereIdentificationData(request.CompanyId, request.CompanyParameters)
                     .Any(company => company.CompanyId == ot.CompanyId));
             }
             // Filter Companies to which we have access and eliminate Removed

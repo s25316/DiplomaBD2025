@@ -1,15 +1,15 @@
 ﻿// Ignore Spelling: Regon Krs
 
-using UseCase.Roles.CompanyUser.Queries.GetBranches.Enums;
-using UseCase.Roles.CompanyUser.Queries.GetBranches.Response;
+using UseCase.Roles.CompanyUser.Queries.CompanyUserGetBranches;
+using UseCase.Roles.CompanyUser.Queries.CompanyUserGetBranches.Response;
 using UseCase.Roles.CompanyUser.Queries.Template.Response;
-using UseCase.Shared.DTOs.QueryParameters;
-using UseCase.Shared.Templates.Requests;
+using UseCase.Shared.Requests;
+using UseCase.Shared.Requests.QueryParameters;
 
 namespace UseCase.Roles.CompanyUser.Queries.GetBranches.Request
 {
     public class GetCompanyUserBranchesRequest
-        : RequestTemplate<GetCompanyUserGenericItemsResponse<CompanyAndBranchDto>>
+        : BaseRequest<GetCompanyUserGenericItemsResponse<CompanyUserGetBranchAndCompanyDto>>
     {
         // For single Company
         public required Guid? BranchId { get; init; }
@@ -27,7 +27,7 @@ namespace UseCase.Roles.CompanyUser.Queries.GetBranches.Request
         public required PaginationQueryParametersDto Pagination { get; init; }
 
         // Sorting
-        public required CompanyUserBranchesOrderBy OrderBy { get; init; }
+        public required CompanyUserBranchOrderBy OrderBy { get; init; }
         public required bool Ascending { get; init; }
     }
 }

@@ -1,30 +1,27 @@
 ﻿using AutoMapper;
 using Domain.Features.People.ValueObjects.Ids;
-using Domain.Shared.CustomProviders.StringProvider;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using NetTopologySuite.Geometries;
 using UseCase.RelationalDatabase;
 using UseCase.RelationalDatabase.Models;
 using UseCase.Roles.CompanyUser.Enums;
-using UseCase.Roles.CompanyUser.Queries.GetBranches.Enums;
+using UseCase.Roles.CompanyUser.Queries.CompanyUserGetBranches.Response;
 using UseCase.Roles.CompanyUser.Queries.GetBranches.Request;
-using UseCase.Roles.CompanyUser.Queries.GetBranches.Response;
 using UseCase.Roles.CompanyUser.Queries.Template;
 using UseCase.Roles.CompanyUser.Queries.Template.Response;
-using UseCase.Shared.DTOs.QueryParameters;
-using UseCase.Shared.DTOs.Responses.Companies;
 using UseCase.Shared.ExtensionMethods.EF;
 using UseCase.Shared.ExtensionMethods.EF.Branches;
 using UseCase.Shared.ExtensionMethods.EF.Companies;
 using UseCase.Shared.ExtensionMethods.EF.CompanyPeople;
+using UseCase.Shared.Responses.BaseResponses;
+using UseCase.Shared.Responses.BaseResponses.CompanyUser;
 using UseCase.Shared.Services.Authentication.Inspectors;
 
 namespace UseCase.Roles.CompanyUser.Queries.GetBranches
 {
     public class GetCompanyUserBranchesHandler :
-        GetCompanyUserGenericsBase<Branch, CompanyAndBranchDto>,
-        IRequestHandler<GetCompanyUserBranchesRequest, GetCompanyUserGenericItemsResponse<CompanyAndBranchDto>>
+        GetCompanyUserGenericsBase<Branch, CompanyUserGetBranchAndCompanyDto>,
+        IRequestHandler<GetCompanyUserBranchesRequest, GetCompanyUserGenericItemsResponse<CompanyUserGetBranchAndCompanyDto>>
     {
         //Properties
         private static readonly IEnumerable<CompanyUserRoles> _authorizedRoles = [
@@ -40,7 +37,7 @@ namespace UseCase.Roles.CompanyUser.Queries.GetBranches
 
 
         // Methods
-        public async Task<GetCompanyUserGenericItemsResponse<CompanyAndBranchDto>> Handle(GetCompanyUserBranchesRequest request, CancellationToken cancellationToken)
+        public async Task<GetCompanyUserGenericItemsResponse<CompanyUserGetBranchAndCompanyDto>> Handle(GetCompanyUserBranchesRequest request, CancellationToken cancellationToken)
         {
             var personId = GetPersonId(request.Metadata.Claims);
             var query = BuildQuery(request, personId);
@@ -58,67 +55,14 @@ namespace UseCase.Roles.CompanyUser.Queries.GetBranches
             return PrepareResponse(
                 selectedValues,
                 branch => branch.Company.Removed != null,
-                branch => new CompanyAndBranchDto
+                branch => new CompanyUserGetBranchAndCompanyDto
                 {
                     Company = _mapper.Map<CompanyDto>(branch.Company),
-                    Branch = _mapper.Map<BranchDto>(branch),
+                    Branch = _mapper.Map<CompanyUserBranchDto>(branch),
                 });
         }
 
-        private static IQueryable<Branch> ApplyOrderBy(
-            IQueryable<Branch> query,
-            CompanyUserBranchesOrderBy orderBy,
-            bool ascending,
-            bool showRemoved,
-            GeographyPointQueryParametersDto geographyPoint)
-        {
-            if (orderBy == CompanyUserBranchesOrderBy.Point &&
-                geographyPoint.Lon.HasValue &&
-                geographyPoint.Lat.HasValue)
-            {
-                var point = new Point(
-                    geographyPoint.Lon.Value,
-                    geographyPoint.Lat.Value)
-                { SRID = 4326 };
 
-                return ascending ?
-                    query.OrderBy(branch => branch.Address.Point.Distance(point))
-                        .ThenBy(branch => branch.Created) :
-                    query.OrderByDescending(branch => branch.Address.Point.Distance(point))
-                        .ThenByDescending(branch => branch.Created);
-            }
-            if (orderBy == CompanyUserBranchesOrderBy.BranchRemoved &&
-                showRemoved)
-            {
-                return ascending ?
-                    query.OrderBy(branch => branch.Removed)
-                        .ThenBy(branch => branch.Created) :
-                    query.OrderByDescending(branch => branch.Removed)
-                        .ThenByDescending(branch => branch.Created);
-            }
-
-            switch (orderBy)
-            {
-                case CompanyUserBranchesOrderBy.CompanyName:
-                    return ascending ?
-                        query.OrderBy(branch => branch.Company.Name) :
-                        query.OrderByDescending(branch => branch.Company.Name);
-                case CompanyUserBranchesOrderBy.CompanyCreated:
-                    return ascending ?
-                        query.OrderBy(branch => branch.Company.Created) :
-                        query.OrderByDescending(branch => branch.Company.Created);
-                case CompanyUserBranchesOrderBy.BranchName:
-                    return ascending ?
-                        query.OrderBy(branch => branch.Name)
-                            .ThenBy(branch => branch.Created) :
-                        query.OrderByDescending(branch => branch.Name)
-                            .ThenByDescending(branch => branch.Created);
-                default:
-                    return ascending ?
-                        query.OrderBy(branch => branch.Created) :
-                        query.OrderByDescending(branch => branch.Created);
-            }
-        }
 
         private IQueryable<Branch> BuildBaseQuery()
         {
@@ -150,10 +94,10 @@ namespace UseCase.Roles.CompanyUser.Queries.GetBranches
 
             // Choose Branches by Company even we haven`t access 
             if (request.CompanyId.HasValue ||
-                request.CompanyParameters.ContainsAny())
+                request.CompanyParameters.HasValue)
             {
                 query = query.Where(branch => _context.Companies
-                    .IdentificationFilter(request.CompanyId, request.CompanyParameters)
+                    .WhereIdentificationData(request.CompanyId, request.CompanyParameters)
                     .Any(company => company.CompanyId == branch.CompanyId)
                 );
             }
@@ -171,20 +115,14 @@ namespace UseCase.Roles.CompanyUser.Queries.GetBranches
             query = query.Where(branch => request.ShowRemoved
                         ? branch.Removed != null
                         : branch.Removed == null);
-            // Search Text
-            var searchWords = CustomStringProvider
-                .Split(request.SearchText, WhiteSpace.All);
 
-            query = query.SearchTextFilter(searchWords);
+            query = query.WhereText(request.SearchText);
 
-            query = ApplyOrderBy(
-                query,
-                request.OrderBy,
-                request.Ascending,
+            return query.OrderBy(
+                request.GeographyPoint,
                 request.ShowRemoved,
-                request.GeographyPoint);
-
-            return query;
+                request.OrderBy,
+                request.Ascending);
         }
     }
 }

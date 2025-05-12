@@ -3,13 +3,13 @@
 using UseCase.Roles.CompanyUser.Queries.GetOfferTemplates.Enums;
 using UseCase.Roles.CompanyUser.Queries.GetOfferTemplates.Response;
 using UseCase.Roles.CompanyUser.Queries.Template.Response;
-using UseCase.Shared.DTOs.QueryParameters;
-using UseCase.Shared.Templates.Requests;
+using UseCase.Shared.Requests;
+using UseCase.Shared.Requests.QueryParameters;
 
 namespace UseCase.Roles.CompanyUser.Queries.GetOfferTemplates.Request
 {
     public class GetCompanyUserOfferTemplatesRequest :
-        RequestTemplate<GetCompanyUserGenericItemsResponse<CompanyAndOfferTemplateDto>>
+        BaseRequest<GetCompanyUserGenericItemsResponse<CompanyAndOfferTemplateDto>>
     {
         // For selection single Template
         public required Guid? OfferTemplateId { get; init; }

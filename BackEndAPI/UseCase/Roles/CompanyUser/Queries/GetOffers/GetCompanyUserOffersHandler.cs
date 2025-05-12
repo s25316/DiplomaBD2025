@@ -115,10 +115,10 @@ namespace UseCase.Roles.CompanyUser.Queries.GetOffers
 
             // Filter by Companies even we are haven`t access 
             if (request.CompanyId.HasValue ||
-                request.CompanyParameters.ContainsAny())
+                request.CompanyParameters.HasValue)
             {
                 query = query.Where(offer => _context.Companies
-                    .IdentificationFilter(request.CompanyId, request.CompanyParameters)
+                    .WhereIdentificationData(request.CompanyId, request.CompanyParameters)
                     .Any(company => offer.OfferConnections
                         .Any(oc => oc.OfferTemplate.CompanyId == company.CompanyId)));
             }
@@ -149,7 +149,7 @@ namespace UseCase.Roles.CompanyUser.Queries.GetOffers
 
 
             // If Lon && Lat != null
-            if (request.GeographyPoint.HasValue())
+            if (request.GeographyPoint.HasValue)
             {
                 query = query.Where(offer => offer.BranchId != null);
             }

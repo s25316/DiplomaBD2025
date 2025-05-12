@@ -2,18 +2,18 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using UseCase.Roles.CompanyUser.Queries.GetBranches.Enums;
+using UseCase.Roles.CompanyUser.Queries.CompanyUserGetBranches;
+using UseCase.Roles.CompanyUser.Queries.CompanyUserGetCompanies.Request;
 using UseCase.Roles.CompanyUser.Queries.GetBranches.Request;
-using UseCase.Roles.CompanyUser.Queries.GetCompanies.Enums;
-using UseCase.Roles.CompanyUser.Queries.GetCompanies.Request;
 using UseCase.Roles.CompanyUser.Queries.GetContractConditions.Enums;
 using UseCase.Roles.CompanyUser.Queries.GetContractConditions.Request;
 using UseCase.Roles.CompanyUser.Queries.GetOffers.Enums;
 using UseCase.Roles.CompanyUser.Queries.GetOffers.Request;
 using UseCase.Roles.CompanyUser.Queries.GetOfferTemplates.Enums;
 using UseCase.Roles.CompanyUser.Queries.GetOfferTemplates.Request;
-using UseCase.Shared.DTOs.QueryParameters;
 using UseCase.Shared.DTOs.Responses.Companies.Offers;
+using UseCase.Shared.Enums;
+using UseCase.Shared.Requests.QueryParameters;
 
 namespace BackEndAPI.Controllers.CompanyUser
 {
@@ -40,19 +40,19 @@ namespace BackEndAPI.Controllers.CompanyUser
             Guid? companyId,
             string? searchText,
             bool? ascending,
-            CompanyUserCompaniesOrderBy? orderBy,
+            CompaniesOrderBy? orderBy,
             [FromQuery] CompanyQueryParametersDto companyParameters,
             [FromQuery] PaginationQueryParametersDto pagination,
             CancellationToken cancellationToken)
         {
-            var result = await _mediator.Send(new GetCompanyUserCompaniesRequest
+            var result = await _mediator.Send(new CompanyUserGetCompaniesRequest
             {
                 CompanyId = companyId,
-                CompanyParameters = companyParameters,
+                CompanyQueryParameters = companyParameters,
 
                 SearchText = searchText,
 
-                OrderBy = orderBy ?? CompanyUserCompaniesOrderBy.Created,
+                OrderBy = orderBy ?? CompaniesOrderBy.Created,
                 Ascending = ascending ?? true,
                 Pagination = pagination,
 
@@ -74,7 +74,7 @@ namespace BackEndAPI.Controllers.CompanyUser
             bool? showRemoved,
 
             bool? ascending,
-            CompanyUserBranchesOrderBy? orderBy,
+            CompanyUserBranchOrderBy? orderBy,
 
             [FromQuery] CompanyQueryParametersDto companyParameters,
             [FromQuery] PaginationQueryParametersDto pagination,
@@ -93,7 +93,7 @@ namespace BackEndAPI.Controllers.CompanyUser
                 GeographyPoint = geographyPoint,
 
                 Ascending = ascending ?? true,
-                OrderBy = orderBy ?? CompanyUserBranchesOrderBy.BranchCreated,
+                OrderBy = orderBy ?? CompanyUserBranchOrderBy.BranchCreated,
                 Pagination = pagination,
 
                 Metadata = HttpContext,

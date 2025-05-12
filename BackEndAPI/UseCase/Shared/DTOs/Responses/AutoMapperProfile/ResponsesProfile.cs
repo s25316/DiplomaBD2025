@@ -10,6 +10,8 @@ using UseCase.Shared.DTOs.Responses.Companies.OfferTemplates;
 using UseCase.Shared.DTOs.Responses.People;
 using UseCase.Shared.DTOs.Responses.People.FullProfile;
 using UseCase.Shared.Enums;
+using UseCase.Shared.Responses.BaseResponses;
+using UseCase.Shared.Responses.BaseResponses.CompanyUser;
 
 namespace UseCase.Shared.DTOs.Responses.AutoMapperProfile
 {
@@ -17,27 +19,8 @@ namespace UseCase.Shared.DTOs.Responses.AutoMapperProfile
     {
         public ResponsesProfile()
         {
-            CreateMap<Company, CompanyDto>();
 
-            CreateMap<Address, AddressResponseDto>()
-                .ConstructUsing(db => new AddressResponseDto
-                {
-                    CountryId = db.City.State.Country.CountryId,
-                    CountryName = db.City.State.Country.Name,
-                    StateId = db.City.State.StateId,
-                    StateName = db.City.State.Name,
-                    CityId = db.City.CityId,
-                    CityName = db.City.Name,
-                    StreetId = db.Street == null ? null : db.Street.StreetId,
-                    StreetName = db.Street == null ? null : db.Street.Name,
-                    HouseNumber = db.HouseNumber,
-                    ApartmentNumber = db.ApartmentNumber,
-                    PostCode = db.PostCode,
-                    Lon = db.Lon,
-                    Lat = db.Lat,
-                });
-
-            CreateMap<Branch, BranchDto>();
+            //CreateMap<Branch, CompanyUserBranchDto>();
 
             CreateMap<OfferSkill, OfferSkillDto>();
 
@@ -119,7 +102,7 @@ namespace UseCase.Shared.DTOs.Responses.AutoMapperProfile
                             ),
                         Branch = db.Branch == null
                             ? null
-                            : context.Mapper.Map<BranchDto>(db.Branch),
+                            : context.Mapper.Map<CompanyUserBranchDto>(db.Branch),
                         ContractConditions = db.OfferConditions
                             .Select(x => context.Mapper.Map<ContractConditionDto>(x.ContractCondition)),
                     };

@@ -3,6 +3,8 @@
 using System.Text.Json.Serialization;
 using UseCase.Shared.DTOs.Responses.Companies.OfferTemplates;
 using UseCase.Shared.JsonConverters;
+using UseCase.Shared.Responses.BaseResponses;
+using UseCase.Shared.Responses.BaseResponses.CompanyUser;
 
 namespace UseCase.Shared.DTOs.Responses.Companies.Offers
 {
@@ -23,7 +25,7 @@ namespace UseCase.Shared.DTOs.Responses.Companies.Offers
 
         public required CompanyDto Company { get; init; }
 
-        public BranchDto? Branch { get; init; }
+        public CompanyUserBranchDto? Branch { get; init; }
 
         public required OfferTemplateDto OfferTemplate { get; init; }
 

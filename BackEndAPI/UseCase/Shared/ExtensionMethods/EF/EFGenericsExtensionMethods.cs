@@ -1,4 +1,4 @@
-﻿using UseCase.Shared.DTOs.QueryParameters;
+﻿using UseCase.Shared.Requests.QueryParameters;
 
 namespace UseCase.Shared.ExtensionMethods.EF
 {

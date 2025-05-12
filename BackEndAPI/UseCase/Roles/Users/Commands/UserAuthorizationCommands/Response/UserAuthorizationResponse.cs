@@ -1,5 +1,5 @@
 ﻿// Ignore Spelling: Dto
-using UseCase.Shared.Templates.Response.Responses;
+using UseCase.Shared.Responses;
 
 namespace UseCase.Roles.Users.Commands.UserAuthorizationCommands.Response
 {

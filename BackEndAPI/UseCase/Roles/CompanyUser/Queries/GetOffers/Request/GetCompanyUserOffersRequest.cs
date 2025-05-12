@@ -2,14 +2,14 @@
 
 using UseCase.Roles.CompanyUser.Queries.GetOffers.Enums;
 using UseCase.Roles.CompanyUser.Queries.Template.Response;
-using UseCase.Shared.DTOs.QueryParameters;
 using UseCase.Shared.DTOs.Responses.Companies.Offers;
-using UseCase.Shared.Templates.Requests;
+using UseCase.Shared.Requests;
+using UseCase.Shared.Requests.QueryParameters;
 
 namespace UseCase.Roles.CompanyUser.Queries.GetOffers.Request
 {
     public class GetCompanyUserOffersRequest :
-        RequestTemplate<GetCompanyUserGenericItemsResponse<OfferDto>>
+        BaseRequest<GetCompanyUserGenericItemsResponse<OfferDto>>
     {
         // For Single Offer
         public required Guid? OfferId { get; init; }

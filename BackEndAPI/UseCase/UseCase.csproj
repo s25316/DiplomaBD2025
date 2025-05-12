@@ -13,9 +13,13 @@
   <ItemGroup>
     <Folder Include="Roles\Administrators\Commands\" />
     <Folder Include="Roles\Administrators\Queries\" />
+    <Folder Include="Roles\CompanyUser\Queries\GetBranches\Enums\" />
+    <Folder Include="Roles\CompanyUser\Queries\GetBranches\Response\" />
     <Folder Include="Roles\Guests\Commands\" />
-    <Folder Include="Roles\Guests\Queries\" />
+    <Folder Include="Roles\Guests\Queries\GuestGetBranches - Copy\Request\" />
+    <Folder Include="Roles\Guests\Queries\GuestGetBranches - Copy\Response\" />
     <Folder Include="Roles\Users\Commands\ProfileCommands\UserProfileUpdateLogin\Response\" />
+    <Folder Include="Shared\Templates\Response\BaseResponses\" />
   </ItemGroup>
 
   <ItemGroup>

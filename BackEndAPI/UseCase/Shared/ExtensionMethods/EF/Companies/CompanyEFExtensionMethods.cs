@@ -1,61 +1,59 @@
 ﻿// Ignore Spelling: Regon Krs, Nip
 
+using Domain.Shared.CustomProviders.StringProvider;
 using UseCase.RelationalDatabase.Models;
-using UseCase.Shared.DTOs.QueryParameters;
+using UseCase.Shared.Enums;
+using UseCase.Shared.Requests.QueryParameters;
 
 namespace UseCase.Shared.ExtensionMethods.EF.Companies
 {
     public static class CompanyEFExtensionMethods
     {
+        // Public Methods
         /// <summary>
         /// By REGON NIP KRS and CompanyId
         /// </summary>
         /// <param name="companyId"></param>
         /// <param name="company"></param>
         /// <returns></returns>
-        public static IQueryable<Company> IdentificationFilter(
+        public static IQueryable<Company> WhereIdentificationData(
             this IQueryable<Company> query,
             Guid? companyId,
-            CompanyQueryParametersDto company)
-        {
-            return query.IdentificationFilter(
-                companyId,
-                company.Regon,
-                company.Nip,
-                company.Krs);
-        }
-
-        /// <summary>
-        /// By REGON NIP KRS and CompanyId
-        /// </summary>
-        /// <param name="query"></param>
-        /// <param name="companyId"></param>
-        /// <param name="regon"></param>
-        /// <param name="nip"></param>
-        /// <param name="krs"></param>
-        /// <returns></returns>
-        public static IQueryable<Company> IdentificationFilter(
-            this IQueryable<Company> query,
-            Guid? companyId,
-            string? regon,
-            string? nip,
-            string? krs)
+            CompanyQueryParametersDto companyQueryParameters)
         {
             var expression = CompanyEFExpressions.IdentificationExpression(
                 companyId,
-                regon,
-                nip,
-                krs);
+                companyQueryParameters.Regon,
+                companyQueryParameters.Nip,
+                companyQueryParameters.Krs);
             return query.Where(expression);
         }
 
-        public static IQueryable<Company> SearchTextFilter(
+        public static IQueryable<Company> WhereText(
             this IQueryable<Company> query,
-            IEnumerable<string> searchWords)
+            string? searchText)
         {
+            var searchWords = CustomStringProvider.Split(searchText, WhiteSpace.All);
             var expression = CompanyEFExpressions.SearchTextExpression(searchWords);
             return query.Where(expression);
         }
 
+        public static IQueryable<Company> OrderBy(
+            this IQueryable<Company> query,
+            CompaniesOrderBy orderBy,
+            bool ascending)
+        {
+            switch (orderBy)
+            {
+                case CompaniesOrderBy.Name:
+                    return ascending ?
+                        query.OrderBy(company => company.Name) :
+                        query.OrderByDescending(company => company.Name);
+                default:
+                    return ascending ?
+                        query.OrderBy(company => company.Created) :
+                        query.OrderByDescending(company => company.Created);
+            }
+        }
     }
 }

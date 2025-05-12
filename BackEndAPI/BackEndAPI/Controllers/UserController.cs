@@ -16,7 +16,7 @@ using UseCase.Roles.Users.Commands.UserAuthorizationCommands.UserAuthorizationLo
 using UseCase.Roles.Users.Commands.UserAuthorizationCommands.UserAuthorizationRefreshToken.Request;
 using UseCase.Roles.Users.Commands.UserAuthorizationCommands.UserLogOut.Request;
 using UseCase.Roles.Users.Queries.GetPersonProfile.Request;
-using UseCase.Shared.Templates.Requests;
+using UseCase.Shared.Requests;
 
 namespace BackEndAPI.Controllers
 {
@@ -57,7 +57,7 @@ namespace BackEndAPI.Controllers
                 Command = new UserProfileActivateCommand
                 {
                     UserId = urlSegmentPart1,
-                    ActivationUrlSegment = urlSegmentPart2,
+                    ActivationUrlSegment = Map(urlSegmentPart2),
                 },
                 Metadata = (RequestMetadata)HttpContext,
             };
@@ -275,7 +275,6 @@ namespace BackEndAPI.Controllers
             var result = await _mediator.Send(request, cancellationToken);
             return Ok(result);
         }
-
 
         private static string Map(string urlSegment)
         {

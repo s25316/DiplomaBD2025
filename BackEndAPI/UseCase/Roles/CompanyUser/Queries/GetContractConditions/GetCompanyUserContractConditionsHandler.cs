@@ -16,6 +16,7 @@ using UseCase.Shared.ExtensionMethods.EF;
 using UseCase.Shared.ExtensionMethods.EF.Companies;
 using UseCase.Shared.ExtensionMethods.EF.CompanyPeople;
 using UseCase.Shared.ExtensionMethods.EF.ContractConditions;
+using UseCase.Shared.Responses.BaseResponses;
 using UseCase.Shared.Services.Authentication.Inspectors;
 
 namespace UseCase.Roles.CompanyUser.Queries.GetContractConditions
@@ -171,10 +172,10 @@ namespace UseCase.Roles.CompanyUser.Queries.GetContractConditions
             }
             // Filter Companies if have no access to it
             if (request.CompanyId.HasValue ||
-                request.CompanyParameters.ContainsAny())
+                request.CompanyParameters.HasValue)
             {
                 query = query.Where(cc => _context.Companies
-                    .IdentificationFilter(request.CompanyId, request.CompanyParameters)
+                    .WhereIdentificationData(request.CompanyId, request.CompanyParameters)
                     .Any(company => company.CompanyId == cc.CompanyId));
             }
             // Filter only to which have access
@@ -199,7 +200,7 @@ namespace UseCase.Roles.CompanyUser.Queries.GetContractConditions
             if (searchWords.Any())
             {
                 query = query.Where(cc => _context.Companies
-                    .SearchTextFilter(searchWords)
+                    .WhereText(request.SearchText)
                     .Any(company => company.CompanyId == cc.CompanyId));
             }
 

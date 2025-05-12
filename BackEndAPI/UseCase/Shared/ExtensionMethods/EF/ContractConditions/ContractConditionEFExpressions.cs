@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 using UseCase.RelationalDatabase.Models;
-using UseCase.Shared.DTOs.QueryParameters;
+using UseCase.Shared.Requests.QueryParameters;
 
 namespace UseCase.Shared.ExtensionMethods.EF.ContractConditions
 {

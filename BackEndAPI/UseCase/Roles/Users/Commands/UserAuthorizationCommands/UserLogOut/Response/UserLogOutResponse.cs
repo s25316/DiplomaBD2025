@@ -1,5 +1,5 @@
 ﻿using Domain.Shared.Enums;
-using UseCase.Shared.Templates.Response.Responses;
+using UseCase.Shared.Responses;
 
 namespace UseCase.Roles.Users.Commands.UserAuthorizationCommands.UserLogOut.Response
 {

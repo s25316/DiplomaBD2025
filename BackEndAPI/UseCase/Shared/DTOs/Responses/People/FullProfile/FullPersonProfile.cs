@@ -1,4 +1,5 @@
 ﻿using UseCase.Shared.Dictionaries.GetSkills.Response;
+using UseCase.Shared.Responses.BaseResponses;
 
 namespace UseCase.Shared.DTOs.Responses.People.FullProfile
 {
