@@ -197,9 +197,9 @@ namespace UseCase.Roles.Guests.Queries.GuestGetContractConditions
                 return query.Where(cc =>
                     contractParameterIds.Any(contractParameterId =>
                          _context.ContractAttributes.Any(ca =>
-                            ca.ContractConditionId == cc.ContractConditionId &&
+                            ca.Removed == null &&
                             ca.ContractParameterId == contractParameterId &&
-                            ca.Removed == null
+                            ca.ContractConditionId == cc.ContractConditionId
                          )
                     ));
             }
@@ -218,16 +218,16 @@ namespace UseCase.Roles.Guests.Queries.GuestGetContractConditions
                 return ascending
                     ? query.OrderBy(cc => _context.ContractAttributes
                         .Count(ca => contractParameterIds.Any(contractParameterId =>
-                            ca.ContractConditionId == cc.ContractConditionId &&
+                            ca.Removed == null &&
                             ca.ContractParameterId == contractParameterId &&
-                            ca.Removed == null
+                            ca.ContractConditionId == cc.ContractConditionId
                         ))
                     ).ThenBy(ot => ot.Created)
                     : query.OrderByDescending(cc => _context.ContractAttributes
                         .Count(ca => contractParameterIds.Any(contractParameterId =>
-                            ca.ContractConditionId == cc.ContractConditionId &&
+                            ca.Removed == null &&
                             ca.ContractParameterId == contractParameterId &&
-                            ca.Removed == null
+                            ca.ContractConditionId == cc.ContractConditionId
                         ))
                     ).ThenByDescending(ot => ot.Created);
             }

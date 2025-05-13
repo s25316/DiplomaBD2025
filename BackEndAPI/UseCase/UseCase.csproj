@@ -15,7 +15,6 @@
     <Folder Include="Roles\Administrators\Queries\" />
     <Folder Include="Roles\Guests\Commands\" />
     <Folder Include="Roles\Users\Commands\ProfileCommands\UserProfileUpdateLogin\Response\" />
-    <Folder Include="Shared\Templates\Response\BaseResponses\" />
   </ItemGroup>
 
   <ItemGroup>

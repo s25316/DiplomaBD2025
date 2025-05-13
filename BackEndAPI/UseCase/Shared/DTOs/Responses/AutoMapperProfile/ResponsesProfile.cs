@@ -3,11 +3,9 @@ using Domain.Shared.CustomProviders;
 using UseCase.RelationalDatabase.Models;
 using UseCase.Shared.Dictionaries.GetSkills.Response;
 using UseCase.Shared.Dictionaries.GetUrlTypes.Response;
-using UseCase.Shared.DTOs.Responses.Companies.Offers;
 using UseCase.Shared.DTOs.Responses.People;
 using UseCase.Shared.DTOs.Responses.People.FullProfile;
 using UseCase.Shared.Responses.BaseResponses;
-using UseCase.Shared.Responses.BaseResponses.CompanyUser;
 
 namespace UseCase.Shared.DTOs.Responses.AutoMapperProfile
 {
@@ -15,50 +13,6 @@ namespace UseCase.Shared.DTOs.Responses.AutoMapperProfile
     {
         public ResponsesProfile()
         {
-
-
-            CreateMap<Offer, OfferDto>()
-                .ConstructUsing((db, context) =>
-                {
-                    var now = CustomTimeProvider.Now;
-                    OfferStatus status = OfferStatus.Active;
-                    if (db.PublicationStart > now)
-                    {
-                        status = OfferStatus.Pending;
-                    }
-                    if (db.PublicationEnd.HasValue && db.PublicationEnd <= now)
-                    {
-                        status = OfferStatus.Expired;
-                    }
-
-                    return new OfferDto
-                    {
-                        OfferId = db.OfferId,
-                        PublicationStart = db.PublicationStart,
-                        PublicationEnd = db.PublicationEnd,
-                        EmploymentLength = db.EmploymentLength,
-                        WebsiteUrl = db.WebsiteUrl,
-                        Status = status,
-                        Company = context.Mapper.Map<CompanyDto>(
-                            db.OfferConnections
-                            .First(oc => oc.Removed == null)
-                            .OfferTemplate
-                            .Company
-                            ),
-                        OfferTemplate = context.Mapper.Map<CompanyUserOfferTemplateDto>(
-                            db.OfferConnections
-                            .First(oc => oc.Removed == null)
-                            .OfferTemplate
-                            ),
-                        Branch = db.Branch == null
-                            ? null
-                            : context.Mapper.Map<CompanyUserBranchDto>(db.Branch),
-                        ContractConditions = db.OfferConditions
-                            .Select(x => context.Mapper.Map<CompanyUserContractConditionDto>(x.ContractCondition)),
-                    };
-                });
-
-
             CreateMap<Skill, SkillDto>()
                 .ConstructUsing(db => new SkillDto
                 {

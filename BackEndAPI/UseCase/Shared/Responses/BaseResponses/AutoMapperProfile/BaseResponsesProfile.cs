@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using Domain.Features.Offers.Enums;
+using Domain.Shared.CustomProviders;
 using UseCase.RelationalDatabase.Models;
 
 namespace UseCase.Shared.Responses.BaseResponses.AutoMapperProfile
@@ -26,6 +28,33 @@ namespace UseCase.Shared.Responses.BaseResponses.AutoMapperProfile
                     PostCode = db.PostCode,
                     Lon = db.Lon,
                     Lat = db.Lat,
+                });
+
+            CreateMap<Offer, OfferDto>()
+                .ConstructUsing((db, context) =>
+                {
+                    var now = CustomTimeProvider.Now;
+                    OfferStatus status = OfferStatus.Active;
+                    if (db.PublicationStart > now)
+                    {
+                        status = OfferStatus.Scheduled;
+                    }
+                    if (db.PublicationEnd.HasValue && db.PublicationEnd <= now)
+                    {
+                        status = OfferStatus.Expired;
+                    }
+
+                    return new OfferDto
+                    {
+                        OfferId = db.OfferId,
+                        BranchId = db.BranchId,
+                        PublicationStart = db.PublicationStart,
+                        PublicationEnd = db.PublicationEnd,
+                        EmploymentLength = db.EmploymentLength,
+                        WebsiteUrl = db.WebsiteUrl,
+                        StatusId = (int)status,
+                        Status = status,
+                    };
                 });
         }
     }

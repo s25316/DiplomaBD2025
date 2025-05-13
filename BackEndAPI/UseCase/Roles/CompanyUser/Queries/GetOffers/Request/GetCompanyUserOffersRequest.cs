@@ -2,9 +2,9 @@
 
 using UseCase.Roles.CompanyUser.Queries.GetOffers.Enums;
 using UseCase.Roles.CompanyUser.Queries.Template.Response;
-using UseCase.Shared.DTOs.Responses.Companies.Offers;
 using UseCase.Shared.Requests;
 using UseCase.Shared.Requests.QueryParameters;
+using UseCase.Shared.Responses.BaseResponses;
 
 namespace UseCase.Roles.CompanyUser.Queries.GetOffers.Request
 {

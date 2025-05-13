@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using UseCase.Shared.DTOs.Requests;
+using UseCase.Shared.Requests.DTOs;
 
 namespace UseCase.Roles.CompanyUser.Commands.BranchesCreate.Request
 {

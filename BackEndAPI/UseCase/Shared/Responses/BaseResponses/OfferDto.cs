@@ -1,15 +1,15 @@
 ﻿// Ignore Spelling: Dto
-
+using Domain.Features.Offers.Enums;
 using System.Text.Json.Serialization;
 using UseCase.Shared.JsonConverters;
-using UseCase.Shared.Responses.BaseResponses;
-using UseCase.Shared.Responses.BaseResponses.CompanyUser;
 
-namespace UseCase.Shared.DTOs.Responses.Companies.Offers
+namespace UseCase.Shared.Responses.BaseResponses
 {
     public class OfferDto
     {
         public Guid OfferId { get; init; }
+
+        public Guid? BranchId { get; set; }
 
         public DateTime PublicationStart { get; init; }
 
@@ -19,15 +19,9 @@ namespace UseCase.Shared.DTOs.Responses.Companies.Offers
 
         public string? WebsiteUrl { get; init; }
 
+        public int StatusId { get; init; }
+
         [JsonConverter(typeof(OfferStatusJsonConverter))]
         public OfferStatus Status { get; init; }
-
-        public required CompanyDto Company { get; init; }
-
-        public CompanyUserBranchDto? Branch { get; init; }
-
-        public required CompanyUserOfferTemplateDto OfferTemplate { get; init; }
-
-        public IEnumerable<CompanyUserContractConditionDto> ContractConditions { get; init; } = [];
     }
 }

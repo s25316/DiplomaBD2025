@@ -1,10 +1,12 @@
-﻿using MediatR;
+﻿using Domain.Features.Offers.Enums;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using UseCase.Roles.Guests.Queries.GuestGetBranches;
 using UseCase.Roles.Guests.Queries.GuestGetBranches.Request;
 using UseCase.Roles.Guests.Queries.GuestGetCompanies.Request;
 using UseCase.Roles.Guests.Queries.GuestGetContractConditions;
 using UseCase.Roles.Guests.Queries.GuestGetContractConditions.Request;
+using UseCase.Roles.Guests.Queries.GuestGetOffers.Request;
 using UseCase.Roles.Guests.Queries.GuestGetOfferTemplates;
 using UseCase.Roles.Guests.Queries.GuestGetOfferTemplates.Request;
 using UseCase.Shared.Enums;
@@ -31,7 +33,7 @@ namespace BackEndAPI.Controllers
         // Public Methods
         [HttpGet("companies")]
         [HttpGet("companies/{companyId:guid}")]
-        public async Task<IActionResult> GetCompaniesAsync(
+        public async Task<IActionResult> GuestGetCompaniesAsync(
             Guid? companyId,
             string? searchText,
             bool? ascending,
@@ -60,7 +62,7 @@ namespace BackEndAPI.Controllers
         [HttpGet("branches")]
         [HttpGet("branches/{branchId:guid}")]
         [HttpGet("companies/{companyId:guid}/branches")]
-        public async Task<IActionResult> GetUserBranchesAsync(
+        public async Task<IActionResult> GuestGetBranchesAsync(
             Guid? branchId,
             Guid? companyId,
             string? searchText,
@@ -93,7 +95,7 @@ namespace BackEndAPI.Controllers
         [HttpGet("offerTemplates")]
         [HttpGet("offerTemplates/{offerTemplateId:guid}")]
         [HttpGet("companies/{companyId:guid}/offerTemplates")]
-        public async Task<IActionResult> GetCompanyOfferTemplatesAsync(
+        public async Task<IActionResult> GuestGetOfferTemplatesAsync(
             Guid? companyId,
             Guid? offerTemplateId,
 
@@ -131,7 +133,7 @@ namespace BackEndAPI.Controllers
         [HttpGet("contractConditions")]
         [HttpGet("contractConditions/{contractConditionId:guid}")]
         [HttpGet("companies/{companyId:guid}/contractConditions")]
-        public async Task<IActionResult> GetCompanyUserContractConditionsAsync(
+        public async Task<IActionResult> GuestGetContractConditionsAsync(
             Guid? companyId,
             Guid? contractConditionId,
             string? searchText,
@@ -158,6 +160,64 @@ namespace BackEndAPI.Controllers
 
                 Ascending = ascending ?? true,
                 OrderBy = orderBy ?? GuestContractConditionOrderBy.ContractConditionCreated,
+                Pagination = pagination,
+
+                Metadata = HttpContext,
+            };
+            var result = await _mediator.Send(request, cancellationToken);
+            return StatusCode((int)result.HttpCode, result.Result);
+        }
+
+        [HttpGet("offers")]
+        [HttpGet("offers/{offerId:guid}")]
+        [HttpGet("companies/{companyId:guid}/offers")]
+        [HttpGet("branches/{branchId:guid}/offers")]
+        [HttpGet("contractConditions/{contractConditionId:guid}/offers")]
+        [HttpGet("offerTemplates/{offerTemplateId:guid}/offers")]
+        public async Task<IActionResult> GuestGetOffersAsync(
+            Guid? offerId,
+            Guid? companyId,
+            Guid? branchId,
+            Guid? offerTemplateId,
+            Guid? contractConditionId,
+
+            string? searchText,
+            OfferStatus? status,
+
+            bool? ascending,
+            OfferOrderBy? orderBy,
+
+            [FromHeader] IEnumerable<int> skillIds,
+            [FromHeader] IEnumerable<int> contractParameterIds,
+            [FromQuery] CompanyQueryParametersDto companyParameters,
+            [FromQuery] SalaryQueryParametersDto salaryParameters,
+            [FromQuery] GeographyPointQueryParametersDto geographyPoint,
+            [FromQuery] OfferQueryParametersDto offerParameters,
+            [FromQuery] PaginationQueryParametersDto pagination,
+            CancellationToken cancellationToken)
+        {
+            var request = new GuestGetOffersRequest
+            {
+                OfferId = offerId,
+                OfferQueryParameters = offerParameters,
+
+                CompanyId = companyId,
+                CompanyQueryParameters = companyParameters,
+
+                BranchId = branchId,
+                GeographyPoint = geographyPoint,
+
+                ContractConditionId = contractConditionId,
+                SalaryParameters = salaryParameters,
+                ContractParameterIds = contractParameterIds,
+
+                OfferTemplateId = offerTemplateId,
+                SkillIds = skillIds,
+
+                SearchText = searchText,
+
+                Ascending = ascending ?? true,
+                OrderBy = orderBy ?? OfferOrderBy.PublicationStart,
                 Pagination = pagination,
 
                 Metadata = HttpContext,

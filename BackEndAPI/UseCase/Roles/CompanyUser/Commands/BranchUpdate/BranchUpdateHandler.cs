@@ -5,8 +5,8 @@ using MediatR;
 using UseCase.Roles.CompanyUser.Commands.BranchUpdate.Request;
 using UseCase.Roles.CompanyUser.Commands.BranchUpdate.Response;
 using UseCase.Roles.CompanyUser.Repositories.Branches;
-using UseCase.Shared.DTOs.Requests;
 using UseCase.Shared.Repositories.Addresses;
+using UseCase.Shared.Requests.DTOs;
 using UseCase.Shared.Services.Authentication.Inspectors;
 using DomainBranch = Domain.Features.Branches.Entities.Branch;
 

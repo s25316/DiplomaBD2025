@@ -2,7 +2,7 @@
 
 using System.ComponentModel.DataAnnotations;
 
-namespace UseCase.Shared.DTOs.Requests
+namespace UseCase.Shared.Requests.DTOs
 {
     public record AddressRequestDto
     {

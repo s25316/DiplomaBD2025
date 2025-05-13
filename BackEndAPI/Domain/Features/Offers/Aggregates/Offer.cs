@@ -1,10 +1,10 @@
 ﻿using Domain.Features.Branches.ValueObjects;
 using Domain.Features.ContractConditions.ValueObjects.Ids;
 using Domain.Features.Offers.Entities;
+using Domain.Features.Offers.Enums;
 using Domain.Features.Offers.Exceptions;
 using Domain.Features.Offers.ValueObjects;
 using Domain.Features.Offers.ValueObjects.EmploymentLengths;
-using Domain.Features.Offers.ValueObjects.Enums;
 using Domain.Features.Offers.ValueObjects.Ids;
 using Domain.Features.Offers.ValueObjects.Info;
 using Domain.Features.OfferTemplates.ValueObjects.Ids;

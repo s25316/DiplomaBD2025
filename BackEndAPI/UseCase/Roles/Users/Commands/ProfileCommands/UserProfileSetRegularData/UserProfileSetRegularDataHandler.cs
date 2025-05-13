@@ -8,9 +8,9 @@ using UseCase.Roles.Users.Commands.ProfileCommands.UserProfileSetRegularData.Req
 using UseCase.Roles.Users.Commands.ProfileCommands.UserProfileSetRegularData.Response;
 using UseCase.Roles.Users.Repositories;
 using UseCase.Shared.Dictionaries.Repositories;
-using UseCase.Shared.DTOs.Requests;
 using UseCase.Shared.Exceptions;
 using UseCase.Shared.Repositories.Addresses;
+using UseCase.Shared.Requests.DTOs;
 using UseCase.Shared.Services.Authentication.Inspectors;
 using DomainPerson = Domain.Features.People.Aggregates.Person;
 

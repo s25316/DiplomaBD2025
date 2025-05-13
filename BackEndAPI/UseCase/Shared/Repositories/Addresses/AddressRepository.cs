@@ -2,8 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 using UseCase.RelationalDatabase;
-using UseCase.Shared.DTOs.Requests;
 using UseCase.Shared.Exceptions;
+using UseCase.Shared.Requests.DTOs;
 
 namespace UseCase.Shared.Repositories.Addresses
 {

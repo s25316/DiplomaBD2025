@@ -199,8 +199,8 @@ namespace UseCase.Roles.CompanyUser.Queries.CompanyUserGetOfferTemplates
                     skillIds.Any(skillId =>
                         _context.OfferSkills.Any(os =>
                             os.Removed == null &&
-                            os.OfferTemplateId == ot.OfferTemplateId &&
-                            os.SkillId == skillId
+                            os.SkillId == skillId &&
+                            os.OfferTemplateId == ot.OfferTemplateId
                         )
                     )
                 );
@@ -229,16 +229,16 @@ namespace UseCase.Roles.CompanyUser.Queries.CompanyUserGetOfferTemplates
                 return ascending
                     ? query.OrderBy(ot => _context.OfferSkills
                         .Count(skill => skillIds.Any(skillId =>
-                            skill.OfferTemplateId == ot.OfferTemplateId &&
+                            skill.Removed == null &&
                             skill.SkillId == skillId &&
-                            skill.Removed == null
+                            skill.OfferTemplateId == ot.OfferTemplateId
                         ))
                     ).ThenBy(ot => ot.Created)
                     : query.OrderByDescending(ot => _context.OfferSkills
                         .Count(skill => skillIds.Any(skillId =>
-                            skill.OfferTemplateId == ot.OfferTemplateId &&
+                            skill.Removed == null &&
                             skill.SkillId == skillId &&
-                            skill.Removed == null
+                            skill.OfferTemplateId == ot.OfferTemplateId
                         ))
                     ).ThenByDescending(ot => ot.Created);
             }

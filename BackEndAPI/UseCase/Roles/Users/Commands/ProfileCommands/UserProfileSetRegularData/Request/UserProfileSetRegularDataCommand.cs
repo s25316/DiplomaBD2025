@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using UseCase.Shared.DTOs.Requests;
+using UseCase.Shared.Requests.DTOs;
 
 namespace UseCase.Roles.Users.Commands.ProfileCommands.UserProfileSetRegularData.Request
 {

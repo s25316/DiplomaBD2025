@@ -1,4 +1,4 @@
-﻿using Domain.Features.Offers.ValueObjects.Enums;
+﻿using Domain.Features.Offers.Enums;
 using Domain.Features.Offers.ValueObjects.Info;
 using Domain.Features.People.ValueObjects.Ids;
 using Domain.Shared.Enums;

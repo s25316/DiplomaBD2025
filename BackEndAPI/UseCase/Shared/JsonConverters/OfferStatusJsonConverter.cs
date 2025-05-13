@@ -1,9 +1,8 @@
 ﻿// Ignore Spelling: Json
-
+using Domain.Features.Offers.Enums;
 using Domain.Shared.Enums;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using UseCase.Shared.DTOs.Responses.Companies.Offers;
 
 namespace UseCase.Shared.JsonConverters
 {

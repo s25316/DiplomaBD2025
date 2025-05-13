@@ -51,18 +51,5 @@ namespace UseCase.Shared.ExtensionMethods.EF.ContractConditions
                         (cc.HoursPerTerm <= salaryParameters.HoursMax)
                     );
         }
-
-        public static Expression<Func<ContractCondition, bool>> ContractParametersExpression(
-           IEnumerable<int> parameterIds)
-        {
-            return cc =>
-                (
-                    !parameterIds.Any() ||
-                    parameterIds.Any(parametrId =>
-                        cc.ContractAttributes.Any(atribute =>
-                            atribute.ContractParameterId == parametrId
-                    ))
-                );
-        }
     }
 }

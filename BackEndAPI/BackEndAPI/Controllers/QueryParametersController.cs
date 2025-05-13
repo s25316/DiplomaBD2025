@@ -1,9 +1,9 @@
-﻿using Domain.Shared.Enums;
+﻿using Domain.Features.Offers.Enums;
+using Domain.Shared.Enums;
 using Microsoft.AspNetCore.Mvc;
 using UseCase.Roles.CompanyUser.Queries.CompanyUserGetBranches;
 using UseCase.Roles.CompanyUser.Queries.CompanyUserGetContractConditions;
 using UseCase.Roles.CompanyUser.Queries.CompanyUserGetOfferTemplates;
-using UseCase.Shared.DTOs.Responses.Companies.Offers;
 using UseCase.Shared.Enums;
 
 namespace BackEndAPI.Controllers

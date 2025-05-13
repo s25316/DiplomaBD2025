@@ -2,7 +2,7 @@
 
 using System.ComponentModel;
 
-namespace Domain.Features.Offers.ValueObjects.Enums
+namespace Domain.Features.Offers.Enums
 {
     public enum OfferStatus
     {

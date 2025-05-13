@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Domain.Features.People.ValueObjects.Ids;
-using Domain.Shared.CustomProviders.StringProvider;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using UseCase.RelationalDatabase;
@@ -9,13 +8,11 @@ using UseCase.Roles.CompanyUser.Enums;
 using UseCase.Roles.CompanyUser.Queries.GetOffers.Request;
 using UseCase.Roles.CompanyUser.Queries.Template;
 using UseCase.Roles.CompanyUser.Queries.Template.Response;
-using UseCase.Shared.DTOs.Responses.Companies.Offers;
 using UseCase.Shared.ExtensionMethods.EF;
 using UseCase.Shared.ExtensionMethods.EF.Companies;
 using UseCase.Shared.ExtensionMethods.EF.CompanyPeople;
-using UseCase.Shared.ExtensionMethods.EF.ContractConditions;
 using UseCase.Shared.ExtensionMethods.EF.Offers;
-using UseCase.Shared.ExtensionMethods.EF.OfferTemplates;
+using UseCase.Shared.Responses.BaseResponses;
 using UseCase.Shared.Services.Authentication.Inspectors;
 
 namespace UseCase.Roles.CompanyUser.Queries.GetOffers
@@ -156,12 +153,12 @@ namespace UseCase.Roles.CompanyUser.Queries.GetOffers
             // SkillIds
             if (request.SkillIds.Any())
             {
-                query = query.Where(offer => offer.OfferConnections.Any(oc =>
+                /*query = query.Where(offer => offer.OfferConnections.Any(oc =>
                     _context.OfferTemplates
                         .SkillsFilter(request.SkillIds)
                         .Any(offerTemplate => oc.OfferTemplateId == offerTemplate.OfferTemplateId)
-                    ));
-            }
+                    ));*/
+            }/*
             // Contract Conditions
             if (request.ContractParameterIds.Any() ||
                 request.SalaryParameters.HasValue)
@@ -172,18 +169,18 @@ namespace UseCase.Roles.CompanyUser.Queries.GetOffers
                             request.ContractParameterIds)
                         .Any(cc => cc.ContractConditionId == oc.ContractConditionId)
                 ));
-            }
-
+            }*/
+            /*
             // Search text Part
             var searchWords = CustomStringProvider
                 .Split(request.SearchText, WhiteSpace.All);
-
-            if (searchWords.Any())
-            {
-                query = query.SearchTextFilter(searchWords);
-            }
-
-            query = query.OfferParametersFilter(request.OfferParameters);
+            
+                        if (searchWords.Any())
+                        {
+                            query = query.SearchTextFilter(searchWords);
+                        }
+            */
+            query = query.WhereOfferParameters(request.OfferParameters);
 
             return query;
         }

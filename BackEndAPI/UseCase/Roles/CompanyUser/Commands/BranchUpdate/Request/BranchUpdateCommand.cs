@@ -1,4 +1,4 @@
-﻿using UseCase.Shared.DTOs.Requests;
+﻿using UseCase.Shared.Requests.DTOs;
 
 namespace UseCase.Roles.CompanyUser.Commands.BranchUpdate.Request
 {

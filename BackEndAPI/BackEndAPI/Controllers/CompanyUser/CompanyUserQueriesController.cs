@@ -1,4 +1,5 @@
 ﻿// Ignore Spelling: regon, nip, krs, api
+using Domain.Features.Offers.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,7 +12,6 @@ using UseCase.Roles.CompanyUser.Queries.CompanyUserGetOfferTemplates;
 using UseCase.Roles.CompanyUser.Queries.CompanyUserGetOfferTemplates.Request;
 using UseCase.Roles.CompanyUser.Queries.GetOffers.Enums;
 using UseCase.Roles.CompanyUser.Queries.GetOffers.Request;
-using UseCase.Shared.DTOs.Responses.Companies.Offers;
 using UseCase.Shared.Enums;
 using UseCase.Shared.Requests.QueryParameters;
 

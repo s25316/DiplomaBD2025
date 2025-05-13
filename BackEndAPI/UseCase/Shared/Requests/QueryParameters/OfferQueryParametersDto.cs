@@ -1,16 +1,8 @@
 ﻿// Ignore Spelling: Dto
-
-
-// Ignore Spelling: Dto
-
-using UseCase.Shared.DTOs.Responses.Companies.Offers;
-
 namespace UseCase.Shared.Requests.QueryParameters
 {
     public class OfferQueryParametersDto
     {
-        public OfferStatus? Status { get; init; }
-
         public DateTime? PublicationStartFrom { get; init; }
 
         public DateTime? PublicationStartTo { get; init; }
