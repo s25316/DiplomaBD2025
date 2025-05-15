@@ -140,7 +140,6 @@ namespace UseCase.Roles.CompanyUser.Queries.CompanyUserGetContractConditions
             return _authenticationInspector.GetPersonId(claims);
         }
 
-
         private IQueryable<ContractCondition> PrepareBaseQuery()
         {
             return _context.ContractConditions

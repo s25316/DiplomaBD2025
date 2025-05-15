@@ -40,12 +40,12 @@ namespace UseCase.Shared.ExtensionMethods.EF.Companies
 
         public static IQueryable<Company> OrderBy(
             this IQueryable<Company> query,
-            CompaniesOrderBy orderBy,
+            CompanyOrderBy orderBy,
             bool ascending)
         {
             switch (orderBy)
             {
-                case CompaniesOrderBy.Name:
+                case CompanyOrderBy.Name:
                     return ascending ?
                         query.OrderBy(company => company.Name) :
                         query.OrderByDescending(company => company.Name);

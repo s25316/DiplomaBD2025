@@ -1,5 +1,4 @@
 ﻿// Ignore Spelling: Enums
-
 using System.ComponentModel;
 
 namespace UseCase.Shared.Enums

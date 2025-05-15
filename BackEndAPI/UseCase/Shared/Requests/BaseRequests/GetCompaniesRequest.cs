@@ -16,7 +16,7 @@ namespace UseCase.Shared.Requests.BaseRequests
         public required PaginationQueryParametersDto Pagination { get; init; }
 
         // Sorting
-        public required CompaniesOrderBy OrderBy { get; init; }
+        public required CompanyOrderBy OrderBy { get; init; }
 
         public required bool Ascending { get; init; }
     }

@@ -1,51 +1,64 @@
 ﻿using AutoMapper;
-using Domain.Shared.CustomProviders;
+using Domain.Features.People.ValueObjects.Ids;
 using Domain.Shared.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
+using System.Security.Claims;
 using UseCase.RelationalDatabase;
 using UseCase.RelationalDatabase.Models;
-using UseCase.Roles.Guests.Queries.GuestGetOffers.Request;
-using UseCase.Roles.Guests.Queries.GuestGetOffers.Response;
+using UseCase.Roles.CompanyUser.Enums;
+using UseCase.Roles.CompanyUser.Queries.CompanyUserGetOffers.Request;
+using UseCase.Roles.CompanyUser.Queries.CompanyUserGetOffers.Response;
 using UseCase.Shared.Enums;
 using UseCase.Shared.ExtensionMethods.EF;
 using UseCase.Shared.ExtensionMethods.EF.Branches;
 using UseCase.Shared.ExtensionMethods.EF.Companies;
+using UseCase.Shared.ExtensionMethods.EF.CompanyPeople;
 using UseCase.Shared.ExtensionMethods.EF.ContractConditions;
 using UseCase.Shared.ExtensionMethods.EF.Offers;
 using UseCase.Shared.ExtensionMethods.EF.OfferTemplates;
 using UseCase.Shared.Requests.QueryParameters;
 using UseCase.Shared.Responses.BaseResponses;
 using UseCase.Shared.Responses.BaseResponses.CompanyUser;
-using UseCase.Shared.Responses.BaseResponses.Guest;
 using UseCase.Shared.Responses.ItemsResponse;
+using UseCase.Shared.Services.Authentication.Inspectors;
 
-namespace UseCase.Roles.Guests.Queries.GuestGetOffers
+namespace UseCase.Roles.CompanyUser.Queries.CompanyUserGetOffers
 {
-    public class GuestGetOffersHandler : IRequestHandler<GuestGetOffersRequest, ItemsResponse<GuestOfferFullDto>>
+    public class CompanyUserGetOffersHandler : IRequestHandler<CompanyUserGetOffersRequest, ItemsResponse<CompanyUserOfferFullDto>>
     {
         // Properties
+        private static readonly IEnumerable<CompanyUserRoles> _authorizedRoles = [
+            CompanyUserRoles.CompanyOwner];
+
         private readonly IMapper _mapper;
         private readonly DiplomaBdContext _context;
-        //private readonly IAuthenticationInspectorService _authenticationInspector;
+        private readonly IAuthenticationInspectorService _authenticationInspector;
 
 
         // Constructor
-        public GuestGetOffersHandler(
+        public CompanyUserGetOffersHandler(
             IMapper mapper,
-            DiplomaBdContext context)
+            DiplomaBdContext context,
+            IAuthenticationInspectorService authenticationInspector)
         {
             _mapper = mapper;
             _context = context;
+            _authenticationInspector = authenticationInspector;
         }
 
 
         // Methods
-        public async Task<ItemsResponse<GuestOfferFullDto>> Handle(GuestGetOffersRequest request, CancellationToken cancellationToken)
+        public async Task<ItemsResponse<CompanyUserOfferFullDto>> Handle(CompanyUserGetOffersRequest request, CancellationToken cancellationToken)
         {
+            // Prepare Data
+            var personId = GetPersonId(request.Metadata.Claims);
+            var personIdValue = personId.Value;
+            var roleIds = _authorizedRoles.Select(r => (int)r);
+
             // Prepare Query
-            var baseQuery = PrepareQuery(request);
+            var baseQuery = PrepareQuery(personId, request);
             var paginatedQuery = baseQuery.Paginate(
                 request.Pagination.Page,
                 request.Pagination.ItemsPerPage);
@@ -71,7 +84,13 @@ namespace UseCase.Roles.Guests.Queries.GuestGetOffers
                             .Where(os =>
                                 os.Removed == null &&
                                 os.OfferTemplateId == oc.OfferTemplateId)
-                            .ToList()
+                            .ToList(),
+                        RolesCount = _context.CompanyPeople
+                            .Count(role => roleIds.Any(roleId =>
+                                role.Deny == null &&
+                                role.RoleId == roleId &&
+                                role.PersonId == personIdValue &&
+                                role.CompanyId == oc.OfferTemplate.CompanyId)),
                     }).First(),
                 ContractConditions = _context.OfferConditions
                     .Include(oc => oc.ContractCondition)
@@ -100,7 +119,7 @@ namespace UseCase.Roles.Guests.Queries.GuestGetOffers
             }
 
             var totalCount = selectResult.FirstOrDefault()?.TotalCount ?? 0;
-            var items = new List<GuestOfferFullDto>();
+            var items = new List<CompanyUserOfferFullDto>();
             foreach (var item in selectResult)
             {
                 var company = item.OfferTemplate.Item.Company;
@@ -109,7 +128,7 @@ namespace UseCase.Roles.Guests.Queries.GuestGetOffers
                     return PrepareResponse(HttpCode.Gone, [], 0);
                 }
 
-                if (company.Blocked.HasValue)
+                if (item.OfferTemplate.RolesCount == 0)
                 {
                     return PrepareResponse(HttpCode.Forbidden, [], 0);
                 }
@@ -123,13 +142,13 @@ namespace UseCase.Roles.Guests.Queries.GuestGetOffers
                     contractConditions.Add(contractCondition.Item);
                 }
 
-                items.Add(new GuestOfferFullDto
+                items.Add(new CompanyUserOfferFullDto
                 {
                     Offer = _mapper.Map<OfferDto>(item.Item),
-                    Branch = _mapper.Map<GuestBranchDto>(item.Item.Branch),
+                    Branch = _mapper.Map<CompanyUserBranchDto>(item.Item.Branch),
                     Company = _mapper.Map<CompanyDto>(company),
-                    OfferTemplate = _mapper.Map<GuestOfferTemplateDto>(item.OfferTemplate.Item),
-                    ContractConditions = _mapper.Map<IEnumerable<GuestContractConditionDto>>(contractConditions),
+                    OfferTemplate = _mapper.Map<CompanyUserOfferTemplateDto>(item.OfferTemplate.Item),
+                    ContractConditions = _mapper.Map<IEnumerable<CompanyUserContractConditionDto>>(contractConditions),
                 });
             }
 
@@ -137,16 +156,21 @@ namespace UseCase.Roles.Guests.Queries.GuestGetOffers
         }
 
         // Static Methods
-        private static ItemsResponse<GuestOfferFullDto> PrepareResponse(
+        private static ItemsResponse<CompanyUserOfferFullDto> PrepareResponse(
             HttpCode code,
-            IEnumerable<GuestOfferFullDto> items,
+            IEnumerable<CompanyUserOfferFullDto> items,
             int totalCount)
         {
-            return ItemsResponse<GuestOfferFullDto>.PrepareResponse(code, items, totalCount);
+            return ItemsResponse<CompanyUserOfferFullDto>.PrepareResponse(code, items, totalCount);
         }
 
         // Non Static Methods
-        private IQueryable<Offer> PrepareBaseQuery(DateTime now)
+        private PersonId GetPersonId(IEnumerable<Claim> claims)
+        {
+            return _authenticationInspector.GetPersonId(claims);
+        }
+
+        private IQueryable<Offer> PrepareBaseQuery()
         {
             return _context.Offers
                 .Include(o => o.Branch)
@@ -158,17 +182,14 @@ namespace UseCase.Roles.Guests.Queries.GuestGetOffers
                 .ThenInclude(oc => oc.City)
                 .ThenInclude(oc => oc.State)
                 .ThenInclude(oc => oc.Country)
-
-                // Offers Which or Active Or Expired
-                .Where(offer => offer.PublicationStart < now)
                 .AsNoTracking();
         }
 
         private IQueryable<Offer> PrepareQuery(
-            GuestGetOffersRequest request)
+            PersonId personId,
+            CompanyUserGetOffersRequest request)
         {
-            var now = CustomTimeProvider.Now;
-            var query = PrepareBaseQuery(now);
+            var query = PrepareBaseQuery();
 
             if (request.OfferId.HasValue)
             {
@@ -212,19 +233,17 @@ namespace UseCase.Roles.Guests.Queries.GuestGetOffers
                 query = query.Where(offer =>
                     _context.OfferConnections
                     .Include(oc => oc.OfferTemplate)
-                    .ThenInclude(oc => oc.Company)
                     .Any(oc =>
-                        oc.Removed == null &&
                         oc.OfferId == offer.OfferId &&
-                        oc.OfferTemplate.Company.Removed == null &&
-                        oc.OfferTemplate.Company.Blocked == null));
+                        _context.CompanyPeople
+                        .WhereAuthorize(personId, _authorizedRoles)
+                        .Any(role => role.CompanyId == oc.OfferTemplate.CompanyId)
+                    ));
             }
-            // Only Active Offers
-            query = query.Where(offer =>
-                offer.PublicationEnd == null ||
-                offer.PublicationEnd > now);
+
             query = query
-                .WhereOfferParameters(request.OfferQueryParameters);
+                .WhereOfferParameters(request.OfferQueryParameters)
+                .WhereStatus(request.Status);
             query = WhereSalary(query, request.SalaryParameters);
             query = WhereContractParameters(query, request.ContractParameterIds);
             query = WhereSkills(query, request.SkillIds);

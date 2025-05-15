@@ -1,10 +1,9 @@
 ﻿// Ignore Spelling: Enums
-
 using System.ComponentModel;
 
 namespace UseCase.Shared.Enums
 {
-    public enum CompaniesOrderBy
+    public enum CompanyOrderBy
     {
         [Description("By Name")]
         Name = 1,

@@ -8,10 +8,9 @@ using UseCase.Roles.CompanyUser.Queries.CompanyUserGetBranches.Request;
 using UseCase.Roles.CompanyUser.Queries.CompanyUserGetCompanies.Request;
 using UseCase.Roles.CompanyUser.Queries.CompanyUserGetContractConditions;
 using UseCase.Roles.CompanyUser.Queries.CompanyUserGetContractConditions.Request;
+using UseCase.Roles.CompanyUser.Queries.CompanyUserGetOffers.Request;
 using UseCase.Roles.CompanyUser.Queries.CompanyUserGetOfferTemplates;
 using UseCase.Roles.CompanyUser.Queries.CompanyUserGetOfferTemplates.Request;
-using UseCase.Roles.CompanyUser.Queries.GetOffers.Enums;
-using UseCase.Roles.CompanyUser.Queries.GetOffers.Request;
 using UseCase.Shared.Enums;
 using UseCase.Shared.Requests.QueryParameters;
 
@@ -40,7 +39,7 @@ namespace BackEndAPI.Controllers.CompanyUser
             Guid? companyId,
             string? searchText,
             bool? ascending,
-            CompaniesOrderBy? orderBy,
+            CompanyOrderBy? orderBy,
             [FromQuery] CompanyQueryParametersDto companyParameters,
             [FromQuery] PaginationQueryParametersDto pagination,
             CancellationToken cancellationToken)
@@ -52,7 +51,7 @@ namespace BackEndAPI.Controllers.CompanyUser
 
                 SearchText = searchText,
 
-                OrderBy = orderBy ?? CompaniesOrderBy.Created,
+                OrderBy = orderBy ?? CompanyOrderBy.Created,
                 Ascending = ascending ?? true,
                 Pagination = pagination,
 
@@ -200,7 +199,7 @@ namespace BackEndAPI.Controllers.CompanyUser
             OfferStatus? status,
 
             bool? ascending,
-            CompanyUserOffersOrderBy? orderBy,
+            OfferOrderBy? orderBy,
 
             [FromHeader] IEnumerable<int> skillIds,
             [FromHeader] IEnumerable<int> contractParameterIds,
@@ -211,13 +210,13 @@ namespace BackEndAPI.Controllers.CompanyUser
             [FromQuery] PaginationQueryParametersDto pagination,
             CancellationToken cancellationToken)
         {
-            var request = new GetCompanyUserOffersRequest
+            var request = new CompanyUserGetOffersRequest
             {
                 OfferId = offerId,
-                OfferParameters = offerParameters,
+                OfferQueryParameters = offerParameters,
 
                 CompanyId = companyId,
-                CompanyParameters = companyParameters,
+                CompanyQueryParameters = companyParameters,
 
                 BranchId = branchId,
                 GeographyPoint = geographyPoint,
@@ -230,9 +229,10 @@ namespace BackEndAPI.Controllers.CompanyUser
                 SkillIds = skillIds,
 
                 SearchText = searchText,
+                Status = status,
 
                 Ascending = ascending ?? true,
-                OrderBy = orderBy ?? CompanyUserOffersOrderBy.Undefined,
+                OrderBy = orderBy ?? OfferOrderBy.PublicationStart,
                 Pagination = pagination,
 
                 Metadata = HttpContext,

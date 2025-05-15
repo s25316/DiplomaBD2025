@@ -37,7 +37,7 @@ namespace BackEndAPI.Controllers
             Guid? companyId,
             string? searchText,
             bool? ascending,
-            CompaniesOrderBy? orderBy,
+            CompanyOrderBy? orderBy,
             [FromQuery] CompanyQueryParametersDto companyParameters,
             [FromQuery] PaginationQueryParametersDto pagination,
             CancellationToken cancellationToken)
@@ -49,7 +49,7 @@ namespace BackEndAPI.Controllers
 
                 SearchText = searchText,
 
-                OrderBy = orderBy ?? CompaniesOrderBy.Created,
+                OrderBy = orderBy ?? CompanyOrderBy.Created,
                 Ascending = ascending ?? true,
                 Pagination = pagination,
 

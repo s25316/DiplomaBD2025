@@ -1,8 +1,4 @@
 ﻿// Ignore Spelling: Dto
-
-
-// Ignore Spelling: Dto
-
 using UseCase.Shared.Responses.BaseResponses.Guest;
 
 namespace UseCase.Shared.Responses.BaseResponses.CompanyUser
