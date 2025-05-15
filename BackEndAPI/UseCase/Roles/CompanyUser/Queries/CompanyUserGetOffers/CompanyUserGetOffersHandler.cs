@@ -237,13 +237,16 @@ namespace UseCase.Roles.CompanyUser.Queries.CompanyUserGetOffers
                         oc.OfferId == offer.OfferId &&
                         _context.CompanyPeople
                         .WhereAuthorize(personId, _authorizedRoles)
-                        .Any(role => role.CompanyId == oc.OfferTemplate.CompanyId)
-                    ));
+                        .Any(role =>
+                            oc.OfferTemplate.CompanyId == role.CompanyId
+                        )
+                    )
+                );
             }
 
             query = query
-                .WhereOfferParameters(request.OfferQueryParameters)
-                .WhereStatus(request.Status);
+                .WhereOfferParameters(request.OfferQueryParameters);
+            //.WhereStatus(request.Status);
             query = WhereSalary(query, request.SalaryParameters);
             query = WhereContractParameters(query, request.ContractParameterIds);
             query = WhereSkills(query, request.SkillIds);
