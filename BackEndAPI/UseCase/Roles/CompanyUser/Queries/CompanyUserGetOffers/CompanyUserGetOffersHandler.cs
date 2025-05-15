@@ -245,8 +245,8 @@ namespace UseCase.Roles.CompanyUser.Queries.CompanyUserGetOffers
             }
 
             query = query
-                .WhereOfferParameters(request.OfferQueryParameters);
-            //.WhereStatus(request.Status);
+                .WhereOfferParameters(request.OfferQueryParameters)
+                .WhereStatus(request.Status);
             query = WhereSalary(query, request.SalaryParameters);
             query = WhereContractParameters(query, request.ContractParameterIds);
             query = WhereSkills(query, request.SkillIds);
