@@ -8,8 +8,8 @@ using UseCase.Roles.CompanyUser.Commands.OfferTemplatesCreate.Response;
 using UseCase.Roles.CompanyUser.Repositories.OfferTemplates;
 using UseCase.Shared.Dictionaries.GetSkills.Response;
 using UseCase.Shared.Dictionaries.Repositories;
+using UseCase.Shared.Responses.CommandResults;
 using UseCase.Shared.Services.Authentication.Inspectors;
-using UseCase.Shared.Templates.Response.Commands;
 using DomainOfferTemplate = Domain.Features.OfferTemplates.Aggregates.OfferTemplate;
 
 namespace UseCase.Roles.CompanyUser.Commands.OfferTemplatesCreate
@@ -46,7 +46,7 @@ namespace UseCase.Roles.CompanyUser.Commands.OfferTemplatesCreate
                 return new OfferTemplatesCreateResponse
                 {
                     Result = buildResult.Dictionary
-                        .Select(pair => new ResponseCommandTemplate<OfferTemplateCreateCommand>
+                        .Select(pair => new BaseCommandResult<OfferTemplateCreateCommand>
                         {
                             Item = pair.Key,
                             IsCorrect = string.IsNullOrWhiteSpace(pair.Value.Error),
@@ -67,7 +67,7 @@ namespace UseCase.Roles.CompanyUser.Commands.OfferTemplatesCreate
             return new OfferTemplatesCreateResponse
             {
                 Result = dictionary
-                        .Select(pair => new ResponseCommandTemplate<OfferTemplateCreateCommand>
+                        .Select(pair => new BaseCommandResult<OfferTemplateCreateCommand>
                         {
                             Item = pair.Key,
                             IsCorrect = repositoryResult.Dictionary[pair.Value].IsCorrect,

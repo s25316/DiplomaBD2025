@@ -1,11 +1,11 @@
 ﻿using Domain.Features.Companies.ValueObjects.Nips;
 using System.ComponentModel.DataAnnotations;
-using UseCase.Shared.Templates.ValidationAttributes;
+using UseCase.Shared.ValidationAttributes.BaseAttributes;
 
 namespace UseCase.Shared.ValidationAttributes.CompanyAttributes
 {
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
-    public class NipAttribute : CustomStringAttribute
+    public class NipAttribute : BaseStringAttribute
     {
         protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
         {

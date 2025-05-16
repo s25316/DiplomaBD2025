@@ -1,4 +1,4 @@
-﻿using UseCase.Shared.Templates.Repositories;
+﻿using UseCase.Shared.Repositories.BaseEFRepository;
 using DomainContractCondition = Domain.Features.ContractConditions.Aggregates.ContractCondition;
 using DomainContractConditionId = Domain.Features.ContractConditions.ValueObjects.Ids.ContractConditionId;
 

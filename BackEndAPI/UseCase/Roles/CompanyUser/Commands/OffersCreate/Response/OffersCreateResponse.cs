@@ -1,11 +1,11 @@
 ﻿using UseCase.Roles.CompanyUser.Commands.OffersCreate.Request;
-using UseCase.Shared.Templates.Response.Commands;
-using UseCase.Shared.Templates.Response.Responses;
+using UseCase.Shared.Responses.CommandResults;
+using UseCase.Shared.Responses.ItemResponse;
 
 namespace UseCase.Roles.CompanyUser.Commands.OffersCreate.Response
 {
     public class OffersCreateResponse :
-        ResponseTemplate<IEnumerable<ResponseCommandTemplate<OfferCreateCommand>>>
+        ItemResponse<IEnumerable<BaseCommandResult<OfferCreateCommand>>>
     {
     }
 }

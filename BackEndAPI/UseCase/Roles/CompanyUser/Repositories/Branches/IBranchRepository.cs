@@ -1,4 +1,4 @@
-﻿using UseCase.Shared.Templates.Repositories;
+﻿using UseCase.Shared.Repositories.BaseEFRepository;
 using DomainBranch = Domain.Features.Branches.Entities.Branch;
 using DomainBranchId = Domain.Features.Branches.ValueObjects.BranchId;
 

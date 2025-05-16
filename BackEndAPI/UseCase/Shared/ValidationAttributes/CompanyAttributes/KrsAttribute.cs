@@ -2,12 +2,12 @@
 
 using Domain.Features.Companies.ValueObjects.Krss;
 using System.ComponentModel.DataAnnotations;
-using UseCase.Shared.Templates.ValidationAttributes;
+using UseCase.Shared.ValidationAttributes.BaseAttributes;
 
 namespace UseCase.Shared.ValidationAttributes.CompanyAttributes
 {
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
-    public class KrsAttribute : CustomStringAttribute
+    public class KrsAttribute : BaseStringAttribute
     {
         protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
         {

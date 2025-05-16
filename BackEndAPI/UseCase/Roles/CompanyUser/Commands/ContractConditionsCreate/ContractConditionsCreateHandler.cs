@@ -9,8 +9,8 @@ using UseCase.Roles.CompanyUser.Repositories.ContractConditions;
 using UseCase.Shared.Dictionaries.GetContractParameters.Response;
 using UseCase.Shared.Dictionaries.Repositories;
 using UseCase.Shared.Enums;
+using UseCase.Shared.Responses.CommandResults;
 using UseCase.Shared.Services.Authentication.Inspectors;
-using UseCase.Shared.Templates.Response.Commands;
 using DomainContractCondition = Domain.Features.ContractConditions.Aggregates.ContractCondition;
 
 namespace UseCase.Roles.CompanyUser.Commands.ContractConditionsCreate
@@ -46,7 +46,7 @@ namespace UseCase.Roles.CompanyUser.Commands.ContractConditionsCreate
             {
                 return new ContractConditionsCreateResponse
                 {
-                    Result = resultBuild.Dictionary.Select(pair => new ResponseCommandTemplate<ContractConditionsCreateCommand>
+                    Result = resultBuild.Dictionary.Select(pair => new BaseCommandResult<ContractConditionsCreateCommand>
                     {
                         Item = pair.Key,
                         IsCorrect = string.IsNullOrWhiteSpace(pair.Value.Error),
@@ -66,7 +66,7 @@ namespace UseCase.Roles.CompanyUser.Commands.ContractConditionsCreate
 
             return new ContractConditionsCreateResponse
             {
-                Result = dictionary.Select(pair => new ResponseCommandTemplate<ContractConditionsCreateCommand>
+                Result = dictionary.Select(pair => new BaseCommandResult<ContractConditionsCreateCommand>
                 {
                     Item = pair.Key,
                     IsCorrect = repositoryResult.Dictionary[pair.Value].IsCorrect,

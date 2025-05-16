@@ -4,8 +4,8 @@ using MediatR;
 using UseCase.Roles.CompanyUser.Commands.CompaniesCreate.Request;
 using UseCase.Roles.CompanyUser.Commands.CompaniesCreate.Response;
 using UseCase.Roles.CompanyUser.Repositories.Companies;
+using UseCase.Shared.Responses.CommandResults;
 using UseCase.Shared.Services.Authentication.Inspectors;
-using UseCase.Shared.Templates.Response.Commands;
 using DomainCompany = Domain.Features.Companies.Entities.Company;
 
 namespace UseCase.Roles.CompanyUser.Commands.CompaniesCreate
@@ -51,7 +51,7 @@ namespace UseCase.Roles.CompanyUser.Commands.CompaniesCreate
             // Handle Repository Result Valid or Not 
             return new CompaniesCreateResponse
             {
-                Result = dictionary.Select(pair => new ResponseCommandTemplate<CompanyCreateCommand>
+                Result = dictionary.Select(pair => new BaseCommandResult<CompanyCreateCommand>
                 {
                     Item = pair.Key,
                     IsCorrect = createResult.Dictionary[pair.Value].IsCorrect,
@@ -115,7 +115,7 @@ namespace UseCase.Roles.CompanyUser.Commands.CompaniesCreate
             return new CompaniesCreateResponse
             {
                 Result = builders.Dictionary
-                    .Select(pair => new ResponseCommandTemplate<CompanyCreateCommand>
+                    .Select(pair => new BaseCommandResult<CompanyCreateCommand>
                     {
                         Item = pair.Key,
                         IsCorrect = string.IsNullOrWhiteSpace(pair.Value.Error),

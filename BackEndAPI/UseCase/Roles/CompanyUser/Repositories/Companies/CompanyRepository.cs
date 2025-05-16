@@ -8,8 +8,8 @@ using UseCase.RelationalDatabase;
 using UseCase.RelationalDatabase.Models;
 using UseCase.Roles.CompanyUser.Enums;
 using UseCase.Shared.Exceptions;
-using UseCase.Shared.Templates.Repositories;
-using UseCase.Shared.Templates.Response.Commands;
+using UseCase.Shared.Repositories.BaseEFRepository;
+using UseCase.Shared.Responses.CommandResults;
 using DatabaseCompany = UseCase.RelationalDatabase.Models.Company;
 using DomainCompany = Domain.Features.Companies.Entities.Company;
 using DomainCompanyId = Domain.Features.Companies.ValueObjects.Ids.CompanyId;
@@ -163,7 +163,7 @@ namespace UseCase.Roles.CompanyUser.Repositories.Companies
 
         private static RepositoryCreateResponse<DomainCompany> PrepareCreateResponse(
             HttpCode code,
-            Dictionary<DomainCompany, ResponseCommandMetadata> dictionary)
+            Dictionary<DomainCompany, ResultMetadata> dictionary)
         {
             return RepositoryCreateResponse<DomainCompany>.PrepareResponse(code, dictionary);
         }
@@ -225,7 +225,7 @@ namespace UseCase.Roles.CompanyUser.Repositories.Companies
 
 
             var code = HttpCode.Created;
-            var dictionary = new Dictionary<DomainCompany, ResponseCommandMetadata>();
+            var dictionary = new Dictionary<DomainCompany, ResultMetadata>();
 
             var stringBuilder = new StringBuilder();
 
@@ -254,7 +254,7 @@ namespace UseCase.Roles.CompanyUser.Repositories.Companies
                 {
                     code = HttpCode.Conflict;
                 }
-                dictionary.Add(item, new ResponseCommandMetadata
+                dictionary.Add(item, new ResultMetadata
                 {
                     IsCorrect = stringBuilder.Length == 0,
                     Message = stringBuilder.ToString().Trim(),

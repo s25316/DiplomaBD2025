@@ -2,6 +2,7 @@
 using Domain.Features.Offers.Enums;
 using Domain.Shared.CustomProviders;
 using UseCase.RelationalDatabase.Models;
+using UseCase.Shared.Dictionaries.GetUrlTypes.Response;
 
 namespace UseCase.Shared.Responses.BaseResponses.AutoMapperProfile
 {
@@ -55,6 +56,18 @@ namespace UseCase.Shared.Responses.BaseResponses.AutoMapperProfile
                         StatusId = (int)status,
                         Status = status,
                     };
+                });
+
+
+            CreateMap<Url, UrlDto>()
+                .ConstructUsing(db => new UrlDto
+                {
+                    Value = db.Value ?? "",
+                    UrlType = new UrlTypeDto
+                    {
+                        UrlTypeId = db.UrlType.UrlTypeId,
+                        Name = db.UrlType.Name,
+                    }
                 });
         }
     }

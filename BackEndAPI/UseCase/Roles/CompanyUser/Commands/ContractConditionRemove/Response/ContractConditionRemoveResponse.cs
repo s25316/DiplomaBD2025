@@ -1,10 +1,10 @@
 ﻿using Domain.Shared.Enums;
-using UseCase.Shared.Templates.Response.Commands;
-using UseCase.Shared.Templates.Response.Responses;
+using UseCase.Shared.Responses.CommandResults;
+using UseCase.Shared.Responses.ItemResponse;
 
 namespace UseCase.Roles.CompanyUser.Commands.ContractConditionRemove.Response
 {
-    public class ContractConditionRemoveResponse : ResponseTemplate<ResponseCommandMetadata>
+    public class ContractConditionRemoveResponse : ItemResponse<ResultMetadata>
     {
         public static ContractConditionRemoveResponse PrepareResponse(
             HttpCode code,
@@ -14,7 +14,7 @@ namespace UseCase.Roles.CompanyUser.Commands.ContractConditionRemove.Response
             return new ContractConditionRemoveResponse
             {
                 HttpCode = code,
-                Result = new ResponseCommandMetadata
+                Result = new ResultMetadata
                 {
                     IsCorrect = intCode >= 200 && intCode < 300,
                     Message = message ?? code.Description()

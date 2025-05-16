@@ -1,7 +1,7 @@
 ﻿using Confluent.Kafka;
 using Infrastructure.Exceptions;
-using UseCase.Kafka;
 using UseCase.MongoDb;
+using UseCase.Shared.Interfaces;
 
 namespace Infrastructure.Kafka
 {

@@ -1,7 +1,7 @@
 // Scaffold-DbContext "ConnectionString" Microsoft.EntityFrameworkCore.SqlServer -OutputDir RelationalDatabase -Project UseCase
 using BackEndAPI.Middlewares;
-using UseCase.Kafka;
 using UseCase.MongoDb.UserLogs.Models.ServiceEvents;
+using UseCase.Shared.Interfaces;
 
 namespace BackEndAPI
 {

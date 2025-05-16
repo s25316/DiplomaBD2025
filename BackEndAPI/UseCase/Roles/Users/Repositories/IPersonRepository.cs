@@ -1,4 +1,4 @@
-﻿using UseCase.Shared.Templates.Repositories;
+﻿using UseCase.Shared.Repositories.BaseEFRepository;
 using DomainLogin = Domain.Shared.ValueObjects.Emails.Email;
 using DomainPerson = Domain.Features.People.Aggregates.Person;
 using DomainPersonId = Domain.Features.People.ValueObjects.Ids.PersonId;

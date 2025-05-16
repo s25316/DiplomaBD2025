@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Domain.Shared.CustomProviders;
 using Domain.Shared.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +10,7 @@ using UseCase.Roles.Guests.Queries.GuestGetContractConditions.Response;
 using UseCase.Shared.ExtensionMethods.EF;
 using UseCase.Shared.ExtensionMethods.EF.Companies;
 using UseCase.Shared.ExtensionMethods.EF.ContractConditions;
+using UseCase.Shared.ExtensionMethods.EF.Offers;
 using UseCase.Shared.Responses.BaseResponses;
 using UseCase.Shared.Responses.BaseResponses.Guest;
 using UseCase.Shared.Responses.ItemsResponse;
@@ -39,16 +39,10 @@ namespace UseCase.Roles.Guests.Queries.GuestGetContractConditions
         public async Task<ItemsResponse<GuestContractConditionAndCompanyDto>> Handle(GuestGetContractConditionsRequest request, CancellationToken cancellationToken)
         {
             // Prepare Data
-            var now = CustomTimeProvider.Now;
-            Expression<Func<Offer, bool>> getActiveOffers = offer =>
-                offer.PublicationStart < now &&
-                (
-                    offer.PublicationEnd == null ||
-                    offer.PublicationEnd > now
-                );
+            var getActiveOffersExpression = OfferEFExpressions.ActiveOffersExpression();
 
             // Prepare Query
-            var baseQuery = PrepareQuery(request, getActiveOffers);
+            var baseQuery = PrepareQuery(request, getActiveOffersExpression);
             var paginatedQuery = baseQuery.Paginate(
                 request.Pagination.Page,
                 request.Pagination.ItemsPerPage);
@@ -70,7 +64,7 @@ namespace UseCase.Roles.Guests.Queries.GuestGetContractConditions
                     .Where(offer => offer.OfferConditions.Any(oc =>
                         oc.Removed == null &&
                         oc.ContractConditionId == item.ContractConditionId))
-                    .Count(getActiveOffers),
+                    .Count(getActiveOffersExpression),
 
             }).ToListAsync(cancellationToken);
 

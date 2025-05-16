@@ -1,20 +1,20 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using UseCase.Roles.Users.Commands.ProfileCommands.UserProfileActivate.Request;
-using UseCase.Roles.Users.Commands.ProfileCommands.UserProfileCreate.Request;
-using UseCase.Roles.Users.Commands.ProfileCommands.UserProfileRemove.Request;
-using UseCase.Roles.Users.Commands.ProfileCommands.UserProfileResetPasswordAuthorize.Request;
-using UseCase.Roles.Users.Commands.ProfileCommands.UserProfileResetPasswordInitiate.Request;
-using UseCase.Roles.Users.Commands.ProfileCommands.UserProfileResetPasswordUnAuthorize.Request;
-using UseCase.Roles.Users.Commands.ProfileCommands.UserProfileRestore.Request;
-using UseCase.Roles.Users.Commands.ProfileCommands.UserProfileSetBaseData.Request;
-using UseCase.Roles.Users.Commands.ProfileCommands.UserProfileSetRegularData.Request;
-using UseCase.Roles.Users.Commands.ProfileCommands.UserProfileUpdateLogin.Request;
-using UseCase.Roles.Users.Commands.UserAuthorizationCommands.UserAuthorization2Stage.Request;
-using UseCase.Roles.Users.Commands.UserAuthorizationCommands.UserAuthorizationLoginIn.Request;
-using UseCase.Roles.Users.Commands.UserAuthorizationCommands.UserAuthorizationRefreshToken.Request;
-using UseCase.Roles.Users.Commands.UserAuthorizationCommands.UserLogOut.Request;
+using UseCase.Roles.Users.Commands.AuthorizationCommands.User2StageAuthorization.Request;
+using UseCase.Roles.Users.Commands.AuthorizationCommands.UserLoginIn.Request;
+using UseCase.Roles.Users.Commands.AuthorizationCommands.UserLogOut.Request;
+using UseCase.Roles.Users.Commands.AuthorizationCommands.UserRefreshToken.Request;
+using UseCase.Roles.Users.Commands.RegistrationCommands.UserActivatePerson.Request;
+using UseCase.Roles.Users.Commands.RegistrationCommands.UserCreatePerson.Request;
+using UseCase.Roles.Users.Commands.RemovingCommands.UserRemovePerson.Request;
+using UseCase.Roles.Users.Commands.RemovingCommands.UserRestorePerson.Request;
+using UseCase.Roles.Users.Commands.UpdatePasswordCommands.UserInitiateUpdatePersonPassword.Request;
+using UseCase.Roles.Users.Commands.UpdatePasswordCommands.UserUpdatePersonPasswordAuthorize.Request;
+using UseCase.Roles.Users.Commands.UpdatePasswordCommands.UserUpdatePersonPasswordUnAuthorize.Request;
+using UseCase.Roles.Users.Commands.UpdatingCommands.UserSetBasePersonData.Request;
+using UseCase.Roles.Users.Commands.UpdatingCommands.UserUpdatePersonData.Request;
+using UseCase.Roles.Users.Commands.UpdatingCommands.UserUpdatePersonLogin.Request;
 using UseCase.Roles.Users.Queries.GetPersonProfile.Request;
 using UseCase.Shared.Requests;
 
@@ -33,10 +33,10 @@ namespace BackEndAPI.Controllers
 
         [HttpPost("registration")]
         public async Task<IActionResult> PersonRegistrationAsync(
-            UserProfileCreateCommand command,
+            UserCreatePersonCommand command,
             CancellationToken cancellationToken)
         {
-            var request = new UserProfileCreateRequest
+            var request = new UserCreatePersonRequest
             {
                 Command = command,
                 Metadata = (RequestMetadata)HttpContext,
@@ -52,9 +52,9 @@ namespace BackEndAPI.Controllers
             string urlSegmentPart2,
             CancellationToken cancellationToken)
         {
-            var request = new UserProfileActivateRequest
+            var request = new UserActivatePersonRequest
             {
-                Command = new UserProfileActivateCommand
+                Command = new UserActivatePersonCommand
                 {
                     UserId = urlSegmentPart1,
                     ActivationUrlSegment = Map(urlSegmentPart2),
@@ -68,10 +68,10 @@ namespace BackEndAPI.Controllers
 
         [HttpPost("login")]
         public async Task<IActionResult> UserAuthorizationLoginInAsync(
-            UserAuthorizationLoginInCommand command,
+            UserLoginInCommand command,
             CancellationToken cancellationToken)
         {
-            var request = new UserAuthorizationLoginInRequest
+            var request = new UserLoginInRequest
             {
                 Command = command,
                 Metadata = (RequestMetadata)HttpContext,
@@ -85,12 +85,12 @@ namespace BackEndAPI.Controllers
         public async Task<IActionResult> UserAuthorization2StageAsync(
             Guid urlSegmentPart1,
             string urlSegmentPart2,
-            UserAuthorization2StageCodeDto code,
+            User2StageCodeDto code,
             CancellationToken cancellationToken)
         {
-            var request = new UserAuthorization2StageRequest
+            var request = new User2StageAuthorizationRequest
             {
-                Command = new UserAuthorization2StageCommand
+                Command = new User2StageAuthorizationCommand
                 {
                     UrlSegmentPart1 = urlSegmentPart1,
                     UrlSegmentPart2 = Map(urlSegmentPart2),
@@ -106,10 +106,10 @@ namespace BackEndAPI.Controllers
 
         [HttpPost("refreshToken")]
         public async Task<IActionResult> UserAuthorizationRefreshTokenAsync(
-            UserAuthorizationRefreshTokenCommand command,
+            UserRefreshTokenCommand command,
             CancellationToken cancellationToken)
         {
-            var request = new UserAuthorizationRefreshTokenRequest
+            var request = new UserRefreshTokenRequest
             {
                 Command = command,
                 Metadata = (RequestMetadata)HttpContext,
@@ -136,10 +136,10 @@ namespace BackEndAPI.Controllers
 
         [HttpPut("password/initiate")]
         public async Task<IActionResult> UserAuthorizationRefreshTokenAsync(
-            UserProfileResetPasswordInitiateCommand command,
+            UserInitiateUpdatePersonPasswordCommand command,
             CancellationToken cancellationToken)
         {
-            var request = new UserProfileResetPasswordInitiateRequest
+            var request = new UserInitiateUpdatePersonPasswordRequest
             {
                 Command = command,
                 Metadata = (RequestMetadata)HttpContext,
@@ -153,10 +153,10 @@ namespace BackEndAPI.Controllers
         public async Task<IActionResult> UserAuthorizationRefreshTokenAsync(
             Guid urlSegmentPart1,
             string urlSegmentPart2,
-            UserProfileResetPasswordUnAuthorizeCommand command,
+            UserUpdatePersonPasswordUnAuthorizeCommand command,
             CancellationToken cancellationToken)
         {
-            var request = new UserProfileResetPasswordUnAuthorizeRequest
+            var request = new UserUpdatePersonPasswordUnAuthorizeRequest
             {
                 UrlSegment1 = urlSegmentPart1,
                 UrlSegment2 = Map(urlSegmentPart2),
@@ -170,10 +170,10 @@ namespace BackEndAPI.Controllers
 
         [HttpPut("password")]
         public async Task<IActionResult> UserAuthorizationRefreshTokenAsync(
-            UserProfileResetPasswordAuthorizeCommand command,
+            UserUpdatePersonPasswordAuthorizeCommand command,
             CancellationToken cancellationToken)
         {
-            var request = new UserProfileResetPasswordAuthorizeRequest
+            var request = new UserUpdatePersonPasswordAuthorizeRequest
             {
                 Command = command,
                 Metadata = (RequestMetadata)HttpContext,
@@ -188,7 +188,7 @@ namespace BackEndAPI.Controllers
         public async Task<IActionResult> UserProfileRemoveAsync(
             CancellationToken cancellationToken)
         {
-            var request = new UserProfileRemoveRequest
+            var request = new UserRemovePersonRequest
             {
                 Metadata = (RequestMetadata)HttpContext,
             };
@@ -203,7 +203,7 @@ namespace BackEndAPI.Controllers
             string urlSegmentPart2,
             CancellationToken cancellationToken)
         {
-            var request = new UserProfileRestoreRequest
+            var request = new UserRestorePersonRequest
             {
                 UrlSegment1 = urlSegmentPart1,
                 UrlSegment2 = Map(urlSegmentPart2),
@@ -217,10 +217,10 @@ namespace BackEndAPI.Controllers
         [Authorize]
         [HttpPut("login")]
         public async Task<IActionResult> UserProfileRemoveAsync(
-            UserProfileUpdateLoginCommand command,
+            UserUpdatePersonLoginCommand command,
             CancellationToken cancellationToken)
         {
-            var request = new UserProfileUpdateLoginRequest
+            var request = new UserUpdatePersonLoginRequest
             {
                 Command = command,
                 Metadata = (RequestMetadata)HttpContext,
@@ -233,10 +233,10 @@ namespace BackEndAPI.Controllers
         [Authorize]
         [HttpPut("baseData")]
         public async Task<IActionResult> UserProfileSetBaseDataAsync(
-            UserProfileSetBaseDataCommand command,
+            UserSetBasePersonDataCommand command,
             CancellationToken cancellationToken)
         {
-            var request = new UserProfileSetBaseDataRequest
+            var request = new UserSetBasePersonDataRequest
             {
                 Command = command,
                 Metadata = (RequestMetadata)HttpContext,
@@ -250,10 +250,10 @@ namespace BackEndAPI.Controllers
         [Authorize]
         [HttpPut("regularData")]
         public async Task<IActionResult> UserProfileSetRegularDataAsync(
-            UserProfileSetRegularDataCommand command,
+            UserUpdatePersonDataCommand command,
             CancellationToken cancellationToken)
         {
-            var request = new UserProfileSetRegularDataRequest
+            var request = new UserUpdatePersonDataRequest
             {
                 Command = command,
                 Metadata = (RequestMetadata)HttpContext,

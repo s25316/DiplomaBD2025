@@ -1,4 +1,4 @@
-﻿using UseCase.Shared.Templates.Repositories;
+﻿using UseCase.Shared.Repositories.BaseEFRepository;
 using DomainCompany = Domain.Features.Companies.Entities.Company;
 using DomainCompanyId = Domain.Features.Companies.ValueObjects.Ids.CompanyId;
 

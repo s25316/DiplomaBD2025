@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using UseCase.RelationalDatabase;
 using UseCase.Roles.CompanyUser.Enums;
 using UseCase.Shared.Exceptions;
-using UseCase.Shared.Templates.Repositories;
+using UseCase.Shared.Repositories.BaseEFRepository;
 using DatabaseContractAttribute = UseCase.RelationalDatabase.Models.ContractAttribute;
 using DatabaseContractCondition = UseCase.RelationalDatabase.Models.ContractCondition;
 using DomainContractCondition = Domain.Features.ContractConditions.Aggregates.ContractCondition;

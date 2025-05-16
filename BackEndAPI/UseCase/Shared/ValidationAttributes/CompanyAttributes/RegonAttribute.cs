@@ -2,12 +2,12 @@
 
 using Domain.Features.Companies.ValueObjects.Regons;
 using System.ComponentModel.DataAnnotations;
-using UseCase.Shared.Templates.ValidationAttributes;
+using UseCase.Shared.ValidationAttributes.BaseAttributes;
 
 namespace UseCase.Shared.ValidationAttributes.CompanyAttributes
 {
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
-    public class RegonAttribute : CustomStringAttribute
+    public class RegonAttribute : BaseStringAttribute
     {
         protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
         {

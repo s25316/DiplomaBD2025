@@ -6,8 +6,8 @@ using System.Text;
 using UseCase.RelationalDatabase;
 using UseCase.Roles.CompanyUser.Enums;
 using UseCase.Shared.Exceptions;
-using UseCase.Shared.Templates.Repositories;
-using UseCase.Shared.Templates.Response.Commands;
+using UseCase.Shared.Repositories.BaseEFRepository;
+using UseCase.Shared.Responses.CommandResults;
 using DatabaseOffer = UseCase.RelationalDatabase.Models.Offer;
 using DatabaseOfferCondition = UseCase.RelationalDatabase.Models.OfferCondition;
 using DatabaseOfferConnection = UseCase.RelationalDatabase.Models.OfferConnection;
@@ -224,7 +224,7 @@ namespace UseCase.Roles.CompanyUser.Repositories.Offers
 
         private static RepositoryCreateResponse<DomainOffer> CreateResponse(
             HttpCode code,
-            Dictionary<DomainOffer, ResponseCommandMetadata> dictionary)
+            Dictionary<DomainOffer, ResultMetadata> dictionary)
         {
             return RepositoryCreateResponse<DomainOffer>.PrepareResponse(
                 code,
@@ -352,7 +352,7 @@ namespace UseCase.Roles.CompanyUser.Repositories.Offers
 
             // Data checking
             var resonseCode = HttpCode.Ok;
-            var responseDictionary = new Dictionary<DomainOffer, ResponseCommandMetadata>();
+            var responseDictionary = new Dictionary<DomainOffer, ResultMetadata>();
             var stringBuilder = new StringBuilder();
             var companyIds = new HashSet<Guid>();
 
@@ -452,7 +452,7 @@ namespace UseCase.Roles.CompanyUser.Repositories.Offers
                     resonseCode = HttpCode.BadRequest;
                 }
 
-                responseDictionary[item] = new ResponseCommandMetadata
+                responseDictionary[item] = new ResultMetadata
                 {
                     IsCorrect = stringBuilder.Length > 0,
                     Message = stringBuilder.ToString(),

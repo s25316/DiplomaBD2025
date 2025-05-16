@@ -1,11 +1,11 @@
 ﻿using UseCase.Roles.CompanyUser.Commands.BranchesCreate.Request;
-using UseCase.Shared.Templates.Response.Commands;
-using UseCase.Shared.Templates.Response.Responses;
+using UseCase.Shared.Responses.CommandResults;
+using UseCase.Shared.Responses.ItemResponse;
 
 namespace UseCase.Roles.CompanyUser.Commands.BranchesCreate.Response
 {
     public class BranchesCreateResponse :
-        ResponseTemplate<IEnumerable<ResponseCommandTemplate<BranchCreateCommand>>>
+        ItemResponse<IEnumerable<BaseCommandResult<BranchCreateCommand>>>
     {
     }
 }

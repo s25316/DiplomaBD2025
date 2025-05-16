@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 using System.Text;
 using UseCase.RelationalDatabase;
 using UseCase.Shared.Exceptions;
-using UseCase.Shared.Templates.Repositories;
+using UseCase.Shared.Repositories.BaseEFRepository;
 using DatabasePerson = UseCase.RelationalDatabase.Models.Person;
 using DatabasePersonSkill = UseCase.RelationalDatabase.Models.PersonSkill;
 using DatabasePersonUrl = UseCase.RelationalDatabase.Models.Url;

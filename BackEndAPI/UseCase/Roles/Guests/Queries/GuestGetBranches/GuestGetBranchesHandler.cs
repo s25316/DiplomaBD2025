@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Domain.Shared.CustomProviders;
 using Domain.Shared.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +10,7 @@ using UseCase.Roles.Guests.Queries.GuestGetBranches.Response;
 using UseCase.Shared.ExtensionMethods.EF;
 using UseCase.Shared.ExtensionMethods.EF.Branches;
 using UseCase.Shared.ExtensionMethods.EF.Companies;
+using UseCase.Shared.ExtensionMethods.EF.Offers;
 using UseCase.Shared.Responses.BaseResponses;
 using UseCase.Shared.Responses.BaseResponses.CompanyUser;
 using UseCase.Shared.Responses.ItemsResponse;
@@ -39,16 +39,10 @@ namespace UseCase.Roles.Guests.Queries.GuestGetBranches
         public async Task<ItemsResponse<GuestBranchAndCompanyDto>> Handle(GuestGetBranchesRequest request, CancellationToken cancellationToken)
         {
             // Prepare Data
-            var now = CustomTimeProvider.Now;
-            Expression<Func<Offer, bool>> getActiveOffers = offer =>
-                offer.PublicationStart < now &&
-                (
-                    offer.PublicationEnd == null ||
-                    offer.PublicationEnd > now
-                );
+            var getActiveOffersExpression = OfferEFExpressions.ActiveOffersExpression();
 
             // Prepare Query
-            var baseQuery = PrepareQuery(request, getActiveOffers);
+            var baseQuery = PrepareQuery(request, getActiveOffersExpression);
             var paginatedQuery = baseQuery.Paginate(
                 request.Pagination.Page,
                 request.Pagination.ItemsPerPage);
@@ -60,7 +54,7 @@ namespace UseCase.Roles.Guests.Queries.GuestGetBranches
                 TotalCount = baseQuery.Count(),
                 OfferCount = _context.Offers
                     .Where(offer => offer.BranchId == branch.BranchId)
-                    .Count(getActiveOffers),
+                    .Count(getActiveOffersExpression),
             }).ToListAsync(cancellationToken);
 
             // Prepare Response

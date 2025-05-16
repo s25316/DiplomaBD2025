@@ -1,10 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using UseCase.Shared.Templates.ValidationAttributes;
+using UseCase.Shared.ValidationAttributes.BaseAttributes;
 
 namespace UseCase.Shared.ValidationAttributes.ContractConditionAttributes
 {
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
-    public class HourAttribute : TemplateAttribute
+    public class HourAttribute : BaseAttribute
     {
         protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
         {

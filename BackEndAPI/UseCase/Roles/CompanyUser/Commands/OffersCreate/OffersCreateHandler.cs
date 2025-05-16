@@ -7,8 +7,8 @@ using System.Text;
 using UseCase.Roles.CompanyUser.Commands.OffersCreate.Request;
 using UseCase.Roles.CompanyUser.Commands.OffersCreate.Response;
 using UseCase.Roles.CompanyUser.Repositories.Offers;
+using UseCase.Shared.Responses.CommandResults;
 using UseCase.Shared.Services.Authentication.Inspectors;
-using UseCase.Shared.Templates.Response.Commands;
 using DomainOffer = Domain.Features.Offers.Aggregates.Offer;
 
 namespace UseCase.Roles.CompanyUser.Commands.OffersCreate
@@ -40,7 +40,7 @@ namespace UseCase.Roles.CompanyUser.Commands.OffersCreate
             {
                 return new OffersCreateResponse
                 {
-                    Result = buildResult.Dictionary.Select(pair => new ResponseCommandTemplate<OfferCreateCommand>
+                    Result = buildResult.Dictionary.Select(pair => new BaseCommandResult<OfferCreateCommand>
                     {
                         Item = pair.Key,
                         IsCorrect = string.IsNullOrWhiteSpace(pair.Value.Error),
@@ -60,7 +60,7 @@ namespace UseCase.Roles.CompanyUser.Commands.OffersCreate
 
             return new OffersCreateResponse
             {
-                Result = dictionary.Select(pair => new ResponseCommandTemplate<OfferCreateCommand>
+                Result = dictionary.Select(pair => new BaseCommandResult<OfferCreateCommand>
                 {
                     Item = pair.Key,
                     IsCorrect = repositoryResult.Dictionary[pair.Value].IsCorrect,

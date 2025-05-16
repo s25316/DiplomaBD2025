@@ -4,12 +4,12 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using UseCase.RelationalDatabase;
 using UseCase.Roles.Users.Queries.GetPersonProfile.Request;
-using UseCase.Shared.DTOs.Responses.People.FullProfile;
+using UseCase.Shared.Responses.BaseResponses.User;
 using UseCase.Shared.Services.Authentication.Inspectors;
 
 namespace UseCase.Roles.Users.Queries.GetPersonProfile
 {
-    public class GetPersonProfileHandler : IRequestHandler<GetPersonProfileRequest, FullPersonProfile>
+    public class GetPersonProfileHandler : IRequestHandler<GetPersonProfileRequest, UserPersonProfile>
     {
         // Properties
         private readonly IMapper _mapper;
@@ -30,7 +30,7 @@ namespace UseCase.Roles.Users.Queries.GetPersonProfile
 
 
         // Methods
-        public async Task<FullPersonProfile> Handle(GetPersonProfileRequest request, CancellationToken cancellationToken)
+        public async Task<UserPersonProfile> Handle(GetPersonProfileRequest request, CancellationToken cancellationToken)
         {
             var personId = GetPersonId(request);
             var dbPersonData = await _context.People
@@ -60,7 +60,7 @@ namespace UseCase.Roles.Users.Queries.GetPersonProfile
             dbPerson.Urls = dbPersonData.Urls;
             dbPerson.PersonSkills = dbPersonData.Sklills;
 
-            return _mapper.Map<FullPersonProfile>(dbPerson);
+            return _mapper.Map<UserPersonProfile>(dbPerson);
         }
 
         // Non Static Methods

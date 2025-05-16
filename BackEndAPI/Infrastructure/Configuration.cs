@@ -9,7 +9,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
 using StackExchange.Redis;
-using UseCase.Kafka;
 using UseCase.MongoDb;
 using UseCase.RelationalDatabase;
 using UseCase.Shared.Interfaces;

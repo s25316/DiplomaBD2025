@@ -63,5 +63,16 @@ namespace UseCase.Shared.ExtensionMethods.EF.Offers
                     offer.EmploymentLength <= offerParameters.EmploymentLengthTo
                 );
         }
+
+        public static Expression<Func<Offer, bool>> ActiveOffersExpression()
+        {
+            var now = CustomTimeProvider.Now;
+            return offer =>
+                offer.PublicationStart < now &&
+                (
+                    offer.PublicationEnd == null ||
+                    offer.PublicationEnd > now
+                );
+        }
     }
 }

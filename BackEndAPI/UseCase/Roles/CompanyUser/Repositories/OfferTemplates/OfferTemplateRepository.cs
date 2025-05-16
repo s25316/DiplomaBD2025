@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using UseCase.RelationalDatabase;
 using UseCase.Roles.CompanyUser.Enums;
 using UseCase.Shared.Exceptions;
-using UseCase.Shared.Templates.Repositories;
+using UseCase.Shared.Repositories.BaseEFRepository;
 using DatabaseOfferSkill = UseCase.RelationalDatabase.Models.OfferSkill;
 using DatabaseOfferTemplate = UseCase.RelationalDatabase.Models.OfferTemplate;
 using DomainOfferTemplate = Domain.Features.OfferTemplates.Aggregates.OfferTemplate;

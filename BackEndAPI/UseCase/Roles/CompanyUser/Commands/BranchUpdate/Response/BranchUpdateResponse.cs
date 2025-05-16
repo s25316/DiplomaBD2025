@@ -1,12 +1,12 @@
 ﻿using Domain.Shared.Enums;
 using UseCase.Roles.CompanyUser.Commands.BranchUpdate.Request;
-using UseCase.Shared.Templates.Response.Commands;
-using UseCase.Shared.Templates.Response.Responses;
+using UseCase.Shared.Responses.CommandResults;
+using UseCase.Shared.Responses.ItemResponse;
 
 namespace UseCase.Roles.CompanyUser.Commands.BranchUpdate.Response
 {
     public class BranchUpdateResponse
-     : ResponseTemplate<ResponseCommandTemplate<BranchUpdateCommand>>
+     : ItemResponse<BaseCommandResult<BranchUpdateCommand>>
     {
         public static BranchUpdateResponse PrepareResponse(
             HttpCode code,
@@ -16,7 +16,7 @@ namespace UseCase.Roles.CompanyUser.Commands.BranchUpdate.Response
             return new BranchUpdateResponse
             {
                 HttpCode = code,
-                Result = new ResponseCommandTemplate<BranchUpdateCommand>
+                Result = new BaseCommandResult<BranchUpdateCommand>
                 {
                     Item = command,
                     IsCorrect = (int)code < 300 && (int)code >= 200,

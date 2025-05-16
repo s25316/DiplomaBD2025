@@ -1,4 +1,4 @@
-﻿using UseCase.Shared.Templates.Repositories;
+﻿using UseCase.Shared.Repositories.BaseEFRepository;
 using DomainOffer = Domain.Features.Offers.Aggregates.Offer;
 using DomainOfferId = Domain.Features.Offers.ValueObjects.Ids.OfferId;
 

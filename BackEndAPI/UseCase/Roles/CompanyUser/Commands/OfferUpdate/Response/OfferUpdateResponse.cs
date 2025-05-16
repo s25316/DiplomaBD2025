@@ -1,12 +1,12 @@
 ﻿using Domain.Shared.Enums;
 using UseCase.Roles.CompanyUser.Commands.OfferUpdate.Request;
-using UseCase.Shared.Templates.Response.Commands;
-using UseCase.Shared.Templates.Response.Responses;
+using UseCase.Shared.Responses.CommandResults;
+using UseCase.Shared.Responses.ItemResponse;
 
 namespace UseCase.Roles.CompanyUser.Commands.OfferUpdate.Response
 {
     public class OfferUpdateResponse
-        : ResponseTemplate<ResponseCommandTemplate<OfferUpdateCommand>>
+        : ItemResponse<BaseCommandResult<OfferUpdateCommand>>
     {
         public static OfferUpdateResponse PrepareResponse(
             HttpCode code,
@@ -16,7 +16,7 @@ namespace UseCase.Roles.CompanyUser.Commands.OfferUpdate.Response
             return new OfferUpdateResponse
             {
                 HttpCode = code,
-                Result = new ResponseCommandTemplate<OfferUpdateCommand>
+                Result = new BaseCommandResult<OfferUpdateCommand>
                 {
                     Item = command,
                     IsCorrect = (int)code < 300 && (int)code >= 200,

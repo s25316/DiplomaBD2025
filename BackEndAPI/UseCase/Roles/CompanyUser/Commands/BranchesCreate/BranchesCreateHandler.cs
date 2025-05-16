@@ -7,8 +7,8 @@ using UseCase.Roles.CompanyUser.Commands.BranchesCreate.Response;
 using UseCase.Roles.CompanyUser.Repositories.Branches;
 using UseCase.Shared.Repositories.Addresses;
 using UseCase.Shared.Requests.DTOs;
+using UseCase.Shared.Responses.CommandResults;
 using UseCase.Shared.Services.Authentication.Inspectors;
-using UseCase.Shared.Templates.Response.Commands;
 using DomainBranch = Domain.Features.Branches.Entities.Branch;
 
 namespace UseCase.Roles.CompanyUser.Commands.BranchesCreate
@@ -61,7 +61,7 @@ namespace UseCase.Roles.CompanyUser.Commands.BranchesCreate
             {
                 HttpCode = repositoryResult.Code,
                 Result = dictionary
-                        .Select(cmd => new ResponseCommandTemplate<BranchCreateCommand>
+                        .Select(cmd => new BaseCommandResult<BranchCreateCommand>
                         {
                             Item = cmd.Key,
                             IsCorrect = repositoryResult.Dictionary[cmd.Value].IsCorrect,
@@ -122,7 +122,7 @@ namespace UseCase.Roles.CompanyUser.Commands.BranchesCreate
             {
                 HttpCode = HttpCode.BadRequest,
                 Result = request.Commands
-                        .Select(cmd => new ResponseCommandTemplate<BranchCreateCommand>
+                        .Select(cmd => new BaseCommandResult<BranchCreateCommand>
                         {
                             Item = cmd,
                             IsCorrect = string.IsNullOrWhiteSpace(
