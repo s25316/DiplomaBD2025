@@ -5,9 +5,12 @@ import React from 'react';
 
 
 const OfferDetails = async ({
-    params: { id, branchId, offerId },
+    // params: { id, branchId, offerId },
+    params: { offerId },
+
   }: {
-    params: { id: string; branchId: string; offerId: string };
+    // params: { id: string; branchId: string; offerId: string };
+    params: {  offerId: string };
   }) => {
     const session = await getServerSession(authOptions);
   
@@ -41,7 +44,7 @@ const OfferDetails = async ({
       <p><b>Employment Length:</b> {offer.employmentLength} months</p>
       <p><b>Website:</b> <a href={offer.websiteUrl} className="text-blue-600 underline" target="_blank">{offer.websiteUrl}</a></p>
 
-      <hr className="my-4" />
+      {/* <hr className="my-4" />
       <h2 className="text-xl font-semibold">Template</h2>
       <p><b>Name:</b> {offer.offerTemplate.name}</p>
       <p><b>Description:</b> {offer.offerTemplate.description}</p>
@@ -69,7 +72,7 @@ const OfferDetails = async ({
             </div>
           ))}
         </>
-      )}
+      )} */}
     </div>
   );
 };

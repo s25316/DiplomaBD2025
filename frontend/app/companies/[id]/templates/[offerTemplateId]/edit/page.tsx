@@ -12,7 +12,7 @@ interface Skill {
   };
 }
 
-const TemplateDetails = () => {
+const EditOfferTemplate = () => {
   const { id, offerTemplateId } = useParams();
   const router = useRouter();
   const { data: session } = useSession();
@@ -23,47 +23,51 @@ const TemplateDetails = () => {
   const [selectedSkills, setSelectedSkills] = useState<{ skillId: number; isRequired: boolean }[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      if (!session?.user?.token) return;
+useEffect(() => {
+  const fetchData = async () => {
+    if (!session?.user?.token || !offerTemplateId) return;
 
-      try {
-        // Get all skills
-        const skillsRes = await fetch("http://localhost:8080/api/Dictionaries/skills", {
+    try {
+      // Fetch both in parallel
+      const [skillsRes, templateRes] = await Promise.all([
+        fetch("http://localhost:8080/api/Dictionaries/skills", {
           headers: { Authorization: `Bearer ${session.user.token}` },
-        });
-        const skillsData = await skillsRes.json();
-        setSkills(skillsData);
+        }),
+        fetch(`http://localhost:8080/api/CompanyUser/offerTemplates/${offerTemplateId}`, {
+          headers: { Authorization: `Bearer ${session.user.token}` },
+          cache: "no-store",
+        }),
+      ]);
 
-        // Get offer template
-        const templateRes = await fetch(
-          `http://localhost:8080/api/CompanyUser/offerTemplates/${offerTemplateId}`,
-          {
-            headers: { Authorization: `Bearer ${session.user.token}` },
-            cache: "no-store",
-          }
-        );
-        const templateJson = await templateRes.json();
-        const offerTemplate = templateJson.items[0]?.offerTemplate;
+      const skillsData = await skillsRes.json();
+      setSkills(skillsData);
 
-        if (offerTemplate) {
-          setName(offerTemplate.name);
-          setDescription(offerTemplate.description);
+      const templateJson = await templateRes.json();
+      const offerTemplate = templateJson.items[0]?.offerTemplate;
+
+      if (offerTemplate) {
+        setName(offerTemplate.name);
+        setDescription(offerTemplate.description);
+
+        // Upewnij się, że skills istnieje i zawiera poprawne dane
+        if (Array.isArray(offerTemplate.skills)) {
           const mappedSkills = offerTemplate.skills.map((s: any) => ({
             skillId: s.skill.skillId,
             isRequired: s.isRequired,
           }));
           setSelectedSkills(mappedSkills);
         }
-      } catch (error) {
-        console.error("Error loading data:", error);
-      } finally {
-        setLoading(false);
       }
-    };
+    } catch (error) {
+      console.error("Error loading data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchData();
-  }, [session]);
+  fetchData();
+}, [session, offerTemplateId]);
+
 
   const handleSkillToggle = (skillId: number, isChecked: boolean) => {
     setSelectedSkills((prev) =>
@@ -77,13 +81,16 @@ const TemplateDetails = () => {
     e.preventDefault();
     if (!session?.user?.token) return;
 
-    const payload = [{
-      name,
-      description,
-      skills: selectedSkills,
-    }];
+    const payload = {
+      command: {
+        name,
+        description,
+        skills: selectedSkills,
+      }
+    };
 
-    const res = await fetch(`http://localhost:8080/api/CompanyUser/companies/${id}/offerTemplates`, {
+
+    const res = await fetch(`http://localhost:8080/api/CompanyUser/companies/offerTemplates/${offerTemplateId}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -137,16 +144,21 @@ const TemplateDetails = () => {
         <div key={typeName} className="mb-4">
           <h4 className="text-lg font-semibold mb-2">{typeName}</h4>
           <div className="grid grid-cols-2 gap-2">
-            {skillsInGroup.map((skill) => (
-              <label key={skill.skillId} className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={selectedSkills.some((s) => s.skillId === skill.skillId)}
-                  onChange={(e) => handleSkillToggle(skill.skillId, e.target.checked)}
-                />
-                {skill.name}
-              </label>
-            ))}
+            {skillsInGroup.map((skill) => {
+              const selected = selectedSkills.find((s) => s.skillId === skill.skillId);
+              return (
+                <label key={skill.skillId} className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={!!selected}
+                    onChange={(e) => handleSkillToggle(skill.skillId, e.target.checked)}
+                  />
+                  {skill.name}
+                  {selected?.isRequired && <span className="text-xs text-blue-600">(required)</span>}
+                </label>
+              );
+            })}
+
           </div>
         </div>
       ))}
@@ -160,4 +172,4 @@ const TemplateDetails = () => {
   );
 };
 
-export default TemplateDetails;
+export default EditOfferTemplate;

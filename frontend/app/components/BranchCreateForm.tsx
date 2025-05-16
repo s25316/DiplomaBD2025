@@ -6,27 +6,28 @@ import "@geoapify/geocoder-autocomplete/styles/round-borders-dark.css"
 interface Props {
   index: number,
   getData: Function,
+  initialData?: any; //do edycji
 }
 
 const BranchCreateForm = (props: Props) => {
   const [autocomplete, setAutocomplete] = useState<GeocoderAutocomplete>()
   const [form, setForm] = useState({
     index: props.index,
-    name: "",
-    description: null,
+    name: props.initialData?.name ||"",
+    description:props.initialData?.description || null,
     address: {
-      apartmentNumber: null,
+      apartmentNumber:props.initialData?.address?.apartmentNumber || null,
     },
   })
   const [address, setAddress] = useState({
-    countryName: "",
-    stateName: "",
-    cityName: "",
-    streetName: null,
-    houseNumber: "",
-    postCode: "",
-    lon: 0,
-    lat: 0,
+    countryName: props.initialData?.address?.countryName || "",
+    stateName: props.initialData?.address?.stateName || "",
+    cityName: props.initialData?.address?.cityName || "",
+    streetName: props.initialData?.address?.streetName || null,
+    houseNumber: props.initialData?.address?.houseNumber || "",
+    postCode: props.initialData?.address?.postCode || "",
+    lon: props.initialData?.address?.lon || 0,
+    lat: props.initialData?.address?.lat || 0,
   })
 
   useEffect(() => {
@@ -79,13 +80,13 @@ const BranchCreateForm = (props: Props) => {
   return (
     <div className='flex flex-col gap-4'>
       <label htmlFor='name'>Branch name:</label>
-      <input type='text' name='name' placeholder='Branch name' onChange={handleChange} required />
+      <input type='text' name='name' placeholder='Branch name' value={form.name} onChange={handleChange} required />
       <label htmlFor='description'>Description:</label>
-      <input type='text' name='description' placeholder='Description' onChange={handleChange} />
+      <input type='text' name='description' placeholder='Description' value={form.description ?? ""} onChange={handleChange} />
       <label htmlFor='address'>Address:</label>
       <div id={`autocomplete-${props.index}`} className='autocomplete-container' style={{ position: 'relative' }}></div>
       <label htmlFor='apartmentNumber'>Apartment number:</label>
-      <input type='text' name='apartmentNumber' placeholder='123' onChange={handleAddressChange} />
+      <input type='text' name='apartmentNumber' placeholder='123' value={form.address.apartmentNumber ?? ""} onChange={handleAddressChange} />
     </div>
   )
 }

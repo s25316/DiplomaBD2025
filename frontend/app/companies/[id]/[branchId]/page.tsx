@@ -24,6 +24,7 @@ interface Offer {
   employmentLength: number;
   websiteUrl: string;
   status: string;
+  branchId: string;
   offerTemplate: {
     name: string;
   };
@@ -70,7 +71,9 @@ const BranchDetails = async ({ params }: { params: { id: string, branchId: strin
 
     if (resOffers.ok) {
       const data = await resOffers.json();
-      offers = data.items.filter((offer: Offer) => offer.branch.branchId === branchId);
+      offers = data.items.filter((offer: Offer) => offer.branchId === branchId);
+      // offers = data.items.filter((offer: Offer) => offerbranch.branchId === branchId);
+      
     }
   
   }
@@ -97,6 +100,10 @@ const BranchDetails = async ({ params }: { params: { id: string, branchId: strin
           </div>
         </>
       }
+
+      {session?.user && (
+      <Link href={`/companies/${id}/${branchId}/edit`} className="text-blue-600 underline">Edit Branch</Link>)}
+      <br/>
       <Link href={`/companies/${id}/${branchId}/publishOffer`} className="text-blue-600">Publish offer</Link>
       
       {/* <PublishOfferButton companyId={id as string} branchId={branchId as string} /> */}
@@ -106,13 +113,12 @@ const BranchDetails = async ({ params }: { params: { id: string, branchId: strin
           {offers.map((offer) => (
             <li key={offer.offerId} className="border p-3 rounded my-2">
               <Link href={`/companies/${id}/${branchId}/offer/${offer.offerId}`}>
-              <b>{offer.offerTemplate.name}</b>
+              <b>{offer.offerId}</b>
             </Link>
-              {/* <p><b> {offer.offerTemplate.name}</b></p> */}
               <p><b>Status:</b> {offer.status}</p>
               <p><b>Start:</b> {new Date(offer.publicationStart).toLocaleDateString()}</p>
               <p><b>End:</b> {new Date(offer.publicationEnd).toLocaleDateString()}</p>
-              <p><b>Website:</b> <a href={offer.websiteUrl.match(/https?:\/\/[^\s]+/)?.[0]} target="_blank">{offer.websiteUrl}</a></p>
+              <p><b>Website:</b> <a href={offer.websiteUrl.match(/https?:\/\/[^\s]+/)?.[0]} target="_blank">{offer.websiteUrl}</a></p>0
               <br />
             </li>
           ))}
