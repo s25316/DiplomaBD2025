@@ -2,7 +2,7 @@
 import { useSession } from 'next-auth/react';
 import { useParams, useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
-import ContractConditionForm, { ContractConditionFormData, ContractParameter } from '@/app/components/ContractConditionForm';
+import ContractConditionForm, { ContractConditionFormData, ContractParameter } from '@/app/components/forms/ContractConditionForm';
 
 const CreateContractConditionPage = () => {
   const { data: session } = useSession();

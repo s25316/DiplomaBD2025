@@ -50,9 +50,7 @@ const OfferTemplatesList = ({
                   alert("Failed to delete.");
                 }
               }}
-                className="ml-4 bg-red-500 text-white px-2 py-1 rounded"
-              >
-                Delete
+                className="ml-4 bg-red-500 text-white px-2 py-1 rounded"> Delete
               </button>
             </div>
           </li>

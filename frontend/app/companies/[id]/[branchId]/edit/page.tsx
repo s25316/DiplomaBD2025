@@ -2,7 +2,7 @@
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
 import { useSession } from "next-auth/react";
-import BranchCreateForm from "@/app/components/BranchCreateForm";
+import BranchCreateForm from "@/app/components/forms/BranchCreateForm";
 
 interface Address {
   countryName: string;

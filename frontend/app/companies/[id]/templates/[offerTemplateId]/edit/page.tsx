@@ -1,94 +1,78 @@
+// app/companies/[id]/templates/[offerTemplateId]/edit/page.tsx
 "use client";
 import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import OfferTemplateForm from "@/app/components/forms/OfferTemplateForm";
 
-interface Skill {
-  skillId: number;
-  name: string;
-  skillType: {
-    skillTypeId: number;
-    name: string;
-  };
-}
-
-const EditOfferTemplate = () => {
+export default function EditOfferTemplate() {
   const { id, offerTemplateId } = useParams();
   const router = useRouter();
   const { data: session } = useSession();
 
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [skills, setSkills] = useState<Skill[]>([]);
-  const [selectedSkills, setSelectedSkills] = useState<{ skillId: number; isRequired: boolean }[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [skills, setSkills] = useState([]);
+  const [form, setForm] = useState({
+    name: "",
+    description: "",
+    skills: [] as { skillId: number; isRequired: boolean }[],
+  });
 
-useEffect(() => {
-  const fetchData = async () => {
-    if (!session?.user?.token || !offerTemplateId) return;
+  useEffect(() => {
+    if (!session?.user?.token) return;
 
-    try {
-      // Fetch both in parallel
+    const fetchAll = async () => {
       const [skillsRes, templateRes] = await Promise.all([
         fetch("http://localhost:8080/api/Dictionaries/skills", {
           headers: { Authorization: `Bearer ${session.user.token}` },
         }),
         fetch(`http://localhost:8080/api/CompanyUser/offerTemplates/${offerTemplateId}`, {
           headers: { Authorization: `Bearer ${session.user.token}` },
-          cache: "no-store",
         }),
       ]);
 
       const skillsData = await skillsRes.json();
       setSkills(skillsData);
 
-      const templateJson = await templateRes.json();
-      const offerTemplate = templateJson.items[0]?.offerTemplate;
+      const templateData = await templateRes.json();
+      const offerTemplate = templateData.items[0]?.offerTemplate;
 
       if (offerTemplate) {
-        setName(offerTemplate.name);
-        setDescription(offerTemplate.description);
-
-        // Upewnij się, że skills istnieje i zawiera poprawne dane
-        if (Array.isArray(offerTemplate.skills)) {
-          const mappedSkills = offerTemplate.skills.map((s: any) => ({
+        setForm({
+          name: offerTemplate.name,
+          description: offerTemplate.description,
+          skills: offerTemplate.skills.map((s: any) => ({
             skillId: s.skill.skillId,
             isRequired: s.isRequired,
-          }));
-          setSelectedSkills(mappedSkills);
-        }
+          })),
+        });
       }
-    } catch (error) {
-      console.error("Error loading data:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
 
-  fetchData();
-}, [session, offerTemplateId]);
+    fetchAll();
+  }, [session, offerTemplateId]);
 
+  const onChange = (field: "name" | "description", value: string) =>
+    setForm((prev) => ({ ...prev, [field]: value }));
 
-  const handleSkillToggle = (skillId: number, isChecked: boolean) => {
-    setSelectedSkills((prev) =>
-      isChecked
-        ? [...prev, { skillId, isRequired: true }]
-        : prev.filter((s) => s.skillId !== skillId)
-    );
-  };
+  const onSkillToggle = (skillId: number, isChecked: boolean) =>
+    setForm((prev) => ({
+      ...prev,
+      skills: isChecked
+        ? [...prev.skills, { skillId, isRequired: true }]
+        : prev.skills.filter((s) => s.skillId !== skillId),
+    }));
+
+  const onSkillRequiredToggle = (skillId: number, isRequired: boolean) =>
+    setForm((prev) => ({
+      ...prev,
+      skills: prev.skills.map((s) =>
+        s.skillId === skillId ? { ...s, isRequired } : s
+      ),
+    }));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!session?.user?.token) return;
-
-    const payload = {
-      command: {
-        name,
-        description,
-        skills: selectedSkills,
-      }
-    };
-
 
     const res = await fetch(`http://localhost:8080/api/CompanyUser/companies/offerTemplates/${offerTemplateId}`, {
       method: "PUT",
@@ -96,12 +80,12 @@ useEffect(() => {
         "Content-Type": "application/json",
         Authorization: `Bearer ${session.user.token}`,
       },
-      body: JSON.stringify(payload),
+      body: JSON.stringify(form),
     });
 
     if (res.ok) {
       alert("Template updated!");
-      router.push(`/companies/${id}/templates/${offerTemplateId}`);
+      router.push(`/companies/${id}`);
     } else {
       const msg = await res.text();
       console.error(msg);
@@ -109,67 +93,20 @@ useEffect(() => {
     }
   };
 
-  if (loading) return <p>Loading...</p>;
-
   return (
     <div className="max-w-xl mx-auto">
-      <h1 className="text-2xl font-semibold mb-4">Edit Template</h1>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <input
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="Template Name"
-          className="border p-2"
-          required
-        />
-
-        <textarea
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          placeholder="Description"
-          className="border p-2"
-          required
-        />
-
-      <h3>Select Skills</h3>
-      {Object.entries(
-        skills.reduce((acc, skill) => {
-          const typeName = skill.skillType.name;
-          if (!acc[typeName]) acc[typeName] = [];
-          acc[typeName].push(skill);
-          return acc;
-        }, {} as Record<string, typeof skills>)
-      ).map(([typeName, skillsInGroup]) => (
-        <div key={typeName} className="mb-4">
-          <h4 className="text-lg font-semibold mb-2">{typeName}</h4>
-          <div className="grid grid-cols-2 gap-2">
-            {skillsInGroup.map((skill) => {
-              const selected = selectedSkills.find((s) => s.skillId === skill.skillId);
-              return (
-                <label key={skill.skillId} className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    checked={!!selected}
-                    onChange={(e) => handleSkillToggle(skill.skillId, e.target.checked)}
-                  />
-                  {skill.name}
-                  {selected?.isRequired && <span className="text-xs text-blue-600">(required)</span>}
-                </label>
-              );
-            })}
-
-          </div>
-        </div>
-      ))}
-
-
-        <button type="submit" className="bg-blue-600 text-white p-2 rounded">
-          Save Changes
-        </button>
-      </form>
+      <h1 className="text-2xl font-semibold mb-4">Edit Offer Template</h1>
+      <OfferTemplateForm
+        name={form.name}
+        description={form.description}
+        skills={skills}
+        selectedSkills={form.skills}
+        onChange={onChange}
+        onSkillToggle={onSkillToggle}
+        onSkillRequiredToggle={onSkillRequiredToggle}
+        onSubmit={handleSubmit}
+        submitText="Save"
+      />
     </div>
   );
-};
-
-export default EditOfferTemplate;
+}

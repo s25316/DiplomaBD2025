@@ -3,10 +3,10 @@ import React, { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useParams } from 'next/navigation';
 
-import CompanyInfo from './components/CompanyInfo';
-import BranchesList from './components/BranchesList';
-import ContractConditionsList from './components/ContractConditionsList';
-import OfferTemplatesList from './components/OfferTemplatesList';
+import CompanyInfo from '../../components/CompanyInfo';
+import BranchesList from '../../components/BranchesList';
+import ContractConditionsList from '../../components/ContractConditionsList';
+import OfferTemplatesList from '../../components/OfferTemplatesList';
 import CreateBranchButton from '@/app/components/buttons/CreateBranchButton';
 import CreateOfferTemplateButton from '@/app/components/buttons/CreateOfferTemplateButton';
 import CreateContractConditionButton from '@/app/components/buttons/CreateContractConditionButton';
@@ -47,8 +47,8 @@ const CompanyDetails = () => {
     const fetchAll = async () => {
       const [c, b, t, cond] = await Promise.all([
         fetch(`http://localhost:8080/api/CompanyUser/companies/${id}`, { headers }),
-        fetch(`http://localhost:8080/api/CompanyUser/companies/${id}/branches`, { headers }),
-        fetch(`http://localhost:8080/api/CompanyUser/companies/${id}/offerTemplates`, { headers }),
+        fetch(`http://localhost:8080/api/CompanyUser/companies/${id}/branches?Page=1&ItemsPerPage=100`, { headers }),
+        fetch(`http://localhost:8080/api/CompanyUser/companies/${id}/offerTemplates?Page=1&ItemsPerPage=100`, { headers }),
         fetch(`http://localhost:8080/api/CompanyUser/contractConditions`, { headers }),
       ]);
 

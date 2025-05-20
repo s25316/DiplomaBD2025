@@ -2,7 +2,7 @@
 import { redirect, useParams, usePathname, useRouter } from 'next/navigation'
 import React, { useState, useRef } from 'react'
 import { useSession } from 'next-auth/react'
-import BranchCreateForm from '@/app/components/BranchCreateForm'
+import BranchCreateForm from '@/app/components/forms/BranchCreateForm'
 
 interface SendData {
   name: string,

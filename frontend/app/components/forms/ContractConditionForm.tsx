@@ -101,50 +101,49 @@ const ContractConditionForm = ({ onSubmit, parameters, initialData, submitText =
     };
 
 
-  return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        onSubmit(form);
-      }}
-      className="flex flex-col gap-4"
+return (
+  <div className="flex flex-col gap-4">
+    <input type="number" name="salaryMin" value={form.salaryMin} onChange={handleChange} placeholder="Salary Min" />
+    <input type="number" name="salaryMax" value={form.salaryMax} onChange={handleChange} placeholder="Salary Max" />
+    <input type="number" name="hoursPerTerm" value={form.hoursPerTerm} onChange={handleChange} placeholder="Hours" />
+    <label>
+      <input type="checkbox" name="isNegotiable" checked={form.isNegotiable} onChange={handleChange} /> Negotiable
+    </label>
+
+    <label>
+      Salary Term:
+      <select name="salaryTermId" value={form.salaryTermId} onChange={handleChange}>
+        {getOptions('Salary Term')}
+      </select>
+    </label>
+
+    <label>
+      Currency:
+      <select name="currencyId" value={form.currencyId} onChange={handleChange}>
+        {getOptions('Currency')}
+      </select>
+    </label>
+
+    <fieldset>
+      <legend>Work Modes</legend>
+      {getCheckboxes('Work Mode', 'workModeIds')}
+    </fieldset>
+
+    <fieldset>
+      <legend>Employment Types</legend>
+      {getCheckboxes('Employment Type', 'employmentTypeIds')}
+    </fieldset>
+
+    <button
+      type="button"
+      className="bg-blue-600 text-white p-2 rounded"
+      onClick={() => onSubmit(form)}
     >
-      <input type="number" name="salaryMin" value={form.salaryMin} onChange={handleChange} placeholder="Salary Min" />
-      <input type="number" name="salaryMax" value={form.salaryMax} onChange={handleChange} placeholder="Salary Max" />
-      <input type="number" name="hoursPerTerm" value={form.hoursPerTerm} onChange={handleChange} placeholder="Hours" />
-      <label>
-        <input type="checkbox" name="isNegotiable" checked={form.isNegotiable} onChange={handleChange} /> Negotiable
-      </label>
+      {submitText}
+    </button>
+  </div>
+);
+}
 
-      <label>
-        Salary Term:
-        <select name="salaryTermId" value={form.salaryTermId} onChange={handleChange}>
-          {getOptions('Salary Term')}
-        </select>
-      </label>
-
-      <label>
-        Currency:
-        <select name="currencyId" value={form.currencyId} onChange={handleChange}>
-          {getOptions('Currency')}
-        </select>
-      </label>
-
-      <fieldset>
-        <legend>Work Modes</legend>
-        {getCheckboxes('Work Mode', 'workModeIds')}
-      </fieldset>
-
-      <fieldset>
-        <legend>Employment Types</legend>
-        {getCheckboxes('Employment Type', 'employmentTypeIds')}
-      </fieldset>
-
-      <button type="submit" className="bg-blue-600 text-white p-2 rounded">
-        {submitText}
-      </button>
-    </form>
-  );
-};
 
 export default ContractConditionForm;
