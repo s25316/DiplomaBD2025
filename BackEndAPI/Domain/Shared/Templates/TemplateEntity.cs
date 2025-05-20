@@ -39,5 +39,10 @@
                 _domainEvents.Add(@event);
             }
         }
+
+        public void ClearEvents()
+        {
+            _domainEvents.Clear();
+        }
     }
 }

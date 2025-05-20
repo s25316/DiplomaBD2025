@@ -63,8 +63,9 @@ namespace UseCase.Roles.Users.Commands.RegistrationCommands.UserActivatePerson
             domainPerson.RaiseProfileActivatedEvent();
             foreach (var @event in domainPerson.DomainEvents)
             {
-                await _mediator.Publish(@event);
+                await _mediator.Publish(@event, cancellationToken);
             }
+            domainPerson.ClearEvents();
             return PrepareResponse(HttpCode.Ok);
         }
 

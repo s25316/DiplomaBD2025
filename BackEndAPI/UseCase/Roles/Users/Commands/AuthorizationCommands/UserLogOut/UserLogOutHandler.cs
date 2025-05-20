@@ -92,11 +92,11 @@ namespace UseCase.Roles.Users.Commands.AuthorizationCommands.UserLogOut
         // Non Static Methods
         private async Task PublishAsync(DomainPerson person, CancellationToken cancellationToken)
         {
-            Console.WriteLine(person.DomainEvents.Count);
             foreach (var @event in person.DomainEvents)
             {
                 await _mediator.Publish(@event, cancellationToken);
             }
+            person.ClearEvents();
         }
     }
 }

@@ -1,20 +1,20 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using UseCase.Roles.CompanyUser.Commands.BranchesCreate.Request;
-using UseCase.Roles.CompanyUser.Commands.BranchRemove.Request;
-using UseCase.Roles.CompanyUser.Commands.BranchUpdate.Request;
-using UseCase.Roles.CompanyUser.Commands.CompaniesCreate.Request;
-using UseCase.Roles.CompanyUser.Commands.CompanyUpdate.Request;
-using UseCase.Roles.CompanyUser.Commands.ContractConditionRemove.Request;
-using UseCase.Roles.CompanyUser.Commands.ContractConditionsCreate.Request;
-using UseCase.Roles.CompanyUser.Commands.ContractConditionUpdate.Request;
-using UseCase.Roles.CompanyUser.Commands.OfferRemove.Request;
-using UseCase.Roles.CompanyUser.Commands.OffersCreate.Request;
-using UseCase.Roles.CompanyUser.Commands.OfferTemplateRemove.Request;
-using UseCase.Roles.CompanyUser.Commands.OfferTemplatesCreate.Request;
-using UseCase.Roles.CompanyUser.Commands.OfferTemplateUpdate.Request;
-using UseCase.Roles.CompanyUser.Commands.OfferUpdate.Request;
+using UseCase.Roles.CompanyUser.Commands.BranchCommands.CompanyUserCreateBranches.Request;
+using UseCase.Roles.CompanyUser.Commands.BranchCommands.CompanyUserRemoveBranch.Request;
+using UseCase.Roles.CompanyUser.Commands.BranchCommands.CompanyUserUpdateBranch.Request;
+using UseCase.Roles.CompanyUser.Commands.CompanyCommands.CompanyUserCreateCompanies.Request;
+using UseCase.Roles.CompanyUser.Commands.CompanyCommands.CompanyUserUpdateCompany.Request;
+using UseCase.Roles.CompanyUser.Commands.ContractConditionCommands.CompanyUserCreateContractConditions.Request;
+using UseCase.Roles.CompanyUser.Commands.ContractConditionCommands.CompanyUserRemoveContractCondition.Request;
+using UseCase.Roles.CompanyUser.Commands.ContractConditionCommands.CompanyUserUpdateContractCondition.Request;
+using UseCase.Roles.CompanyUser.Commands.OfferCommands.CompanyUserCreateOffers.Request;
+using UseCase.Roles.CompanyUser.Commands.OfferCommands.CompanyUserRemoveOffer.Request;
+using UseCase.Roles.CompanyUser.Commands.OfferCommands.CompanyUserUpdateOffer.Request;
+using UseCase.Roles.CompanyUser.Commands.OfferTemplateCommands.CompanyUserCreateOfferTemplates.Request;
+using UseCase.Roles.CompanyUser.Commands.OfferTemplateCommands.CompanyUserRemoveOfferTemplate.Request;
+using UseCase.Roles.CompanyUser.Commands.OfferTemplateCommands.CompanyUserUpdateOfferTemplate.Request;
 
 namespace BackEndAPI.Controllers.CompanyUser
 {
@@ -37,10 +37,10 @@ namespace BackEndAPI.Controllers.CompanyUser
         [Authorize]
         [HttpPost]
         public async Task<IActionResult> CompaniesCreateAsync(
-            CompanyCreateCommand command,
+            CompanyUserCreateCompaniesCommand command,
             CancellationToken cancellationToken)
         {
-            var request = new CompaniesCreateRequest
+            var request = new CompanyUserCreateCompaniesRequest
             {
                 Commands = [command],
                 Metadata = HttpContext,
@@ -54,10 +54,10 @@ namespace BackEndAPI.Controllers.CompanyUser
         [HttpPut("{companyId:guid}")]
         public async Task<IActionResult> CompanyUpdateAsync(
             Guid companyId,
-            CompanyUpdateCommand command,
+            CompanyUserUpdateCompanyCommand command,
             CancellationToken cancellationToken)
         {
-            var request = new CompanyUpdateRequest
+            var request = new CompanyUserUpdateCompanyRequest
             {
                 CompanyId = companyId,
                 Command = command,
@@ -71,10 +71,10 @@ namespace BackEndAPI.Controllers.CompanyUser
         [HttpPost("{companyId:guid}/branches")]
         public async Task<IActionResult> BranchesCreateAsync(
             Guid companyId,
-            IEnumerable<BranchCreateCommand> commands,
+            IEnumerable<CompanyUserCreateBranchesCommand> commands,
             CancellationToken cancellationToken)
         {
-            var request = new BranchesCreateRequest
+            var request = new CompanyUserCreateBranchesRequest
             {
                 CompanyId = companyId,
                 Commands = commands,
@@ -88,10 +88,10 @@ namespace BackEndAPI.Controllers.CompanyUser
         [HttpPut("branches/{branchId:guid}")]
         public async Task<IActionResult> BranchUpdateAsync(
             Guid branchId,
-            BranchUpdateCommand command,
+            CompanyUserUpdateBranchCommand command,
             CancellationToken cancellationToken)
         {
-            var request = new BranchUpdateRequest
+            var request = new CompanyUserUpdateBranchRequest
             {
                 BranchId = branchId,
                 Command = command,
@@ -107,7 +107,7 @@ namespace BackEndAPI.Controllers.CompanyUser
             Guid branchId,
             CancellationToken cancellationToken)
         {
-            var request = new BranchRemoveRequest
+            var request = new CompanyUserRemoveBranchRequest
             {
                 BranchId = branchId,
                 Metadata = HttpContext,
@@ -120,10 +120,10 @@ namespace BackEndAPI.Controllers.CompanyUser
         [HttpPost("{companyId:guid}/offerTemplates")]
         public async Task<IActionResult> OfferTemplatesCreateAsync(
             Guid companyId,
-            IEnumerable<OfferTemplateCreateCommand> commands,
+            IEnumerable<CompanyUserCreateOfferTemplatesCommand> commands,
             CancellationToken cancellationToken)
         {
-            var request = new OfferTemplatesCreateRequest
+            var request = new CompanyUserCreateOfferTemplatesRequest
             {
                 CompanyId = companyId,
                 Commands = commands,
@@ -137,10 +137,10 @@ namespace BackEndAPI.Controllers.CompanyUser
         [HttpPut("offerTemplates/{offerTemplateId:guid}")]
         public async Task<IActionResult> OfferTemplateUpdateAsync(
             Guid offerTemplateId,
-            OfferTemplateUpdateCommand command,
+            CompanyUserUpdateOfferTemplateCommand command,
             CancellationToken cancellationToken)
         {
-            var request = new OfferTemplateUpdateRequest
+            var request = new CompanyUserUpdateOfferTemplateRequest
             {
                 OfferTemplateId = offerTemplateId,
                 Command = command,
@@ -156,7 +156,7 @@ namespace BackEndAPI.Controllers.CompanyUser
             Guid offerTemplateId,
             CancellationToken cancellationToken)
         {
-            var request = new OfferTemplateRemoveRequest
+            var request = new CompanyUserRemoveOfferTemplateRequest
             {
                 OfferTemplateId = offerTemplateId,
                 Metadata = HttpContext,
@@ -169,10 +169,10 @@ namespace BackEndAPI.Controllers.CompanyUser
         [HttpPost("{companyId:guid}/contractConditions")]
         public async Task<IActionResult> ContractConditionsCreateAsync(
             Guid companyId,
-            IEnumerable<ContractConditionsCreateCommand> commands,
+            IEnumerable<CompanyUserCreateContractConditionsCommand> commands,
             CancellationToken cancellationToken)
         {
-            var request = new ContractConditionsCreateRequest
+            var request = new CompanyUserCreateContractConditionsRequest
             {
                 CompanyId = companyId,
                 Commands = commands,
@@ -186,10 +186,10 @@ namespace BackEndAPI.Controllers.CompanyUser
         [HttpPut("contractConditions/{contractConditionId:guid}")]
         public async Task<IActionResult> ContractConditionUpdateAsync(
             Guid contractConditionId,
-            ContractConditionsUpdateCommand command,
+            CompanyUserUpdateContractConditionCommand command,
             CancellationToken cancellationToken)
         {
-            var request = new ContractConditionUpdateRequest
+            var request = new CompanyUserUpdateContractConditionRequest
             {
                 ContractConditionId = contractConditionId,
                 Command = command,
@@ -205,7 +205,7 @@ namespace BackEndAPI.Controllers.CompanyUser
             Guid contractConditionId,
             CancellationToken cancellationToken)
         {
-            var request = new ContractConditionRemoveRequest
+            var request = new CompanyUserRemoveContractConditionRequest
             {
                 ContractConditionId = contractConditionId,
                 Metadata = HttpContext,
@@ -217,10 +217,10 @@ namespace BackEndAPI.Controllers.CompanyUser
         [Authorize]
         [HttpPost("offers")]
         public async Task<IActionResult> OffersCreateAsync(
-            IEnumerable<OfferCreateCommand> commands,
+            IEnumerable<CompanyUserCreateOffersCommand> commands,
             CancellationToken cancellationToken)
         {
-            var request = new OffersCreateRequest
+            var request = new CompanyUserCreateOffersRequest
             {
                 Commands = commands,
                 Metadata = HttpContext,
@@ -233,10 +233,10 @@ namespace BackEndAPI.Controllers.CompanyUser
         [HttpPut("offers/{offerId:guid}")]
         public async Task<IActionResult> OffersCreateAsync(
             Guid offerId,
-            OfferUpdateCommand command,
+            CompanyUserUpdateOfferCommand command,
             CancellationToken cancellationToken)
         {
-            var request = new OfferUpdateRequest
+            var request = new CompanyUserUpdateOfferRequest
             {
                 OfferId = offerId,
                 Command = command,
@@ -252,7 +252,7 @@ namespace BackEndAPI.Controllers.CompanyUser
             Guid offerId,
             CancellationToken cancellationToken)
         {
-            var request = new OfferRemoveRequest
+            var request = new CompanyUserRemoveOfferRequest
             {
                 OfferId = offerId,
                 Metadata = HttpContext,

@@ -152,6 +152,7 @@ namespace UseCase.Roles.Users.Commands.AuthorizationCommands.UserLoginIn
             {
                 await _mediator.Publish(@event, cancellationToken);
             }
+            person.ClearEvents();
         }
 
         private async Task<UserLoginInResponse> Handle2StageAsync(

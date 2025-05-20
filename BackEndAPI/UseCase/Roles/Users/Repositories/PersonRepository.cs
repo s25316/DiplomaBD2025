@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Domain.Shared.Enums;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using System.Text;
@@ -18,17 +19,20 @@ namespace UseCase.Roles.Users.Repositories
     public class PersonRepository : IPersonRepository
     {
         // Properties
-        private readonly DiplomaBdContext _context;
         private readonly IMapper _mapper;
+        private readonly IMediator _mediator;
+        private readonly DiplomaBdContext _context;
 
 
         // Constructor
         public PersonRepository(
-            DiplomaBdContext context,
-            IMapper mapper)
+            IMapper mapper,
+            IMediator mediator,
+            DiplomaBdContext context)
         {
-            _context = context;
             _mapper = mapper;
+            _mediator = mediator;
+            _context = context;
         }
 
 
@@ -53,6 +57,8 @@ namespace UseCase.Roles.Users.Repositories
             await _context.SaveChangesAsync(cancellationToken);
 
             item.RaiseProfileCreatedEvent(dbPerson.PersonId);
+            await PublishEventsAsync(item, cancellationToken);
+
             return RepositoryCreateSingleResponse.ValidResponse();
         }
 
@@ -114,7 +120,6 @@ namespace UseCase.Roles.Users.Repositories
                 return InvalidUpdate(HttpCode.NotFound);
             }
 
-            Console.WriteLine(people.Count);
             if (people.Count > 1)
             {
                 var stringBuilder = new StringBuilder();
@@ -150,6 +155,9 @@ namespace UseCase.Roles.Users.Repositories
 
             var dbPerson = people[0];
             await UpdatePerson(dbPerson, item, cancellationToken);
+
+
+            await PublishEventsAsync(item, cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
 
             return ValidUpdate();
@@ -263,6 +271,15 @@ namespace UseCase.Roles.Users.Repositories
         }
 
         // Private Non Static Methods
+        private async Task PublishEventsAsync(DomainPerson domain, CancellationToken cancellationToken)
+        {
+            foreach (var @event in domain.DomainEvents)
+            {
+                await _mediator.Publish(@event, cancellationToken);
+            }
+            domain.ClearEvents();
+        }
+
         private RepositorySelectResponse<DomainPerson> PreparePersonGetResponse(
             DatabasePerson? dbPerson)
         {

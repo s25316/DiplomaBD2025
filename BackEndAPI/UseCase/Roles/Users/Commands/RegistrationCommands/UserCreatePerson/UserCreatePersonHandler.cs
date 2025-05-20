@@ -11,18 +11,15 @@ namespace UseCase.Roles.Users.Commands.RegistrationCommands.UserCreatePerson
     public class UserCreatePersonHandler : IRequestHandler<UserCreatePersonRequest, ResultMetadataResponse>
     {
         // Properties
-        public readonly IMediator _mediator;
         public readonly IPersonRepository _personRepository;
         public readonly IAuthenticationGeneratorService _authenticationGenerator;
 
 
         // Constructor
         public UserCreatePersonHandler(
-            IMediator mediator,
             IPersonRepository personRepository,
             IAuthenticationGeneratorService authenticationGenerator)
         {
-            _mediator = mediator;
             _personRepository = personRepository;
             _authenticationGenerator = authenticationGenerator;
         }
@@ -40,22 +37,13 @@ namespace UseCase.Roles.Users.Commands.RegistrationCommands.UserCreatePerson
             }
 
             var domainPerson = personBuilder.Build();
-            var createResult = await _personRepository
-                .CreateAsync(domainPerson, cancellationToken);
+            var createResult = await _personRepository.CreateAsync(
+                domainPerson,
+                cancellationToken);
 
-            if (createResult.Code != HttpCode.Created)
-            {
-                return PrepareResponse(
-                    createResult.Code,
-                    createResult.Metadata.Message);
-            }
-
-            foreach (var domainEvent in domainPerson.DomainEvents)
-            {
-                await _mediator.Publish(domainEvent);
-            }
-
-            return PrepareResponse(createResult.Code, createResult.Metadata.Message);
+            return PrepareResponse(
+                createResult.Code,
+                createResult.Metadata.Message);
         }
 
         // Private Static Methods

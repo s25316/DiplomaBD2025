@@ -88,6 +88,7 @@ namespace UseCase.Roles.Users.Commands.AuthorizationCommands.User2StageAuthoriza
             {
                 await _mediator.Publish(@event, cancellationToken);
             }
+            person.ClearEvents();
         }
 
         private async Task<UserAuthorizationResponse> HandleRegularAuthorizationAsync(

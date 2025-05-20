@@ -16,17 +16,14 @@ namespace UseCase.Roles.Users.Commands.UpdatePasswordCommands.UserUpdatePersonPa
         private readonly IAuthenticationGeneratorService _authenticationGeneratorService;
         private readonly IAuthenticationInspectorService _authenticationInspectorService;
         private readonly IPersonRepository _personRepository;
-        private readonly IMediator _mediator;
 
 
         // Constructor
         public UserUpdatePersonPasswordAuthorizeHandler(
             IAuthenticationGeneratorService authenticationGeneratorService,
             IAuthenticationInspectorService authenticationInspectorService,
-            IPersonRepository personRepository,
-            IMediator mediator)
+            IPersonRepository personRepository)
         {
-            _mediator = mediator;
             _personRepository = personRepository;
             _authenticationGeneratorService = authenticationGeneratorService;
             _authenticationInspectorService = authenticationInspectorService;
@@ -56,10 +53,6 @@ namespace UseCase.Roles.Users.Commands.UpdatePasswordCommands.UserUpdatePersonPa
             // Update Password
             var (salt, password) = _authenticationGeneratorService.HashPassword(request.Command.NewPassword);
             domainPerson.SetAuthenticationData(salt, password);
-            foreach (var @event in domainPerson.DomainEvents)
-            {
-                await _mediator.Publish(@event, cancellationToken);
-            }
             var updateResult = await _personRepository.UpdateAsync(domainPerson, cancellationToken);
             if (updateResult.Code != HttpCode.Ok)
             {

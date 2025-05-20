@@ -13,18 +13,15 @@ namespace UseCase.Roles.Users.Commands.RemovingCommands.UserRestorePerson
     public class UserRestorePersonHandler : IRequestHandler<UserRestorePersonRequest, ResultMetadataResponse>
     {
         // Properties
-        private readonly IMediator _mediator;
         private readonly IMongoDbService _mongo;
         private readonly IPersonRepository _personRepository;
 
 
         // Constructor
         public UserRestorePersonHandler(
-            IMediator mediator,
             IPersonRepository personRepository,
             IMongoDbService mongo)
         {
-            _mediator = mediator;
             _mongo = mongo;
             _personRepository = personRepository;
         }
@@ -52,15 +49,12 @@ namespace UseCase.Roles.Users.Commands.RemovingCommands.UserRestorePerson
                 return PrepareInvalid();
             }
             var doaminPerson = selectResult.Item;
-
-
             doaminPerson.Restore();
-            foreach (var @event in doaminPerson.DomainEvents)
-            {
-                await _mediator.Publish(@event, cancellationToken);
-            }
 
-            var updateResult = await _personRepository.UpdateAsync(doaminPerson, cancellationToken);
+
+            var updateResult = await _personRepository.UpdateAsync(
+                doaminPerson,
+                cancellationToken);
             if (updateResult.Code != HttpCode.Ok)
             {
                 throw new UseCaseLayerException(updateResult.Metadata.Message);

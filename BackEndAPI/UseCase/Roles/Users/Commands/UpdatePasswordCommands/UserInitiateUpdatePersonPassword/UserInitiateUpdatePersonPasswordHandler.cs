@@ -44,6 +44,7 @@ namespace UseCase.Roles.Users.Commands.UpdatePasswordCommands.UserInitiateUpdate
                 {
                     await _mediator.Publish(domainEvent, cancellationToken);
                 }
+                domainPerson.ClearEvents();
                 return PrepareValid();
             }
             catch (EmailException)
