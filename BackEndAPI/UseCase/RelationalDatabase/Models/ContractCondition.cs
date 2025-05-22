@@ -6,9 +6,9 @@ public partial class ContractCondition
 
     public Guid CompanyId { get; set; }
 
-    public decimal? SalaryMin { get; set; }
+    public decimal SalaryMin { get; set; }
 
-    public decimal? SalaryMax { get; set; }
+    public decimal SalaryMax { get; set; }
 
     public int HoursPerTerm { get; set; }
 

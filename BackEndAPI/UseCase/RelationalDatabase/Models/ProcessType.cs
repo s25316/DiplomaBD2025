@@ -6,5 +6,5 @@ public partial class ProcessType
 
     public string Name { get; set; } = null!;
 
-    public virtual ICollection<Hrchat> Hrchats { get; set; } = new List<Hrchat>();
+    public virtual ICollection<HrProcess> HrProcesses { get; set; } = new List<HrProcess>();
 }

@@ -17,8 +17,7 @@ DELETE FROM [dbo].[SkillTypes];
 INSERT INTO [dbo].[NotificationTypes]
 (NotificationTypeId, Name, Description)
 VALUES
-(1, '',''),
-(2, '','');
+(1, 'Problem','UnDefined Problem');
 
 
 --======================================================================================
@@ -49,21 +48,11 @@ VALUES
 INSERT INTO [dbo].[ProcessType]
 (ProcessTypeId, Name)
 VALUES
-(1, 'Message'),
+(1, 'Recruit'),
+(2, 'Watched'),
 
-(2, 'Accept'),
-(3, 'Rejected'),
-(5, 'Passed'),
-
-(4, 'Hired'),
-
-(11, 'Application Submitted'),
-(12, 'Technical Assessment'),
-(13, 'Technical Interview'),
-(14, 'Soft Skills Interview'),
-(15, 'Job Offer'),
-(16, 'CV Screening'),
-(17, 'HR Screening');
+(11, 'Rejected'),
+(12, 'Passed');
 
 
 --======================================================================================

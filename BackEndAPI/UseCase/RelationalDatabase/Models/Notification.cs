@@ -24,6 +24,8 @@ public partial class Notification
 
     public Guid? ObjectId { get; set; }
 
+    public virtual ICollection<Nchat> Nchats { get; set; } = new List<Nchat>();
+
     public virtual NotificationType NotificationType { get; set; } = null!;
 
     public virtual Person? Person { get; set; }

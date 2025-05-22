@@ -78,5 +78,4 @@ public partial class DiplomaBdContext : DbContext
     public virtual DbSet<Url> Urls { get; set; }
 
     public virtual DbSet<UrlType> UrlTypes { get; set; }
-
 }

@@ -15,6 +15,7 @@ namespace Infrastructure.RelationalDatabase
                 x => x.UseNetTopologySuite());
         }
 
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Address>(entity =>
@@ -221,6 +222,25 @@ namespace Infrastructure.RelationalDatabase
                 entity.ToTable("HrProcess");
 
                 entity.Property(e => e.ProcessId).HasDefaultValueSql("(newid())");
+                entity.Property(e => e.Created).HasColumnType("datetime");
+                entity.Property(e => e.File)
+                    .HasMaxLength(800)
+                    .IsUnicode(false);
+
+                entity.HasOne(d => d.Offer).WithMany(p => p.HrProcesses)
+                    .HasForeignKey(d => d.OfferId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("HrProcess_Offers");
+
+                entity.HasOne(d => d.Person).WithMany(p => p.HrProcesses)
+                    .HasForeignKey(d => d.PersonId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("HrProcess_People");
+
+                entity.HasOne(d => d.ProcessType).WithMany(p => p.HrProcesses)
+                    .HasForeignKey(d => d.ProcessTypeId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("HrProcess_ProcessType");
             });
 
             modelBuilder.Entity<Hrchat>(entity =>
@@ -234,7 +254,6 @@ namespace Infrastructure.RelationalDatabase
                     .HasDefaultValueSql("(getdate())")
                     .HasColumnType("datetime");
                 entity.Property(e => e.Message).HasMaxLength(800);
-                entity.Property(e => e.MongoUrl).HasMaxLength(100);
                 entity.Property(e => e.Read).HasColumnType("datetime");
                 entity.Property(e => e.Removed).HasColumnType("datetime");
 
@@ -242,11 +261,6 @@ namespace Infrastructure.RelationalDatabase
                     .HasForeignKey(d => d.ProcessId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("HRChat_HRProcess");
-
-                entity.HasOne(d => d.ProcessType).WithMany(p => p.Hrchats)
-                    .HasForeignKey(d => d.ProcessTypeId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("HRChat_ProcessType");
             });
 
             modelBuilder.Entity<Nchat>(entity =>
@@ -260,9 +274,13 @@ namespace Infrastructure.RelationalDatabase
                     .HasDefaultValueSql("(getdate())")
                     .HasColumnType("datetime");
                 entity.Property(e => e.Message).HasMaxLength(800);
-                entity.Property(e => e.MongoUrl).HasMaxLength(100);
                 entity.Property(e => e.Read).HasColumnType("datetime");
                 entity.Property(e => e.Removed).HasColumnType("datetime");
+
+                entity.HasOne(d => d.Notification).WithMany(p => p.Nchats)
+                    .HasForeignKey(d => d.NotificationId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("NChat_Notifications");
             });
 
             modelBuilder.Entity<Notification>(entity =>

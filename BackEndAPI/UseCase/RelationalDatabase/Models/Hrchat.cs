@@ -16,11 +16,5 @@ public partial class Hrchat
 
     public string? Message { get; set; }
 
-    public string? MongoUrl { get; set; }
-
-    public int ProcessTypeId { get; set; }
-
     public virtual HrProcess Process { get; set; } = null!;
-
-    public virtual ProcessType ProcessType { get; set; } = null!;
 }

@@ -1,5 +1,5 @@
 -- Created by Vertabelo (http://vertabelo.com)
--- Last modification date: 2025-03-15 02:02:15.639
+-- Last modification date: 2025-05-22 14:44:38.816
 
 -- foreign keys
 ALTER TABLE Addresses DROP CONSTRAINT Addresses_Cities;
@@ -28,7 +28,13 @@ ALTER TABLE ContractParameters DROP CONSTRAINT ContractParameters_ContractParame
 
 ALTER TABLE HRChat DROP CONSTRAINT HRChat_HRProcess;
 
-ALTER TABLE HRChat DROP CONSTRAINT HRChat_ProcessType;
+ALTER TABLE HrProcess DROP CONSTRAINT HrProcess_Offers;
+
+ALTER TABLE HrProcess DROP CONSTRAINT HrProcess_People;
+
+ALTER TABLE HrProcess DROP CONSTRAINT HrProcess_ProcessType;
+
+ALTER TABLE NChat DROP CONSTRAINT NChat_Notifications;
 
 ALTER TABLE Notifications DROP CONSTRAINT Notifications_NotificationTypes;
 

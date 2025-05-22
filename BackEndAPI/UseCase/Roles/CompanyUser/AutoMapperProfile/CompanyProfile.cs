@@ -103,8 +103,8 @@ namespace UseCase.Roles.CompanyUser.AutoMapperProfile
                     .SetId(db.ContractConditionId)
                     .SetCompanyId(db.CompanyId)
                     .SetSalaryRange(
-                        (db.SalaryMin == null ? 0 : db.SalaryMin.Value),
-                        (db.SalaryMax == null ? 0 : db.SalaryMax.Value))
+                        (db.SalaryMin),
+                        (db.SalaryMax))
                     .SetHoursPerTerm(db.HoursPerTerm)
                     .SetIsNegotiable(db.IsNegotiable)
                     .SetCreated(db.Created)

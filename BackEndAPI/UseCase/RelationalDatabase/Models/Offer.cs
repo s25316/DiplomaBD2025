@@ -16,6 +16,8 @@ public partial class Offer
 
     public virtual Branch? Branch { get; set; }
 
+    public virtual ICollection<HrProcess> HrProcesses { get; set; } = new List<HrProcess>();
+
     public virtual ICollection<OfferCondition> OfferConditions { get; set; } = new List<OfferCondition>();
 
     public virtual ICollection<OfferConnection> OfferConnections { get; set; } = new List<OfferConnection>();

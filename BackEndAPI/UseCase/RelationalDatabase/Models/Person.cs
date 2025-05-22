@@ -42,6 +42,8 @@ public partial class Person
 
     public virtual ICollection<CompanyPerson> CompanyPeople { get; set; } = new List<CompanyPerson>();
 
+    public virtual ICollection<HrProcess> HrProcesses { get; set; } = new List<HrProcess>();
+
     public virtual ICollection<Notification> Notifications { get; set; } = new List<Notification>();
 
     public virtual ICollection<PersonSkill> PersonSkills { get; set; } = new List<PersonSkill>();

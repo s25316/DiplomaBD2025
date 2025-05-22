@@ -1,5 +1,5 @@
 -- Created by Vertabelo (http://vertabelo.com)
--- Last modification date: 2025-03-15 02:02:15.639
+-- Last modification date: 2025-05-22 14:44:38.816
 
 -- tables
 -- Table: Addresses
@@ -77,8 +77,8 @@ CREATE TABLE ContractAttributes (
 CREATE TABLE ContractConditions (
     ContractConditionId uniqueidentifier  NOT NULL,
     CompanyId uniqueidentifier  NOT NULL,
-    SalaryMin money  NULL,
-    SalaryMax money  NULL,
+    SalaryMin money  NOT NULL,
+    SalaryMax money  NOT NULL,
     HoursPerTerm int  NOT NULL,
     IsNegotiable bit  NOT NULL,
     Created datetime  NOT NULL,
@@ -141,14 +141,18 @@ CREATE TABLE HRChat (
     "Read" datetime  NULL,
     IsPersonSend bit  NOT NULL,
     Message nvarchar(800)  NULL,
-    MongoUrl nvarchar(100)  NULL,
-    ProcessTypeId int  NOT NULL,
     CONSTRAINT HRChat_pk PRIMARY KEY  (MessageId)
 );
 
 -- Table: HrProcess
 CREATE TABLE HrProcess (
     ProcessId uniqueidentifier  NOT NULL,
+    OfferId uniqueidentifier  NOT NULL,
+    PersonId uniqueidentifier  NOT NULL,
+    ProcessTypeId int  NOT NULL,
+    Message nvarchar(max)  NULL,
+    "File" varchar(800)  NOT NULL,
+    Created datetime  NOT NULL,
     CONSTRAINT HrProcess_pk PRIMARY KEY  (ProcessId)
 );
 
@@ -160,7 +164,7 @@ CREATE TABLE NChat (
     "Read" datetime  NULL,
     IsAdminSend bit  NOT NULL,
     Message nvarchar(800)  NULL,
-    MongoUrl nvarchar(100)  NULL,
+    NotificationId uniqueidentifier  NOT NULL,
     CONSTRAINT NChat_pk PRIMARY KEY  (MessageId)
 );
 
@@ -412,10 +416,25 @@ ALTER TABLE HRChat ADD CONSTRAINT HRChat_HRProcess
     FOREIGN KEY (ProcessId)
     REFERENCES HrProcess (ProcessId);
 
--- Reference: HRChat_ProcessType (table: HRChat)
-ALTER TABLE HRChat ADD CONSTRAINT HRChat_ProcessType
+-- Reference: HrProcess_Offers (table: HrProcess)
+ALTER TABLE HrProcess ADD CONSTRAINT HrProcess_Offers
+    FOREIGN KEY (OfferId)
+    REFERENCES Offers (OfferId);
+
+-- Reference: HrProcess_People (table: HrProcess)
+ALTER TABLE HrProcess ADD CONSTRAINT HrProcess_People
+    FOREIGN KEY (PersonId)
+    REFERENCES People (PersonId);
+
+-- Reference: HrProcess_ProcessType (table: HrProcess)
+ALTER TABLE HrProcess ADD CONSTRAINT HrProcess_ProcessType
     FOREIGN KEY (ProcessTypeId)
     REFERENCES ProcessType (ProcessTypeId);
+
+-- Reference: NChat_Notifications (table: NChat)
+ALTER TABLE NChat ADD CONSTRAINT NChat_Notifications
+    FOREIGN KEY (NotificationId)
+    REFERENCES Notifications (NotificationId);
 
 -- Reference: Notifications_NotificationTypes (table: Notifications)
 ALTER TABLE Notifications ADD CONSTRAINT Notifications_NotificationTypes

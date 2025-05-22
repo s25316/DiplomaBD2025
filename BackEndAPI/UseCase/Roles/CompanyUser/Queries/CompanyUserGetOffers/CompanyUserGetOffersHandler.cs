@@ -454,7 +454,6 @@ namespace UseCase.Roles.CompanyUser.Queries.CompanyUserGetOffers
                                 oc.Removed == null &&
                                 oc.OfferId == offer.OfferId
                             )).Min(cc => cc.SalaryMin)
-                            .Value
                         )
                         : query.OrderByDescending(offer =>
                             _context.ContractConditions
@@ -463,7 +462,6 @@ namespace UseCase.Roles.CompanyUser.Queries.CompanyUserGetOffers
                                 oc.Removed == null &&
                                 oc.OfferId == offer.OfferId
                             )).Min(cc => cc.SalaryMin)
-                            .Value
                         );
 
                 case OfferOrderBy.SalaryMax:
@@ -475,7 +473,6 @@ namespace UseCase.Roles.CompanyUser.Queries.CompanyUserGetOffers
                                 oc.Removed == null &&
                                 oc.OfferId == offer.OfferId
                             )).Max(cc => cc.SalaryMax)
-                            .Value
                         )
                         : query.OrderByDescending(offer =>
                             _context.ContractConditions
@@ -484,7 +481,6 @@ namespace UseCase.Roles.CompanyUser.Queries.CompanyUserGetOffers
                                 oc.Removed == null &&
                                 oc.OfferId == offer.OfferId
                             )).Max(cc => cc.SalaryMax)
-                            .Value
                         );
 
                 case OfferOrderBy.SalaryAvg:
@@ -496,7 +492,6 @@ namespace UseCase.Roles.CompanyUser.Queries.CompanyUserGetOffers
                                 oc.Removed == null &&
                                 oc.OfferId == offer.OfferId
                             )).Average(cc => ((cc.SalaryMax + cc.SalaryMin) / 2))
-                            .Value
                         )
                         : query.OrderByDescending(offer =>
                             _context.ContractConditions
@@ -505,7 +500,6 @@ namespace UseCase.Roles.CompanyUser.Queries.CompanyUserGetOffers
                                 oc.Removed == null &&
                                 oc.OfferId == offer.OfferId
                             )).Average(cc => ((cc.SalaryMax + cc.SalaryMin) / 2))
-                            .Value
                         );
 
                 case OfferOrderBy.SalaryPerHourMin:
@@ -517,7 +511,6 @@ namespace UseCase.Roles.CompanyUser.Queries.CompanyUserGetOffers
                                 oc.Removed == null &&
                                 oc.OfferId == offer.OfferId
                             )).Min(cc => (cc.SalaryMin / cc.HoursPerTerm))
-                            .Value
                         )
                         : query.OrderByDescending(offer =>
                             _context.ContractConditions
@@ -526,7 +519,6 @@ namespace UseCase.Roles.CompanyUser.Queries.CompanyUserGetOffers
                                 oc.Removed == null &&
                                 oc.OfferId == offer.OfferId
                             )).Min(cc => (cc.SalaryMin / cc.HoursPerTerm))
-                            .Value
                         );
 
                 case OfferOrderBy.SalaryPerHourMax:
@@ -538,7 +530,6 @@ namespace UseCase.Roles.CompanyUser.Queries.CompanyUserGetOffers
                                 oc.Removed == null &&
                                 oc.OfferId == offer.OfferId
                             )).Max(cc => (cc.SalaryMax / cc.HoursPerTerm))
-                            .Value
                         )
                         : query.OrderByDescending(offer =>
                             _context.ContractConditions
@@ -547,7 +538,6 @@ namespace UseCase.Roles.CompanyUser.Queries.CompanyUserGetOffers
                                 oc.Removed == null &&
                                 oc.OfferId == offer.OfferId
                             )).Max(cc => (cc.SalaryMax / cc.HoursPerTerm))
-                            .Value
                         );
 
                 case OfferOrderBy.SalaryPerHourAvg:
@@ -559,7 +549,7 @@ namespace UseCase.Roles.CompanyUser.Queries.CompanyUserGetOffers
                                 oc.Removed == null &&
                                 oc.OfferId == offer.OfferId
                             )).Average(cc => ((cc.SalaryMax + cc.SalaryMin) / (2 * cc.HoursPerTerm)))
-                            .Value
+
                         )
                         : query.OrderByDescending(offer =>
                             _context.ContractConditions
@@ -568,7 +558,7 @@ namespace UseCase.Roles.CompanyUser.Queries.CompanyUserGetOffers
                                 oc.Removed == null &&
                                 oc.OfferId == offer.OfferId
                             )).Average(cc => ((cc.SalaryMax + cc.SalaryMin) / (2 * cc.HoursPerTerm)))
-                            .Value
+
                         );
 
                 default:

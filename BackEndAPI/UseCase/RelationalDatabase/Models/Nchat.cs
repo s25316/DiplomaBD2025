@@ -14,5 +14,7 @@ public partial class Nchat
 
     public string? Message { get; set; }
 
-    public string? MongoUrl { get; set; }
+    public Guid NotificationId { get; set; }
+
+    public virtual Notification Notification { get; set; } = null!;
 }
