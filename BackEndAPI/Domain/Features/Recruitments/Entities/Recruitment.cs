@@ -26,7 +26,7 @@ namespace Domain.Features.Recruitments.Entities
                 ProcessType == ProcessType.Passed ||
                 ProcessType == ProcessType.Rejected)
             {
-                throw new RecruitmentException($"Unable change, actual: {ProcessType.Description()}")
+                throw new RecruitmentException($"Unable change, actual: {ProcessType.Description()}");
             }
             ProcessType = type;
         }
