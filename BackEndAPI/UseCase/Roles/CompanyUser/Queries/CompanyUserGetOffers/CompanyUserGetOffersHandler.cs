@@ -115,7 +115,7 @@ namespace UseCase.Roles.CompanyUser.Queries.CompanyUserGetOffers
             // Prepare Response
             if (!selectResult.Any())
             {
-                return PrepareResponse(HttpCode.NotFound, [], 0);
+                return PrepareResponse(HttpCode.Ok, [], 0);
             }
 
             var totalCount = selectResult.FirstOrDefault()?.TotalCount ?? 0;

@@ -5,6 +5,7 @@ using UseCase.Roles.Users.Commands.AuthorizationCommands.User2StageAuthorization
 using UseCase.Roles.Users.Commands.AuthorizationCommands.UserLoginIn.Request;
 using UseCase.Roles.Users.Commands.AuthorizationCommands.UserLogOut.Request;
 using UseCase.Roles.Users.Commands.AuthorizationCommands.UserRefreshToken.Request;
+using UseCase.Roles.Users.Commands.RecruitmentCommands.UserRecruitsOffer.Request;
 using UseCase.Roles.Users.Commands.RegistrationCommands.UserActivatePerson.Request;
 using UseCase.Roles.Users.Commands.RegistrationCommands.UserCreatePerson.Request;
 using UseCase.Roles.Users.Commands.RemovingCommands.UserRemovePerson.Request;
@@ -274,6 +275,28 @@ namespace BackEndAPI.Controllers
             };
             var result = await _mediator.Send(request, cancellationToken);
             return Ok(result);
+        }
+
+
+        [AllowAnonymous]
+        //[RequestSizeLimit(30 * 1024 * 1024)]
+        [HttpPost("recruitments")]
+        public async Task<IActionResult> UserRecruitsOfferAsync(
+            [FromForm] UserRecruitsOfferCommand command,
+            CancellationToken cancellationToken)
+        {
+            var maxFileSize = 25 * 1024 * 1024;
+            if (command.File.Length > maxFileSize)
+            {
+                return BadRequest("File should be less 25MB");
+            }
+
+            return Ok(new
+            {
+                SizeBytes = command.File.Length,
+                FileName = command.File.FileName,
+                FileType = Path.GetExtension(command.File.FileName),
+            });
         }
 
         private static string Map(string urlSegment)

@@ -7,6 +7,7 @@ using UseCase.RelationalDatabase.Models;
 using UseCase.Shared.Dictionaries.GetContractParameters.Response;
 using UseCase.Shared.Dictionaries.GetContractParameterTypes.Response;
 using UseCase.Shared.Dictionaries.GetFaqs.Response;
+using UseCase.Shared.Dictionaries.GetProcessTypes.Response;
 using UseCase.Shared.Dictionaries.GetSkills.Response;
 using UseCase.Shared.Dictionaries.GetSkillTypes.Response;
 using UseCase.Shared.Dictionaries.GetUrlTypes.Response;
@@ -86,6 +87,14 @@ namespace UseCase.Shared.Dictionaries.Repositories
                 selector => selector.UrlTypeId,
                 () => _context.UrlTypes.AsNoTracking(),
                 entity => entity.UrlTypeId);
+        }
+
+        public async Task<IReadOnlyDictionary<int, ProcessTypeDto>> GetProcessTypesAsync()
+        {
+            return await GetDataAsync<int, ProcessTypeDto, ProcessType>(
+                selector => selector.ProcessTypeId,
+                () => _context.ProcessTypes.AsNoTracking(),
+                entity => entity.ProcessTypeId);
         }
 
         // Private Methods

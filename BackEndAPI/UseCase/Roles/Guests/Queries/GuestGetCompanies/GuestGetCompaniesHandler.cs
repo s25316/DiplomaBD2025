@@ -49,7 +49,7 @@ namespace UseCase.Roles.Guests.Queries.GuestGetCompanies
             // Prepare Response
             if (!selectResult.Any())
             {
-                return PrepareResponse(HttpCode.NotFound, [], 0);
+                return PrepareResponse(HttpCode.Ok, [], 0);
             }
 
             var totalCount = selectResult.FirstOrDefault()?.TotalCount ?? 0;

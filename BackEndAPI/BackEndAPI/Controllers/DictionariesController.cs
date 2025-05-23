@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using UseCase.Shared.Dictionaries.GetContractParameters.Request;
 using UseCase.Shared.Dictionaries.GetContractParameterTypes.Request;
 using UseCase.Shared.Dictionaries.GetFaqs.Request;
+using UseCase.Shared.Dictionaries.GetProcessTypes.Request;
 using UseCase.Shared.Dictionaries.GetSkills.Request;
 using UseCase.Shared.Dictionaries.GetSkillTypes.Request;
 using UseCase.Shared.Dictionaries.GetUrlTypes.Request;
@@ -78,6 +79,14 @@ namespace BackEndAPI.Controllers
         public async Task<IActionResult> GetUrlTypesAsync(CancellationToken cancellationToken)
         {
             var result = await _mediator.Send(new GetUrlTypesRequest(), cancellationToken);
+            return Ok(result);
+        }
+
+
+        [HttpGet("processTypes")]
+        public async Task<IActionResult> GetProcessTypesRequestAsync(CancellationToken cancellationToken)
+        {
+            var result = await _mediator.Send(new GetProcessTypesRequest(), cancellationToken);
             return Ok(result);
         }
     }
