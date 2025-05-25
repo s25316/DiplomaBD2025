@@ -96,6 +96,7 @@ namespace UseCase.Roles.CompanyUser.Commands.OfferCommands.CompanyUserUpdateOffe
         {
             var command = request.Command;
             var updater = new DomainOffer.Updater(item)
+                        .SetEmploymentLength(command.EmploymentLength)
                         .SetPublicationRange(
                             command.PublicationStart,
                             command.PublicationEnd)
