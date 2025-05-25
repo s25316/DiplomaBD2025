@@ -50,6 +50,11 @@ const BranchDetails = () => {
   const [branchData, setBranchData] = useState<BranchDetailsType | null>(null);
   const [offers, setOffers] = useState<OfferFull[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [statusFilter, setStatusFilter] = useState<number | null>(null);
+  const [page, setPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
+
+
 
   useEffect(() => {
     if (!session?.user?.token || !branchId) return;
@@ -63,7 +68,7 @@ const BranchDetails = () => {
       try {
         const [branchRes, offersRes] = await Promise.all([
           fetch(`http://localhost:8080/api/CompanyUser/branches/${branchId}`, { headers }),
-          fetch(`http://localhost:8080/api/CompanyUser/branches/${branchId}/offers`, { headers }),
+          fetch(`http://localhost:8080/api/CompanyUser/branches/${branchId}/offers?${statusFilter !== null ? `status=${statusFilter}&` : ''}Page=${page}&ItemsPerPage=${itemsPerPage}`, { headers }),
         ]);
 
         if (!branchRes.ok) throw new Error('Failed to fetch branch details');
@@ -73,13 +78,17 @@ const BranchDetails = () => {
         if (!offersRes.ok) throw new Error('Failed to fetch offers');
         const offersJson = await offersRes.json();
         setOffers(offersJson.items || []);
+
+
+
+
       } catch (err: any) {
         setError(err.message);
       }
     };
 
     fetchData();
-  }, [session, branchId]);
+  }, [session, branchId, statusFilter, page, itemsPerPage]);
 
   if (!session?.user?.token) return <div>Unauthorized</div>;
   if (error) return <div>Error: {error}</div>;
@@ -130,6 +139,37 @@ const BranchDetails = () => {
 
       <h2 className="mt-6 mb-2 text-xl font-semibold">Offers in this Branch:</h2>
       
+      <select
+        value={statusFilter ?? ''}
+        onChange={(e) => {
+          const val = e.target.value;
+          setStatusFilter(val === '' ? null : Number(val));
+          setPage(1); // reset page
+        }}
+      >
+        <option value="">All statuses</option>
+        <option value="0">Sth is wrong</option>
+        <option value="1">Expired</option>
+        <option value="2">Active</option>
+        <option value="3">Scheduled</option>
+      </select>
+      <div className="mt-4 mb-2">
+        <label className="mr-2 font-medium">Items per page:</label>
+        <select
+          value={itemsPerPage}
+          onChange={(e) => {
+            setItemsPerPage(Number(e.target.value));
+            setPage(1); // reset na stronę 1 przy zmianie
+          }}
+          className="border px-2 py-1 rounded"
+        >
+          {[5, 10, 20, 50, 100].map((count) => (
+            <option key={count} value={count}>{count}</option>
+          ))}
+        </select>
+      </div>
+
+
       {offers.length > 0 ? (
         <ul className="list-disc ml-6">
           {offers.map(({ offer, offerTemplate }) => (
@@ -164,6 +204,21 @@ const BranchDetails = () => {
       ) : (
         <p>No offers published for this branch yet.</p>
       )}
+      <div className="mt-4 flex gap-2">
+        <button
+          onClick={() => setPage(prev => Math.max(1, prev - 1))}
+          disabled={page === 1}
+        >
+          Previous
+        </button>
+        <span>Page {page}</span>
+        <button
+          onClick={() => setPage(prev => prev + 1)}
+          disabled={offers.length < itemsPerPage}
+        >
+          Next
+        </button>
+      </div>
     </div>
   );
 };

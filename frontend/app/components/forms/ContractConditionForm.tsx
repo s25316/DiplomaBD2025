@@ -103,19 +103,27 @@ const ContractConditionForm = ({ onSubmit, parameters, initialData, submitText =
 
 return (
   <div className="flex flex-col gap-4">
+    <br/>
+    <label>Min salary: 
     <input type="number" name="salaryMin" value={form.salaryMin} onChange={handleChange} placeholder="Salary Min" />
-    <input type="number" name="salaryMax" value={form.salaryMax} onChange={handleChange} placeholder="Salary Max" />
-    <input type="number" name="hoursPerTerm" value={form.hoursPerTerm} onChange={handleChange} placeholder="Hours" />
-    <label>
-      <input type="checkbox" name="isNegotiable" checked={form.isNegotiable} onChange={handleChange} /> Negotiable
     </label>
-
+    <label>Max salary: 
+    <input type="number" name="salaryMax" value={form.salaryMax} onChange={handleChange} placeholder="Salary Max" />
+    </label>
     <label>
       Salary Term:
       <select name="salaryTermId" value={form.salaryTermId} onChange={handleChange}>
         {getOptions('Salary Term')}
       </select>
     </label>
+    <label>Hours per term:
+    <input type="number" name="hoursPerTerm" value={form.hoursPerTerm} onChange={handleChange} placeholder="Hours" />
+    </label>
+    <label>
+      <input type="checkbox" name="isNegotiable" checked={form.isNegotiable} onChange={handleChange} /> Negotiable
+    </label>
+
+    
 
     <label>
       Currency:

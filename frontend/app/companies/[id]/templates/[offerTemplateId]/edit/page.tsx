@@ -1,4 +1,3 @@
-// app/companies/[id]/templates/[offerTemplateId]/edit/page.tsx
 "use client";
 import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
@@ -20,14 +19,14 @@ export default function EditOfferTemplate() {
   useEffect(() => {
     if (!session?.user?.token) return;
 
+    const headers = {
+          Authorization: `Bearer ${session.user.token}`,
+        };
+
     const fetchAll = async () => {
       const [skillsRes, templateRes] = await Promise.all([
-        fetch("http://localhost:8080/api/Dictionaries/skills", {
-          headers: { Authorization: `Bearer ${session.user.token}` },
-        }),
-        fetch(`http://localhost:8080/api/CompanyUser/offerTemplates/${offerTemplateId}`, {
-          headers: { Authorization: `Bearer ${session.user.token}` },
-        }),
+        fetch(`http://localhost:8080/api/Dictionaries/skills`, {headers} ),
+        fetch(`http://localhost:8080/api/CompanyUser/offerTemplates/${offerTemplateId}`, {headers}),
       ]);
 
       const skillsData = await skillsRes.json();

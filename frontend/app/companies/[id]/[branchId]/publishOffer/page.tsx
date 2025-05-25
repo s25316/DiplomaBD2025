@@ -2,16 +2,15 @@
 import React, { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useParams, useRouter } from 'next/navigation';
-import OfferForm from '@/app/components/forms/OfferForm'; // import komponentu wspólnego
-import ContractConditionForm, {
-  ContractConditionFormData,
-  ContractParameter,
-} from '@/app/components/forms/ContractConditionForm';
+import OfferForm from '@/app/components/forms/OfferForm';
+import {  ContractConditionFormData } from '@/app/components/forms/ContractConditionForm';
+
+
 const PublishOffer = () => {
   const { id, branchId } = useParams();
   const router = useRouter();
   const { data: session } = useSession();
-
+  const [offerStatusId, setOfferStatusId] = useState<null | null>(null);;
   const [templates, setTemplates] = useState([]);
   const [parameters, setParameters] = useState([]);
   const [skills, setSkills] = useState([]);
@@ -22,13 +21,14 @@ const PublishOffer = () => {
     publicationStart: '',
     publicationEnd: '',
     employmentLength: 0,
-    websiteUrl: '',
+    websiteUrl: 'https://',
     conditionIds: [] as string[],
   });
 
   const [selectedConditionId, setSelectedConditionId] = useState('');
   const [includeNewCondition, setIncludeNewCondition] = useState(false);
   const [includeNewTemplate, setIncludeNewTemplate] = useState(false);
+  
 
   const [newTemplateForm, setNewTemplateForm] = useState({
     name: '', description: '', skills: [],
@@ -67,7 +67,7 @@ const PublishOffer = () => {
     if (!res.ok) return alert("Failed to create contract condition");
 
     const all = await refreshConditions();
-    const match = all.find((c) =>
+    const match = all.find((c : any) =>
       c.salaryMin === formData.salaryMin &&
       c.salaryMax === formData.salaryMax &&
       c.hoursPerTerm === formData.hoursPerTerm
@@ -97,7 +97,7 @@ const PublishOffer = () => {
 
   const allTemplates = await refreshTemplates();
 
-  const newest = allTemplates.find(t =>
+  const newest = allTemplates.find((t:any) =>
     t.name === newTemplateForm.name &&
     t.description === newTemplateForm.description
   );
@@ -181,6 +181,7 @@ const refreshConditions = async () => {
           newTemplateForm={newTemplateForm}
           setNewTemplateForm={setNewTemplateForm}
           onTemplateCreate={handleTemplateCreate}
+          statusId= {offerStatusId}
         />
         <button type="submit" className="bg-blue-600 text-white p-2 rounded mt-4">Publish Offer</button>
       </form>

@@ -1,6 +1,8 @@
 import React from "react";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import Link from "next/link";
+import DeleteTemplateButton from "@/app/components/buttons/DeleteTemplateButton";
 
 interface Skill {
   skillId: number;
@@ -85,6 +87,20 @@ const TemplateDetails = async ({
         </ul>
       ) : (
         <p>No skills assigned.</p>
+      )}
+
+      <Link
+        href={`/companies/${params.id}/templates/${template.offerTemplateId}/edit`}
+        className="inline-block mt-4 bg-blue-500 text-white px-4 py-2 rounded"
+      >
+        Edit Template
+      </Link>
+
+      {session?.user.token && (
+        <DeleteTemplateButton
+          offerTemplateId={template.offerTemplateId}
+          companyId={params.id}
+        />
       )}
     </div>
   );

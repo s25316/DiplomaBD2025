@@ -112,19 +112,22 @@ const OfferDetails = () => {
 
 
 
+
+      {offer.statusId != 1 && (
+        <>
       <Link
         href={`/companies/${id}/${branchId}/offer/${offerId}/edit`}
         className="inline-block mt-6 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
       >
         Edit Offer
       </Link>
-      {offer.statusId != 1 && (
         <button
         onClick={handleDelete}
         className="mt-4 ml-4 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
       >
         Delete Offer
       </button>
+      </>
       )}      
 
     </div>

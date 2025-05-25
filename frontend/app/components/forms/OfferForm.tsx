@@ -2,6 +2,13 @@
 import React from 'react';
 import ContractConditionForm, { ContractConditionFormData, ContractParameter } from '@/app/components/forms/ContractConditionForm';
 import OfferTemplateForm from '@/app/components/forms/OfferTemplateForm';
+interface SkillWithRequired {
+  skill: {
+    name: string;
+    skillType: { name: string };
+  };
+  isRequired: boolean;
+}
 
 interface OfferFormProps {
     form: any;
@@ -20,6 +27,7 @@ interface OfferFormProps {
     newTemplateForm: any;
     setNewTemplateForm: (updater: (prev: any) => any) => void;
     onTemplateCreate: () => void;
+    statusId: number | null;
 }
 
 const OfferForm = ({
@@ -31,7 +39,11 @@ const OfferForm = ({
     includeNewTemplate, setIncludeNewTemplate,
     newTemplateForm, setNewTemplateForm,
     onTemplateCreate,
+    statusId,
 }: OfferFormProps) => {
+    const isScheduled = statusId === 3;
+    const isActive = statusId === 2;
+    const isExpired = statusId === 1;
     const handleTemplateChange = (field: 'name' | 'description', value: string) => {
         setNewTemplateForm(prev => ({ ...prev, [field]: value }));
     };
@@ -51,6 +63,17 @@ const OfferForm = ({
 
     return (
         <>
+        {isExpired && (
+        <div className="text-red-600 font-semibold mb-4">
+            Editing is not allowed. This offer is expired.
+        </div>
+        )}
+
+{isExpired ? null : (
+    <>
+    {(isScheduled || statusId === null) && (
+    <>
+            <p>Status: {statusId}</p>
         <label className="font-semibold">Contract Condition</label>
         <select value={selectedConditionId} onChange={(e) => setSelectedConditionId(e.target.value)}>
             <option value="">-- None --</option>
@@ -136,7 +159,6 @@ const OfferForm = ({
         )}
         {form.offerTemplateId && (
         <div className="font-semibold mb-2">
-            
             <h4>Selected Offer Template</h4>
             {(() => {
             const tpl = templates.find(t => t.offerTemplateId === form.offerTemplateId);
@@ -149,11 +171,12 @@ const OfferForm = ({
                 <li><b>Description:</b> {tpl.description}</li>
                 <li><b>Skills:</b>
                     <ul className="list-disc pl-6">
-                    {tpl.skills.map((s, idx) => (
-                        <li key={idx}>
+                    {(tpl.skills as SkillWithRequired[]).map((s, idx) => (
+                    <li key={idx}>
                         {s.skill.name} ({s.skill.skillType.name}) {s.isRequired ? '(required)' : ''}
-                        </li>
+                    </li>
                     ))}
+
                     </ul>
                 </li>
                 </ul>
@@ -168,7 +191,10 @@ const OfferForm = ({
             onChange={(e) => setForm((prev) => ({ ...prev, publicationStart: e.target.value }))}
             required
         />
-
+        </>)}
+        
+        {(isScheduled || isActive || statusId === null) && (
+    <>
         <label>Publication End</label>
         <input
             type="datetime-local"
@@ -191,6 +217,10 @@ const OfferForm = ({
             onChange={(e) => setForm((prev) => ({ ...prev, websiteUrl: e.target.value }))}
             required
         />
+        </>
+        )}
+        </>
+    )}
     </>
   );
 };

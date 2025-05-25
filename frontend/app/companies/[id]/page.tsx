@@ -10,6 +10,7 @@ import OfferTemplatesList from '../../components/OfferTemplatesList';
 import CreateBranchButton from '@/app/components/buttons/CreateBranchButton';
 import CreateOfferTemplateButton from '@/app/components/buttons/CreateOfferTemplateButton';
 import CreateContractConditionButton from '@/app/components/buttons/CreateContractConditionButton';
+import EditCompanyForm from '@/app/components/forms/EditCompanyForm';
 
 interface OfferTemplate {
   offerTemplateId: string;
@@ -36,6 +37,7 @@ const CompanyDetails = () => {
   const [branches, setBranches] = useState([]);
   const [templates, setTemplates] = useState<OfferTemplate[]>([]);
   const [conditions, setConditions] = useState<ContractCondition[]>([]);
+  const [showEditForm, setShowEditForm] = useState(false);
 
   useEffect(() => {
     if (!session?.user?.token || !id) return;
@@ -49,7 +51,7 @@ const CompanyDetails = () => {
         fetch(`http://localhost:8080/api/CompanyUser/companies/${id}`, { headers }),
         fetch(`http://localhost:8080/api/CompanyUser/companies/${id}/branches?Page=1&ItemsPerPage=100`, { headers }),
         fetch(`http://localhost:8080/api/CompanyUser/companies/${id}/offerTemplates?Page=1&ItemsPerPage=100`, { headers }),
-        fetch(`http://localhost:8080/api/CompanyUser/contractConditions`, { headers }),
+        fetch(`http://localhost:8080/api/CompanyUser/companies/${id}/contractConditions`, { headers }),
       ]);
 
       if (c.ok) setCompany((await c.json()).items[0]);
@@ -68,7 +70,31 @@ const CompanyDetails = () => {
     <div>
       <h1>Company Details</h1>
       <CompanyInfo company={company} />
-      <br />
+
+      {company && (
+        <>
+          <button
+            onClick={() => setShowEditForm(prev => !prev)}
+            className="bg-blue-500 text-white px-2 py-1 rounded"
+          >
+            {showEditForm ? 'Cancel Edit' : 'Edit Company'}
+          </button>
+
+          {showEditForm && (
+            <EditCompanyForm
+              company={company}
+              companyId={id as string}
+              onUpdated={(updated) => {
+                setCompany(updated);
+                setShowEditForm(false);
+              }}
+            />
+          )}
+        </>
+      )}
+      <br/>
+      <br/>
+
       <BranchesList branches={branches} companyId={id as string} />
       <br />
       
