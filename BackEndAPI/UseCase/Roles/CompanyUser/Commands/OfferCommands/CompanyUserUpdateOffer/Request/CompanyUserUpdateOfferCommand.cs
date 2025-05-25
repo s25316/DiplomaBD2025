@@ -2,7 +2,7 @@
 {
     public class CompanyUserUpdateOfferCommand
     {
-        public Guid OfferTemplateId { get; init; }
+        public Guid? OfferTemplateId { get; init; }
 
         public Guid? BranchId { get; init; }
 

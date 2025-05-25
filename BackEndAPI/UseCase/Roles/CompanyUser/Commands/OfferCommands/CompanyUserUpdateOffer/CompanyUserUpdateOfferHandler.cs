@@ -105,11 +105,15 @@ namespace UseCase.Roles.CompanyUser.Commands.OfferCommands.CompanyUserUpdateOffe
             if (item.Status == OfferStatus.Scheduled)
             {
                 updater
-                    .SetOfferTemplate(command.OfferTemplateId)
                     .SetBranchId(command.BranchId)
                     .SetContractConditions(
                         command.ConditionIds
                         .Select(cc => (ContractInfo)cc));
+
+                if (command.OfferTemplateId.HasValue)
+                {
+                    updater.SetOfferTemplate(command.OfferTemplateId);
+                }
             }
             return updater;
         }
