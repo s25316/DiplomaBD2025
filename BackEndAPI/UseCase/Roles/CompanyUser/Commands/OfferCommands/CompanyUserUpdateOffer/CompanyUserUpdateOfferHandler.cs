@@ -107,7 +107,6 @@ namespace UseCase.Roles.CompanyUser.Commands.OfferCommands.CompanyUserUpdateOffe
                 updater
                     .SetOfferTemplate(command.OfferTemplateId)
                     .SetBranchId(command.BranchId)
-                    .SetEmploymentLength(command.EmploymentLength)
                     .SetContractConditions(
                         command.ConditionIds
                         .Select(cc => (ContractInfo)cc));
