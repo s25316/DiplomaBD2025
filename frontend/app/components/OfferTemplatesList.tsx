@@ -19,10 +19,9 @@ const OfferTemplatesList = ({
 
   return (
     <>
-      <h2 className="mt-6">Offer Templates:</h2>
       <ul>
         {templates.map((t) => (
-          <li key={t.offerTemplateId} className="border p-3 rounded my-2">
+          <li key={t.offerTemplateId} className="border p-3 rounded my-2 max-w-md">
             <Link href={`/companies/${id}/templates/${t.offerTemplateId}`}>
               <b>{t.name}</b>
             </Link>

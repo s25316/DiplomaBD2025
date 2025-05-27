@@ -28,7 +28,7 @@ const TemplateDetails = async ({
   params: { id: string; offerTemplateId: string };
 }) => {
   const session = await getServerSession(authOptions);
-  const { offerTemplateId } = params;
+  const { id, offerTemplateId } = params;
 
   let template: OfferTemplate | null = null;
 
@@ -90,7 +90,7 @@ const TemplateDetails = async ({
       )}
 
       <Link
-        href={`/companies/${params.id}/templates/${template.offerTemplateId}/edit`}
+        href={`/companies/${id}/templates/${template.offerTemplateId}/edit`}
         className="inline-block mt-4 bg-blue-500 text-white px-4 py-2 rounded"
       >
         Edit Template
@@ -99,7 +99,7 @@ const TemplateDetails = async ({
       {session?.user.token && (
         <DeleteTemplateButton
           offerTemplateId={template.offerTemplateId}
-          companyId={params.id}
+          companyId={id}
         />
       )}
     </div>

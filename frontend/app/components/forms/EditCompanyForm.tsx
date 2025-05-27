@@ -23,7 +23,7 @@ const EditCompanyForm = ({ company, companyId, onUpdated }: { company: any, comp
       body: JSON.stringify({
         description,
         websiteUrl,
-        krs: '', // niezmienialne
+        krs: '', // niezmienne
       }),
     });
 
@@ -64,7 +64,7 @@ const EditCompanyForm = ({ company, companyId, onUpdated }: { company: any, comp
 
       <button
         type="submit"
-        className="bg-blue-600 text-white px-4 py-2 rounded"
+        className="inline-block mt-2 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
         disabled={loading}
       >
         {loading ? 'Saving...' : 'Save Changes'}

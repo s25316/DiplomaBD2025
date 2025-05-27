@@ -5,10 +5,9 @@ const BranchesList = ({ branches, companyId }: { branches: any[], companyId: str
 
   return (
     <>
-      <h2>Branches:</h2>
       <ul>
         {branches.map((value) => (
-          <li key={value.branch.branchId} className="border p-3 rounded my-2">
+          <li key={value.branch.branchId} className="border p-3 rounded my-2 max-w-md">
             <Link href={`/companies/${companyId}/${value.branch.branchId}`}>
               <b>Name: {value.branch.name}</b>
             </Link>

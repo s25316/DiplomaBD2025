@@ -42,7 +42,7 @@ const Profile = async () => {
           <h2>Companies:</h2>
           <ul>
             {companies.map((value) => 
-              <li key={value.companyId} className="border p-3 rounded my-2">
+              <li key={value.companyId} className="border p-3 rounded my-2 max-w-md">
                 <Link href={`/companies/${value.companyId}`}><b>Name: {value.name}</b></Link></li>
             )}
           </ul>

@@ -4,6 +4,9 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
+import SelectItemsPerPage from '@/app/components/SelectItemsPerPage';
+import Pagination from '@/app/components/Pagination';
+import GeoMap from '@/app/components/GeoMap';
 
 interface BranchDetailsType {
   name: string;
@@ -17,6 +20,8 @@ interface BranchDetailsType {
     houseNumber: string;
     apartmentNumber?: string;
     postCode: string;
+    lon: number;
+    lat: number;
   };
 }
 
@@ -52,7 +57,9 @@ const BranchDetails = () => {
   const [error, setError] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<number | null>(null);
   const [page, setPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [totalCount, setTotalCount] = useState(0);
+
 
 
 
@@ -78,7 +85,7 @@ const BranchDetails = () => {
         if (!offersRes.ok) throw new Error('Failed to fetch offers');
         const offersJson = await offersRes.json();
         setOffers(offersJson.items || []);
-
+        setTotalCount(offersJson.totalCount || 0);
 
 
 
@@ -128,16 +135,23 @@ const BranchDetails = () => {
         <p className="ml-4"><b>House number:</b> {branchData.address.houseNumber}</p>
         {branchData.address.apartmentNumber && <p className="ml-4"><b>Apartment number:</b> {branchData.address.apartmentNumber}</p>}
       </div>
+      {branchData.address.lat && branchData.address.lon && (
+        <GeoMap lat={branchData.address.lat} lon={branchData.address.lon} />
+      )}
 
-      <Link href={`/companies/${id}/${branchId}/edit`} className="text-blue-600 underline">
+      <Link href={`/companies/${id}/${branchId}/edit`} className="inline-block mt-6 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
         Edit Branch
       </Link>
       <br />
-      <Link href={`/companies/${id}/${branchId}/publishOffer`} className="text-blue-600">
+      <Link href={`/companies/${id}/${branchId}/publishOffer`} className="inline-block mt-6 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
         Publish offer
       </Link>
 
       <h2 className="mt-6 mb-2 text-xl font-semibold">Offers in this Branch:</h2>
+      <p className="mt-2 text-sm text-gray-600">
+        Showing {offers.length} of {totalCount} offers
+      </p>
+
       
       <select
         value={statusFilter ?? ''}
@@ -153,27 +167,26 @@ const BranchDetails = () => {
         <option value="2">Active</option>
         <option value="3">Scheduled</option>
       </select>
-      <div className="mt-4 mb-2">
-        <label className="mr-2 font-medium">Items per page:</label>
-        <select
-          value={itemsPerPage}
-          onChange={(e) => {
-            setItemsPerPage(Number(e.target.value));
-            setPage(1); // reset na stronę 1 przy zmianie
-          }}
-          className="border px-2 py-1 rounded"
-        >
-          {[5, 10, 20, 50, 100].map((count) => (
-            <option key={count} value={count}>{count}</option>
-          ))}
-        </select>
-      </div>
+      <SelectItemsPerPage
+        value={itemsPerPage}
+        onChange={(val) => {
+          setItemsPerPage(val);
+          setPage(1);
+        }}
+      />
+
+      <Pagination
+        page={page}
+        onPrev={() => setPage((prev) => Math.max(1, prev - 1))}
+        onNext={() => setPage((prev) => prev + 1)}
+        isNextDisabled={offers.length < itemsPerPage}
+      />
 
 
       {offers.length > 0 ? (
         <ul className="list-disc ml-6">
           {offers.map(({ offer, offerTemplate }) => (
-            <li key={offer.offerId} className="border p-3 rounded my-2">
+            <li key={offer.offerId} className="border p-3 rounded my-2 max-w-md">
               <Link href={`/companies/${id}/${branchId}/offer/${offer.offerId}`}>
                 <b>{offerTemplate?.name || 'Untitled Template'}</b>
               </Link>
@@ -204,21 +217,12 @@ const BranchDetails = () => {
       ) : (
         <p>No offers published for this branch yet.</p>
       )}
-      <div className="mt-4 flex gap-2">
-        <button
-          onClick={() => setPage(prev => Math.max(1, prev - 1))}
-          disabled={page === 1}
-        >
-          Previous
-        </button>
-        <span>Page {page}</span>
-        <button
-          onClick={() => setPage(prev => prev + 1)}
-          disabled={offers.length < itemsPerPage}
-        >
-          Next
-        </button>
-      </div>
+      <Pagination
+        page={page}
+        onPrev={() => setPage((prev) => Math.max(1, prev - 1))}
+        onNext={() => setPage((prev) => prev + 1)}
+        isNextDisabled={offers.length < itemsPerPage}
+      />
     </div>
   );
 };

@@ -69,8 +69,7 @@ export default function EditOfferTemplate() {
       ),
     }));
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     if (!session?.user?.token) return;
 
     const res = await fetch(`http://localhost:8080/api/CompanyUser/companies/offerTemplates/${offerTemplateId}`, {

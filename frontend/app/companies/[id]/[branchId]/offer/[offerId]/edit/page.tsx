@@ -173,7 +173,7 @@ const EditOfferPage = () => {
           onTemplateCreate={handleTemplateCreate}
           statusId={offerStatusId}
         />
-        <button type="submit" className="bg-blue-600 text-white p-2 rounded mt-4">
+        <button type="submit" className="inline-block mt-6 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
           Update Offer
         </button>
       </form>

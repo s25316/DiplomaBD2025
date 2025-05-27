@@ -21,7 +21,7 @@ interface OfferFormProps {
     setSelectedConditionId: (id: string) => void;
     includeNewCondition: boolean;
     setIncludeNewCondition: (val: boolean) => void;
-    onConditionCreate: (formData: ContractConditionFormData) => void;
+    onConditionCreate: (formData: ContractConditionFormData) => Promise<void>;
     includeNewTemplate: boolean;
     setIncludeNewTemplate: (val: boolean) => void;
     newTemplateForm: any;
