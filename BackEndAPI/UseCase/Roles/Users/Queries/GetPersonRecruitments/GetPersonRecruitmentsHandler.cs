@@ -241,6 +241,9 @@ namespace UseCase.Roles.Users.Queries.GetPersonRecruitments
                 .WhereOfferParameters(_context, request.OfferQueryParameters)
                 .WhereProcessType(request.ProcessType);
 
+            query = request.Ascending
+                ? query.OrderBy(recruitment => recruitment.Created)
+                : query.OrderByDescending(recruitment => recruitment.Created);
             return query;
         }
     }
