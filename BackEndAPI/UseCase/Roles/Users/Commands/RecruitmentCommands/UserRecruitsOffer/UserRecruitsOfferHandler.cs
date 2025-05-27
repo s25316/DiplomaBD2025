@@ -53,7 +53,7 @@ namespace UseCase.Roles.Users.Commands.RecruitmentCommands.UserRecruitsOffer
 
             await _recruitmentRepository.CreateAsync(domain, cancellationToken);
 
-            return PrepareResponse(HttpCode.Ok);
+            return PrepareResponse(HttpCode.Created);
         }
 
         // Static Methods

@@ -134,8 +134,11 @@ namespace UseCase.Roles.Users.Queries.GetPersonRecruitments
                     return PrepareResponse(HttpCode.Gone, [], 0);
                 }
 
-                if (company.Blocked.HasValue ||
-                    dbPerson.PersonId != personId.Value)
+                if (company.Blocked.HasValue)
+                {
+                    return PrepareResponse(HttpCode.Forbidden, [], 0);
+                }
+                if (item.Recruitment.PersonId != personId.Value)
                 {
                     return PrepareResponse(HttpCode.Forbidden, [], 0);
                 }
@@ -210,6 +213,7 @@ namespace UseCase.Roles.Users.Queries.GetPersonRecruitments
             }
             if (request.CompanyQueryParameters.HasValue)
             {
+                // Przkminiac?
                 query.WhereCompanyIdentificationData(
                     _context,
                     null,

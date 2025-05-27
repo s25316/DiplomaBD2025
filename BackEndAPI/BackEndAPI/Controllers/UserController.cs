@@ -298,6 +298,8 @@ namespace BackEndAPI.Controllers
             {
                 return BadRequest("File should be less 25MB");
             }
+            // Pdf only
+
 
             var request = new UserRecruitsOfferRequest
             {
