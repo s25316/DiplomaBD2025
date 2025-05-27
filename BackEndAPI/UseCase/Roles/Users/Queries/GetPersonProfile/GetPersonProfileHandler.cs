@@ -4,12 +4,14 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using UseCase.RelationalDatabase;
 using UseCase.Roles.Users.Queries.GetPersonProfile.Request;
+using UseCase.Roles.Users.Queries.GetPersonProfile.Response;
+using UseCase.Shared.Responses.BaseResponses.CompanyUser;
 using UseCase.Shared.Responses.BaseResponses.User;
 using UseCase.Shared.Services.Authentication.Inspectors;
 
 namespace UseCase.Roles.Users.Queries.GetPersonProfile
 {
-    public class GetPersonProfileHandler : IRequestHandler<GetPersonProfileRequest, UserPersonProfile>
+    public class GetPersonProfileHandler : IRequestHandler<GetPersonProfileRequest, GetPersonProfileResponse>
     {
         // Properties
         private readonly IMapper _mapper;
@@ -30,7 +32,7 @@ namespace UseCase.Roles.Users.Queries.GetPersonProfile
 
 
         // Methods
-        public async Task<UserPersonProfile> Handle(GetPersonProfileRequest request, CancellationToken cancellationToken)
+        public async Task<GetPersonProfileResponse> Handle(GetPersonProfileRequest request, CancellationToken cancellationToken)
         {
             var personId = GetPersonId(request);
             var dbPersonData = await _context.People
@@ -60,7 +62,11 @@ namespace UseCase.Roles.Users.Queries.GetPersonProfile
             dbPerson.Urls = dbPersonData.Urls;
             dbPerson.PersonSkills = dbPersonData.Sklills;
 
-            return _mapper.Map<UserPersonProfile>(dbPerson);
+            return new GetPersonProfileResponse
+            {
+                PersonPerspective = _mapper.Map<UserPersonProfile>(dbPerson),
+                CompanyPerspective = _mapper.Map<CompanyUserPersonProfile>(dbPerson),
+            };
         }
 
         // Non Static Methods

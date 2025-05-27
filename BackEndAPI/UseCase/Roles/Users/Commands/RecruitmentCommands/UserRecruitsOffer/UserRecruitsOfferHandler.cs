@@ -1,7 +1,9 @@
 ﻿using Domain.Features.People.ValueObjects.Ids;
 using Domain.Shared.Enums;
 using MediatR;
+using UseCase.MongoDb;
 using UseCase.Roles.Users.Commands.RecruitmentCommands.UserRecruitsOffer.Request;
+using UseCase.Shared.Repositories.Recruitments;
 using UseCase.Shared.Responses.ItemResponse;
 using UseCase.Shared.Services.Authentication.Inspectors;
 using DomainRecruitment = Domain.Features.Recruitments.Entities.Recruitment;
@@ -12,12 +14,18 @@ namespace UseCase.Roles.Users.Commands.RecruitmentCommands.UserRecruitsOffer
     {
         // Properties
         private readonly IAuthenticationInspectorService _authenticationInspector;
+        private readonly IRecruitmentRepository _recruitmentRepository;
+        private readonly IMongoDbFileService _mongoDbFileService;
 
 
         // Constructor
         public UserRecruitsOfferHandler(
+            IMongoDbFileService mongoDbFileService,
+            IRecruitmentRepository recruitmentRepository,
             IAuthenticationInspectorService authenticationInspector)
         {
+            _mongoDbFileService = mongoDbFileService;
+            _recruitmentRepository = recruitmentRepository;
             _authenticationInspector = authenticationInspector;
         }
 
@@ -27,8 +35,25 @@ namespace UseCase.Roles.Users.Commands.RecruitmentCommands.UserRecruitsOffer
         {
             var personId = GetPersonId(request);
             var builder = PrepareBuilder(personId, request);
+            if (builder.HasErrors())
+            {
+                return PrepareResponse(HttpCode.BadRequest, builder.GetErrors());
+            }
 
-            throw new NotImplementedException();
+            var domain = builder.Build();
+            var validationData = await _recruitmentRepository.IsValidCreateAsync(domain, cancellationToken);
+            if (validationData.Code != HttpCode.Ok)
+            {
+                return PrepareResponse(validationData.Code, validationData.Message);
+            }
+            var fileId = await _mongoDbFileService.SaveAsync(request.Command.File, cancellationToken);
+            domain = new DomainRecruitment.Updater(domain)
+                .SetFile(fileId)
+                .Build();
+
+            await _recruitmentRepository.CreateAsync(domain, cancellationToken);
+
+            return PrepareResponse(HttpCode.Ok);
         }
 
         // Static Methods

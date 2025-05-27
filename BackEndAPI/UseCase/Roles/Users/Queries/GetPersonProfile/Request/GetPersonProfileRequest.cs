@@ -1,9 +1,9 @@
-﻿using UseCase.Shared.Requests;
-using UseCase.Shared.Responses.BaseResponses.User;
+﻿using UseCase.Roles.Users.Queries.GetPersonProfile.Response;
+using UseCase.Shared.Requests;
 
 namespace UseCase.Roles.Users.Queries.GetPersonProfile.Request
 {
-    public class GetPersonProfileRequest : BaseRequest<UserPersonProfile>
+    public class GetPersonProfileRequest : BaseRequest<GetPersonProfileResponse>
     {
     }
 }

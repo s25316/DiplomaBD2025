@@ -1,6 +1,8 @@
-﻿using MediatR;
+﻿using Domain.Features.Recruitments.Enums;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using UseCase.MongoDb;
 using UseCase.Roles.Users.Commands.AuthorizationCommands.User2StageAuthorization.Request;
 using UseCase.Roles.Users.Commands.AuthorizationCommands.UserLoginIn.Request;
 using UseCase.Roles.Users.Commands.AuthorizationCommands.UserLogOut.Request;
@@ -17,7 +19,9 @@ using UseCase.Roles.Users.Commands.UpdatingCommands.UserSetBasePersonData.Reques
 using UseCase.Roles.Users.Commands.UpdatingCommands.UserUpdatePersonData.Request;
 using UseCase.Roles.Users.Commands.UpdatingCommands.UserUpdatePersonLogin.Request;
 using UseCase.Roles.Users.Queries.GetPersonProfile.Request;
+using UseCase.Roles.Users.Queries.GetPersonRecruitments.Request;
 using UseCase.Shared.Requests;
+using UseCase.Shared.Requests.QueryParameters;
 
 namespace BackEndAPI.Controllers
 {
@@ -26,11 +30,14 @@ namespace BackEndAPI.Controllers
     public class UserController : ControllerBase
     {
         private readonly IMediator _mediator;
+        private readonly IMongoDbFileService _mongoDbFileService;
 
-        public UserController(IMediator mediator)
+        public UserController(IMediator mediator, IMongoDbFileService mongoDbFileService)
         {
             _mediator = mediator;
+            _mongoDbFileService = mongoDbFileService;
         }
+
 
         [HttpPost("registration")]
         public async Task<IActionResult> PersonRegistrationAsync(
@@ -278,10 +285,11 @@ namespace BackEndAPI.Controllers
         }
 
 
-        [AllowAnonymous]
+        [Authorize]
         //[RequestSizeLimit(30 * 1024 * 1024)]
-        [HttpPost("recruitments")]
+        [HttpPost("recruitments/{offerId:guid}")]
         public async Task<IActionResult> UserRecruitsOfferAsync(
+            Guid offerId,
             [FromForm] UserRecruitsOfferCommand command,
             CancellationToken cancellationToken)
         {
@@ -291,12 +299,56 @@ namespace BackEndAPI.Controllers
                 return BadRequest("File should be less 25MB");
             }
 
-            return Ok(new
+            var request = new UserRecruitsOfferRequest
             {
-                SizeBytes = command.File.Length,
-                FileName = command.File.FileName,
-                FileType = Path.GetExtension(command.File.FileName),
-            });
+                OfferId = offerId,
+                Command = command,
+                Metadata = (RequestMetadata)HttpContext,
+            };
+            var result = await _mediator.Send(request, cancellationToken);
+            return StatusCode((int)result.HttpCode, result.Result);
+        }
+
+        [Authorize]
+        //[RequestSizeLimit(30 * 1024 * 1024)]
+        [HttpGet("recruitments")]
+        [HttpGet("recruitments/{recruitmentId:guid}")]
+        public async Task<IActionResult> GetCompanyUserOffersAsync(
+            Guid? recruitmentId,
+            string? searchText,
+
+            bool? ascending,
+            ProcessType? processType,
+
+            [FromHeader] IEnumerable<int> skillIds,
+            [FromHeader] IEnumerable<int> contractParameterIds,
+            [FromQuery] CompanyQueryParametersDto companyParameters,
+            [FromQuery] SalaryQueryParametersDto salaryParameters,
+            [FromQuery] OfferQueryParametersDto offerParameters,
+            [FromQuery] PaginationQueryParametersDto pagination,
+            CancellationToken cancellationToken)
+        {
+            var request = new GetPersonRecruitmentsRequest
+            {
+                OfferQueryParameters = offerParameters,
+
+                CompanyQueryParameters = companyParameters,
+                SalaryParameters = salaryParameters,
+                ContractParameterIds = contractParameterIds,
+
+                SkillIds = skillIds,
+
+                SearchText = searchText,
+                ProcessType = processType,
+                RecruitmentId = recruitmentId,
+
+                Ascending = ascending ?? true,
+                Pagination = pagination,
+
+                Metadata = HttpContext,
+            };
+            var result = await _mediator.Send(request, cancellationToken);
+            return StatusCode((int)result.HttpCode, result.Result);
         }
 
         private static string Map(string urlSegment)

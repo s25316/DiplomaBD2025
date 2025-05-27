@@ -49,6 +49,7 @@ namespace Infrastructure
             services.AddTransient<IRedisService, RedisService>();
             services.AddTransient<IKafkaService, KafkaService>();
             services.AddTransient<IMongoDbService, MongoDbService>();
+            services.AddSingleton<IMongoDbFileService, MongoDbFileService>();
 
             return services;
         }

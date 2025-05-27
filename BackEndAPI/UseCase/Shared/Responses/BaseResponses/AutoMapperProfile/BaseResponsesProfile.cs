@@ -69,6 +69,8 @@ namespace UseCase.Shared.Responses.BaseResponses.AutoMapperProfile
                         Name = db.UrlType.Name,
                     }
                 });
+
+            CreateMap<HrProcess, RecruitmentDto>();
         }
     }
 }

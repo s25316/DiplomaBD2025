@@ -33,6 +33,24 @@
                 GetDateOnly(dateTime1).DayNumber;
         }
 
+        public static int GetYears(DateOnly dateOnly1, DateOnly? dateOnly2 = null)
+        {
+            dateOnly2 ??= Today;
+
+            if (dateOnly2.HasValue && dateOnly1 > dateOnly2)
+            {
+                var min = dateOnly2.Value;
+                dateOnly2 = dateOnly1;
+                dateOnly1 = min;
+            }
+
+
+            return DateOnly
+                .MinValue
+                .AddDays(dateOnly2.Value.DayNumber - dateOnly1.DayNumber)
+                .Year - 1;
+        }
+
         public static DateTime GetDateTime(DateOnly dateOnly) => dateOnly.ToDateTime(TimeOnly.MinValue);
     }
 }

@@ -10,6 +10,10 @@ namespace UseCase.Roles.Users.Commands.UpdatingCommands.UserSetBasePersonData.Re
         [Required]
         public required string Surname { get; init; }
 
+        [Required]
+        [EmailAddress]
+        public required string ContactEmail { get; init; }
+
         public DateTime? BirthDate { get; init; }
     }
 }

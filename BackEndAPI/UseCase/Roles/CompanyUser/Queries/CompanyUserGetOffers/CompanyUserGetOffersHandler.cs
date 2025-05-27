@@ -201,6 +201,8 @@ namespace UseCase.Roles.CompanyUser.Queries.CompanyUserGetOffers
                request.CompanyQueryParameters.HasValue)
             {
                 query = query.Where(offer => _context.Companies
+                    .Include(x => x.OfferTemplates)
+                    .ThenInclude(x => x.OfferConnections)
                     .WhereIdentificationData(
                         request.CompanyId,
                         request.CompanyQueryParameters)
