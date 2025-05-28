@@ -1,5 +1,6 @@
 ﻿// Ignore Spelling: Mongo
 using Microsoft.AspNetCore.Http;
+using UseCase.Shared.Responses.ItemResponse.FileResponses;
 
 namespace UseCase.MongoDb
 {
@@ -7,7 +8,7 @@ namespace UseCase.MongoDb
     {
         Task<string> SaveAsync(IFormFile file, CancellationToken cancellationToken);
 
-        Task<(Stream stream, string fileName)?> GetAsync(string fileId, CancellationToken cancellationToken);
+        Task<FileDto?> GetAsync(string fileId, CancellationToken cancellationToken);
 
         Task DeleteFileAsync(string fileId, CancellationToken cancellationToken);
     }

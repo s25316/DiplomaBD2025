@@ -4,6 +4,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
 using UseCase.MongoDb;
+using UseCase.Shared.Responses.ItemResponse.FileResponses;
 
 namespace Infrastructure.MongoDb
 {
@@ -48,7 +49,7 @@ namespace Infrastructure.MongoDb
             }
         }
 
-        public async Task<(Stream stream, string fileName)?> GetAsync(string fileId, CancellationToken cancellationToken)
+        public async Task<FileDto?> GetAsync(string fileId, CancellationToken cancellationToken)
         {
             if (!ObjectId.TryParse(fileId, out var objectId))
             {
@@ -70,7 +71,11 @@ namespace Infrastructure.MongoDb
             memoryStream.Position = 0;
             var fileName = fileInfo.Filename;
 
-            return (memoryStream, fileName);
+            return new FileDto
+            {
+                Stream = memoryStream,
+                FileName = fileName,
+            };
         }
 
         public async Task DeleteFileAsync(string fileId, CancellationToken cancellationToken)

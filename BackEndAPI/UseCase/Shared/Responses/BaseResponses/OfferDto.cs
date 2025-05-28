@@ -9,7 +9,7 @@ namespace UseCase.Shared.Responses.BaseResponses
     {
         public Guid OfferId { get; init; }
 
-        public Guid? BranchId { get; set; }
+        public Guid? BranchId { get; init; }
 
         public DateTime PublicationStart { get; init; }
 

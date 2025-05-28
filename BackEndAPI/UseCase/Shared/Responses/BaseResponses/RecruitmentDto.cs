@@ -1,20 +1,22 @@
 ﻿// Ignore Spelling: Dto
+using UseCase.Shared.Dictionaries.GetProcessTypes.Response;
+
 namespace UseCase.Shared.Responses.BaseResponses
 {
     public class RecruitmentDto
     {
-        public Guid ProcessId { get; set; }
+        public Guid ProcessId { get; init; }
 
-        public Guid OfferId { get; set; }
+        public Guid OfferId { get; init; }
 
-        public Guid PersonId { get; set; }
+        public Guid PersonId { get; init; }
 
-        public int ProcessTypeId { get; set; }
+        public int ProcessTypeId { get; init; }
 
-        public string? Message { get; set; }
+        public string? Message { get; init; }
 
-        public string File { get; set; } = null!;
+        public DateTime Created { get; init; }
 
-        public DateTime Created { get; set; }
+        public ProcessTypeDto ProcessType { get; init; } = null!;
     }
 }

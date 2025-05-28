@@ -5,6 +5,6 @@ namespace UseCase.Shared.Responses.BaseResponses.CompanyUser
 {
     public class CompanyUserOfferTemplateDto : GuestOfferTemplateDto
     {
-        public DateTime? Removed { get; set; }
+        public DateTime? Removed { get; init; }
     }
 }

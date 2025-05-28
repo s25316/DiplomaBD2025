@@ -156,5 +156,45 @@ namespace UseCase.Shared.ExtensionMethods.EF.Recruitments
 
             return query.Where(expression);
         }
+
+
+        public static IQueryable<HrProcess> WherePerson(
+            this IQueryable<HrProcess> query,
+            DiplomaBdContext context,
+            string? personEmail,
+            string? personPhoneNumber)
+        {
+            Expression<Func<HrProcess, bool>> expression = recruitment =>
+                (
+                    string.IsNullOrWhiteSpace(personEmail) &&
+                    string.IsNullOrWhiteSpace(personPhoneNumber) &&
+                    context.People.Any(person =>
+                        person.Removed == null &&
+                        person.Blocked == null
+                    )
+                ) ||
+                (
+                    (
+                        !string.IsNullOrWhiteSpace(personEmail) &&
+                        context.People.Any(person =>
+                            person.Removed == null &&
+                            person.Blocked == null &&
+                            person.ContactEmail == personEmail &&
+                            person.PersonId == recruitment.PersonId
+                        )
+                    ) ||
+                    (
+                        !string.IsNullOrWhiteSpace(personPhoneNumber) &&
+                        context.People.Any(person =>
+                            person.Removed == null &&
+                            person.Blocked == null &&
+                            person.PhoneNum == personPhoneNumber &&
+                            person.PersonId == recruitment.PersonId
+                        )
+                    )
+                );
+
+            return query.Where(expression);
+        }
     }
 }

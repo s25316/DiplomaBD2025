@@ -6,7 +6,7 @@ namespace UseCase.Shared.Responses.BaseResponses.Guest
     {
         public Guid ContractConditionId { get; init; }
 
-        public Guid CompanyId { get; set; }
+        public Guid CompanyId { get; init; }
 
         public int HoursPerTerm { get; init; }
 
@@ -26,7 +26,7 @@ namespace UseCase.Shared.Responses.BaseResponses.Guest
 
         public bool IsNegotiable { get; init; }
 
-        public DateTime Created { get; set; }
+        public DateTime Created { get; init; }
 
         // ContractParameters
         public ContractParameterDto? SalaryTerm { get; init; }

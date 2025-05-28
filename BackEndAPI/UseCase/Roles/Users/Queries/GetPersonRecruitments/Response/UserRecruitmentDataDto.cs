@@ -4,7 +4,7 @@ using UseCase.Shared.Responses.BaseResponses.Guest;
 
 namespace UseCase.Roles.Users.Queries.GetPersonRecruitments.Response
 {
-    public class RecruitmentDataDto
+    public class UserRecruitmentDataDto
     {
         public required RecruitmentDto Recruitment { get; init; }
 

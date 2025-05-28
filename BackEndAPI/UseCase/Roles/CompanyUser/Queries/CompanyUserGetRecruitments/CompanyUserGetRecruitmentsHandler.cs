@@ -5,23 +5,18 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using UseCase.RelationalDatabase;
 using UseCase.RelationalDatabase.Models;
-using UseCase.Roles.Users.Queries.GetPersonRecruitments.Request;
-using UseCase.Roles.Users.Queries.GetPersonRecruitments.Response;
+using UseCase.Roles.CompanyUser.Queries.CompanyUserGetRecruitments.Request;
+using UseCase.Roles.CompanyUser.Queries.CompanyUserGetRecruitments.Response;
 using UseCase.Shared.ExtensionMethods.EF;
-using UseCase.Shared.ExtensionMethods.EF.Branches;
-using UseCase.Shared.ExtensionMethods.EF.Companies;
-using UseCase.Shared.ExtensionMethods.EF.ContractConditions;
-using UseCase.Shared.ExtensionMethods.EF.OfferTemplates;
 using UseCase.Shared.ExtensionMethods.EF.Recruitments;
 using UseCase.Shared.Responses.BaseResponses;
 using UseCase.Shared.Responses.BaseResponses.CompanyUser;
-using UseCase.Shared.Responses.BaseResponses.Guest;
 using UseCase.Shared.Responses.ItemsResponse;
 using UseCase.Shared.Services.Authentication.Inspectors;
 
-namespace UseCase.Roles.Users.Queries.GetPersonRecruitments
+namespace UseCase.Roles.CompanyUser.Queries.CompanyUserGetRecruitments
 {
-    public class GetPersonRecruitmentsHandler : IRequestHandler<GetPersonRecruitmentsRequest, ItemsResponse<UserRecruitmentDataDto>>
+    public class CompanyUserGetRecruitmentsHandler : IRequestHandler<CompanyUserGetRecruitmentsRequest, ItemsResponse<CompanyUserRecruitmentDataDto>>
     {
         // Properties 
         private readonly IMapper _mapper;
@@ -30,7 +25,7 @@ namespace UseCase.Roles.Users.Queries.GetPersonRecruitments
 
 
         // Constructor 
-        public GetPersonRecruitmentsHandler(
+        public CompanyUserGetRecruitmentsHandler(
             IMapper mapper,
             DiplomaBdContext context,
             IAuthenticationInspectorService authenticationInspector)
@@ -42,9 +37,10 @@ namespace UseCase.Roles.Users.Queries.GetPersonRecruitments
 
 
         // Methods
-        public async Task<ItemsResponse<UserRecruitmentDataDto>> Handle(GetPersonRecruitmentsRequest request, CancellationToken cancellationToken)
+        public async Task<ItemsResponse<CompanyUserRecruitmentDataDto>> Handle(CompanyUserGetRecruitmentsRequest request, CancellationToken cancellationToken)
         {
             var personId = GetPersonId(request);
+            var personIdValue = personId.Value;
             var baseQuery = PrepareQuery(personId, request);
             var paginatedQuery = baseQuery.Paginate(request.Pagination);
 
@@ -68,7 +64,12 @@ namespace UseCase.Roles.Users.Queries.GetPersonRecruitments
                             .Where(os =>
                                 os.Removed == null &&
                                 os.OfferTemplateId == oc.OfferTemplateId)
-                            .ToList()
+                            .ToList(),
+                        RoleCount = _context.CompanyPeople.Count(role =>
+                            role.Deny == null &&
+                            role.PersonId == personIdValue &&
+                            role.CompanyId == oc.OfferTemplate.CompanyId
+                        ),
                     }).First(),
                 ContractConditions = _context.OfferConditions
                     .Include(oc => oc.ContractCondition)
@@ -88,7 +89,7 @@ namespace UseCase.Roles.Users.Queries.GetPersonRecruitments
                             .ToList(),
                     }).ToList(),
                 Person = _context.People
-                    .Where(p => p.PersonId == personId.Value)
+                    .Where(p => p.PersonId == recruitment.PersonId)
                     .Select(person => new
                     {
                         Person = person,
@@ -126,7 +127,7 @@ namespace UseCase.Roles.Users.Queries.GetPersonRecruitments
             // Total Count
             var totalCount = first.TotalCount;
 
-            var items = new List<UserRecruitmentDataDto>();
+            var items = new List<CompanyUserRecruitmentDataDto>();
             foreach (var item in selectResult)
             {
                 var company = item.OfferTemplate.Item.Company;
@@ -139,7 +140,8 @@ namespace UseCase.Roles.Users.Queries.GetPersonRecruitments
                 {
                     return PrepareResponse(HttpCode.Forbidden, [], 0);
                 }
-                if (item.Recruitment.PersonId != personId.Value)
+                // Here Changed
+                if (item.OfferTemplate.RoleCount == 0)
                 {
                     return PrepareResponse(HttpCode.Forbidden, [], 0);
                 }
@@ -154,15 +156,15 @@ namespace UseCase.Roles.Users.Queries.GetPersonRecruitments
                 }
 
 
-                items.Add(new UserRecruitmentDataDto
+                items.Add(new CompanyUserRecruitmentDataDto
                 {
                     Person = _mapper.Map<CompanyUserPersonProfile>(dbPerson),
                     Recruitment = _mapper.Map<RecruitmentDto>(item.Recruitment),
                     Offer = _mapper.Map<OfferDto>(item.Recruitment.Offer),
-                    Branch = _mapper.Map<GuestBranchDto>(item.Recruitment.Offer.Branch),
+                    Branch = _mapper.Map<CompanyUserBranchDto>(item.Recruitment.Offer.Branch),
                     Company = _mapper.Map<CompanyDto>(company),
-                    OfferTemplate = _mapper.Map<GuestOfferTemplateDto>(item.OfferTemplate.Item),
-                    ContractConditions = _mapper.Map<IEnumerable<GuestContractConditionDto>>(contractConditions),
+                    OfferTemplate = _mapper.Map<CompanyUserOfferTemplateDto>(item.OfferTemplate.Item),
+                    ContractConditions = _mapper.Map<IEnumerable<CompanyUserContractConditionDto>>(contractConditions),
                 });
             }
 
@@ -170,16 +172,16 @@ namespace UseCase.Roles.Users.Queries.GetPersonRecruitments
         }
 
         // Static Methods
-        private static ItemsResponse<UserRecruitmentDataDto> PrepareResponse(
+        private static ItemsResponse<CompanyUserRecruitmentDataDto> PrepareResponse(
             HttpCode code,
-            IEnumerable<UserRecruitmentDataDto> items,
+            IEnumerable<CompanyUserRecruitmentDataDto> items,
             int totalCount)
         {
-            return ItemsResponse<UserRecruitmentDataDto>.PrepareResponse(code, items, totalCount);
+            return ItemsResponse<CompanyUserRecruitmentDataDto>.PrepareResponse(code, items, totalCount);
         }
 
         // Non Static Methods
-        private PersonId GetPersonId(GetPersonRecruitmentsRequest request)
+        private PersonId GetPersonId(CompanyUserGetRecruitmentsRequest request)
         {
             return _authenticationInspector.GetPersonId(request.Metadata.Claims);
         }
@@ -205,7 +207,7 @@ namespace UseCase.Roles.Users.Queries.GetPersonRecruitments
 
         private IQueryable<HrProcess> PrepareQuery(
             PersonId personId,
-            GetPersonRecruitmentsRequest request)
+            CompanyUserGetRecruitmentsRequest request)
         {
             var personIdValue = personId.Value;
             var query = PrepareBaseQuery();
@@ -214,30 +216,50 @@ namespace UseCase.Roles.Users.Queries.GetPersonRecruitments
             {
                 return query.WhereRecruitmentId(request.RecruitmentId.Value);
             }
-            if (request.CompanyQueryParameters.HasValue)
+            if (request.CompanyQueryParameters.HasValue ||
+                request.CompanyId.HasValue)
             {
                 query = query.WhereCompanyIdentificationData(
                     _context,
-                    null,
+                    request.CompanyId,
                     request.CompanyQueryParameters);
             }
-            query = query
-                .Where(recruitment => recruitment.PersonId == personIdValue)
-                .Where(recruitment => _context.Companies
-                    .Include(c => c.OfferTemplates)
-                    .ThenInclude(oc => oc.OfferConnections)
-                    .Where(company =>
-                        company.Removed == null &&
-                        company.Blocked == null)
-                    .Any(company =>
-                        company.OfferTemplates.Any(ot =>
-                            ot.OfferConnections.Any(oc =>
-                                oc.Removed == null &&
-                                oc.OfferId == recruitment.OfferId
-                            ))
-                    ));
+            else if (request.BranchId.HasValue)
+            {
+                query = query.Where(recruitment =>
+                    recruitment.Offer.BranchId == request.BranchId);
+            }
+            else if (request.OfferId.HasValue)
+            {
+                query = query.Where(recruitment =>
+                    recruitment.OfferId == request.OfferId);
+            }
+            else
+            {
+                query = query
+                    .Where(recruitment => _context.Companies
+                        .Include(c => c.OfferTemplates)
+                        .ThenInclude(oc => oc.OfferConnections)
+                        .Where(company =>
+                            company.Removed == null &&
+                            company.Blocked == null)
+                        .Any(company =>
+                            company.OfferTemplates.Any(ot =>
+                                ot.OfferConnections.Any(oc =>
+                                    oc.Removed == null &&
+                                    oc.OfferId == recruitment.OfferId &&
+                                    _context.CompanyPeople.Any(role =>
+                                        role.Deny == null &&
+                                        role.PersonId == personIdValue &&
+                                        role.CompanyId == company.CompanyId
+                                    )
+                                ))
+                        ));
+            }
 
-            query = query.WhereSalary(_context, request.SalaryParameters)
+            query = query
+                .WherePerson(_context, request.PersonEmail, request.PersonPhoneNumber)
+                .WhereSalary(_context, request.SalaryParameters)
                 .WhereContractParameters(_context, request.ContractParameterIds)
                 .WhereSkills(_context, request.SkillIds)
                 .WhereText(_context, request.SearchText)

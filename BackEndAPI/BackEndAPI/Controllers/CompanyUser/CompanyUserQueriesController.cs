@@ -3,6 +3,7 @@ using Domain.Features.Offers.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 using UseCase.Roles.CompanyUser.Queries.CompanyUserGetBranches;
 using UseCase.Roles.CompanyUser.Queries.CompanyUserGetBranches.Request;
 using UseCase.Roles.CompanyUser.Queries.CompanyUserGetCompanies.Request;
@@ -11,8 +12,10 @@ using UseCase.Roles.CompanyUser.Queries.CompanyUserGetContractConditions.Request
 using UseCase.Roles.CompanyUser.Queries.CompanyUserGetOffers.Request;
 using UseCase.Roles.CompanyUser.Queries.CompanyUserGetOfferTemplates;
 using UseCase.Roles.CompanyUser.Queries.CompanyUserGetOfferTemplates.Request;
+using UseCase.Roles.CompanyUser.Queries.CompanyUserGetRecruitments.Request;
 using UseCase.Shared.Enums;
 using UseCase.Shared.Requests.QueryParameters;
+using UseCase.Shared.ValidationAttributes.UserAttributes;
 
 namespace BackEndAPI.Controllers.CompanyUser
 {
@@ -233,6 +236,64 @@ namespace BackEndAPI.Controllers.CompanyUser
 
                 Ascending = ascending ?? true,
                 OrderBy = orderBy ?? OfferOrderBy.PublicationStart,
+                Pagination = pagination,
+
+                Metadata = HttpContext,
+            };
+            var result = await _mediator.Send(request, cancellationToken);
+            return StatusCode((int)result.HttpCode, result.Result);
+        }
+
+        [Authorize]
+        //[RequestSizeLimit(30 * 1024 * 1024)]
+        [HttpGet("recruitments")]
+        [HttpGet("recruitments/{processId:guid}")]
+        [HttpGet("offers/{offerId:guid}/recruitments")]
+        [HttpGet("branches/{branchId:guid}/recruitments")]
+        [HttpGet("companies/{companyId:guid}/recruitments")]
+        public async Task<IActionResult> GetCompanyUserOffersAsync(
+            Guid? processId,
+            Guid? offerId,
+            Guid? branchId,
+            Guid? companyId,
+
+            [EmailAddress] string? personEmail,
+            [PhoneNumber] string? personPhoneNumber,
+
+            string? searchText,
+
+            bool? ascending,
+            Domain.Features.Recruitments.Enums.ProcessType? processType,
+
+            [FromHeader] IEnumerable<int> skillIds,
+            [FromHeader] IEnumerable<int> contractParameterIds,
+            [FromQuery] CompanyQueryParametersDto companyParameters,
+            [FromQuery] SalaryQueryParametersDto salaryParameters,
+            [FromQuery] OfferQueryParametersDto offerParameters,
+            [FromQuery] PaginationQueryParametersDto pagination,
+            CancellationToken cancellationToken)
+        {
+            var request = new CompanyUserGetRecruitmentsRequest
+            {
+                OfferId = offerId,
+                BranchId = branchId,
+                CompanyId = companyId,
+                PersonEmail = personEmail,
+                PersonPhoneNumber = personPhoneNumber,
+
+                OfferQueryParameters = offerParameters,
+
+                CompanyQueryParameters = companyParameters,
+                SalaryParameters = salaryParameters,
+                ContractParameterIds = contractParameterIds,
+
+                SkillIds = skillIds,
+
+                SearchText = searchText,
+                ProcessType = processType,
+                RecruitmentId = processId,
+
+                Ascending = ascending ?? true,
                 Pagination = pagination,
 
                 Metadata = HttpContext,

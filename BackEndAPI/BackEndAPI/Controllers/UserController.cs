@@ -1,5 +1,4 @@
-﻿using Domain.Features.Recruitments.Enums;
-using MediatR;
+﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using UseCase.MongoDb;
@@ -19,6 +18,7 @@ using UseCase.Roles.Users.Commands.UpdatingCommands.UserSetBasePersonData.Reques
 using UseCase.Roles.Users.Commands.UpdatingCommands.UserUpdatePersonData.Request;
 using UseCase.Roles.Users.Commands.UpdatingCommands.UserUpdatePersonLogin.Request;
 using UseCase.Roles.Users.Queries.GetPersonProfile.Request;
+using UseCase.Roles.Users.Queries.GetPersonRecruitmentFile.Request;
 using UseCase.Roles.Users.Queries.GetPersonRecruitments.Request;
 using UseCase.Shared.Requests;
 using UseCase.Shared.Requests.QueryParameters;
@@ -298,8 +298,18 @@ namespace BackEndAPI.Controllers
             {
                 return BadRequest("File should be less 25MB");
             }
-            // Pdf only
+            if (command.File == null || command.File.Length == 0)
+            {
+                return BadRequest("File Required");
+            }
 
+            var fileType = Path
+                .GetExtension(command.File.FileName)
+                .ToLower();
+            if (fileType != ".pdf")
+            {
+                return BadRequest("Only files type: .pdf");
+            }
 
             var request = new UserRecruitsOfferRequest
             {
@@ -314,13 +324,13 @@ namespace BackEndAPI.Controllers
         [Authorize]
         //[RequestSizeLimit(30 * 1024 * 1024)]
         [HttpGet("recruitments")]
-        [HttpGet("recruitments/{recruitmentId:guid}")]
+        [HttpGet("recruitments/{processId:guid}")]
         public async Task<IActionResult> GetCompanyUserOffersAsync(
-            Guid? recruitmentId,
+            Guid? processId,
             string? searchText,
 
             bool? ascending,
-            ProcessType? processType,
+            Domain.Features.Recruitments.Enums.ProcessType? processType,
 
             [FromHeader] IEnumerable<int> skillIds,
             [FromHeader] IEnumerable<int> contractParameterIds,
@@ -342,7 +352,7 @@ namespace BackEndAPI.Controllers
 
                 SearchText = searchText,
                 ProcessType = processType,
-                RecruitmentId = recruitmentId,
+                RecruitmentId = processId,
 
                 Ascending = ascending ?? true,
                 Pagination = pagination,
@@ -351,6 +361,28 @@ namespace BackEndAPI.Controllers
             };
             var result = await _mediator.Send(request, cancellationToken);
             return StatusCode((int)result.HttpCode, result.Result);
+        }
+
+        [Authorize]
+        [HttpGet("recruitments/{processId:guid}/file")]
+        public async Task<IActionResult> GetCompanyUserOffersAsync(
+            Guid processId,
+            CancellationToken cancellationToken)
+        {
+            var request = new GetPersonRecruitmentFileRequest
+            {
+                RecruitmentId = processId,
+                Metadata = HttpContext,
+            };
+            var result = await _mediator.Send(request, cancellationToken);
+
+            if (result.HttpCode != Domain.Shared.Enums.HttpCode.Ok ||
+                result.Result == null)
+            {
+                return StatusCode((int)result.HttpCode);
+            }
+
+            return File(result.Result.Stream, "application/octet-stream", result.Result.FileName);
         }
 
         private static string Map(string urlSegment)
