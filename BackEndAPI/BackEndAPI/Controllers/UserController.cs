@@ -6,6 +6,7 @@ using UseCase.Roles.Users.Commands.AuthorizationCommands.User2StageAuthorization
 using UseCase.Roles.Users.Commands.AuthorizationCommands.UserLoginIn.Request;
 using UseCase.Roles.Users.Commands.AuthorizationCommands.UserLogOut.Request;
 using UseCase.Roles.Users.Commands.AuthorizationCommands.UserRefreshToken.Request;
+using UseCase.Roles.Users.Commands.RecruitmentCommands.UserRecruitmentSetMessage.Request;
 using UseCase.Roles.Users.Commands.RecruitmentCommands.UserRecruitsOffer.Request;
 using UseCase.Roles.Users.Commands.RegistrationCommands.UserActivatePerson.Request;
 using UseCase.Roles.Users.Commands.RegistrationCommands.UserCreatePerson.Request;
@@ -19,6 +20,7 @@ using UseCase.Roles.Users.Commands.UpdatingCommands.UserUpdatePersonData.Request
 using UseCase.Roles.Users.Commands.UpdatingCommands.UserUpdatePersonLogin.Request;
 using UseCase.Roles.Users.Queries.GetPersonProfile.Request;
 using UseCase.Roles.Users.Queries.GetPersonRecruitmentFile.Request;
+using UseCase.Roles.Users.Queries.GetPersonRecruitmentMessages.Request;
 using UseCase.Roles.Users.Queries.GetPersonRecruitments.Request;
 using UseCase.Shared.Requests;
 using UseCase.Shared.Requests.QueryParameters;
@@ -383,6 +385,43 @@ namespace BackEndAPI.Controllers
             }
 
             return File(result.Result.Stream, "application/octet-stream", result.Result.FileName);
+        }
+
+        [Authorize]
+        [HttpPost("recruitments/{processId:guid}/messages")]
+        public async Task<IActionResult> UserRecruitmentSetMessageAsync(
+            Guid processId,
+            UserRecruitmentSetMessageCommand command,
+            CancellationToken cancellationToken)
+        {
+            var request = new UserRecruitmentSetMessageRequest
+            {
+                RecruitmentId = processId,
+                Command = command,
+                Metadata = HttpContext,
+            };
+            var result = await _mediator.Send(request, cancellationToken);
+            return StatusCode((int)result.HttpCode, result.Result);
+        }
+
+
+        [Authorize]
+        [HttpGet("recruitments/{processId:guid}/messages")]
+        public async Task<IActionResult> GetPersonRecruitmentMessagesAsync(
+             Guid processId,
+             [FromQuery] PaginationQueryParametersDto paginationQueryParameters,
+             [FromQuery] bool ascending,
+             CancellationToken cancellationToken)
+        {
+            var request = new GetPersonRecruitmentMessagesRequest
+            {
+                RecruitmentId = processId,
+                PaginationQueryParameters = paginationQueryParameters,
+                Ascending = ascending,
+                Metadata = HttpContext,
+            };
+            var result = await _mediator.Send(request, cancellationToken);
+            return StatusCode((int)result.HttpCode, result.Result);
         }
 
         private static string Map(string urlSegment)

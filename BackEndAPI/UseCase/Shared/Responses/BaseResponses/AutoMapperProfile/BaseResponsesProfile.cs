@@ -83,6 +83,7 @@ namespace UseCase.Shared.Responses.BaseResponses.AutoMapperProfile
                 });
 
             CreateMap<HrProcess, RecruitmentDto>();
+            CreateMap<Hrchat, MessageDto>();
         }
     }
 }

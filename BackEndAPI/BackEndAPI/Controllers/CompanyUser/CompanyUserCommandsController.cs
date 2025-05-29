@@ -15,6 +15,7 @@ using UseCase.Roles.CompanyUser.Commands.OfferCommands.CompanyUserUpdateOffer.Re
 using UseCase.Roles.CompanyUser.Commands.OfferTemplateCommands.CompanyUserCreateOfferTemplates.Request;
 using UseCase.Roles.CompanyUser.Commands.OfferTemplateCommands.CompanyUserRemoveOfferTemplate.Request;
 using UseCase.Roles.CompanyUser.Commands.OfferTemplateCommands.CompanyUserUpdateOfferTemplate.Request;
+using UseCase.Roles.CompanyUser.Commands.RecruitmentCommands.CompanyUserRecruitmentSetMessage.Request;
 using UseCase.Roles.CompanyUser.Commands.RecruitmentCommands.CompanyUserUpdateRecruitment.Request;
 
 namespace BackEndAPI.Controllers.CompanyUser
@@ -270,6 +271,23 @@ namespace BackEndAPI.Controllers.CompanyUser
             CancellationToken cancellationToken)
         {
             var request = new CompanyUserUpdateRecruitmentRequest
+            {
+                RecruitmentId = processId,
+                Command = command,
+                Metadata = HttpContext,
+            };
+            var result = await _mediator.Send(request, cancellationToken);
+            return StatusCode((int)result.HttpCode, result.Result);
+        }
+
+        [Authorize]
+        [HttpPost("recruitments/{processId:guid}/messages")]
+        public async Task<IActionResult> UserRecruitmentSetMessageAsync(
+            Guid processId,
+            CompanyUserRecruitmentSetMessageCommand command,
+            CancellationToken cancellationToken)
+        {
+            var request = new CompanyUserRecruitmentSetMessageRequest
             {
                 RecruitmentId = processId,
                 Command = command,

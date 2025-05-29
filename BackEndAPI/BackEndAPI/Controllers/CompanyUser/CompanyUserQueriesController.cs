@@ -13,6 +13,7 @@ using UseCase.Roles.CompanyUser.Queries.CompanyUserGetOffers.Request;
 using UseCase.Roles.CompanyUser.Queries.CompanyUserGetOfferTemplates;
 using UseCase.Roles.CompanyUser.Queries.CompanyUserGetOfferTemplates.Request;
 using UseCase.Roles.CompanyUser.Queries.CompanyUserGetRecruitmentFile.Request;
+using UseCase.Roles.CompanyUser.Queries.CompanyUserGetRecruitmentMessages.Request;
 using UseCase.Roles.CompanyUser.Queries.CompanyUserGetRecruitments.Request;
 using UseCase.Shared.Enums;
 using UseCase.Shared.Requests.QueryParameters;
@@ -323,6 +324,25 @@ namespace BackEndAPI.Controllers.CompanyUser
             }
 
             return File(result.Result.Stream, "application/octet-stream", result.Result.FileName);
+        }
+
+        [Authorize]
+        [HttpGet("recruitments/{processId:guid}/messages")]
+        public async Task<IActionResult> CompanyUserGetRecruitmentMessagesAsync(
+             Guid processId,
+             [FromQuery] PaginationQueryParametersDto paginationQueryParameters,
+             [FromQuery] bool ascending,
+             CancellationToken cancellationToken)
+        {
+            var request = new CompanyUserGetRecruitmentMessagesRequest
+            {
+                RecruitmentId = processId,
+                PaginationQueryParameters = paginationQueryParameters,
+                Ascending = ascending,
+                Metadata = HttpContext,
+            };
+            var result = await _mediator.Send(request, cancellationToken);
+            return StatusCode((int)result.HttpCode, result.Result);
         }
     }
 }

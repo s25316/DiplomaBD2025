@@ -11,6 +11,7 @@ using UseCase.Roles.Users.Repositories;
 using UseCase.Shared.Dictionaries.Repositories;
 using UseCase.Shared.Exceptions;
 using UseCase.Shared.Repositories.Addresses;
+using UseCase.Shared.Repositories.RecruitmentMessages;
 using UseCase.Shared.Repositories.Recruitments;
 using UseCase.Shared.Services.Authentication.Generators;
 using UseCase.Shared.Services.Authentication.Inspectors;
@@ -91,6 +92,7 @@ namespace UseCase
             // Shared
             services.AddTransient<IDictionariesRepository, DictionariesRepository>();
             services.AddTransient<IAddressRepository, AddressRepository>();
+            services.AddTransient<IRecruitmentMessagesRepository, RecruitmentMessagesRepository>();
 
             services.AddTransient<IAuthenticationGeneratorService, AuthenticationGeneratorService>();
             services.AddTransient<IAuthenticationInspectorService, AuthenticationInspectorService>();
