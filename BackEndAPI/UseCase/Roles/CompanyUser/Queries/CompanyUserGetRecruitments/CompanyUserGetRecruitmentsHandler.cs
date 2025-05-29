@@ -89,6 +89,10 @@ namespace UseCase.Roles.CompanyUser.Queries.CompanyUserGetRecruitments
                             .ToList(),
                     }).ToList(),
                 Person = _context.People
+                    .Include(p => p.Address)
+                    .ThenInclude(p => p.City)
+                    .ThenInclude(p => p.State)
+                    .ThenInclude(p => p.Country)
                     .Where(p => p.PersonId == recruitment.PersonId)
                     .Select(person => new
                     {

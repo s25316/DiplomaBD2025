@@ -31,6 +31,18 @@ namespace UseCase.Shared.Responses.BaseResponses.AutoMapperProfile
                     Lat = db.Lat,
                 });
 
+
+            CreateMap<Address, UserRecruitmentAddressResponseDto>()
+                .ConstructUsing(db => new UserRecruitmentAddressResponseDto
+                {
+                    CountryId = db.City.State.Country.CountryId,
+                    CountryName = db.City.State.Country.Name,
+                    StateId = db.City.State.StateId,
+                    StateName = db.City.State.Name,
+                    CityId = db.City.CityId,
+                    CityName = db.City.Name,
+                });
+
             CreateMap<Offer, OfferDto>()
                 .ConstructUsing((db, context) =>
                 {

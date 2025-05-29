@@ -49,7 +49,7 @@ INSERT INTO [dbo].[ProcessType]
 (ProcessTypeId, Name)
 VALUES
 (1, 'Recruit'),
-(2, 'Watched'),
+(2, 'Seen'),
 
 (11, 'Rejected'),
 (12, 'Passed');

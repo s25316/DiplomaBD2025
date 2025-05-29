@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
 using Domain.Features.Offers.Enums;
+using Domain.Features.People.ValueObjects.Ids;
+using Domain.Features.Recruitments.ValueObjects.Ids;
 using Domain.Shared.Enums;
 using Microsoft.EntityFrameworkCore;
 using UseCase.RelationalDatabase;
+using UseCase.Shared.Repositories.BaseEFRepository;
 using DatabaseRecruitment = UseCase.RelationalDatabase.Models.HrProcess;
 using DomainOffer = Domain.Features.Offers.Aggregates.Offer;
 using DomainPerson = Domain.Features.People.Aggregates.Person;
@@ -97,10 +100,13 @@ namespace UseCase.Shared.Repositories.Recruitments
             return (HttpCode.Ok, null);
         }
 
-        public async Task CreateAsync(
-            DomainRecruitment item,
+        public async Task<RepositoryCreateResponse<DomainRecruitment>> CreateAsync(
+            PersonId personId,
+            IEnumerable<DomainRecruitment> items,
             CancellationToken cancellationToken)
         {
+            var item = items.FirstOrDefault() ?? throw new Exception();
+
             var recruitment = new DatabaseRecruitment
             {
                 PersonId = item.PersonId.Value,
@@ -113,6 +119,74 @@ namespace UseCase.Shared.Repositories.Recruitments
 
             await _context.HrProcesses.AddAsync(recruitment, cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
+
+            return RepositoryCreateResponse<DomainRecruitment>.PrepareResponse(HttpCode.Created, null, items);
+        }
+
+        public async Task<RepositoryUpdateResponse> UpdateAsync(
+            PersonId personId,
+            DomainRecruitment item,
+            CancellationToken cancellationToken)
+        {
+            var recruitmentId = item.Id?.Value ?? throw new KeyNotFoundException();
+            var database = await _context.HrProcesses
+                .Where(recruitment => recruitment.ProcessId == recruitmentId)
+                .FirstOrDefaultAsync(cancellationToken);
+            if (database == null)
+            {
+                return RepositoryUpdateResponse.InvalidResponse(HttpCode.NotFound);
+            }
+
+            database.ProcessTypeId = (int)item.ProcessType;
+            await _context.SaveChangesAsync(cancellationToken);
+            return RepositoryUpdateResponse.ValidResponse();
+        }
+
+        public async Task<RepositorySelectResponse<DomainRecruitment>> GetAsync(
+            PersonId personId,
+            RecruitmentId id,
+            CancellationToken cancellationToken)
+        {
+            var recruitmentId = id.Value;
+            var personIdValue = personId.Value;
+
+            var selectResult = await _context.HrProcesses
+                .Where(recruitment => recruitment.ProcessId == recruitmentId)
+                .Select(recruitment => new
+                {
+                    Recruitment = recruitment,
+                    RoleCount = _context.CompanyPeople
+                        .Where(role =>
+                            role.Deny == null &&
+                            role.PersonId == personIdValue)
+                        .Count(role =>
+                            _context.OfferConnections
+                            .Include(x => x.OfferTemplate)
+                            .Any(oc =>
+                                oc.Removed == null &&
+                                oc.OfferId == recruitment.OfferId &&
+                                role.CompanyId == oc.OfferTemplate.CompanyId
+                            )
+                        ),
+                })
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (selectResult == null)
+            {
+                return RepositorySelectResponse<DomainRecruitment>.InvalidResponse(HttpCode.NotFound);
+            }
+            if (selectResult.RoleCount == 0)
+            {
+                return RepositorySelectResponse<DomainRecruitment>.InvalidResponse(HttpCode.Forbidden);
+            }
+
+            return RepositorySelectResponse<DomainRecruitment>
+                .ValidResponse(_mapper.Map<DomainRecruitment>(selectResult.Recruitment));
+        }
+
+        public Task<RepositoryRemoveResponse> RemoveAsync(PersonId personId, DomainRecruitment item, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
         }
     }
 }

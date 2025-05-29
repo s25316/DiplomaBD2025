@@ -88,6 +88,10 @@ namespace UseCase.Roles.Users.Queries.GetPersonRecruitments
                             .ToList(),
                     }).ToList(),
                 Person = _context.People
+                    .Include(p => p.Address)
+                    .ThenInclude(p => p.City)
+                    .ThenInclude(p => p.State)
+                    .ThenInclude(p => p.Country)
                     .Where(p => p.PersonId == personId.Value)
                     .Select(person => new
                     {

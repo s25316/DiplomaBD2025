@@ -12,6 +12,7 @@ using UseCase.Roles.CompanyUser.Queries.CompanyUserGetContractConditions.Request
 using UseCase.Roles.CompanyUser.Queries.CompanyUserGetOffers.Request;
 using UseCase.Roles.CompanyUser.Queries.CompanyUserGetOfferTemplates;
 using UseCase.Roles.CompanyUser.Queries.CompanyUserGetOfferTemplates.Request;
+using UseCase.Roles.CompanyUser.Queries.CompanyUserGetRecruitmentFile.Request;
 using UseCase.Roles.CompanyUser.Queries.CompanyUserGetRecruitments.Request;
 using UseCase.Shared.Enums;
 using UseCase.Shared.Requests.QueryParameters;
@@ -191,7 +192,7 @@ namespace BackEndAPI.Controllers.CompanyUser
         [HttpGet("branches/{branchId:guid}/offers")]
         [HttpGet("contractConditions/{contractConditionId:guid}/offers")]
         [HttpGet("offerTemplates/{offerTemplateId:guid}/offers")]
-        public async Task<IActionResult> GetCompanyUserOffersAsync(
+        public async Task<IActionResult> CompanyUserGetOffersAsync(
             Guid? offerId,
             Guid? companyId,
             Guid? branchId,
@@ -251,7 +252,7 @@ namespace BackEndAPI.Controllers.CompanyUser
         [HttpGet("offers/{offerId:guid}/recruitments")]
         [HttpGet("branches/{branchId:guid}/recruitments")]
         [HttpGet("companies/{companyId:guid}/recruitments")]
-        public async Task<IActionResult> GetCompanyUserOffersAsync(
+        public async Task<IActionResult> CompanyUserGetRecruitmentsAsync(
             Guid? processId,
             Guid? offerId,
             Guid? branchId,
@@ -300,6 +301,28 @@ namespace BackEndAPI.Controllers.CompanyUser
             };
             var result = await _mediator.Send(request, cancellationToken);
             return StatusCode((int)result.HttpCode, result.Result);
+        }
+
+        [Authorize]
+        [HttpGet("recruitments/{processId:guid}/file")]
+        public async Task<IActionResult> GetCompanyUserOffersAsync(
+             Guid processId,
+             CancellationToken cancellationToken)
+        {
+            var request = new CompanyUserGetRecruitmentFileRequest
+            {
+                RecruitmentId = processId,
+                Metadata = HttpContext,
+            };
+            var result = await _mediator.Send(request, cancellationToken);
+
+            if (result.HttpCode != Domain.Shared.Enums.HttpCode.Ok ||
+                result.Result == null)
+            {
+                return StatusCode((int)result.HttpCode);
+            }
+
+            return File(result.Result.Stream, "application/octet-stream", result.Result.FileName);
         }
     }
 }

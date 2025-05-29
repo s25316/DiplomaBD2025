@@ -2,17 +2,20 @@
 using Domain.Features.ContractConditions.ValueObjects.Info;
 using Domain.Features.Offers.ValueObjects.Info;
 using Domain.Features.OfferTemplates.ValueObjects.Info;
+using Domain.Features.Recruitments.Enums;
 using UseCase.Shared.Enums;
 using DatabaseBranch = UseCase.RelationalDatabase.Models.Branch;
 using DatabaseCompany = UseCase.RelationalDatabase.Models.Company;
 using DatabaseContractCondition = UseCase.RelationalDatabase.Models.ContractCondition;
 using DatabaseOffer = UseCase.RelationalDatabase.Models.Offer;
 using DatabaseOfferTemplate = UseCase.RelationalDatabase.Models.OfferTemplate;
+using DatabaseRecruitment = UseCase.RelationalDatabase.Models.HrProcess;
 using DomainBranch = Domain.Features.Branches.Entities.Branch;
 using DomainCompany = Domain.Features.Companies.Entities.Company;
 using DomainContractCondition = Domain.Features.ContractConditions.Aggregates.ContractCondition;
 using DomainOffer = Domain.Features.Offers.Aggregates.Offer;
 using DomainOfferTemplate = Domain.Features.OfferTemplates.Aggregates.OfferTemplate;
+using DomainRecruitment = Domain.Features.Recruitments.Entities.Recruitment;
 
 namespace UseCase.Roles.CompanyUser.AutoMapperProfile
 {
@@ -160,6 +163,32 @@ namespace UseCase.Roles.CompanyUser.AutoMapperProfile
                 .ConstructUsing(db =>
                     MapDatabaseOfferToDomainOffer(db))
                 .ForAllMembers(opt => opt.Ignore());
+
+
+            CreateMap<DomainRecruitment, DatabaseRecruitment>()
+                .ConstructUsing(item => new DatabaseRecruitment
+                {
+                    PersonId = item.PersonId.Value,
+                    OfferId = item.OfferId.Value,
+                    Message = item.Message,
+                    File = item.File,
+                    Created = item.Created,
+                    ProcessTypeId = 1,
+                })
+                .ForAllMembers(opt => opt.Ignore());
+
+            CreateMap<DatabaseRecruitment, DomainRecruitment>()
+               .ConstructUsing(item => new DomainRecruitment.Builder()
+                    .SetId(item.ProcessId)
+                    .SetPersonId(item.PersonId)
+                    .SetOfferId(item.OfferId)
+                    .SetProcessType((ProcessType)item.ProcessTypeId)
+                    .SetCreated(item.Created)
+                    .SetMessage(item.Message)
+                    .SetFile(item.File)
+                    .Build()
+               ).ForAllMembers(opt => opt.Ignore());
+
         }
 
         private DomainOffer MapDatabaseOfferToDomainOffer(DatabaseOffer db)

@@ -69,7 +69,7 @@ namespace UseCase.Shared.Responses.BaseResponses.CompanyUser.AutoMapperProfile
                     Created = db.Created,
                     Blocked = db.Blocked,
                     Removed = db.Removed,
-                    Address = context.Mapper.Map<AddressResponseDto>(db.Address),
+                    Address = context.Mapper.Map<UserRecruitmentAddressResponseDto>(db.Address),
                     Skills = db.PersonSkills
                         .Where(x => x.Removed == null)
                         .Select(skill => context.Mapper.Map<SkillDto>(skill.Skill)),

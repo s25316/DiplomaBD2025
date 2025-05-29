@@ -51,8 +51,7 @@ namespace UseCase.Roles.Users.Commands.RecruitmentCommands.UserRecruitsOffer
                 .SetFile(fileId)
                 .Build();
 
-            await _recruitmentRepository.CreateAsync(domain, cancellationToken);
-
+            await _recruitmentRepository.CreateAsync(personId, [domain], cancellationToken);
             return PrepareResponse(HttpCode.Created);
         }
 

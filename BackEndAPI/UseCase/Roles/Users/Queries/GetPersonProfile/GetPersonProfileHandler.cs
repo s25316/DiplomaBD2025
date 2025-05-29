@@ -36,6 +36,13 @@ namespace UseCase.Roles.Users.Queries.GetPersonProfile
         {
             var personId = GetPersonId(request);
             var dbPersonData = await _context.People
+                .Include(p => p.Address)
+                .ThenInclude(p => p.City)
+                .ThenInclude(p => p.State)
+                .ThenInclude(p => p.Country)
+
+                .Include(p => p.Address)
+                .ThenInclude(p => p.Street)
                 .Where(p => p.PersonId == personId.Value)
                 .Select(person => new
                 {

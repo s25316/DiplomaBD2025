@@ -28,6 +28,6 @@ namespace UseCase.Shared.Responses.BaseResponses.CompanyUser
 
         public IEnumerable<UrlDto> Urls { get; init; } = new List<UrlDto>();
 
-        public virtual AddressResponseDto? Address { get; init; }
+        public virtual UserRecruitmentAddressResponseDto? Address { get; init; }
     }
 }
