@@ -1,17 +1,16 @@
-﻿using Domain.Features.People.ValueObjects.Ids;
-using Domain.Shared.Enums;
+﻿using Domain.Shared.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using UseCase.MongoDb;
 using UseCase.MongoDb.Enums;
 using UseCase.RelationalDatabase;
-using UseCase.Roles.Users.Queries.GetPersonRecruitmentFile.Request;
+using UseCase.Roles.Guests.Queries.GuestGetCompanyLogo.Request;
 using UseCase.Shared.Responses.ItemResponse.FileResponses;
 using UseCase.Shared.Services.Authentication.Inspectors;
 
-namespace UseCase.Roles.Users.Queries.GetPersonRecruitmentFile
+namespace UseCase.Roles.Guests.Queries.GuestGetCompanyLogo
 {
-    public class GetPersonRecruitmentFileHandler : IRequestHandler<GetPersonRecruitmentFileRequest, FileResponse>
+    class GuestGetCompanyLogoHandler : IRequestHandler<GuestGetCompanyLogoRequest, FileResponse>
     {
         // Properties 
         private readonly DiplomaBdContext _context;
@@ -20,7 +19,7 @@ namespace UseCase.Roles.Users.Queries.GetPersonRecruitmentFile
 
 
         // Constructor 
-        public GetPersonRecruitmentFileHandler(
+        public GuestGetCompanyLogoHandler(
             DiplomaBdContext context,
             IMongoDbFileService mongoDbFileService,
             IAuthenticationInspectorService authenticationInspector)
@@ -32,24 +31,22 @@ namespace UseCase.Roles.Users.Queries.GetPersonRecruitmentFile
 
 
         // Methods
-        public async Task<FileResponse> Handle(GetPersonRecruitmentFileRequest request, CancellationToken cancellationToken)
+        public async Task<FileResponse> Handle(GuestGetCompanyLogoRequest request, CancellationToken cancellationToken)
         {
-            var peronId = GetPersonId(request);
-
-            var selectResult = await _context.HrProcesses
-                .Where(recruitment => recruitment.ProcessId == request.RecruitmentId)
+            var selectResult = await _context.Companies
+                .Where(company =>
+                    company.CompanyId == request.CompanyId &&
+                    company.Removed == null &&
+                    company.Blocked == null)
+                .AsNoTracking()
                 .FirstOrDefaultAsync(cancellationToken);
 
-            if (selectResult == null)
+            if (selectResult == null || string.IsNullOrWhiteSpace(selectResult.Logo))
             {
                 return PrepareResponse(HttpCode.NotFound);
             }
-            if (selectResult.PersonId != peronId.Value)
-            {
-                return PrepareResponse(HttpCode.Forbidden);
-            }
 
-            var fileDto = await _mongoDbFileService.GetAsync(selectResult.File, MongoDbCollection.Recruitments, cancellationToken);
+            var fileDto = await _mongoDbFileService.GetAsync(selectResult.Logo, MongoDbCollection.CompanyLogo, cancellationToken);
 
             if (fileDto == null)
             {
@@ -62,12 +59,6 @@ namespace UseCase.Roles.Users.Queries.GetPersonRecruitmentFile
         private static FileResponse PrepareResponse(HttpCode code, FileDto? item = null)
         {
             return FileResponse.PrepareResponse(code, item);
-        }
-
-        // Non Static Methods
-        private PersonId GetPersonId(GetPersonRecruitmentFileRequest request)
-        {
-            return _authenticationInspector.GetPersonId(request.Metadata.Claims);
         }
     }
 }

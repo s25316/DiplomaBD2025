@@ -2,6 +2,7 @@
 using Domain.Shared.Enums;
 using MediatR;
 using UseCase.MongoDb;
+using UseCase.MongoDb.Enums;
 using UseCase.Roles.Users.Commands.RecruitmentCommands.UserRecruitsOffer.Request;
 using UseCase.Shared.Repositories.Recruitments;
 using UseCase.Shared.Responses.ItemResponse;
@@ -46,7 +47,7 @@ namespace UseCase.Roles.Users.Commands.RecruitmentCommands.UserRecruitsOffer
             {
                 return PrepareResponse(validationData.Code, validationData.Message);
             }
-            var fileId = await _mongoDbFileService.SaveAsync(request.Command.File, cancellationToken);
+            var fileId = await _mongoDbFileService.SaveAsync(request.Command.File, MongoDbCollection.Recruitments, cancellationToken);
             domain = new DomainRecruitment.Updater(domain)
                 .SetFile(fileId)
                 .Build();

@@ -1,11 +1,13 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 using UseCase.Roles.CompanyUser.Commands.BranchCommands.CompanyUserCreateBranches.Request;
 using UseCase.Roles.CompanyUser.Commands.BranchCommands.CompanyUserRemoveBranch.Request;
 using UseCase.Roles.CompanyUser.Commands.BranchCommands.CompanyUserUpdateBranch.Request;
 using UseCase.Roles.CompanyUser.Commands.CompanyCommands.CompanyUserCreateCompanies.Request;
 using UseCase.Roles.CompanyUser.Commands.CompanyCommands.CompanyUserUpdateCompany.Request;
+using UseCase.Roles.CompanyUser.Commands.CompanyCommands.CompanyUserUpdateCompanyLogo.Request;
 using UseCase.Roles.CompanyUser.Commands.ContractConditionCommands.CompanyUserCreateContractConditions.Request;
 using UseCase.Roles.CompanyUser.Commands.ContractConditionCommands.CompanyUserRemoveContractCondition.Request;
 using UseCase.Roles.CompanyUser.Commands.ContractConditionCommands.CompanyUserUpdateContractCondition.Request;
@@ -26,6 +28,15 @@ namespace BackEndAPI.Controllers.CompanyUser
     {
         //Properties
         private readonly IMediator _mediator;
+        private readonly string[] _allowedImageMimeTypes = new string[]
+        {
+            "image/jpeg",
+            "image/png",
+            "image/gif",
+            "image/bmp",
+            "image/webp"
+        };
+
 
 
         // Constructor
@@ -291,6 +302,33 @@ namespace BackEndAPI.Controllers.CompanyUser
             {
                 RecruitmentId = processId,
                 Command = command,
+                Metadata = HttpContext,
+            };
+            var result = await _mediator.Send(request, cancellationToken);
+            return StatusCode((int)result.HttpCode, result.Result);
+        }
+
+        [Authorize]
+        [HttpPut("{companyId:guid}/file")]
+        public async Task<IActionResult> CompanyUserUpdateCompanyLogoAsync(
+            Guid companyId,
+            [Required] IFormFile file,
+            CancellationToken cancellationToken)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return BadRequest("File cannot be empty");
+            }
+            if (!_allowedImageMimeTypes.Contains(file.ContentType.ToLowerInvariant()))
+            {
+                return BadRequest("Only (JPEG, PNG, GIF, BMP, WebP).");
+            }
+
+
+            var request = new CompanyUserUpdateCompanyLogoRequest
+            {
+                CompanyId = companyId,
+                File = file,
                 Metadata = HttpContext,
             };
             var result = await _mediator.Send(request, cancellationToken);

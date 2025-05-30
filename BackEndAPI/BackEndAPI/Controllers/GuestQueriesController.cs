@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using UseCase.Roles.Guests.Queries.GuestGetBranches;
 using UseCase.Roles.Guests.Queries.GuestGetBranches.Request;
 using UseCase.Roles.Guests.Queries.GuestGetCompanies.Request;
+using UseCase.Roles.Guests.Queries.GuestGetCompanyLogo.Request;
 using UseCase.Roles.Guests.Queries.GuestGetContractConditions;
 using UseCase.Roles.Guests.Queries.GuestGetContractConditions.Request;
 using UseCase.Roles.Guests.Queries.GuestGetOffers.Request;
@@ -224,6 +225,29 @@ namespace BackEndAPI.Controllers
             };
             var result = await _mediator.Send(request, cancellationToken);
             return StatusCode((int)result.HttpCode, result.Result);
+        }
+
+
+        [HttpGet("companies/{companyId:guid}/logo")]
+        public async Task<IActionResult> GetCompanyUserOffersAsync(
+            Guid companyId,
+            CancellationToken cancellationToken)
+        {
+            var request = new GuestGetCompanyLogoRequest
+            {
+                CompanyId = companyId,
+                Metadata = HttpContext,
+            };
+
+            var result = await _mediator.Send(request, cancellationToken);
+
+            if (result.HttpCode != Domain.Shared.Enums.HttpCode.Ok ||
+                result.Result == null)
+            {
+                return StatusCode((int)result.HttpCode);
+            }
+
+            return File(result.Result.Stream, "application/octet-stream", result.Result.FileName);
         }
     }
 }

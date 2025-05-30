@@ -140,6 +140,7 @@ namespace UseCase.Roles.CompanyUser.Repositories.Companies
             dbCompany.Krs = item.Krs?.Value;
             dbCompany.Description = item.Description;
             dbCompany.WebsiteUrl = item.WebsiteUrl;
+            dbCompany.Logo = item.Logo;
             await _context.SaveChangesAsync(cancellationToken);
 
             return ValidUpdate();

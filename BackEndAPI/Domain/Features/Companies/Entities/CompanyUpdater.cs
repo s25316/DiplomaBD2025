@@ -38,6 +38,12 @@ namespace Domain.Features.Companies.Entities
                 return this;
             }
 
+            public Updater SetLogo(string? logo)
+            {
+                SetProperty(company => company.SetLogo(logo));
+                return this;
+            }
+
             // Protected Methods
             protected override Action<Company> SetDefaultValues()
             {

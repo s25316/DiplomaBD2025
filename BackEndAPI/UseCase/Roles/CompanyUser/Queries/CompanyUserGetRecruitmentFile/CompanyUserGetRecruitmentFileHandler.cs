@@ -3,6 +3,7 @@ using Domain.Features.Recruitments.Enums;
 using Domain.Shared.Enums;
 using MediatR;
 using UseCase.MongoDb;
+using UseCase.MongoDb.Enums;
 using UseCase.Roles.CompanyUser.Queries.CompanyUserGetRecruitmentFile.Request;
 using UseCase.Shared.Exceptions;
 using UseCase.Shared.Repositories.Recruitments;
@@ -58,7 +59,7 @@ namespace UseCase.Roles.CompanyUser.Queries.CompanyUserGetRecruitmentFile
                 }
             }
 
-            var fileDto = await _mongoDbFileService.GetAsync(domainRecruitment.File, cancellationToken);
+            var fileDto = await _mongoDbFileService.GetAsync(domainRecruitment.File, MongoDbCollection.Recruitments, cancellationToken);
             return PrepareResponse(HttpCode.Ok, fileDto);
         }
 

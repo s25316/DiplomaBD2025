@@ -4,6 +4,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
 using UseCase.MongoDb;
+using UseCase.MongoDb.Enums;
 using UseCase.Shared.Responses.ItemResponse.FileResponses;
 
 namespace Infrastructure.MongoDb
@@ -12,8 +13,9 @@ namespace Infrastructure.MongoDb
     {
         // Properties
         private readonly string _recruitmentsCollectionName = "recruitments";
+        private readonly string _companyLogoCollectionName = "company-logo";
         private readonly IMongoDatabase _database;
-        private readonly GridFSBucket _gridFSBucket;
+        private readonly Dictionary<MongoDbCollection, IGridFSBucket> _buckets;
 
 
         // Constructor
@@ -21,16 +23,31 @@ namespace Infrastructure.MongoDb
         {
             _database = database;
 
-            var options = new GridFSBucketOptions
+            _buckets = new Dictionary<MongoDbCollection, IGridFSBucket>
             {
-                BucketName = _recruitmentsCollectionName
+                {
+                    MongoDbCollection.CompanyLogo,
+                    new GridFSBucket(_database, new GridFSBucketOptions
+                    {
+                        BucketName = _companyLogoCollectionName
+                    })
+                },
+                {
+                    MongoDbCollection.Recruitments,
+                    new GridFSBucket(_database, new GridFSBucketOptions
+                    {
+                        BucketName = _recruitmentsCollectionName
+                    })
+                }
             };
-            _gridFSBucket = new GridFSBucket(_database, options);
         }
 
 
         // Methods
-        public async Task<string> SaveAsync(IFormFile file, CancellationToken cancellationToken)
+        public async Task<string> SaveAsync(
+            IFormFile file,
+            MongoDbCollection collection = MongoDbCollection.Recruitments,
+            CancellationToken cancellationToken = default)
         {
             using (var stream = file.OpenReadStream())
             {
@@ -44,12 +61,20 @@ namespace Infrastructure.MongoDb
                     }
                 };
 
-                var fileId = await _gridFSBucket.UploadFromStreamAsync(file.FileName, stream, options);
+                if (!_buckets.TryGetValue(collection, out var gridFSBucket))
+                {
+                    throw new ArgumentException($"No GridFS bucket configured for collection: {collection}");
+                }
+
+                var fileId = await gridFSBucket.UploadFromStreamAsync(file.FileName, stream, options);
                 return fileId.ToString();
             }
         }
 
-        public async Task<FileDto?> GetAsync(string fileId, CancellationToken cancellationToken)
+        public async Task<FileDto?> GetAsync(
+            string fileId,
+            MongoDbCollection collection = MongoDbCollection.Recruitments,
+            CancellationToken cancellationToken = default)
         {
             if (!ObjectId.TryParse(fileId, out var objectId))
             {
@@ -57,7 +82,12 @@ namespace Infrastructure.MongoDb
             }
 
             var filter = Builders<GridFSFileInfo>.Filter.Eq("_id", objectId);
-            var fileInfo = await _gridFSBucket.Find(filter).FirstOrDefaultAsync(cancellationToken);
+
+            if (!_buckets.TryGetValue(collection, out var gridFSBucket))
+            {
+                throw new ArgumentException($"No GridFS bucket configured for collection: {collection}");
+            }
+            var fileInfo = await gridFSBucket.Find(filter).FirstOrDefaultAsync(cancellationToken);
 
 
             if (fileInfo == null)
@@ -66,7 +96,7 @@ namespace Infrastructure.MongoDb
             }
 
             var memoryStream = new MemoryStream();
-            await _gridFSBucket.DownloadToStreamAsync(objectId, memoryStream);
+            await gridFSBucket.DownloadToStreamAsync(objectId, memoryStream);
 
             memoryStream.Position = 0;
             var fileName = fileInfo.Filename;
@@ -78,11 +108,18 @@ namespace Infrastructure.MongoDb
             };
         }
 
-        public async Task DeleteFileAsync(string fileId, CancellationToken cancellationToken)
+        public async Task DeleteFileAsync(
+            string fileId,
+            MongoDbCollection collection = MongoDbCollection.Recruitments,
+            CancellationToken cancellationToken = default)
         {
             if (ObjectId.TryParse(fileId, out var objectId))
             {
-                await _gridFSBucket.DeleteAsync(objectId, cancellationToken);
+                if (!_buckets.TryGetValue(collection, out var gridFSBucket))
+                {
+                    throw new ArgumentException($"No GridFS bucket configured for collection: {collection}");
+                }
+                await gridFSBucket.DeleteAsync(objectId, cancellationToken);
             }
         }
     }
