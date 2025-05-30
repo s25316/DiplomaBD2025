@@ -1,7 +1,7 @@
 "use client"
 import React, { useState, useEffect, ReactEventHandler } from 'react'
 import { GeocoderAutocomplete } from '@geoapify/geocoder-autocomplete'
-import "@geoapify/geocoder-autocomplete/styles/round-borders-dark.css"
+import "@geoapify/geocoder-autocomplete/styles/round-borders.css"
 
 interface Props {
   index: number,

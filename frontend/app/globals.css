@@ -39,3 +39,27 @@ button:hover {
   background: var(--foreground);
   color: var(--background);
 }
+
+
+/* globals.css */
+
+:root {
+  --geoapify-bg: white;
+  --geoapify-text: black;
+}
+
+.dark {
+  --geoapify-bg: #2d2e30; /* Tailwind gray-800 */
+  --geoapify-text: #f9fafb; /* Tailwind gray-50 */
+}
+
+.geoapify-autocomplete-input,
+.geoapify-autocomplete-item {
+  background-color: var(--geoapify-bg) !important;
+  color: var(--geoapify-text) !important;
+  border-color: var(--geoapify-bg) !important;
+}
+
+.geoapify-autocomplete-item:hover {
+  background-color: rgb(78, 78, 83) !important; /* blue-500 semi-transparent */
+}

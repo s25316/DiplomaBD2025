@@ -14,7 +14,7 @@ const SelectItemsPerPage = ({ value, onChange }: Props) => (
       onChange={(e) => onChange(Number(e.target.value))}
       className="border px-2 py-1 rounded"
     >
-      {[10, 20, 50, 100, 125, 150].map((count) => (
+      {[10, 20, 50, 100].map((count) => (
         <option key={count} value={count}>{count}</option>
       ))}
     </select>
