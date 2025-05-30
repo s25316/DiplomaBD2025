@@ -67,11 +67,28 @@ namespace UseCase.Roles.Users.Repositories
             CancellationToken cancellationToken)
         {
             var loginValue = login.Value;
-            var dbPerson = await _context.People
+            var selectResult = await _context.People
                .Where(person => person.Login == loginValue)
-               .FirstOrDefaultAsync(cancellationToken);
+               .Select(person => new
+               {
+                   Person = person,
+                   Urls = _context.Urls
+                        .Where(url =>
+                            url.PersonId == person.PersonId &&
+                            url.Removed == null)
+                        .ToList(),
+                   Skills = _context.PersonSkills
+                        .Where(skill =>
+                            skill.PersonId == person.PersonId &&
+                            skill.Removed == null)
+                        .ToList(),
+               })
+                .FirstAsync(cancellationToken);
 
-            return PreparePersonGetResponse(dbPerson);
+            selectResult.Person.PersonSkills = selectResult.Skills;
+            selectResult.Person.Urls = selectResult.Urls;
+
+            return PreparePersonGetResponse(selectResult.Person);
         }
 
 
@@ -80,11 +97,28 @@ namespace UseCase.Roles.Users.Repositories
             CancellationToken cancellationToken)
         {
             var personIdValue = id.Value;
-            var dbPerson = await _context.People
+            var selectResult = await _context.People
                 .Where(person => person.PersonId == personIdValue)
-                .FirstOrDefaultAsync(cancellationToken);
+                .Select(person => new
+                {
+                    Person = person,
+                    Urls = _context.Urls
+                        .Where(url =>
+                            url.PersonId == person.PersonId &&
+                            url.Removed == null)
+                        .ToList(),
+                    Skills = _context.PersonSkills
+                        .Where(skill =>
+                            skill.PersonId == person.PersonId &&
+                            skill.Removed == null)
+                        .ToList(),
+                })
+                .FirstAsync(cancellationToken);
 
-            return PreparePersonGetResponse(dbPerson);
+            selectResult.Person.PersonSkills = selectResult.Skills;
+            selectResult.Person.Urls = selectResult.Urls;
+
+            return PreparePersonGetResponse(selectResult.Person);
         }
 
         public async Task<RepositoryUpdateResponse> UpdateAsync(
