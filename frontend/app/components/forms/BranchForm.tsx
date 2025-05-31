@@ -9,7 +9,7 @@ interface Props {
   initialData?: any; //do edycji
 }
 
-const BranchCreateForm = (props: Props) => {
+const BranchForm = (props: Props) => {
   const [autocomplete, setAutocomplete] = useState<GeocoderAutocomplete>()
   const [form, setForm] = useState({
     index: props.index,
@@ -84,6 +84,24 @@ const BranchCreateForm = (props: Props) => {
       <label htmlFor='description'>Description:</label>
       <input type='text' name='description' placeholder='Description' value={form.description ?? ""} onChange={handleChange} />
       <label htmlFor='address'>Address:</label>
+      {(props.initialData?.address && props.initialData.address.streetName) && (
+        <div className="text-sm text-gray-700 italic mb-2">
+          <b>Current address:</b><br />
+          {[
+            'ul.',
+            props.initialData.address.streetName,
+            props.initialData.address.houseNumber,
+            props.initialData.address.apartmentNumber && `/${props.initialData.address.apartmentNumber}`,
+            ',',
+            props.initialData.address.postCode,
+            props.initialData.address.cityName,
+            props.initialData.address.countryName,
+          ]
+            .filter(Boolean)
+            .join(' ')}
+        </div>
+      )}
+
       <div id={`autocomplete-${props.index}`} className='autocomplete-container' style={{ position: 'relative' }}></div>
       <label htmlFor='apartmentNumber'>Apartment number:</label>
       <input type='text' name='apartmentNumber' placeholder='123' value={form.address.apartmentNumber ?? ""} onChange={handleAddressChange} />
@@ -91,4 +109,4 @@ const BranchCreateForm = (props: Props) => {
   )
 }
 
-export default BranchCreateForm
+export default BranchForm

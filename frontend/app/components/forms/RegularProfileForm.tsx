@@ -120,19 +120,37 @@ const RegularProfileForm = ({ initialData, token }: Props) => {
 
   return (
     <div className="flex flex-col gap-4 mt-4 max-w-2xl">
-      <label>Description</label>
+      <label><b>Description</b></label>
       <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
 
-      <label>Contact Email</label>
+      <label><b>Contact Email</b></label>
       <input value={form.contactEmail} onChange={(e) => setForm({ ...form, contactEmail: e.target.value })} />
 
-      <label>Phone Number</label>
+      <label><b>Phone Number</b></label>
       <input value={form.contactPhoneNumber} onChange={(e) => setForm({ ...form, contactPhoneNumber: e.target.value })} />
 
-      <label>Birth Date</label>
+      <label><b>Birth Date</b></label>
       <input type="date" value={form.birthDate} onChange={(e) => setForm({ ...form, birthDate: e.target.value })} />
+      {(address.countryName != "") && (
+        <>
+      <label><b>Current Address</b></label>
+      <p>
+        {[
+          "'ul. ",
+          address.streetName, " ",
+          address.houseNumber, "/ ",
+          address.apartmentNumber,", ",
+          address.postCode, ", ",
+          address.cityName, " ",
+          address.countryName,"'"
+        ]
+          .filter(Boolean)
+          .join('')}
+      </p>
+      </>
+      )}
 
-      <label>Address (search or edit)</label>
+     <p className="text-gray-700 text-sm italic">Address (search or edit)</p>
       <div id="autocomplete-container" style={{ position: 'relative' }} />
       <label>Apartment Number</label>
       <input
@@ -157,7 +175,7 @@ const RegularProfileForm = ({ initialData, token }: Props) => {
         /> Are you a student?
       </label>
 
-      <label>Skills</label>
+      <label><b>Skills</b></label>
       <div className="grid grid-cols-2 gap-1">
         {skills.map((skill: any) => (
           <label key={skill.skillId} className="text-sm">

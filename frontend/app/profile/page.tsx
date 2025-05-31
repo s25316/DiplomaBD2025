@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import CreateCompanyButton from '@/app/components/buttons/CreateCompanyButton';
+import BaseProfileForm from '../components/forms/BaseProfileForm';
 
 interface CompanyProfile {
   companyId: string;
@@ -65,7 +66,10 @@ const Profile = () => {
       <h1 className="text-2xl font-bold">My Profile</h1>
 
       {isFirstTime ? (
-        <p>No profile data yet.</p>
+        <BaseProfileForm
+            token={session.user.token}
+            onSuccess={() => window.location.reload()}
+          />
       ) : (
         <div className="space-y-2">
           <p><b>Name:</b> {userData.name}</p>
@@ -73,6 +77,22 @@ const Profile = () => {
           <p><b>Email:</b> {userData.contactEmail}</p>
           <p><b>Phone:</b> {userData.phoneNum}</p>
           <p><b>Birth Date:</b> {userData.birthDate?.substring(0, 10)}</p>
+
+          {(userData.address !=null) && (
+          <p><b>Address:</b> 
+            {[
+              " ul.",
+              userData.address.streetName,
+              userData.address.houseNumber, "/",
+              userData.address.apartmentNumber, ",",
+              userData.address.postCode, ",",
+              userData.address.cityName,
+              userData.address.countryName,
+            ]
+              .filter(Boolean)
+              .join(' ')}
+          </p>
+          )}
 
           <p className="mt-4"><b>Skills:</b></p>
           <ul className="list-disc ml-5">

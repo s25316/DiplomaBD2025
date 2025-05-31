@@ -2,7 +2,7 @@
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
 import { useSession } from "next-auth/react";
-import BranchCreateForm from "@/app/components/forms/BranchCreateForm";
+import BranchForm from "@/app/components/forms/BranchForm";
 
 interface Address {
   countryName: string;
@@ -105,7 +105,7 @@ const EditBranch = () => {
     <div className="flex flex-col gap-4">
       <h1>Edit Branch</h1>
       <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-        <BranchCreateForm index={0} getData={handleData} initialData={formState} />
+        <BranchForm index={0} getData={handleData} initialData={formState} />
         <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">Save Changes</button>
       </form>
     </div>

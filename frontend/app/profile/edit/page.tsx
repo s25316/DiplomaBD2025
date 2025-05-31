@@ -8,7 +8,6 @@ const EditProfilePage = () => {
   const { data: session } = useSession();
   const [userData, setUserData] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
-  const router = useRouter();
 
   useEffect(() => {
     const fetchUser = async () => {

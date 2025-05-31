@@ -2,7 +2,8 @@
 import { redirect, useParams, usePathname, useRouter } from 'next/navigation'
 import React, { useState, useRef } from 'react'
 import { useSession } from 'next-auth/react'
-import BranchCreateForm from '@/app/components/forms/BranchCreateForm'
+import BranchCreateForm from '@/app/components/forms/BranchForm'
+import BranchForm from '@/app/components/forms/BranchForm'
 
 interface SendData {
   name: string,
@@ -92,7 +93,7 @@ const createBranch = () => {
             </li>
           ))}
         </ul>
-        <button onClick={() => { setForms([...forms, <BranchCreateForm index={counter} getData={handleData} />]); setCounter(counter + 1) }}>Add branch</button>
+        <button onClick={() => { setForms([...forms, <BranchForm index={counter} getData={handleData} />]); setCounter(counter + 1) }}>Add branch</button>
         <button type='submit'>Create</button>
       </form>
     </div>
