@@ -50,9 +50,7 @@ const EditBranch = () => {
           index: 0,
           name: b.name,
           description: b.description,
-          address: {
-            apartmentNumber: b.address.apartmentNumber,
-          },
+          address: { ...b.address },
         });
 
         sendData.current = {
@@ -93,7 +91,7 @@ const EditBranch = () => {
 
     if (res.ok) {
       alert("Branch updated.");
-      router.push(`/companies/${id}`);
+      router.push(`/companies/${id}/${branchId}`);
     } else {
       alert("Failed to update branch.");
     }
