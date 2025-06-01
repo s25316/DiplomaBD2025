@@ -144,7 +144,7 @@ export const authOptions: AuthOptions = {
   ],
   callbacks: {
 
-    async jwt({ token, user }) {
+    async jwt({ token, user, session, trigger }) {
       if(user?.isNeed2Stage){
         redirect(`/2stage/${user.user2StageData?.urlSegmentPart1}/${user.user2StageData?.urlSegmentPart2}`)
       }

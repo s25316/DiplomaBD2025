@@ -3,6 +3,7 @@ import { signIn, signOut, useSession } from 'next-auth/react'
 import React from 'react'
 import ThemeToggle from './buttons/ThemeToggle';
 import ReturnButton from './buttons/ReturnButton';
+import { useRouter } from 'next/navigation';
 
 const AppBar = () => {
   const { data: session } = useSession();
@@ -17,7 +18,11 @@ const AppBar = () => {
       {session?.user? (
         <>
         <button onClick={() => { window.location.href = '/profile' }}>Profile</button>
-        <button onClick={() => signOut()}>Sign Out</button>
+        <button onClick={() => {
+          signOut()
+          let router = useRouter()
+          router.push("/")
+          }}>Sign Out</button>
         </>
       ) : (
         <>

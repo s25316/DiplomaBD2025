@@ -4,6 +4,7 @@ import React, { FormEvent, useState } from 'react'
 import { usePathname } from 'next/navigation'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
+import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 
 const page = () => {
     const [code, setCode] = useState('')
