@@ -2,15 +2,16 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
+using UseCase.Roles.Administrators.Commands.FaqCommands.Repositories;
 using UseCase.Roles.CompanyUser.Repositories.Branches;
-using UseCase.Roles.CompanyUser.Repositories.Companies;
 using UseCase.Roles.CompanyUser.Repositories.ContractConditions;
 using UseCase.Roles.CompanyUser.Repositories.Offers;
 using UseCase.Roles.CompanyUser.Repositories.OfferTemplates;
-using UseCase.Roles.Users.Repositories;
 using UseCase.Shared.Dictionaries.Repositories;
 using UseCase.Shared.Exceptions;
 using UseCase.Shared.Repositories.Addresses;
+using UseCase.Shared.Repositories.Companies;
+using UseCase.Shared.Repositories.People;
 using UseCase.Shared.Repositories.RecruitmentMessages;
 using UseCase.Shared.Repositories.Recruitments;
 using UseCase.Shared.Services.Authentication.Generators;
@@ -87,7 +88,8 @@ namespace UseCase
             // User
             services.AddTransient<IPersonRepository, PersonRepository>();
 
-            // Guest
+            // Administrator
+            services.AddTransient<IFaqRepository, FaqRepository>();
 
             // Shared
             services.AddTransient<IDictionariesRepository, DictionariesRepository>();

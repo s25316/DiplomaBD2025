@@ -34,5 +34,22 @@ namespace UseCase.Shared.ExtensionMethods.EF.Companies
                     (company.Description != null && company.Description.Contains(word))
                 );
         }
+
+
+        public static Expression<Func<Company, bool>> ShowRemovedExpression(
+            bool? showRemoved)
+        {
+            return company =>
+                !showRemoved.HasValue ||
+                (
+                    (
+                        showRemoved == true &&
+                        company.Removed != null
+                    ) || (
+                        showRemoved == false &&
+                        company.Removed == null
+                    )
+                );
+        }
     }
 }

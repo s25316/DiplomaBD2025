@@ -1,5 +1,7 @@
 ﻿// Ignore Spelling: Jwt
+using Domain.Features.People.DomainEvents.AdministrationEvents;
 using Domain.Features.People.DomainEvents.AuthorizationEvents;
+using Domain.Features.People.DomainEvents.BlockingEvents;
 using Domain.Features.People.DomainEvents.ProfileEvents;
 using Domain.Features.People.Entities;
 using Domain.Features.People.Exceptions;
@@ -85,15 +87,39 @@ namespace Domain.Features.People.Aggregates
         }
 
 
-        public void Block()
+        public void Block(string message)
         {
-            if (Blocked.HasValue)
-            {
-                Blocked = null;
-            }
-            else
+            if (!HasBlocked)
             {
                 Blocked = CustomTimeProvider.Now;
+                AddDomainEvent(PersonBlockedEvent.Prepare(this, message));
+            }
+        }
+
+        public void UnBlock()
+        {
+            if (HasBlocked)
+            {
+                Blocked = null;
+                AddDomainEvent(PersonUnBlockedEvent.Prepare(this));
+            }
+        }
+
+        public void GrandAdministrator()
+        {
+            if (!IsAdministrator)
+            {
+                IsAdministrator = true;
+                AddDomainEvent(PersonAdministrationGrantEvent.Prepare(this));
+            }
+        }
+
+        public void RevokeAdministrator()
+        {
+            if (IsAdministrator)
+            {
+                IsAdministrator = false;
+                AddDomainEvent(PersonAdministrationRevokeEvent.Prepare(this));
             }
         }
 

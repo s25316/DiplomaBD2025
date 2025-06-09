@@ -1,7 +1,7 @@
 ﻿using Domain.Shared.Enums;
 using MediatR;
 using UseCase.Roles.Users.Commands.RegistrationCommands.UserCreatePerson.Request;
-using UseCase.Roles.Users.Repositories;
+using UseCase.Shared.Repositories.People;
 using UseCase.Shared.Responses.ItemResponse;
 using UseCase.Shared.Services.Authentication.Generators;
 using DomainPerson = Domain.Features.People.Aggregates.Person;

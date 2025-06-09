@@ -38,6 +38,14 @@ namespace UseCase.Shared.ExtensionMethods.EF.Companies
             return query.Where(expression);
         }
 
+        public static IQueryable<Company> ShowRemoved(
+            this IQueryable<Company> query,
+            bool? showRemoved)
+        {
+            var expression = CompanyEFExpressions.ShowRemovedExpression(showRemoved);
+            return query.Where(expression);
+        }
+
         public static IQueryable<Company> OrderBy(
             this IQueryable<Company> query,
             CompanyOrderBy orderBy,

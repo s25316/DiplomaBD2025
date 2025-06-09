@@ -3,7 +3,7 @@ using Domain.Shared.Enums;
 using MediatR;
 using UseCase.MongoDb;
 using UseCase.Roles.Users.Commands.RegistrationCommands.UserActivatePerson.Request;
-using UseCase.Roles.Users.Repositories;
+using UseCase.Shared.Repositories.People;
 using UseCase.Shared.Responses.ItemResponse;
 
 namespace UseCase.Roles.Users.Commands.RegistrationCommands.UserActivatePerson

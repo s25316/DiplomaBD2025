@@ -59,7 +59,7 @@ namespace UseCase.Shared.Dictionaries.Repositories
         {
             return await GetDataAsync<Guid, FaqDto, Faq>(
                 selector => selector.FaqId,
-                () => _context.Faqs.AsNoTracking(),
+                () => _context.Faqs.Where(x => x.Removed == null).AsNoTracking(),
                 entity => entity.FaqId);
         }
 

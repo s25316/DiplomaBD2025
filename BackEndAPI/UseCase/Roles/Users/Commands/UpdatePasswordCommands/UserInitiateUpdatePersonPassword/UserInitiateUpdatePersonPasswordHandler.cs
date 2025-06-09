@@ -2,7 +2,7 @@
 using Domain.Shared.ValueObjects.Emails;
 using MediatR;
 using UseCase.Roles.Users.Commands.UpdatePasswordCommands.UserInitiateUpdatePersonPassword.Request;
-using UseCase.Roles.Users.Repositories;
+using UseCase.Shared.Repositories.People;
 using UseCase.Shared.Responses.ItemResponse;
 
 namespace UseCase.Roles.Users.Commands.UpdatePasswordCommands.UserInitiateUpdatePersonPassword

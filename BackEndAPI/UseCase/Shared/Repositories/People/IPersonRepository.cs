@@ -3,7 +3,7 @@ using DomainLogin = Domain.Shared.ValueObjects.Emails.Email;
 using DomainPerson = Domain.Features.People.Aggregates.Person;
 using DomainPersonId = Domain.Features.People.ValueObjects.Ids.PersonId;
 
-namespace UseCase.Roles.Users.Repositories
+namespace UseCase.Shared.Repositories.People
 {
     public interface IPersonRepository
     {

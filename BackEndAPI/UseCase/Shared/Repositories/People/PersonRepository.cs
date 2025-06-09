@@ -14,7 +14,7 @@ using DomainLogin = Domain.Shared.ValueObjects.Emails.Email;
 using DomainPerson = Domain.Features.People.Aggregates.Person;
 using DomainPersonId = Domain.Features.People.ValueObjects.Ids.PersonId;
 
-namespace UseCase.Roles.Users.Repositories
+namespace UseCase.Shared.Repositories.People
 {
     public class PersonRepository : IPersonRepository
     {
@@ -134,14 +134,14 @@ namespace UseCase.Roles.Users.Repositories
             Expression<Func<DatabasePerson, bool>> expression = person =>
                 person.PersonId == itemId ||
                 person.Login == itemLogin ||
-                (
+
                     itemContactEmail != null &&
                     person.ContactEmail == itemContactEmail
-                ) ||
-                (
+                 ||
+
                     itemContactPhoneNumber != null &&
                     person.PhoneNum == itemContactPhoneNumber
-                );
+                ;
 
             var people = await _context.People
                 .Include(p => p.Urls)

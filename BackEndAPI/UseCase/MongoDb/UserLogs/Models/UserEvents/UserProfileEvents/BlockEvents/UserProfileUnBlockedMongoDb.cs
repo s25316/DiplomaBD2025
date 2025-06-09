@@ -1,4 +1,5 @@
 ﻿// Ignore Spelling: Mongo, Json
+using Domain.Features.People.DomainEvents.BlockingEvents;
 using UseCase.MongoDb.Enums;
 
 namespace UseCase.MongoDb.UserLogs.Models.UserEvents.UserProfileEvents.BlockEvents
@@ -6,11 +7,11 @@ namespace UseCase.MongoDb.UserLogs.Models.UserEvents.UserProfileEvents.BlockEven
     public class UserProfileUnBlockedMongoDb : BaseUserLogMongoDb
     {
         // Static Methods
-        public static UserProfileUnBlockedMongoDb Prepare(Guid userId)
+        public static implicit operator UserProfileUnBlockedMongoDb(PersonUnBlockedEvent @event)
         {
             return new UserProfileUnBlockedMongoDb
             {
-                UserId = userId,
+                UserId = @event.UserId,
                 TypeId = typeof(UserProfileUnBlockedMongoDb).GetMongoLog(),
             };
         }

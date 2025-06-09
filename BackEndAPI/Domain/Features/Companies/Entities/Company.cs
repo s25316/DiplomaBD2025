@@ -1,5 +1,6 @@
 ﻿// Ignore Spelling: Regon Krs
 
+using Domain.Features.Companies.DomainEvents;
 using Domain.Features.Companies.Exceptions;
 using Domain.Features.Companies.ValueObjects.Ids;
 using Domain.Features.Companies.ValueObjects.Krss;
@@ -26,13 +27,27 @@ namespace Domain.Features.Companies.Entities
         public DateTime? Removed { get; private set; }
         public DateTime? Blocked { get; private set; }
 
+        // Computed Properties
+        public bool IsBlocked => Blocked.HasValue;
+
 
         // Public Methods
-        public void Remove()
+        public void Block(string message)
         {
-            Removed = Removed.HasValue
-                ? null
-                : CustomTimeProvider.Now;
+            if (!IsBlocked)
+            {
+                Blocked = CustomTimeProvider.Now;
+                AddDomainEvent(CompanyBlockedEvent.Prepare(this, message));
+            }
+        }
+
+        public void UnBlock()
+        {
+            if (IsBlocked)
+            {
+                Blocked = null;
+                AddDomainEvent(CompanyUnBlockedEvent.Prepare(this));
+            }
         }
 
         // Private Methods

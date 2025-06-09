@@ -70,6 +70,15 @@ namespace Domain {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Not set ID.
+        /// </summary>
+        internal static string Enitity_Company_NotInitializedId {
+            get {
+                return ResourceManager.GetString("Enitity_Company_NotInitializedId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Empty Login.
         /// </summary>
         internal static string Enitity_Person_EmptyLogin {

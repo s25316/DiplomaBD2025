@@ -4,7 +4,7 @@ using Domain.Shared.Enums;
 using MediatR;
 using UseCase.MongoDb;
 using UseCase.Roles.Users.Commands.AuthorizationCommands.UserLogOut.Request;
-using UseCase.Roles.Users.Repositories;
+using UseCase.Shared.Repositories.People;
 using UseCase.Shared.Responses.ItemResponse;
 using UseCase.Shared.Services.Authentication.Inspectors;
 using DomainPerson = Domain.Features.People.Aggregates.Person;

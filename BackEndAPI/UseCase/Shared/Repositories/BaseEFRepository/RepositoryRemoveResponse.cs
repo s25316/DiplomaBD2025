@@ -24,7 +24,7 @@ namespace UseCase.Shared.Repositories.BaseEFRepository
             var intCode = (int)code;
             return new RepositoryRemoveResponse
             {
-                Code = HttpCode.Ok,
+                Code = code,
                 Metadata = new ResultMetadata
                 {
                     IsCorrect = intCode >= 200 && intCode < 300,

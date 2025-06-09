@@ -1,13 +1,13 @@
 ﻿// Ignore Spelling: Middlewares, Middleware, Mongo
-using System.Security.Claims;
-using UseCase.MongoDb;
 using UseCase.Shared.Services.Authentication.Inspectors;
 
 namespace BackEndAPI.Middlewares.Authorization
 {
     public class UserAuthorizationMiddleware
     {
+        // Properties
         private static readonly string _authorizationHeader = "Authorization";
+        private static readonly string _bearerString = "Bearer";
         private readonly RequestDelegate _next;
 
 
@@ -17,56 +17,39 @@ namespace BackEndAPI.Middlewares.Authorization
             _next = next;
         }
 
+
+        // Methods
         public async Task Invoke(
             HttpContext context,
-            IMongoDbService mongoService,
             IAuthenticationInspectorService authenticationInspector)
         {
-
-            context.Items["IsAdmin"] = null;
-            if (context.Request.Headers.TryGetValue(_authorizationHeader, out var authorizationHeader))
+            var jwt = GetJwt(context);
+            if (!string.IsNullOrWhiteSpace(jwt) &&
+                !authenticationInspector.IsValidJwt(jwt, true))
             {
-                var jwt = authorizationHeader
-                    .ToString()
-                    .Replace("Bearer", "")
-                    .Trim();
-
-                if (!authenticationInspector.IsValidJwt(jwt, true))
-                {
-                    RemoveHeader(context, _authorizationHeader);
-                }
-
-                var personId = authenticationInspector.GetClaimsName(jwt, true)
-                    ?? throw new Exception("Something Changed in JWT Generation");
-
-                var userMiddlewareData = await mongoService.GetUserMiddlewareDataAsync(
-                    Guid.Parse(personId),
-                    jwt,
-                    CancellationToken.None);
-
-                if (userMiddlewareData.HasRemoved ||
-                    userMiddlewareData.HasBlocked ||
-                    userMiddlewareData.HasLogOut)
-                {
-                    RemoveHeader(context, _authorizationHeader);
-
-                    Console.WriteLine(context.Request.Headers.ContainsKey(_authorizationHeader));
-                }
-                if (userMiddlewareData.IsAdmin)
-                {
-                    context.Items["IsAdmin"] = true;
-                }
+                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                return;
             }
+
             await _next(context);
         }
 
-        private static void RemoveHeader(HttpContext context, string header)
+        private static string? GetJwt(HttpContext context)
         {
-            if (context.Request.Headers.ContainsKey(header))
+            if (!context.Request.Headers.TryGetValue(
+                _authorizationHeader,
+                out var authorizationHeader))
             {
-                context.Request.Headers.Remove(header);
-                context.User = new ClaimsPrincipal(new ClaimsIdentity());
+                return null;
             }
+            var authHeaderValue = authorizationHeader.ToString();
+            if (!authHeaderValue.StartsWith(
+                _bearerString,
+                StringComparison.OrdinalIgnoreCase))
+            {
+                throw new Exception($"Someone wrote invalid \"{_authorizationHeader}\"");
+            }
+            return authHeaderValue.Substring(_bearerString.Length).Trim();
         }
     }
 }

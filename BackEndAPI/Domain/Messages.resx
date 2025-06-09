@@ -120,6 +120,9 @@
   <data name="Enitity_Branch_EmptyName" xml:space="preserve">
     <value>Branch name can not be empty</value>
   </data>
+  <data name="Enitity_Company_NotInitializedId" xml:space="preserve">
+    <value>Not set ID</value>
+  </data>
   <data name="Enitity_Person_EmptyLogin" xml:space="preserve">
     <value>Empty Login</value>
   </data>

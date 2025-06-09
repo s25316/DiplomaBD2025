@@ -2,7 +2,7 @@
 using Domain.Shared.Enums;
 using MediatR;
 using UseCase.Roles.CompanyUser.Commands.CompanyCommands.CompanyUserCreateCompanies.Request;
-using UseCase.Roles.CompanyUser.Repositories.Companies;
+using UseCase.Shared.Repositories.Companies;
 using UseCase.Shared.Responses.CommandResults;
 using UseCase.Shared.Responses.ItemResponse;
 using UseCase.Shared.Services.Authentication.Inspectors;

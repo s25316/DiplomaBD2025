@@ -8,8 +8,8 @@ using UseCase.MongoDb.UserLogs.DTOs.UserAuthorizationDtos;
 using UseCase.Roles.Users.Commands.AuthorizationCommands.SharedResponses;
 using UseCase.Roles.Users.Commands.AuthorizationCommands.UserLoginIn.Request;
 using UseCase.Roles.Users.Commands.AuthorizationCommands.UserLoginIn.Response;
-using UseCase.Roles.Users.Repositories;
 using UseCase.Shared.Exceptions;
+using UseCase.Shared.Repositories.People;
 using UseCase.Shared.Services.Authentication.Generators;
 using DomainPerson = Domain.Features.People.Aggregates.Person;
 

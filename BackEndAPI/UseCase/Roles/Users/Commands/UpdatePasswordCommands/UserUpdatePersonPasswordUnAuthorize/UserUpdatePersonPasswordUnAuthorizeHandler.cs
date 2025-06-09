@@ -3,8 +3,8 @@ using Domain.Shared.Enums;
 using MediatR;
 using UseCase.MongoDb;
 using UseCase.Roles.Users.Commands.UpdatePasswordCommands.UserUpdatePersonPasswordUnAuthorize.Request;
-using UseCase.Roles.Users.Repositories;
 using UseCase.Shared.Exceptions;
+using UseCase.Shared.Repositories.People;
 using UseCase.Shared.Responses.ItemResponse;
 using UseCase.Shared.Services.Authentication.Generators;
 

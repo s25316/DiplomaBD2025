@@ -5,8 +5,8 @@ using MediatR;
 using UseCase.MongoDb;
 using UseCase.Roles.Users.Commands.AuthorizationCommands.SharedResponses;
 using UseCase.Roles.Users.Commands.AuthorizationCommands.User2StageAuthorization.Request;
-using UseCase.Roles.Users.Repositories;
 using UseCase.Shared.Exceptions;
+using UseCase.Shared.Repositories.People;
 using UseCase.Shared.Services.Authentication.Generators;
 using DomainPerson = Domain.Features.People.Aggregates.Person;
 

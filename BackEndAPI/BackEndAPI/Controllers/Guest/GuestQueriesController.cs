@@ -13,7 +13,7 @@ using UseCase.Roles.Guests.Queries.GuestGetOfferTemplates.Request;
 using UseCase.Shared.Enums;
 using UseCase.Shared.Requests.QueryParameters;
 
-namespace BackEndAPI.Controllers
+namespace BackEndAPI.Controllers.Guest
 {
     [Route("api/[controller]")]
     [ApiController]

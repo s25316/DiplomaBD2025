@@ -25,7 +25,7 @@ using UseCase.Roles.Users.Queries.GetPersonRecruitments.Request;
 using UseCase.Shared.Requests;
 using UseCase.Shared.Requests.QueryParameters;
 
-namespace BackEndAPI.Controllers
+namespace BackEndAPI.Controllers.User
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -278,6 +278,9 @@ namespace BackEndAPI.Controllers
         public async Task<IActionResult> GetPersonProfileAsync(
             CancellationToken cancellationToken)
         {
+
+            Console.WriteLine(string.Join("\n", HttpContext.User.Claims.Select(x => x.ToString())));
+
             var request = new GetPersonProfileRequest
             {
                 Metadata = (RequestMetadata)HttpContext,
