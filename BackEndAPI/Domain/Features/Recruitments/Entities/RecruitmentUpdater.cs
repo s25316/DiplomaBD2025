@@ -15,12 +15,6 @@ namespace Domain.Features.Recruitments.Entities
             public Updater(Recruitment value) : base(value) { }
 
             // Public Methods
-            public Updater SetId(Guid id)
-            {
-                SetProperty(recruitment => recruitment.Id = id);
-                return this;
-            }
-
             public Updater SetFile(string file)
             {
                 SetProperty(recruitment => recruitment.SetFile(file));

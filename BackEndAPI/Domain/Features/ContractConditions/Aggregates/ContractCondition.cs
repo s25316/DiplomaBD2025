@@ -147,6 +147,5 @@ namespace Domain.Features.ContractConditions.Aggregates
                 Removed = item.Removed,
             };
         }
-
     }
 }

@@ -22,7 +22,7 @@ namespace Domain.Features.People.ValueObjects.PhoneNumbers
                 throw new PhoneNumberException(
                     $"{Messages.Record_PhoneNumber_Invalid}: {value}");
             }
-            Value = value;
+            Value = normalizeValue;
         }
 
         // Methods

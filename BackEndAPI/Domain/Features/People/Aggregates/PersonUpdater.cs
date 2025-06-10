@@ -30,12 +30,6 @@ namespace Domain.Features.People.Aggregates
                 return this;
             }
 
-            public Updater SetAuthenticationData(string salt, string password)
-            {
-                SetProperty(person => person.SetAuthenticationData(salt, password));
-                return this;
-            }
-
             public Updater SetHasTwoFactorAuthentication(bool isTwo)
             {
                 SetProperty(person => person.HasTwoFactorAuthentication = isTwo);
@@ -45,18 +39,6 @@ namespace Domain.Features.People.Aggregates
             public Updater SetIsStudent(bool isStudent)
             {
                 SetProperty(person => person.IsStudent = isStudent);
-                return this;
-            }
-
-            public Updater SetIsAdministrator(bool isAdministrator)
-            {
-                SetProperty(person => person.IsAdministrator = isAdministrator);
-                return this;
-            }
-
-            public Updater SetLogo(string? logo)
-            {
-                SetProperty(person => person.Logo = logo);
                 return this;
             }
 
