@@ -38,6 +38,8 @@ public partial class Person
 
     public DateTime? Removed { get; set; }
 
+    public bool IsIndividual { get; set; }
+
     public virtual Address? Address { get; set; }
 
     public virtual ICollection<CompanyPerson> CompanyPeople { get; set; } = new List<CompanyPerson>();

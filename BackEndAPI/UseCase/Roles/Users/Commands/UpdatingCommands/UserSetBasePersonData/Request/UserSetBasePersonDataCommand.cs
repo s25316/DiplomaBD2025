@@ -14,6 +14,9 @@ namespace UseCase.Roles.Users.Commands.UpdatingCommands.UserSetBasePersonData.Re
         [EmailAddress]
         public required string ContactEmail { get; init; }
 
+        [Required]
+        public required bool IsIndividual { get; init; }
+
         public DateTime? BirthDate { get; init; }
     }
 }

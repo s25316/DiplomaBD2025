@@ -24,6 +24,12 @@ namespace Domain.Features.People.Aggregates
                 return this;
             }
 
+            public Updater SetIsIndividual(bool isIndividual)
+            {
+                SetProperty(person => person.IsIndividual = isIndividual);
+                return this;
+            }
+
             public Updater SetLogin(string login)
             {
                 SetProperty(person => person.SetLogin(login));

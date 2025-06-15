@@ -94,7 +94,8 @@ CONSTRAINT People_Default_PersonId DEFAULT NEWID() FOR [PersonId],
 CONSTRAINT People_Default_Created DEFAULT GETDATE() FOR [Created],
 CONSTRAINT People_Default_IsTwoFactorAuth DEFAULT 0 FOR [IsTwoFactorAuth],
 CONSTRAINT People_Default_IsStudent DEFAULT 0 FOR [IsStudent],
-CONSTRAINT People_Default_IsAdmin DEFAULT 0 FOR [IsAdmin];
+CONSTRAINT People_Default_IsAdmin DEFAULT 0 FOR [IsAdmin],
+CONSTRAINT People_Default_IsIndividual DEFAULT 0 FOR [IsIndividual];
 --======================================================================================
 --[Urls]
 --Create

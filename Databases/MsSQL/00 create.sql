@@ -1,5 +1,5 @@
 -- Created by Vertabelo (http://vertabelo.com)
--- Last modification date: 2025-05-22 14:44:38.816
+-- Last modification date: 2025-06-15 12:59:20.713
 
 -- tables
 -- Table: Addresses
@@ -265,6 +265,7 @@ CREATE TABLE People (
     Created datetime  NOT NULL,
     Blocked datetime  NULL,
     Removed datetime  NULL,
+    IsIndividual bit  NOT NULL,
     CONSTRAINT People_pk PRIMARY KEY  (PersonId)
 );
 

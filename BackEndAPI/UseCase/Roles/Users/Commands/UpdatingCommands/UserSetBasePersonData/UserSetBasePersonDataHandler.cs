@@ -69,7 +69,8 @@ namespace UseCase.Roles.Users.Commands.UpdatingCommands.UserSetBasePersonData
             var updater = new DomainPerson.Updater(domain)
                 .SetName(request.Command.Name)
                 .SetSurname(request.Command.Surname)
-                .SetContactEmail(request.Command.ContactEmail);
+                .SetContactEmail(request.Command.ContactEmail)
+                .SetIsIndividual(request.Command.IsIndividual);
 
             if (request.Command.BirthDate.HasValue)
             {

@@ -250,6 +250,7 @@ namespace UseCase.Shared.Repositories.People
             database.Created = domain.Created;
             database.Blocked = domain.Blocked;
             database.Removed = domain.Removed;
+            database.IsIndividual = domain.IsIndividual;
 
             var skillsDictionary = database.PersonSkills
                 .Where(s => s.Removed == null)

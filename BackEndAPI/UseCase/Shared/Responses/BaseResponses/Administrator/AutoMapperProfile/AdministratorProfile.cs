@@ -14,6 +14,7 @@ namespace UseCase.Shared.Responses.BaseResponses.Administrator.AutoMapperProfile
             CreateMap<Person, AdministratorPersonProfile>()
                .ConstructUsing((db, context) => new AdministratorPersonProfile
                {
+                   IsIndividual = db.IsIndividual,
                    PersonId = db.PersonId,
                    Login = db.Login,
                    Logo = db.Logo,

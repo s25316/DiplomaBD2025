@@ -27,6 +27,7 @@ namespace Domain.Features.People.Aggregates
         public string Password { get; private set; } = null!;
         public bool HasTwoFactorAuthentication { get; private set; } = false;
         public bool IsStudent { get; private set; } = false;
+        public bool IsIndividual { get; private set; } = false;
         public bool IsAdministrator { get; private set; } = false;
         public DateTime Created { get; private set; }
         public DateTime? Removed { get; private set; } = null;

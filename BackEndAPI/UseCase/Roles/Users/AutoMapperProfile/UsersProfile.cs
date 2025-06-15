@@ -48,6 +48,7 @@ namespace UseCase.Roles.Users.AutoMapperProfile
                     .SetAuthenticationData(db.Salt, db.Password)
                     .SetHasTwoFactorAuthentication(db.IsTwoFactorAuth)
                     .SetIsStudent(db.IsStudent)
+                    .SetIsIndividual(db.IsIndividual)
                     .SetIsAdministrator(db.IsAdmin)
                     .SetCreated(db.Created)
                     .SetRemoved(db.Removed)

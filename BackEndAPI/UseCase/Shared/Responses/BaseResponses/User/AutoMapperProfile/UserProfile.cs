@@ -12,6 +12,7 @@ namespace UseCase.Shared.Responses.BaseResponses.User.AutoMapperProfile
             CreateMap<Person, UserPersonProfile>()
                 .ConstructUsing((db, context) => new UserPersonProfile
                 {
+                    IsIndividual = db.IsIndividual,
                     Logo = db.Logo,
                     Name = db.Name,
                     Surname = db.Surname,

@@ -24,6 +24,12 @@ namespace Domain.Features.People.Aggregates
                 return this;
             }
 
+            public Builder SetIsIndividual(bool isIndividual)
+            {
+                SetProperty(person => person.IsIndividual = isIndividual);
+                return this;
+            }
+
             public Builder SetLogin(string login)
             {
                 SetProperty(person => person.SetLogin(login));

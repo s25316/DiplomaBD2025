@@ -109,7 +109,7 @@ services:
 
   Diploma_Kafka:
     container_name: Diploma_Kafka
-    image: confluentinc/cp-kafka:latest
+    image: confluentinc/cp-kafka:7.0.0
     ports:
       - "9092:9092"
       - "9093:9093"

@@ -1,5 +1,5 @@
 -- Created by Vertabelo (http://vertabelo.com)
--- Last modification date: 2025-05-22 14:44:38.816
+-- Last modification date: 2025-06-15 12:59:20.713
 
 -- foreign keys
 ALTER TABLE Addresses DROP CONSTRAINT Addresses_Cities;

@@ -20,6 +20,8 @@ namespace UseCase.Shared.Responses.BaseResponses.User
 
         public bool IsTwoFactorAuth { get; init; }
 
+        public required bool IsIndividual { get; init; }
+
         public bool IsStudent { get; init; }
 
         public bool IsAdmin { get; init; }
