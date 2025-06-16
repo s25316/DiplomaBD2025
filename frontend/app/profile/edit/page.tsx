@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import RegularProfileForm from '@/app/components/forms/RegularProfileForm';
-import { useRouter } from 'next/navigation';
 
 const EditProfilePage = () => {
   const { data: session } = useSession();

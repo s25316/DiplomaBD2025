@@ -11,13 +11,31 @@ const BaseProfileForm = ({ onSuccess, token }: Props) => {
     name: '',
     surname: '',
     contactEmail: '',
-    birthDate: ''
+    birthDate: '',
+    isIndividual: false,
   });
 
   const [confirming, setConfirming] = useState(false);
+  const [dateError, setDateError] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value, type, checked } = e.target;
+
+    const newValue = type === 'checkbox' ? checked : value;
+
+    if (name === 'birthDate') {
+      const selectedDate = new Date(value);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // remove time component
+
+      if (selectedDate >= today) {
+        setDateError('Birth date must be in the past.');
+      } else {
+        setDateError(null);
+      }
+    }
+
+    setForm({ ...form, [name]: newValue });
   };
 
   const submitConfirmed = async () => {
@@ -38,17 +56,28 @@ const BaseProfileForm = ({ onSuccess, token }: Props) => {
     }
   };
   const handleSubmit = () => {
+    if (!form.name || !form.surname || !form.birthDate || dateError) {
+      alert('Please fill all required fields with valid values.');
+      return;
+    }
     setConfirming(true);
   };
 
   return (
     <div className="max-w-md p-4 border rounded shadow">
       <h2 className="text-lg font-bold mb-2">Complete your basic profile</h2>
+      <br/>
+      <label className="flex items-center gap-2 mb-2">
+        <input type="checkbox" name="isIndividual" checked={form.isIndividual} onChange={handleChange}/>
+        Create an individual profile
+      </label>
       <input name="name" placeholder="Name" onChange={handleChange} value={form.name} className="mb-2 w-full border p-1" />
       <input name="surname" placeholder="Surname" onChange={handleChange} value={form.surname} className="mb-2 w-full border p-1" />
       <input name="contactEmail" placeholder="Email" onChange={handleChange} value={form.contactEmail} className="mb-2 w-full border p-1" />
       <input type="date" name="birthDate" onChange={handleChange} value={form.birthDate} className="mb-2 w-full border p-1" />
       
+
+
       {!confirming ? (
         <button onClick={handleSubmit} className="bg-blue-600 text-white px-4 py-2 rounded">Submit</button>
       ) : (
@@ -59,6 +88,8 @@ const BaseProfileForm = ({ onSuccess, token }: Props) => {
           <ul className="list-disc ml-5 text-sm text-yellow-700">
             <li><b>Name:</b> {form.name || <i>(empty)</i>}</li>
             <li><b>Surname:</b> {form.surname || <i>(empty)</i>}</li>
+            <br/>
+            <li><b> {form.isIndividual ? 'Individual account' : 'Company account'}</b></li>
           </ul>
           <div className="mt-4 flex gap-3">
             <button onClick={submitConfirmed} className="bg-green-600 text-white px-4 py-1 rounded" >

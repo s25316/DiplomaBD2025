@@ -31,7 +31,7 @@ interface ContractCondition {
     <>
       <ul>
         {contractConditions.map((cond) => (
-          <li key={cond.contractConditionId} className="border p-3 rounded my-2 max-w-md">
+          <li key={cond.contractConditionId} className="border p-2 rounded my-2 max-w-md">
             <p><b>Hours/Term:</b> {cond.hoursPerTerm}</p>
             <p><b>Salary:</b> {cond.salaryMin} – {cond.salaryMax} {cond.currency.name} ({cond.salaryTerm.name})</p>
             <p><b>Negotiable:</b> {cond.isNegotiable ? "Yes" : "No"}</p>

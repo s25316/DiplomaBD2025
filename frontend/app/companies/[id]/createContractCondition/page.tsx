@@ -38,7 +38,7 @@ const CreateContractConditionPage = () => {
   };
 
   return (
-    <div>
+    <div className="max-w-xl mx-auto">
       <h1>Create Contract Condition</h1>
       <ContractConditionForm onSubmit={handleSubmit} parameters={parameters} submitText="Create" />
     </div>

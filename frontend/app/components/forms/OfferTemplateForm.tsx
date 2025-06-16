@@ -95,7 +95,6 @@ const OfferTemplateForm = ({
                     </label>
                 )}
                 </div>
-
               );
             })}
           </div>

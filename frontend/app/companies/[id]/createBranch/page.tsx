@@ -74,7 +74,7 @@ const createBranch = () => {
   }
 
   return (
-    <div className='flex flex-col gap-4'>
+    <div className="max-w-xl mx-auto">
       <h1>Create Branch</h1>
       <form className='flex flex-col gap-4' onSubmit={handleSubmit}>
         <ul>

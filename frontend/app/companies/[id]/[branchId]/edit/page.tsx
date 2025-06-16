@@ -100,7 +100,7 @@ const EditBranch = () => {
   if (!formState) return <div>Loading...</div>;
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="max-w-xl mx-auto">
       <h1>Edit Branch</h1>
       <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
         <BranchForm index={0} getData={handleData} initialData={formState} />

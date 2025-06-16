@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 interface Props {
   onSubmit: (form: ContractConditionFormData) => Promise<void>;
@@ -107,23 +107,25 @@ return (
     <label>Min salary: 
     <input type="number" name="salaryMin" value={form.salaryMin} onChange={handleChange} placeholder="Salary Min" />
     </label>
+
     <label>Max salary: 
     <input type="number" name="salaryMax" value={form.salaryMax} onChange={handleChange} placeholder="Salary Max" />
     </label>
+
     <label>
       Salary Term:
       <select name="salaryTermId" value={form.salaryTermId} onChange={handleChange}>
         {getOptions('Salary Term')}
       </select>
     </label>
+
     <label>Hours per term:
     <input type="number" name="hoursPerTerm" value={form.hoursPerTerm} onChange={handleChange} placeholder="Hours" />
     </label>
+
     <label>
       <input type="checkbox" name="isNegotiable" checked={form.isNegotiable} onChange={handleChange} /> Negotiable
     </label>
-
-    
 
     <label>
       Currency:

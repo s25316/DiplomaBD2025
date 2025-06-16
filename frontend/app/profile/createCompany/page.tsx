@@ -77,7 +77,7 @@ const CreateCompany = () => {
   };
 
   return (
-    <div>
+    <div className="max-w-xl mx-auto">
       <h1>Create Company</h1>
 
       {/* Błędy walidacji */}

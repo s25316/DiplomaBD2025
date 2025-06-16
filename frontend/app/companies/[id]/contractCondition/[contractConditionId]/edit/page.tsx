@@ -66,7 +66,7 @@ const EditContractConditionPage = () => {
   };
 
   return (
-    <div>
+    <div className="max-w-xl mx-auto">
       <h1>Edit Contract Condition</h1>
       {initialData && (
         <ContractConditionForm

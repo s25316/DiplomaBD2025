@@ -21,11 +21,13 @@ const OfferTemplatesList = ({
     <>
       <ul>
         {templates.map((t) => (
-          <li key={t.offerTemplateId} className="border p-3 rounded my-2 max-w-md">
+          <li key={t.offerTemplateId} className="border p-2 rounded my-2 max-w-md">
+            <div className="flex justify-between items-center">
+            
             <Link href={`/companies/${id}/templates/${t.offerTemplateId}`}>
               <b>{t.name}</b>
             </Link>
-            <div className="mt-2 flex gap-2">
+            <div className="flex gap">
               <button
                 onClick={() => router.push(`/companies/${id}/templates/${t.offerTemplateId}/edit`)}
                 className="bg-blue-500 text-white px-2 py-1 rounded"
@@ -51,6 +53,7 @@ const OfferTemplatesList = ({
               }}
                 className="ml-4 bg-red-500 text-white px-2 py-1 rounded"> Delete
               </button>
+            </div>
             </div>
           </li>
         ))}

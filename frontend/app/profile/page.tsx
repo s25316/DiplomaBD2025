@@ -1,5 +1,4 @@
 'use client';
-
 import React, { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
@@ -72,6 +71,7 @@ const Profile = () => {
           />
       ) : (
         <div className="space-y-2">
+          <h2><b> {userData.isIndividual ? 'Individual account' : 'Company account'} </b></h2>
           <p><b>Name:</b> {userData.name}</p>
           <p><b>Surname:</b> {userData.surname}</p>
           <p><b>Email:</b> {userData.contactEmail}</p>
@@ -118,8 +118,9 @@ const Profile = () => {
       )}
 
       {/* Companies */}
+      {(userData.isIndividual===false) && (
       <div>
-        <h2 className="text-xl font-semibold mt-8 mb-2">My Companies</h2>
+        <h2 className="text-xl font-semibold mt-8 mb-2">Companies templates</h2>
         {companies.length > 0 ? (
           <ul className="space-y-2">
             {companies.map((company) => (
@@ -131,12 +132,13 @@ const Profile = () => {
             ))}
           </ul>
         ) : (
-          <p>You don’t own any companies yet.</p>
+          <p>You did not register any company template.</p>
         )}
         <div className="mt-4">
           <CreateCompanyButton />
         </div>
       </div>
+      )}
     </div>
   );
 };

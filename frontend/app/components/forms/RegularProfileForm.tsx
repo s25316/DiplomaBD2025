@@ -4,7 +4,6 @@ import { useRouter } from 'next/navigation';
 import { GeocoderAutocomplete } from '@geoapify/geocoder-autocomplete';
 import '@geoapify/geocoder-autocomplete/styles/round-borders.css';
 
-
 interface Props {
   initialData: any;
   token: string;
@@ -117,7 +116,6 @@ const RegularProfileForm = ({ initialData, token }: Props) => {
     }));
   };
 
-
   return (
     <div className="flex flex-col gap-4 mt-4 max-w-2xl">
       <label><b>Description</b></label>
@@ -132,25 +130,23 @@ const RegularProfileForm = ({ initialData, token }: Props) => {
       <label><b>Birth Date</b></label>
       <input type="date" value={form.birthDate} onChange={(e) => setForm({ ...form, birthDate: e.target.value })} />
       {(address.countryName != "") && (
-        <>
-      <label><b>Current Address</b></label>
-      <p>
+        <div className="text-sm text-gray-700 italic mb-2">
+          <b>Current address:</b><br />
+
         {[
-          "'ul. ",
-          address.streetName, " ",
-          address.houseNumber, "/ ",
-          address.apartmentNumber,", ",
-          address.postCode, ", ",
-          address.cityName, " ",
-          address.countryName,"'"
+          "ul.",
+          address.streetName,
+          address.houseNumber, "/",
+          address.apartmentNumber,",",
+          address.postCode, ",",
+          address.cityName,
+          address.countryName,
         ]
           .filter(Boolean)
-          .join('')}
-      </p>
-      </>
+          .join(' ')}
+      </div>
       )}
 
-     <p className="text-gray-700 text-sm italic">Address (search or edit)</p>
       <div id="autocomplete-container" style={{ position: 'relative' }} />
       <label>Apartment Number</label>
       <input
