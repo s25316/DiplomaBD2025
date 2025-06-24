@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { GeocoderAutocomplete } from '@geoapify/geocoder-autocomplete';
 import '@geoapify/geocoder-autocomplete/styles/round-borders.css';
 
+
 interface Props {
   initialData: any;
   token: string;

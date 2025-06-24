@@ -24,6 +24,9 @@ interface BranchDetailsType {
     lat: number;
   };
 }
+interface CompanyName {
+  name: string;
+}
 
 interface OfferFull {
   offer: {
@@ -53,6 +56,8 @@ const BranchDetails = () => {
   const { data: session } = useSession();
 
   const [branchData, setBranchData] = useState<BranchDetailsType | null>(null);
+  const [companyData, setCompanyData] = useState<CompanyName | null>(null);
+
   const [offers, setOffers] = useState<OfferFull[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<number | null>(null);
@@ -81,6 +86,7 @@ const BranchDetails = () => {
         if (!branchRes.ok) throw new Error('Failed to fetch branch details');
         const branchJson = await branchRes.json();
         setBranchData(branchJson.items[0]?.branch);
+        setCompanyData(branchJson.items[0]?.company);
 
         if (!offersRes.ok) throw new Error('Failed to fetch offers');
         const offersJson = await offersRes.json();
@@ -126,6 +132,11 @@ const BranchDetails = () => {
       <h1>Branch Details</h1>
       <br />
       <p><b>Name:</b> {branchData.name}</p>
+      <p>
+        <Link href={`/companies/${id}`} >
+        <b>Company:</b> {companyData?.name}
+        </Link>
+        </p>
       {branchData.desciption && <p><b>Description:</b> {branchData.desciption}</p>}
       <div className="mb-2">
         <p><b>Address:</b></p>

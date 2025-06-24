@@ -55,7 +55,7 @@ const Profile = () => {
     fetchData();
   }, [session]);
 
-  if (!session?.user?.token) return <p>Unauthorized</p>;
+  if (!session?.user?.token) return <p>Unauthorized/Loading...</p>;
   if (loading) return <p>Loading...</p>;
 
   const isFirstTime = !userData?.name;

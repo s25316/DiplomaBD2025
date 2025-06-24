@@ -43,7 +43,7 @@ const OfferDetails = () => {
   if (error) return <div>Error: {error}</div>;
   if (!data) return <div>Loading...</div>;
 
-  const { offer, offerTemplate, contractConditions } = data;
+  const {company, branch, offer, offerTemplate, contractConditions } = data;
 
   const handleDelete = async () => {
     const confirmed = confirm('Are you sure you want to delete this offer?');
@@ -67,7 +67,16 @@ const OfferDetails = () => {
   return (
     <div className="max-w-2xl mx-auto">
       <h1 className="text-2xl font-bold mb-4">Offer Details</h1>
-
+      <p>
+        <Link href={`/companies/${id}`} >
+        <b>Company:</b> {company?.name}
+        </Link>
+      </p>
+      <p>
+        <Link href={`/companies/${id}/${branchId}`} >
+        <b>Branch:</b> {branch?.name}
+        </Link>
+      </p>
       <p><b>Status:</b> {offer.status}</p>
       
 
