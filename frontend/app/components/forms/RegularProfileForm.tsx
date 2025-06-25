@@ -3,41 +3,101 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { GeocoderAutocomplete } from '@geoapify/geocoder-autocomplete';
 import '@geoapify/geocoder-autocomplete/styles/round-borders.css';
+import { UserProfile } from '@/app/profile/edit/page';
 
-
-interface Props {
-  initialData: any;
+interface RegularProfileFormProps {
+  initialData: UserProfile;
   token: string;
 }
 
-const RegularProfileForm = ({ initialData, token }: Props) => {
-  const [skills, setSkills] = useState([]);
-  const [urlTypes, setUrlTypes] = useState([]);
+interface SkillOption {
+    skillId: number;
+    name: string;
+}
+
+interface UrlTypeOption {
+    urlTypeId: number;
+    name: string;
+}
+
+interface FormUrl {
+    value: string;
+    urlTypeId: number;
+}
+
+interface ProfileUpdatePayload {
+    description: string;
+    contactEmail: string;
+    contactPhoneNumber: string;
+    birthDate: string;
+    isTwoFactorAuthentication: boolean;
+    isStudent: boolean;
+    skillsIds: number[];
+    urls: FormUrl[];
+    address: {
+        countryName: string;
+        stateName: string;
+        cityName: string;
+        streetName: string;
+        houseNumber: string;
+        apartmentNumber: string | null;
+        postCode: string;
+        lon: number;
+        lat: number;
+    } | null;
+}
+
+const RegularProfileForm = ({ initialData, token }: RegularProfileFormProps) => {
+
+  const [skills, setSkills] = useState<SkillOption[]>([]);
+  const [urlTypes, setUrlTypes] = useState<UrlTypeOption[]>([]);
   const router = useRouter();
 
-  const [address, setAddress] = useState({
-    countryName: initialData.address?.countryName || '',
-    stateName: initialData.address?.stateName || '',
-    cityName: initialData.address?.cityName || '',
-    streetName: initialData.address?.streetName || '',
-    houseNumber: initialData.address?.houseNumber || '',
-    apartmentNumber: initialData.address?.apartmentNumber || '',
-    postCode: initialData.address?.postCode || '',
-    lon: initialData.address?.lon || 0,
-    lat: initialData.address?.lat || 0,
-  });
-
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<ProfileUpdatePayload>({
     description: initialData.description || '',
     contactEmail: initialData.contactEmail || '',
     contactPhoneNumber: initialData.phoneNum || '',
     birthDate: initialData.birthDate?.substring(0, 10) || '',
     isTwoFactorAuthentication: initialData.isTwoFactorAuth || false,
     isStudent: initialData.isStudent || false,
-    skillsIds: initialData.skills?.map((s: any) => s.skillId) || [],
-    urls: initialData.urls?.map((u: any) => ({ value: u.value, urlTypeId: u.urlType.urlTypeId })) || [],
+    skillsIds: initialData.skills?.map(s => s.skillId) || [],
+    urls: initialData.urls?.map(u => ({ value: u.value, urlTypeId: u.urlType.urlTypeId })) || [],
+    address: initialData.address ? {
+      countryName: initialData.address?.countryName || '',
+      stateName: initialData.address?.stateName || '',
+      cityName: initialData.address?.cityName || '',
+      streetName: initialData.address?.streetName || '',
+      houseNumber: initialData.address?.houseNumber || '',
+      apartmentNumber: initialData.address?.apartmentNumber || '',
+      postCode: initialData.address?.postCode || '',
+      lon: initialData.address?.lon || 0,
+      lat: initialData.address?.lat || 0,
+    }: null,
   });
+const setAddress = (newAddressPart: Partial<ProfileUpdatePayload['address']>) => {
+    setForm(prevForm => {
+      const currentAddress = prevForm.address || {
+        countryName: '',
+        stateName: '',
+        cityName: '',
+        streetName: '',
+        houseNumber: '',
+        apartmentNumber: null,
+        postCode: '',
+        lon: 0,
+        lat: 0,
+      };
 
+      return {
+        ...prevForm,
+        address: {
+          ...currentAddress, // keep existing address
+          ...newAddressPart, // override/add new address part
+        },
+      };
+    });
+  };
+  
   useEffect(() => {
     const headers = { Authorization: `Bearer ${token}` };
     Promise.all([
@@ -59,7 +119,7 @@ const RegularProfileForm = ({ initialData, token }: Props) => {
 
       geo.on('select', (location) => {
         const props = location.properties;
-        setAddress({
+        setForm(prev => ({ ...prev, address: {
           countryName: props.country || '',
           stateName: props.state || '',
           cityName: props.city || '',
@@ -69,15 +129,32 @@ const RegularProfileForm = ({ initialData, token }: Props) => {
           postCode: props.postcode || '',
           lon: props.lon,
           lat: props.lat,
-        });
+        }}));
       });
     }
-  }, []);
+  }, [token]);
 
-  const updateUrl = (index: number, field: 'value' | 'urlTypeId', value: any) => {
-    const updated = [...form.urls];
-    updated[index] = { ...updated[index], [field]: value };
-    setForm({ ...form, urls: updated });
+  const updateUrl = (index: number, field: keyof FormUrl, value: string | number) => {
+    const updatedUrls = [...form.urls];
+    updatedUrls[index] = { ...updatedUrls[index], [field]: value };
+    setForm(prev => ({ ...prev, urls: updatedUrls }));
+  };
+
+  const addUrl = () => {
+    setForm(prev => ({...prev, urls: [...prev.urls, { value: '', urlTypeId: 1 }]}));
+  }
+
+  const removeUrl = (index: number) => {
+    setForm(prev => ({ ...prev, urls: prev.urls.filter((_, i) => i !== index)}));
+  };
+
+  const handleSkillChange = (skillId: number, isSelected: boolean) => {
+      setForm(prev => ({
+          ...prev,
+          skillsIds: isSelected
+            ? [...prev.skillsIds, skillId]
+            : prev.skillsIds.filter(id => id !== skillId)
+      }));
   };
 
   const handleSubmit = async () => {
@@ -87,11 +164,7 @@ const RegularProfileForm = ({ initialData, token }: Props) => {
         index === self.findIndex((v) => v.value === value.value && v.urlTypeId === value.urlTypeId)
       );
 
-    const fullPayload = {
-      ...form,
-      urls: deduplicatedUrls,
-      address,
-    };
+    const fullPayload: ProfileUpdatePayload = { ...form, urls: deduplicatedUrls };
 
     const res = await fetch('http://localhost:8080/api/User/regularData', {
       method: 'PUT',
@@ -110,38 +183,31 @@ const RegularProfileForm = ({ initialData, token }: Props) => {
     else alert('Failed to update profile');
   };
 
-  const removeUrl = (index: number) => {
-    setForm((prevForm) => ({
-      ...prevForm,
-      urls: prevForm.urls.filter((_: any, i: number) => i !== index),
-    }));
-  };
-
   return (
-    <div className="flex flex-col gap-4 mt-4 max-w-2xl">
+    <div className="flex flex-col gap-4 mt-4 max-w-2xl border rounded-lg">
       <label><b>Description</b></label>
-      <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
+      <textarea className='border border-gray-300' value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
 
       <label><b>Contact Email</b></label>
-      <input value={form.contactEmail} onChange={(e) => setForm({ ...form, contactEmail: e.target.value })} />
+      <input className='border border-gray-300 rounded-md p-1' value={form.contactEmail} onChange={(e) => setForm({ ...form, contactEmail: e.target.value })} />
 
       <label><b>Phone Number</b></label>
-      <input value={form.contactPhoneNumber} onChange={(e) => setForm({ ...form, contactPhoneNumber: e.target.value })} />
+      <input className='border border-gray-300 rounded-md p-1' value={form.contactPhoneNumber} onChange={(e) => setForm({ ...form, contactPhoneNumber: e.target.value })} />
 
       <label><b>Birth Date</b></label>
-      <input type="date" value={form.birthDate} onChange={(e) => setForm({ ...form, birthDate: e.target.value })} />
-      {(address.countryName != "") && (
+      <input className='border border-gray-300 rounded-md p-1' type="date" value={form.birthDate} onChange={(e) => setForm({ ...form, birthDate: e.target.value })} />
+      {(form.address?.countryName != "") && (
         <div className="text-sm text-gray-700 italic mb-2">
           <b>Current address:</b><br />
 
         {[
           "ul.",
-          address.streetName,
-          address.houseNumber, "/",
-          address.apartmentNumber,",",
-          address.postCode, ",",
-          address.cityName,
-          address.countryName,
+          form.address?.streetName,
+          form.address?.houseNumber, "/",
+          form.address?.apartmentNumber,",",
+          form.address?.postCode, ",",
+          form.address?.cityName,
+          form.address?.countryName,
         ]
           .filter(Boolean)
           .join(' ')}
@@ -152,8 +218,9 @@ const RegularProfileForm = ({ initialData, token }: Props) => {
       <label>Apartment Number</label>
       <input
         type="text"
-        value={address.apartmentNumber || ''}
-        onChange={(e) => setAddress({ ...address, apartmentNumber: e.target.value })}
+        className='border border-gray-300 rounded-md p-1'
+        value={form.address?.apartmentNumber || ''}
+        onChange={(e) => setAddress({ ...form.address, apartmentNumber: e.target.value })}
       />
       
       <label>
@@ -172,56 +239,35 @@ const RegularProfileForm = ({ initialData, token }: Props) => {
         /> Are you a student?
       </label>
 
-      <label><b>Skills</b></label>
-      <div className="grid grid-cols-2 gap-1">
-        {skills.map((skill: any) => (
-          <label key={skill.skillId} className="text-sm">
+       <label><b>Skills</b></label>
+       <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+         {skills.map(skill => (
+          <label key={skill.skillId} className="text-sm flex items-center gap-2">
             <input
               type="checkbox"
               checked={form.skillsIds.includes(skill.skillId)}
-              onChange={(e) => {
-                const selected = e.target.checked;
-                setForm((prev) => ({
-                  ...prev,
-                  skillsIds: selected
-                    ? [...prev.skillsIds, skill.skillId]
-                    : prev.skillsIds.filter((id : {value : number}) => id !== skill.skillId),
-                }));
-              }}
+              onChange={(e) => handleSkillChange(skill.skillId, e.target.checked)}
             />
             {skill.name}
           </label>
         ))}
       </div>
 
-      <label>Links</label>
-      {form.urls.map((url: { value: string; urlTypeId: number }, index: number) => (
+      <label><b>Links</b></label>
+      {form.urls.map((url, index) => (
         <div key={index} className="flex gap-2 items-center">
-          <input
-            type="text"
-            value={url.value}
-            placeholder="https://..."
-            onChange={(e) => updateUrl(index, 'value', e.target.value)}
-            className="flex-1"
-          />
-          <select
-            value={url.urlTypeId}
-            onChange={(e) => updateUrl(index, 'urlTypeId', Number(e.target.value))}
-          >
-            {urlTypes.map((t: any) => (
-              <option key={t.urlTypeId} value={t.urlTypeId}>{t.name}</option>
-            ))}
+          <input className='border border-gray-300 rounded-md p-1' type="text" value={url.value} onChange={(e) => updateUrl(index, 'value', e.target.value)} />
+          <select className='border border-gray-300 rounded-md p-2' value={url.urlTypeId} onChange={(e) => updateUrl(index, 'urlTypeId', Number(e.target.value))}>
+            {urlTypes.map(t => <option key={t.urlTypeId} value={t.urlTypeId}>{t.name}</option>)}
           </select>
           <button
-            type="button"
-            onClick={() => removeUrl(index)}
-            className="text-red-500 hover:underline"
-            title="Remove link" > Remove
-          </button>
+            className = 'bg-red-600 text-white rounded-lg hover:bg-red-700'
+            type="button" onClick={() => removeUrl(index)}>Remove</button>
         </div>
       ))}
-      <button type="button" onClick={() => setForm({ ...form, urls: [...form.urls, { value: '', urlTypeId: 1 }] })}>
-        Add Link
+      <button
+        className = 'bg-green-600 text-white py-2 px-4 rounded mt-4'
+        type="button" onClick={addUrl}>Add Link
       </button>
 
       <button

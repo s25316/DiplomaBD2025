@@ -1,12 +1,12 @@
-"use client"
-import React, { useState, useEffect, ReactEventHandler } from 'react'
+'use client'
+import React, { useState, useEffect} from 'react'
 import { GeocoderAutocomplete } from '@geoapify/geocoder-autocomplete'
-import "@geoapify/geocoder-autocomplete/styles/round-borders.css"
+import '@geoapify/geocoder-autocomplete/styles/round-borders.css'
 
 interface Props {
   index: number,
   getData: Function,
-  initialData?: any; //do edycji
+  initialData?: any;
 }
 
 const BranchForm = (props: Props) => {
@@ -20,7 +20,7 @@ const BranchForm = (props: Props) => {
     },
   })
   const [address, setAddress] = useState({
-    countryName: props.initialData?.address?.countryName || "",
+    countryName: props.initialData?.address?.countryName || "", 
     stateName: props.initialData?.address?.stateName || "",
     cityName: props.initialData?.address?.cityName || "",
     streetName: props.initialData?.address?.streetName || null,
@@ -78,14 +78,14 @@ const BranchForm = (props: Props) => {
   }
 
   return (
-    <div className='flex flex-col gap-4'>
+    <div className='flex flex-col gap-4 p-4 border rounded-lg'>
       <label htmlFor='name'>Branch name:</label>
-      <input type='text' name='name' placeholder='Branch name' value={form.name} onChange={handleChange} required />
+      <input className='border border-gray-300 rounded-md p-1' type='text' name='name' placeholder='Branch name' value={form.name} onChange={handleChange} required />
       <label htmlFor='description'>Description:</label>
-      <input type='text' name='description' placeholder='Description' value={form.description ?? ""} onChange={handleChange} />
-      <label htmlFor='address'>Address:</label>
+      <input className='border border-gray-300 rounded-md p-1' type='text' name='description' placeholder='Description' value={form.description ?? ""} onChange={handleChange} />
+      <label  htmlFor='address'>Address:</label>
       {(props.initialData?.address && props.initialData.address.streetName) && (
-        <div className="text-sm text-gray-700 italic mb-2">
+        <div className='text-sm text-gray-700 italic mb-2'>
           <b>Current address:</b><br />
           {[
             'ul.',
@@ -104,7 +104,7 @@ const BranchForm = (props: Props) => {
 
       <div id={`autocomplete-${props.index}`} className='autocomplete-container' style={{ position: 'relative' }}></div>
       <label htmlFor='apartmentNumber'>Apartment number:</label>
-      <input type='text' name='apartmentNumber' placeholder='123' value={form.address.apartmentNumber ?? ""} onChange={handleAddressChange} />
+      <input className='border border-gray-300 rounded-md p-1' type='text' name='apartmentNumber' placeholder='123' value={form.address.apartmentNumber ?? ""} onChange={handleAddressChange} />
     </div>
   )
 }

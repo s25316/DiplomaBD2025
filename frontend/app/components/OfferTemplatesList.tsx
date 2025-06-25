@@ -4,11 +4,16 @@ import Link from 'next/link';
 import { useRouter, useParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 
+interface Template{
+  offerTemplateId: string;
+  name: string;
+}
+
 const OfferTemplatesList = ({
     templates,
     onDelete,
   }: {
-    templates: any[];
+    templates: Template[];
     onDelete: (id: string) => void;
   }) => {
   const { data: session } = useSession();

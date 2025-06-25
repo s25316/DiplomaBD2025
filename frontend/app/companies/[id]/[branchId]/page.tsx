@@ -1,34 +1,36 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
+import React, { useEffect, useState, useCallback } from 'react';
+import { useParams, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import SelectItemsPerPage from '@/app/components/SelectItemsPerPage';
 import Pagination from '@/app/components/Pagination';
 import GeoMap from '@/app/components/GeoMap';
+import DeleteBranchButton from '@/app/components/buttons/DeleteBranchButton';
+import DeleteOfferButton from '@/app/components/buttons/DeleteOfferButton';
 
-interface BranchDetailsType {
+interface Branch {
   name: string;
-  desciption: string;
+  description: string | null;
   created: string;
   address: {
     countryName: string;
     stateName: string;
     cityName: string;
-    streetName?: string;
+    streetName?: string | null;
     houseNumber: string;
-    apartmentNumber?: string;
+    apartmentNumber?: string | null;
     postCode: string;
     lon: number;
     lat: number;
   };
 }
-interface CompanyName {
+interface Company {
   name: string;
 }
 
-interface OfferFull {
+interface Offer {
   offer: {
     offerId: string;
     publicationStart: string;
@@ -44,6 +46,11 @@ interface OfferFull {
   };
   contractConditions: any[];
 }
+interface BranchDetailsApi {
+  company: Company;
+  branch: Branch;
+}
+
 const STATUS_MAP: Record<number, string> = {
   0: "Not Published",
   1: "Expired",
@@ -54,21 +61,19 @@ const STATUS_MAP: Record<number, string> = {
 const BranchDetails = () => {
   const { id, branchId } = useParams() as { id: string; branchId: string };
   const { data: session } = useSession();
+  const router = useRouter();
 
-  const [branchData, setBranchData] = useState<BranchDetailsType | null>(null);
-  const [companyData, setCompanyData] = useState<CompanyName | null>(null);
+  const [offers, setOffers] = useState<Offer[]>([]);
+  const [branchDetails, setBranchDetails] = useState<BranchDetailsApi | null>(null);
 
-  const [offers, setOffers] = useState<OfferFull[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<number | null>(null);
   const [page, setPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [totalCount, setTotalCount] = useState(0);
 
-
-
-
-  useEffect(() => {
+  // Memoized function to fetch all data for this branch
+  const fetchBranchAndOffers = useCallback(async () => {
     if (!session?.user?.token || !branchId) return;
 
     const headers = {
@@ -76,135 +81,149 @@ const BranchDetails = () => {
       Authorization: `Bearer ${session.user.token}`,
     };
 
-    const fetchData = async () => {
-      try {
-        const [branchRes, offersRes] = await Promise.all([
-          fetch(`http://localhost:8080/api/CompanyUser/branches/${branchId}`, { headers }),
-          fetch(`http://localhost:8080/api/CompanyUser/branches/${branchId}/offers?${statusFilter !== null ? `status=${statusFilter}&` : ''}Page=${page}&ItemsPerPage=${itemsPerPage}`, { headers }),
-        ]);
+    try {
+      console.log("Fetching branch details and offers...");
+      const [branchRes, offersRes] = await Promise.all([
+        fetch(`http://localhost:8080/api/CompanyUser/branches/${branchId}`, { headers, cache: 'no-store' }),
+        fetch(`http://localhost:8080/api/CompanyUser/branches/${branchId}/offers?${statusFilter !== null ? `status=${statusFilter}&` : ''}Page=${page}&ItemsPerPage=${itemsPerPage}`, { headers, cache: 'no-store' }),
+      ]);
 
-        if (!branchRes.ok) throw new Error('Failed to fetch branch details');
-        const branchJson = await branchRes.json();
-        setBranchData(branchJson.items[0]?.branch);
-        setCompanyData(branchJson.items[0]?.company);
-
-        if (!offersRes.ok) throw new Error('Failed to fetch offers');
-        const offersJson = await offersRes.json();
-        setOffers(offersJson.items || []);
-        setTotalCount(offersJson.totalCount || 0);
-
-
-
-      } catch (err: any) {
-        setError(err.message);
+      if (!branchRes.ok) {
+        if (branchRes.status === 404) {
+          setError("Branch not found. It might have been deleted.");
+          router.replace(`/companies/${id}`);
+          return;
+        }
+        const errorText = await branchRes.text();
+        throw new Error(`Failed to fetch branch details: ${errorText}`);
       }
-    };
+      const branchJson = await branchRes.json();
+      setBranchDetails(branchJson.items[0]);
 
-    fetchData();
-  }, [session, branchId, statusFilter, page, itemsPerPage]);
+      if (!offersRes.ok) {
+        const errorText = await offersRes.text();
+        throw new Error(`Failed to fetch offers: ${errorText}`);
+      }
+      const offersJson = await offersRes.json();
+      setOffers(offersJson.items || []);
+      setTotalCount(offersJson.totalCount || 0);
 
-  if (!session?.user?.token) return <div>Unauthorized</div>;
-  if (error) return <div>Error: {error}</div>;
-  if (!branchData) return <div>Loading...</div>;
+      setError(null);
 
-  const handleDeleteOffer = async (offerIdToDelete: string) => {
-    const confirmed = confirm('Delete this offer?');
-    if (!confirmed) return;
-
-    const res = await fetch(`http://localhost:8080/api/CompanyUser/companies/offers/${offerIdToDelete}`, {
-      method: 'DELETE',
-      headers: {
-        Authorization: `Bearer ${session?.user.token}`,
-      },
-    });
-
-    if (res.ok) {
-      setOffers((prev) => prev.filter(({ offer }) => offer.offerId !== offerIdToDelete));
-      alert('Offer deleted');
-    } else {
-      alert('Failed to delete offer');
+    } catch (err: any) {
+      console.error("Error fetching data in BranchDetails:", err);
+      setError(err.message);
     }
-  };
+  }, [session, branchId, statusFilter, page, itemsPerPage, router, id]);
 
+  useEffect(() => {
+    fetchBranchAndOffers();
+  }, [fetchBranchAndOffers]);
+
+  const handleOfferDeleted = useCallback(() => {
+    fetchBranchAndOffers(); // refresh list after delete
+  }, [fetchBranchAndOffers]);
+
+  if (!session?.user?.token) return <div className="text-center py-4 text-red-600">Unauthorized. Please log in.</div>;
+  if (error) return <div className="text-center py-4 text-red-600">Error: {error}</div>;
+  if (!branchDetails) return <div className="text-center py-4 text-blue-600">Loading branch details...</div>;
+
+  const { branch, company } = branchDetails;
 
   return (
-    <div>
-      <h1>Branch Details</h1>
-      <br />
-      <p><b>Name:</b> {branchData.name}</p>
-      <p>
-        <Link href={`/companies/${id}`} >
-        <b>Company:</b> {companyData?.name}
-        </Link>
+    <div className="max-w-4xl mx-auto p-6 bg-white dark:bg-gray-900 rounded-lg shadow-xl mt-8 font-inter text-gray-900 dark:text-gray-100">
+      <h1 className="text-3xl font-bold mb-6 text-gray-800 dark:text-gray-100 text-center">Branch Details</h1>
+      
+      <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg shadow-inner mb-6">
+        <p className="text-xl font-bold mb-2 text-gray-800 dark:text-gray-100">Name: {branch.name}</p>
+        <p className="text-lg mb-2 text-gray-700 dark:text-gray-300">
+          <Link href={`/companies/${id}`}>
+            Company: {company?.name}
+          </Link>
         </p>
-      {branchData.desciption && <p><b>Description:</b> {branchData.desciption}</p>}
-      <div className="mb-2">
-        <p><b>Address:</b></p>
-        <p className="ml-4"><b>Country:</b> {branchData.address.countryName}</p>
-        <p className="ml-4"><b>City:</b> {branchData.address.cityName}</p>
-        {branchData.address.streetName && <p className="ml-4"><b>Street:</b> {branchData.address.streetName}</p>}
-        <p className="ml-4"><b>House number:</b> {branchData.address.houseNumber}</p>
-        {branchData.address.apartmentNumber && <p className="ml-4"><b>Apartment number:</b> {branchData.address.apartmentNumber}</p>}
+        {branch.description && <p className="mb-2 text-gray-700 dark:text-gray-300">Description: {branch.description}</p>}
+        <div className="mb-2 text-gray-700 dark:text-gray-300">
+          <p className="font-semibold">Address:</p>
+          <ul className="ml-4 list-disc list-inside">
+            <li>Country: {branch.address.countryName}</li>
+            <li>City: {branch.address.cityName}</li>
+            {branch.address.streetName && <li>Street: {branch.address.streetName}</li>}
+            <li>House number: {branch.address.houseNumber}</li>
+            {branch.address.apartmentNumber && <li>Apartment number: {branch.address.apartmentNumber}</li>}
+            <li>Post Code: {branch.address.postCode}</li>
+          </ul>
+        </div>
+        {branch.address.lat && branch.address.lon && (
+          <GeoMap lat={branch.address.lat} lon={branch.address.lon} />
+        )}
       </div>
-      {branchData.address.lat && branchData.address.lon && (
-        <GeoMap lat={branchData.address.lat} lon={branchData.address.lon} />
-      )}
 
-      <Link href={`/companies/${id}/${branchId}/edit`} className="inline-block mt-6 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-        Edit Branch
-      </Link>
-      <br />
-      <Link href={`/companies/${id}/${branchId}/publishOffer`} className="inline-block mt-6 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
-        Publish offer
-      </Link>
+      <div className="flex flex-wrap gap-4 mb-8">
+        <Link href={`/companies/${id}/${branchId}/edit`} className="inline-block bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition duration-300">
+          Edit Branch
+        </Link>
+        <DeleteBranchButton
+          branchId={branchId}
+          companyId={id as string} 
+          buttonText="Delete Branch"
+          className="inline-block bg-red-600 text-white px-5 py-2 rounded-lg hover:bg-red-700 transition duration-300"
+        />
 
-      <h2 className="mt-6 mb-2 text-xl font-semibold">Offers in this Branch:</h2>
-      <p className="mt-2 text-sm text-gray-600">
+      </div>
+      <Link href={`/companies/${id}/${branchId}/publishOffer`} className="inline-block bg-green-600 text-white px-5 py-2 rounded-lg hover:bg-green-700 transition duration-300">
+        Publish Offer
+      </Link>
+      <h2 className="mt-6 mb-4 text-2xl font-bold text-gray-800 dark:text-gray-100">Offers in this Branch:</h2>
+      <p className="mb-4 text-sm text-gray-600 dark:text-gray-400">
         Showing {offers.length} of {totalCount} offers
       </p>
 
-      
-      <select
-        value={statusFilter ?? ''}
-        onChange={(e) => {
-          const val = e.target.value;
-          setStatusFilter(val === '' ? null : Number(val));
-          setPage(1); // reset page
-        }}
-      >
-        <option value="">All statuses</option>
-        <option value="0">Sth is wrong</option>
-        <option value="1">Expired</option>
-        <option value="2">Active</option>
-        <option value="3">Scheduled</option>
-      </select>
-      <SelectItemsPerPage
-        value={itemsPerPage}
-        onChange={(val) => {
-          setItemsPerPage(val);
-          setPage(1);
-        }}
-      />
+      <div className="flex flex-wrap items-center gap-4 mb-4">
+        <label htmlFor="statusFilter" className="font-semibold text-gray-700 dark:text-gray-300">Filter by Status:</label>
+        <select
+          id="statusFilter"
+          value={statusFilter ?? ''}
+          onChange={(e) => {
+            const val = e.target.value;
+            setStatusFilter(val === '' ? null : Number(val));
+            setPage(1);
+          }}
+          className="border border-gray-300 dark:border-gray-600 rounded-md p-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+        >
+          <option value="">All statuses</option>
+          <option value="0">Not Published</option>
+          <option value="1">Expired</option>
+          <option value="2">Active</option>
+          <option value="3">Scheduled</option>
+        </select>
+        <SelectItemsPerPage
+          value={itemsPerPage}
+          onChange={(val) => {
+            setItemsPerPage(val);
+            setPage(1);
+          }}
+        />
+      </div>
 
       <Pagination
         page={page}
         onPrev={() => setPage((prev) => Math.max(1, prev - 1))}
         onNext={() => setPage((prev) => prev + 1)}
-        isNextDisabled={offers.length < itemsPerPage}
+        isNextDisabled={offers.length < itemsPerPage || (itemsPerPage * page) >= totalCount}
       />
 
-
       {offers.length > 0 ? (
-        <ul className="list-disc ml-6">
+        <ul className="space-y-4 mt-6">
           {offers.map(({ offer, offerTemplate }) => (
-            <li key={offer.offerId} className="border p-3 rounded my-2 max-w-md">
-              <Link href={`/companies/${id}/${branchId}/offer/${offer.offerId}`}>
-                <b>{offerTemplate?.name || 'Untitled Template'}</b>
+            <li key={offer.offerId} 
+            className="border p-4 rou-lg shadow-sm font-inter bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100">
+              <Link href={`/companies/${id}/${branchId}/offer/${offer.offerId}`} className="text-blue-600 dark:text-blue-400">
+                <b className="text-lg font-bold">{offerTemplate?.name || 'Untitled Template'}</b>
               </Link>
-              <p><b>Status:</b> {STATUS_MAP[offer.statusId] || offer.status}</p>
-              <p><b>Start:</b> {new Date(offer.publicationStart).toLocaleDateString()}</p>
-              <p><b>End:</b> {new Date(offer.publicationEnd).toLocaleDateString()}</p>
-              <p>
+              <p className="text-sm text-gray-700 dark:text-gray-300"><b>Status:</b> {STATUS_MAP[offer.statusId] || offer.status}</p>
+              <p className="text-sm text-gray-700 dark:text-gray-300"><b>Start:</b> {new Date(offer.publicationStart).toLocaleDateString()}</p>
+              <p className="text-sm text-gray-700 dark:text-gray-300"><b>End:</b> {new Date(offer.publicationEnd).toLocaleDateString()}</p>
+              <p className="text-sm text-gray-700 dark:text-gray-300">
                 <b>Website:</b>{' '}
                 <a href={offer.websiteUrl} target="_blank" rel="noopener noreferrer">
                   {offer.websiteUrl}
@@ -212,29 +231,34 @@ const BranchDetails = () => {
               </p>
 
               {offer.statusId !== 1 ? (
-                <button
-                  onClick={() => handleDeleteOffer(offer.offerId)}
-                  className="mt-2 text-red-600 underline"
-                >
-                  Delete
-                </button>
+                <DeleteOfferButton
+                  offerId={offer.offerId}
+                  onSuccess={handleOfferDeleted} //refresh list
+                  buttonText="Delete Offer"
+                  confirmationMessage={`Are you sure you want to delete offer "${offerTemplate?.name || offer.offerId}"?`}
+                  className="mt-3 bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition duration-200 shadow-sm"
+                />
               ) : (
-                <p className="text-gray-500 mt-2 italic">Expired (cannot delete)</p>
+                <p className="text-gray-500 dark:text-gray-400 mt-3 italic">Expired (cannot delete)</p>
               )}
             </li>
           ))}
-
         </ul>
       ) : (
-        <p>No offers published for this branch yet.</p>
+        <p className="text-gray-600 dark:text-gray-400 mt-6">No offers published for this branch yet.</p>
       )}
       <Pagination
         page={page}
         onPrev={() => setPage((prev) => Math.max(1, prev - 1))}
         onNext={() => setPage((prev) => prev + 1)}
-        isNextDisabled={offers.length < itemsPerPage}
+        isNextDisabled={offers.length < itemsPerPage || (itemsPerPage * page) >= totalCount}
       />
+      <br/>
+      <Link href={`/companies/${id}/${branchId}/publishOffer`} className="inline-block bg-green-600 text-white px-5 py-2 rounded-lg hover:bg-green-700 transition duration-300 ease-in-out shadow-md font-semibold">
+        Publish Offer
+      </Link>
     </div>
+    
   );
 };
 

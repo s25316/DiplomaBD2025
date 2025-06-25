@@ -18,6 +18,23 @@ interface OfferTemplate {
   offerTemplateId: string;
   name: string;
 }
+interface Branch {
+  branchId: string;
+  name: string;
+  address: {
+    cityName: string;
+    streetName: string | null;
+  }
+}
+interface Company{
+  name: string;
+  description: string;
+  regon: string;
+  nip: string;
+  krs: string;
+  created: string;
+  websiteUrl: string;
+}
 interface ContractCondition {
   contractConditionId: string;
   hoursPerTerm: number;
@@ -35,8 +52,8 @@ const CompanyDetails = () => {
   const { data: session } = useSession();
   const { id } = useParams();
 
-  const [company, setCompany] = useState(null);
-  const [branches, setBranches] = useState([]);
+  const [company, setCompany] = useState<Company | null>(null);
+  const [branches, setBranches] = useState<Branch[]>([]);
   const [templates, setTemplates] = useState<OfferTemplate[]>([]);
   const [conditions, setConditions] = useState<ContractCondition[]>([]);
   const [showEditForm, setShowEditForm] = useState(false);
@@ -73,7 +90,7 @@ const CompanyDetails = () => {
       if (c.ok) setCompany((await c.json()).items[0]);
       if (b.ok){
         const data =await b.json()
-        setBranches((data).items);
+        setBranches((data).items.map((item: any) => item.branch));
         setBranchTotal(data.totalCount);
       }
       if (t.ok){
@@ -149,7 +166,10 @@ const CompanyDetails = () => {
             Showing {branches.length} of {branchTotal} branches
           </p>
           <SelectItemsPerPage value={branchPerPage} onChange={(val) => { setBranchPerPage(val); setBranchPage(1); }} />
-          <BranchesList branches={branches} companyId={id as string} />
+          <BranchesList
+            branches={branches} companyId={id as string}
+            onDelete={(id: string) => setBranches(prev => prev.filter(b => b.branchId !== id))}
+             />
           <Pagination
             page={branchPage}
             onPrev={() => setBranchPage(p => Math.max(1, p - 1))}

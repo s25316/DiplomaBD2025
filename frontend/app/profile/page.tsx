@@ -1,4 +1,5 @@
 'use client';
+
 import React, { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
@@ -6,19 +7,55 @@ import Link from 'next/link';
 import CreateCompanyButton from '@/app/components/buttons/CreateCompanyButton';
 import BaseProfileForm from '../components/forms/BaseProfileForm';
 
-interface CompanyProfile {
+interface Company{
   companyId: string;
   name: string;
   description: string;
   websiteUrl?: string;
+}
+interface SkillInfo {
+  name: string;
+  skillType: {
+    name: string;
+  };
+}
+
+interface LinkInfo {
+  value: string,
+  urlType: {
+    urlTypeId: number;
+    name: string;
+  }
+}
+interface Address {
+  streetName: string;
+  houseNumber: string;
+  apartmentNumber: string | null;
+  postCode: string;
+  cityName: string;
+  countryName: string;
+}
+interface User {
+  logo: string | null;
+  name: string;
+  surname: string;
+  isIndividual: boolean;
+  isTwoFactorAuth: boolean;
+  isStudent: boolean;
+  contactEmail: string;
+  phoneNum: string;
+  birthDate: string;
+  address: Address;
+  skills: SkillInfo[];
+  urls: LinkInfo[];
 }
 
 const Profile = () => {
   const { data: session } = useSession();
   const router = useRouter();
 
-  const [userData, setUserData] = useState<any | null>(null);
-  const [companies, setCompanies] = useState<CompanyProfile[]>([]);
+  const [user, setUserDetails] = useState<User | null>(null);
+  const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -43,7 +80,7 @@ const Profile = () => {
         const userJson = await userRes.json();
         const companiesJson = await companiesRes.json();
 
-        setUserData(userJson.personPerspective);
+        setUserDetails(userJson.personPerspective);
         setCompanies(companiesJson.items || []);
       } catch (error) {
         console.error('Error loading profile:', error);
@@ -56,10 +93,11 @@ const Profile = () => {
   }, [session]);
 
   if (!session?.user?.token) return <p>Unauthorized/Loading...</p>;
-  if (loading) return <p>Loading...</p>;
+  if (!user) return <p>Loading...</p>;
 
-  const isFirstTime = !userData?.name;
-
+  const {skills, urls, address} = user;
+  const isFirstTime = !user?.name;
+  
   return (
     <div className="p-6 space-y-6">
       <h1 className="text-2xl font-bold">My Profile</h1>
@@ -71,23 +109,23 @@ const Profile = () => {
           />
       ) : (
         <div className="space-y-2">
-          <h2><b> {userData.isIndividual ? 'Individual account' : 'Company account'} </b></h2>
-          <p><b>Name:</b> {userData.name}</p>
-          <p><b>Surname:</b> {userData.surname}</p>
-          <p><b>Email:</b> {userData.contactEmail}</p>
-          <p><b>Phone:</b> {userData.phoneNum}</p>
-          <p><b>Birth Date:</b> {userData.birthDate?.substring(0, 10)}</p>
+          <h2><b> {user.isIndividual ? 'Individual account' : 'Company account'} </b></h2>
+          <p><b>Name:</b> {user.name}</p>
+          <p><b>Surname:</b> {user.surname}</p>
+          <p><b>Email:</b> {user.contactEmail}</p>
+          <p><b>Phone:</b> {user.phoneNum}</p>
+          <p><b>Birth Date:</b> {user.birthDate?.substring(0, 10)}</p>
 
-          {(userData.address !=null) && (
+          {(address !=null) && (
           <p><b>Address:</b> 
             {[
               " ul.",
-              userData.address.streetName,
-              userData.address.houseNumber, "/",
-              userData.address.apartmentNumber, ",",
-              userData.address.postCode, ",",
-              userData.address.cityName,
-              userData.address.countryName,
+              address.streetName,
+              address.houseNumber, "/",
+              address.apartmentNumber, ",",
+              address.postCode, ",",
+              address.cityName,
+              address.countryName,
             ]
               .filter(Boolean)
               .join(' ')}
@@ -96,14 +134,14 @@ const Profile = () => {
 
           <p className="mt-4"><b>Skills:</b></p>
           <ul className="list-disc ml-5">
-            {userData.skills?.map((s: any) => (
+            {skills?.map((s: any) => (
               <li key={s.skillId}>{s.name}</li>
             ))}
           </ul>
 
           <p className="mt-4"><b>Links:</b></p>
           <ul className="list-disc ml-5">
-            {userData.urls?.map((u: any, i: number) => (
+            {urls?.map((u: any, i: number) => (
               <li key={i}>{u.value} ({u.urlType?.name})</li>
             ))}
           </ul>
@@ -118,7 +156,7 @@ const Profile = () => {
       )}
 
       {/* Companies */}
-      {(userData.isIndividual===false) && (
+      {(user.isIndividual===false) && (
       <div>
         <h2 className="text-xl font-semibold mt-8 mb-2">Companies templates</h2>
         {companies.length > 0 ? (

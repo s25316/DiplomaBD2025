@@ -2,6 +2,7 @@
 import React from 'react';
 import ContractConditionForm, { ContractConditionFormData, ContractParameter } from '@/app/components/forms/ContractConditionForm';
 import OfferTemplateForm from '@/app/components/forms/OfferTemplateForm';
+
 interface SkillWithRequired {
   skill: {
     name: string;
@@ -62,6 +63,7 @@ const OfferForm = ({
     };
 
     return (
+        <div className="flex flex-col gap-4 p-4 border rounded-lg">
         <>
         {isExpired && (
         <div className="text-red-600 font-semibold mb-4">
@@ -69,160 +71,173 @@ const OfferForm = ({
         </div>
         )}
 
-{isExpired ? null : (
-    <>
-    {(isScheduled || statusId === null) && (
-    <>
-            <p>Status: {statusId}</p>
-        <label className="font-semibold">Contract Condition</label>
-        <select value={selectedConditionId} onChange={(e) => setSelectedConditionId(e.target.value)}>
-            <option value="">-- None --</option>
-            {existingConditions.map((c: any) => (
-            <option key={c.contractConditionId} value={c.contractConditionId}>
-                [{c.hoursPerTerm}h] {c.salaryMin}-{c.salaryMax} {c.currency?.name}
-            </option>
-            ))}
-        </select>
+        {isExpired ? null : (
+            <>
+            {(isScheduled || statusId === null) && (
+            <>
+                {(statusId != null) && (<p>Status: {statusId}</p>)} 
+                
+                <label  className="font-semibold">Contract Condition</label>
+                <select 
+                    className="border border-gray-300 rounded-md p-1"
+                    value={selectedConditionId}
+                    onChange={(e) => setSelectedConditionId(e.target.value)}>
+                        <option value="">-- None --</option>
+                        {existingConditions.map((c: any) => (
+                            <option key={c.contractConditionId} value={c.contractConditionId}>
+                                [{c.hoursPerTerm}h] {c.salaryMin}-{c.salaryMax} {c.currency?.name}
+                            </option>
+                        ))}
+                </select>
 
-        <label>
-            <input
-            type="checkbox"
-            checked={includeNewCondition}
-            onChange={(e) => setIncludeNewCondition(e.target.checked)}
-            disabled={!!selectedConditionId}
-            /> Create New Condition
-        </label>
+                <label>
+                    <input
+                    type="checkbox"
+                    checked={includeNewCondition}
+                    onChange={(e) => setIncludeNewCondition(e.target.checked)}
+                    disabled={!!selectedConditionId}
+                    
+                    /> Create New Condition
+                </label>
 
-        {includeNewCondition && (
-            <ContractConditionForm
-            parameters={parameters}
-            onSubmit={onConditionCreate}
-            submitText="Create Condition"
-            />
-        )}
-            {selectedConditionId && (
-            <div className="font-semibold mb-2">
-                <h4>Selected Contract Details</h4>
-                {(() => {
-                const cond = existingConditions.find(c => c.contractConditionId === selectedConditionId);
-                if (!cond) return <p className="text-gray-500">Loading...</p>;
-                return (
-                    <ul className="text-sm list-disc list-inside text-gray-700">
-                    <li><b>Hours/Term:</b> {cond.hoursPerTerm}</li>
-                    <li><b>Salary:</b> {cond.salaryMin} – {cond.salaryMax} {cond.currency?.name}</li>
-                    <li><b>Negotiable:</b> {cond.isNegotiable ? 'Yes' : 'No'}</li>
-                    <li><b>Salary Term:</b> {cond.salaryTerm?.name}</li>
-                    <li><b>Work Modes:</b> {cond.workModes?.map((w: any) => w.name).join(', ')}</li>
-                    <li><b>Employment Types:</b> {cond.employmentTypes?.map((e: any) => e.name).join(', ')}</li>
-                    </ul>
-                );
-                })()}
-            </div>
-            )}
-        <hr className="my-4" />
+                {includeNewCondition && (
+                    <ContractConditionForm
+                    parameters={parameters}
+                    onSubmit={onConditionCreate}
+                    submitText="Create Condition"
+                    />
+                )}
+                {selectedConditionId && (
+                <div className="font-semibold mb-2">
+                    <h4>Selected Contract Details</h4>
+                    {(() => {
+                    const cond = existingConditions.find(c => c.contractConditionId === selectedConditionId);
+                    if (!cond) return <p className="text-gray-500">Loading...</p>;
+                    return (
+                        <ul className="text-sm list-disc list-inside text-gray-700">
+                        <li><b>Hours/Term:</b> {cond.hoursPerTerm}</li>
+                        <li><b>Salary:</b> {cond.salaryMin} – {cond.salaryMax} {cond.currency?.name}</li>
+                        <li><b>Negotiable:</b> {cond.isNegotiable ? 'Yes' : 'No'}</li>
+                        <li><b>Salary Term:</b> {cond.salaryTerm?.name}</li>
+                        <li><b>Work Modes:</b> {cond.workModes?.map((w: any) => w.name).join(', ')}</li>
+                        <li><b>Employment Types:</b> {cond.employmentTypes?.map((e: any) => e.name).join(', ')}</li>
+                        </ul>
+                    );
+                    })()}
+                </div>
+                )}
+                <hr className="my-4" />
 
-        <label className="font-semibold">Offer Template</label>
-        <select
-            required
-            value={form.offerTemplateId}
-            onChange={(e) => setForm(prev => ({ ...prev, offerTemplateId: e.target.value }))}
-        >
-            <option value="">-- Select Template --</option>
-            {templates.map((tpl) => (
-            <option key={tpl.offerTemplateId} value={tpl.offerTemplateId}>
-                {tpl.name}
-            </option>
-            ))}
-        </select>
-
-        <label>
-            <input
-            type="checkbox"
-            checked={includeNewTemplate}
-            onChange={(e) => setIncludeNewTemplate(e.target.checked)}
-            disabled={!!form.offerTemplateId}
-            /> Create New Offer Template
-        </label>
-
-        {includeNewTemplate && (
-            <OfferTemplateForm
-            name={newTemplateForm.name}
-            description={newTemplateForm.description}
-            skills={skills}
-            selectedSkills={newTemplateForm.skills}
-            onChange={handleTemplateChange}
-            onSkillToggle={handleSkillToggle}
-            onSkillRequiredToggle={handleSkillRequiredToggle}
-            onSubmit={onTemplateCreate}
-            submitText="Create Template"
-            />
-        )}
-        {form.offerTemplateId && (
-        <div className="font-semibold mb-2">
-            <h4>Selected Offer Template</h4>
-            {(() => {
-            const tpl = templates.find(t => t.offerTemplateId === form.offerTemplateId);
-            if (!tpl && templates.length === 0) return <p className="text-gray-500">Loading templates...</p>;
-            if (!tpl) return <p className="text-red-500">Template not found</p>;
-
-            return (
-                <ul className="text-sm list-disc list-inside text-gray-700">
-                <li><b>Name:</b> {tpl.name}</li>
-                <li><b>Description:</b> {tpl.description}</li>
-                <li><b>Skills:</b>
-                    <ul className="list-disc pl-6">
-                    {(tpl.skills as SkillWithRequired[]).map((s, idx) => (
-                    <li key={idx}>
-                        {s.skill.name} ({s.skill.skillType.name}) {s.isRequired ? '(required)' : ''}
-                    </li>
+                <label className="font-semibold">Offer Template</label>
+                <select
+                    className="border border-gray-300 rounded-md p-1"
+                    required
+                    value={form.offerTemplateId}
+                    onChange={(e) => setForm(prev => ({ ...prev, offerTemplateId: e.target.value }))}
+                >
+                    <option value="">-- Select Template --</option>
+                    {templates.map((tpl) => (
+                    <option key={tpl.offerTemplateId} value={tpl.offerTemplateId}>
+                        {tpl.name}
+                    </option>
                     ))}
+                </select>
 
-                    </ul>
-                </li>
-                </ul>
-            );
-            })()}
+                <label>
+                    <input
+                    type="checkbox"
+                    checked={includeNewTemplate}
+                    onChange={(e) => setIncludeNewTemplate(e.target.checked)}
+                    disabled={!!form.offerTemplateId}
+                    /> Create New Offer Template
+                </label>
+
+                {includeNewTemplate && (
+                    <OfferTemplateForm
+                    name={newTemplateForm.name}
+                    description={newTemplateForm.description}
+                    skills={skills}
+                    selectedSkills={newTemplateForm.skills}
+                    onChange={handleTemplateChange}
+                    onSkillToggle={handleSkillToggle}
+                    onSkillRequiredToggle={handleSkillRequiredToggle}
+                    onSubmit={onTemplateCreate}
+                    submitText="Create Template"
+                    />
+                )}
+                {form.offerTemplateId && (
+                    <div className="font-semibold mb-2">
+                        <h4>Selected Offer Template</h4>
+                        {(() => {
+                        const tpl = templates.find(t => t.offerTemplateId === form.offerTemplateId);
+                        if (!tpl && templates.length === 0) return <p className="text-gray-500">Loading templates...</p>;
+                        if (!tpl) return <p className="text-red-500">Template not found</p>;
+
+                        return (
+                            <ul className="text-sm list-disc list-inside text-gray-700">
+                            <li><b>Name:</b> {tpl.name}</li>
+                            <li><b>Description:</b> {tpl.description}</li>
+                            <li><b>Skills:</b>
+                                <ul className="list-disc pl-6">
+                                {(tpl.skills as SkillWithRequired[]).map((s, idx) => (
+                                <li key={idx}>
+                                    {s.skill.name} ({s.skill.skillType.name}) {s.isRequired ? '(required)' : ''}
+                                </li>
+                                ))}
+
+                                </ul>
+                            </li>
+                            </ul>
+                        );
+                        })()}
+                    </div>
+                )}
+                <label>Publication Start</label>
+                <input
+                    type="datetime-local"
+                    value={form.publicationStart}
+                    onChange={(e) => setForm((prev) => ({ ...prev, publicationStart: e.target.value }))}
+                    required
+                    className="border border-gray-300 rounded-md p-1"
+                />
+                </>
+            )}
+            
+            {(isScheduled || isActive || statusId === null) && (
+                <>
+                <label>Publication End</label>
+                <input
+                    type="datetime-local"
+                    value={form.publicationEnd}
+                    onChange={(e) => setForm((prev) => ({ ...prev, publicationEnd: e.target.value }))}
+                    required
+                    className="border border-gray-300 rounded-md p-1"
+                />
+
+                <label>Employment Length (months)</label>
+                <input
+                    type="number"
+                    value={form.employmentLength}
+                    onChange={(e) => setForm((prev) => ({ ...prev, employmentLength: Number(e.target.value) }))}
+                    min="0"
+                    className="border border-gray-300 rounded-md p-1"
+                />
+
+                <label>Website URL</label>
+                <input
+                    type="url"
+                    value={form.websiteUrl}
+                    onChange={(e) => setForm((prev) => ({ ...prev, websiteUrl: e.target.value }))}
+                    required
+                    className="border border-gray-300 rounded-md p-1"
+                />
+                </>
+            )}
+        </>
+        )}
+        </>
         </div>
-        )}
-        <label>Publication Start</label>
-        <input
-            type="datetime-local"
-            value={form.publicationStart}
-            onChange={(e) => setForm((prev) => ({ ...prev, publicationStart: e.target.value }))}
-            required
-        />
-        </>)}
-        
-        {(isScheduled || isActive || statusId === null) && (
-    <>
-        <label>Publication End</label>
-        <input
-            type="datetime-local"
-            value={form.publicationEnd}
-            onChange={(e) => setForm((prev) => ({ ...prev, publicationEnd: e.target.value }))}
-            required
-        />
-
-        <label>Employment Length (months)</label>
-        <input
-            type="number"
-            value={form.employmentLength}
-            onChange={(e) => setForm((prev) => ({ ...prev, employmentLength: Number(e.target.value) }))}
-        />
-
-        <label>Website URL</label>
-        <input
-            type="url"
-            value={form.websiteUrl}
-            onChange={(e) => setForm((prev) => ({ ...prev, websiteUrl: e.target.value }))}
-            required
-        />
-        </>
-        )}
-        </>
-    )}
-    </>
-  );
+    );
 };
 
 export default OfferForm;

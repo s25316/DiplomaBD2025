@@ -4,6 +4,7 @@ import React, { useState, useRef } from 'react'
 import { useSession } from 'next-auth/react'
 import BranchCreateForm from '@/app/components/forms/BranchForm'
 import BranchForm from '@/app/components/forms/BranchForm'
+import CancelButton from '@/app/components/buttons/CancelButton'
 
 interface SendData {
   name: string,
@@ -74,14 +75,15 @@ const createBranch = () => {
   }
 
   return (
-    <div className="max-w-xl mx-auto">
-      <h1>Create Branch</h1>
-      <form className='flex flex-col gap-4' onSubmit={handleSubmit}>
+    <div className='max-w-xl mx-auto p-6 mt-8 font-inter'>
+      <h1 className='text-3xl font-bold mb-6 text-gray-800 text-center'>Create Branch</h1>
+      <form className='flex flex-col gap-6' onSubmit={handleSubmit}>
         <ul>
           {forms.map((value) => (
             <li key={value.props.index} className='flex flex-col gap-4'>
               {value}
-              <button onClick={() => {
+              <button className='bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition duration-300 ease-in-out shadow-md font-semibold self-end mt-2'
+              onClick={() => {
                 setForms(forms.filter((val) => {
                   if (val.props.index === value.props.index) {
                     sendData.current = sendData.current.filter((v) => v.index !== val.props.index)
@@ -89,12 +91,18 @@ const createBranch = () => {
                   }
                   return true
                 }))
-              }}>Remove branch</button>
+              }}
+              >Remove branch</button>
             </li>
           ))}
         </ul>
-        <button onClick={() => { setForms([...forms, <BranchForm index={counter} getData={handleData} />]); setCounter(counter + 1) }}>Add branch</button>
-        <button type='submit'>Create</button>
+        <button
+          className='bg-green-600 text-white px-5 py-2 rounded-lg hover:bg-green-700 transition duration-300 ease-in-out shadow-md font-semibold mt-4'
+          onClick={() => { setForms([...forms, <BranchForm index={counter} getData={handleData} />]); setCounter(counter + 1) }}>Add branch</button>
+        <CancelButton/>
+        <button
+          className='bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition duration-300 ease-in-out shadow-md font-semibold mt-4'
+          type='submit'>Create</button>
       </form>
     </div>
   )

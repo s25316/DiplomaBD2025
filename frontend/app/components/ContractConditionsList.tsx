@@ -1,7 +1,9 @@
 'use client'
+
 import React from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
+
 interface ContractCondition {
     contractConditionId: string;
     hoursPerTerm: number;

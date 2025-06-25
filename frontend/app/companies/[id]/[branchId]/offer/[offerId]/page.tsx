@@ -5,6 +5,58 @@ import { useParams, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 
+interface Company {
+  name: string;
+}
+
+interface Branch {
+  name: string;
+}
+
+interface Offer {
+  status: string;
+  statusId: number;
+  publicationStart: string;
+  publicationEnd: string;
+  employmentLength: number;
+  websiteUrl: string;
+}
+
+interface SkillInfo {
+  skill: {
+    name: string;
+    skillType: {
+      name: string;
+    };
+  };
+  isRequired: boolean;
+}
+
+interface OfferTemplate {
+  name: string;
+  description: string;
+  skills: SkillInfo[];
+}
+
+interface ContractCondition {
+  salaryMin: number;
+  salaryMax: number;
+  currency: { name: string };
+  salaryTerm: { name: string };
+  hoursPerTerm: number;
+  isNegotiable: boolean;
+  workModes: { name: string }[];
+  employmentTypes: { name: string }[];
+}
+
+interface OfferDetailsData {
+  company: Company;
+  branch: Branch;
+  offer: Offer;
+  offerTemplate: OfferTemplate;
+  contractConditions: ContractCondition[];
+}
+
 const OfferDetails = () => {
   const { id, branchId, offerId } = useParams() as {
     id: string;
@@ -15,130 +67,157 @@ const OfferDetails = () => {
   const { data: session } = useSession();
   const router = useRouter();
 
-  const [data, setData] = useState<any>(null);
+  const [offerDetails, setOfferDetails] = useState<OfferDetailsData | null>(null);
   const [error, setError] = useState<string | null>(null);
-
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     if (!session?.user?.token || !offerId) return;
 
-    fetch(`http://localhost:8080/api/CompanyUser/offers/${offerId}`, {
-      headers: {
-        Authorization: `Bearer ${session.user.token}`,
-      },
-    })
-      .then(res => {
-        if (!res.ok) throw new Error('Failed to fetch offer');
-        return res.json();
-      })
-      .then(json => {
+    const fetchOfferDetails = async () => {
+      try {
+        const res = await fetch(`http://localhost:8080/api/CompanyUser/offers/${offerId}`, {
+          headers: {
+            'Authorization': `Bearer ${session.user.token}`,
+          },
+        });
+
+        if (!res.ok) {
+          throw new Error('Failed to fetch offer details');
+        }
+
+        const json = await res.json();
         const item = json.items?.[0];
-        if (!item) throw new Error('No offer found');
-        setData(item);
-      })
-      .catch(err => setError(err.message));
+
+        if (!item) {
+          throw new Error('No offer data found in the API response');
+        }
+
+        setOfferDetails(item);
+      } catch (err: any) {
+        setError(err.message);
+      }
+    };
+
+    fetchOfferDetails();
   }, [session, offerId]);
 
   if (!session?.user?.token) return <div>Unauthorized</div>;
   if (error) return <div>Error: {error}</div>;
-  if (!data) return <div>Loading...</div>;
-
-  const {company, branch, offer, offerTemplate, contractConditions } = data;
 
   const handleDelete = async () => {
-    const confirmed = confirm('Are you sure you want to delete this offer?');
-    if (!confirmed) return;
+    if (!window.confirm('Are you sure you want to delete this offer?')) {
+      return;
+    }
 
-    const res = await fetch(`http://localhost:8080/api/CompanyUser/companies/offers/${offerId}`, {
-      method: 'DELETE',
-      headers: {
-        Authorization: `Bearer ${session.user.token}`,
-      },
-    });
+    setIsDeleting(true);
+    setError(null);
 
-    if (res.ok) {
-      alert('Offer deleted');
+    try {
+      const res = await fetch(`http://localhost:8080/api/CompanyUser/companies/offers/${offerId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${session.user.token}`,
+        },
+      });
+
+      if (!res.ok) {
+        throw new Error('Failed to delete the offer.');
+      }
+
+      alert('Offer deleted successfully!');
       router.push(`/companies/${id}/${branchId}`);
-    } else {
-      alert('Failed to delete offer');
+
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setIsDeleting(false);
     }
   };
+
+  if (!session?.user?.token) return <div className="text-center p-4">Unauthorized</div>;
+  if (error) return <div className="text-center p-4 text-red-600">Error: {error}</div>;
+  if (!offerDetails) return <div className="text-center p-4">Loading...</div>;
+
+  const { company, branch, offer, offerTemplate, contractConditions } = offerDetails;
 
   return (
     <div className="max-w-2xl mx-auto">
       <h1 className="text-2xl font-bold mb-4">Offer Details</h1>
-      <p>
-        <Link href={`/companies/${id}`} >
-        <b>Company:</b> {company?.name}
-        </Link>
-      </p>
-      <p>
-        <Link href={`/companies/${id}/${branchId}`} >
-        <b>Branch:</b> {branch?.name}
-        </Link>
-      </p>
-      <p><b>Status:</b> {offer.status}</p>
-      
 
-      <p><b>Publication:</b> {new Date(offer.publicationStart).toLocaleString()} – {new Date(offer.publicationEnd).toLocaleString()}</p>
-      <p><b>Employment Length:</b> {offer.employmentLength} months</p>
-      <p><b>Website:</b> <a href={offer.websiteUrl} className="text-blue-600 underline" target="_blank" rel="noopener noreferrer">{offer.websiteUrl}</a></p>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <p>
+          <span className="font-semibold">Company:</span>{' '}
+          <Link href={`/companies/${id}`}>
+            {company?.name || 'N/A'}
+          </Link>
+        </p>
+        <p>
+          <span className="font-semibold">Branch:</span>{' '}
+          <Link href={`/companies/${id}/${branchId}`}>
+            {branch?.name || 'N/A'}
+          </Link>
+        </p>
+        <p><span className="font-semibold">Status:</span> {offer.status}</p>
+        <p><span className="font-semibold">Employment Length:</span> {offer.employmentLength} months</p>
+        <p className="md:col-span-2"><span className="font-semibold">Publication:</span> {new Date(offer.publicationStart).toLocaleString()} – {new Date(offer.publicationEnd).toLocaleString()}</p>
+        <p className="md:col-span-2"><span className="font-semibold">Website:</span> <a href={offer.websiteUrl} className="text-blue-600 underline" target="_blank" rel="noopener noreferrer">{offer.websiteUrl}</a></p>
+      </div>
 
-      <hr className="my-4" />
+      <hr className="my-6" />
 
-      <h2 className="text-xl font-semibold">Template</h2>
-      <p><b>Name:</b> {offerTemplate.name}</p>
-      <p><b>Description:</b> {offerTemplate.description}</p>
-
-      <h3 className="font-medium mt-2">Skills:</h3>
-      <ul className="list-disc ml-6">
-        {offerTemplate.skills.map((s: any, i: number) => (
-          <li key={i}>
-            {s.skill.name} ({s.skill.skillType.name}) {s.isRequired ? '(required)' : ''}
-          </li>
-        ))}
-      </ul>
-      
-      <br/>
-
-      {contractConditions?.length > 0 ? (
-        <>
-          <hr className="my-4" />
-          <h2 className="text-xl font-semibold">Contract Conditions</h2>
-          {contractConditions.map((cond: any, index: number) => (
-            <div key={index} className="mb-4 border p-3 rounded">
-              <p><b>Salary:</b> {cond.salaryMin} – {cond.salaryMax} {cond.currency?.name} ({cond.salaryTerm?.name})</p>
-              <p><b>Hours/Term:</b> {cond.hoursPerTerm}</p>
-              <p><b>Negotiable:</b> {cond.isNegotiable ? 'Yes' : 'No'}</p>
-              <p><b>Work Modes:</b> {cond.workModes?.map((w: any) => w.name).join(', ')}</p>
-              <p><b>Employment Types:</b> {cond.employmentTypes?.map((e: any) => e.name).join(', ')}</p>
-            </div>
+      <div>
+        <h2 className="text-2xl font-semibold mb-3 text-gray-700">Template Details</h2>
+        <p><span className="font-semibold">Name:</span> {offerTemplate.name}</p>
+        <p><span className="font-semibold">Description:</span> {offerTemplate.description}</p>
+        <h3 className="font-semibold mt-4 mb-2">Required Skills:</h3>
+        <ul className="list-disc list-inside space-y-1">
+          {offerTemplate.skills.map((s, i) => (
+            <li key={i}>
+              {s.skill.name} ({s.skill.skillType.name}) {s.isRequired && <span className="font-bold text-sm"> (required)</span>}
+            </li>
           ))}
-        </>
-      ) : (
-         <h2 className="text-xl font-semibold">Contract Conditions: Non</h2> )
-      }
+        </ul>
+      </div>
 
+      <hr className="my-6" />
 
+      <div>
+        <h2 className="text-2xl font-semibold mb-3 text-gray-700">Contract Conditions</h2>
+        {contractConditions?.length > 0 ? (
+          <div className="space-y-4">
+            {contractConditions.map((cond, index) => (
+              <div key={index} className="mb-4 border p-4 rounded-md">
+                <p><span className="font-semibold">Salary:</span> {cond.salaryMin} – {cond.salaryMax} {cond.currency?.name} ({cond.salaryTerm?.name})</p>
+                <p><span className="font-semibold">Hours/Term:</span> {cond.hoursPerTerm}</p>
+                <p><span className="font-semibold">Negotiable:</span> {cond.isNegotiable ? 'Yes' : 'No'}</p>
+                <p><span className="font-semibold">Work Modes:</span> {cond.workModes?.map((w) => w.name).join(', ')}</p>
+                <p><span className="font-semibold">Employment Types:</span> {cond.employmentTypes?.map((e) => e.name).join(', ')}</p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-gray-500 italic">No contract conditions specified.</p>
+        )}
+      </div>
 
-
-      {offer.statusId != 1 && (
-        <>
-      <Link
-        href={`/companies/${id}/${branchId}/offer/${offerId}/edit`}
-        className="inline-block mt-6 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-      >
-        Edit Offer
-      </Link>
-        <button
-        onClick={handleDelete}
-        className="mt-4 ml-4 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
-      >
-        Delete Offer
-      </button>
-      </>
-      )}      
-
+      {offer.statusId !== 1 && (
+        <div className="mt-8 flex items-center gap-4">
+          <Link
+            href={`/companies/${id}/${branchId}/offer/${offerId}/edit`}
+            className="inline-block bg-blue-600  py-2 rounded-md hover:bg-blue-700 transition-colors"
+          >
+            Edit Offer
+          </Link>
+          <button
+            onClick={handleDelete}
+            disabled={isDeleting}
+            className="bg-red-600 py-2 rounded-md hover:bg-red-700 transition-colors disabled:bg-gray-400"
+          >
+            {isDeleting ? 'Deleting...' : 'Delete Offer'}
+          </button>
+        </div>
+      )}
     </div>
   );
 };
