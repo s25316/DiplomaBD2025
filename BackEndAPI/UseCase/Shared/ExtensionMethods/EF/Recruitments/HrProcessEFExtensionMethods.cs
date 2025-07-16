@@ -134,16 +134,19 @@ namespace UseCase.Shared.ExtensionMethods.EF.Recruitments
             Guid? companyId,
             CompanyQueryParametersDto companyQueryParameters)
         {
-            return query.Where(recruitment => context.Companies
-                .Include(x => x.OfferTemplates)
-                .ThenInclude(x => x.OfferConnections)
+            return query.Where(process =>
+                context.Companies
                 .WhereIdentificationData(companyId, companyQueryParameters)
-                .Any(company => company.OfferTemplates
-                    .Any(ot =>
-                        ot.OfferConnections.Any(oc =>
-                            oc.OfferId == recruitment.OfferId &&
-                            oc.Removed == null
-                ))));
+                .Any(company =>
+                    context.OfferConnections
+                    .Include(oc => oc.OfferTemplate)
+                    .Any(offerConnections =>
+                        offerConnections.OfferId == process.OfferId &&
+                        offerConnections.Removed == null &&
+                        offerConnections.OfferTemplate.CompanyId == company.CompanyId
+                    )
+                )
+            );
         }
 
         public static IQueryable<HrProcess> WhereProcessType(
