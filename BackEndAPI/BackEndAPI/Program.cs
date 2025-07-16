@@ -37,7 +37,8 @@ namespace BackEndAPI
             app.UseCors(x => x.AllowAnyMethod()
                 .AllowAnyHeader()
                 .SetIsOriginAllowed(origin => true)
-                .AllowCredentials());
+                .AllowCredentials()
+                .WithExposedHeaders("Content-Disposition"));
 
             // Configure the HTTP request pipeline.
             app.UseSwagger();

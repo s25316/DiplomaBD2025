@@ -155,7 +155,6 @@ const Profile = () => {
         </div>
       )}
 
-      {/* Companies */}
       {(user.isIndividual===false) && (
       <div>
         <h2 className="text-xl font-semibold mt-8 mb-2">Companies templates</h2>
