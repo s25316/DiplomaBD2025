@@ -200,14 +200,17 @@ namespace UseCase.Roles.CompanyUser.Queries.CompanyUserGetOffers
             if (request.CompanyId.HasValue ||
                request.CompanyQueryParameters.HasValue)
             {
-                query = query.Where(offer => _context.Companies
-                    .Include(x => x.OfferTemplates)
-                    .ThenInclude(x => x.OfferConnections)
-                    .WhereIdentificationData(
-                        request.CompanyId,
-                        request.CompanyQueryParameters)
-                    .Any(company => offer.OfferConnections
-                        .Any(oc => oc.OfferTemplate.CompanyId == company.CompanyId)));
+                query = query.Where(offer =>
+                    _context.OfferConnections
+                    .Include(oc => oc.OfferTemplate)
+                    .Where(oc => oc.Removed == null)
+                    .Any(oc =>
+                        _context.Companies
+                        .WhereIdentificationData(request.CompanyId, request.CompanyQueryParameters)
+                        .Any(comapny =>
+                            comapny.CompanyId == oc.OfferTemplate.CompanyId &&
+                            comapny.Removed == null
+                    )));
             }
             else if (request.BranchId.HasValue)
             {
@@ -270,14 +273,15 @@ namespace UseCase.Roles.CompanyUser.Queries.CompanyUserGetOffers
             if (parameters.HasValue)
             {
                 return query.Where(offer =>
-                    _context.ContractConditions
-                        .Include(cc => cc.OfferConditions)
-                        .WhereSalary(parameters)
-                        .Any(cc =>
-                            cc.OfferConditions.Any(oc =>
-                                oc.Removed == null &&
-                                oc.OfferId == offer.OfferId
-                        )));
+                    _context.OfferConditions.Any(oc =>
+                        _context.ContractConditions
+                            .WhereSalary(parameters)
+                            .Any(cc =>
+                                    oc.Removed == null &&
+                                    oc.OfferId == offer.OfferId &&
+                                    oc.ContractConditionId == cc.ContractConditionId
+                            )
+                    ));
             }
             return query;
         }
@@ -337,19 +341,21 @@ namespace UseCase.Roles.CompanyUser.Queries.CompanyUserGetOffers
             if (!string.IsNullOrWhiteSpace(searchText))
             {
                 return query.Where(offer =>
-                    _context.OfferTemplates
-                    .Include(ot => ot.Company)
-                    .Include(ot => ot.OfferConnections)
-                    .WhereText(searchText)
-                    .Any(ot => ot.OfferConnections.Any(oc =>
-                        oc.Removed == null &&
-                        oc.OfferId == offer.OfferId
-                    )) ||
-                    _context.Branches
-                    .Include(branch => branch.Company)
-                    .WhereText(searchText)
-                    .Any(branch =>
-                        offer.BranchId == branch.BranchId)
+                    _context.OfferConnections
+                    .Include(oc => oc.OfferTemplate)
+                    .Any(oc =>
+                        _context.Branches
+                        .WhereText(searchText)
+                        .Any(branch =>
+                            oc.OfferTemplate.CompanyId == branch.CompanyId
+                        ) ||
+                        _context.Companies
+                        .WhereText(searchText)
+                        .Any(company =>
+                            oc.OfferTemplate.CompanyId == company.CompanyId &&
+                            company.Removed == null
+                        )
+                     )
                 );
             }
             return query;
