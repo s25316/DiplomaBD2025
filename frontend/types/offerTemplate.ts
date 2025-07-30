@@ -1,0 +1,3 @@
+interface OfferTemplate{
+    name: string
+}

@@ -1,0 +1,3 @@
+interface Offer {
+  offerId: string;
+}
