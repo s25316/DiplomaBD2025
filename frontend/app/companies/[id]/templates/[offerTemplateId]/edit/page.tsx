@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import OfferTemplateForm from '@/app/components/forms/OfferTemplateForm';
+import { OuterContainer } from '@/app/components/layout/PageContainers';
 
 // This interface defines the structure of a single skill object as received from the API
 interface Skill {
@@ -211,8 +212,8 @@ export default function EditOfferTemplate() {
   if (!form || skills.length === 0) return <div className="text-center py-4 text-blue-600">Loading template data...</div>;
 
   return (
-    <div className="max-w-xl mx-auto p-6 mt-8 font-inter">
-      <h1 className="text-3xl font-bold mb-6 text-gray-800 text-center">Edit Offer Template</h1>
+    <OuterContainer className="max-w-xl mx-auto p-6 mt-8 font-inter">
+      <h1 className="text-3xl font-bold mb-6 text-center">Edit Offer Template</h1>
       <OfferTemplateForm
         name={form.name}
         description={form.description}
@@ -224,6 +225,6 @@ export default function EditOfferTemplate() {
         onSubmit={handleSubmit}
         submitText="Save Changes"
       />
-    </div>
+    </OuterContainer>
   );
 }

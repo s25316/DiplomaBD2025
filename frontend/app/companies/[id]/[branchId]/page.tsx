@@ -9,6 +9,7 @@ import Pagination from '@/app/components/Pagination';
 import GeoMap from '@/app/components/GeoMap';
 import DeleteBranchButton from '@/app/components/buttons/DeleteBranchButton';
 import DeleteOfferButton from '@/app/components/buttons/DeleteOfferButton';
+import { InnerSection, OuterContainer } from '@/app/components/layout/PageContainers';
 
 interface Branch {
   name: string;
@@ -131,10 +132,10 @@ const BranchDetails = () => {
   const { branch, company } = branchDetails;
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white dark:bg-gray-900 rounded-lg shadow-xl mt-8 font-inter text-gray-900 dark:text-gray-100">
+    <OuterContainer>
       <h1 className="text-3xl font-bold mb-6 text-gray-800 dark:text-gray-100 text-center">Branch Details</h1>
       
-      <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg shadow-inner mb-6">
+      <InnerSection>
         <p className="text-xl font-bold mb-2 text-gray-800 dark:text-gray-100">Name: {branch.name}</p>
         <p className="text-lg mb-2 text-gray-700 dark:text-gray-300">
           <Link href={`/companies/${id}`}>
@@ -156,8 +157,7 @@ const BranchDetails = () => {
         {branch.address.lat && branch.address.lon && (
           <GeoMap lat={branch.address.lat} lon={branch.address.lon} />
         )}
-      </div>
-
+      <br/>
       <div className="flex flex-wrap gap-4 mb-8">
         <Link href={`/companies/${id}/${branchId}/edit`} className="inline-block bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition duration-300">
           Edit Branch
@@ -168,12 +168,17 @@ const BranchDetails = () => {
           buttonText="Delete Branch"
           className="inline-block bg-red-600 text-white px-5 py-2 rounded-lg hover:bg-red-700 transition duration-300"
         />
-
       </div>
+      </InnerSection>
+
+      <InnerSection>
       <Link href={`/companies/${id}/${branchId}/publishOffer`} className="inline-block bg-green-600 text-white px-5 py-2 rounded-lg hover:bg-green-700 transition duration-300">
         Publish Offer
       </Link>
+      <OuterContainer>
+
       <h2 className="mt-6 mb-4 text-2xl font-bold text-gray-800 dark:text-gray-100">Offers in this Branch:</h2>
+   
       <p className="mb-4 text-sm text-gray-600 dark:text-gray-400">
         Showing {offers.length} of {totalCount} offers
       </p>
@@ -215,8 +220,8 @@ const BranchDetails = () => {
       {offers.length > 0 ? (
         <ul className="space-y-4 mt-6">
           {offers.map(({ offer, offerTemplate }) => (
-            <li key={offer.offerId} 
-            className="border p-4 rou-lg shadow-sm font-inter bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100">
+            <li key={offer.offerId} >
+            <InnerSection>
               <Link href={`/companies/${id}/${branchId}/offer/${offer.offerId}`} className="text-blue-600 dark:text-blue-400">
                 <b className="text-lg font-bold">{offerTemplate?.name || 'Untitled Template'}</b>
               </Link>
@@ -241,6 +246,7 @@ const BranchDetails = () => {
               ) : (
                 <p className="text-gray-500 dark:text-gray-400 mt-3 italic">Expired (cannot delete)</p>
               )}
+              </InnerSection>
             </li>
           ))}
         </ul>
@@ -254,10 +260,12 @@ const BranchDetails = () => {
         isNextDisabled={offers.length < itemsPerPage || (itemsPerPage * page) >= totalCount}
       />
       <br/>
+      </OuterContainer>
       <Link href={`/companies/${id}/${branchId}/publishOffer`} className="inline-block bg-green-600 text-white px-5 py-2 rounded-lg hover:bg-green-700 transition duration-300 ease-in-out shadow-md font-semibold">
         Publish Offer
       </Link>
-    </div>
+      </InnerSection>
+    </OuterContainer>
     
   );
 };

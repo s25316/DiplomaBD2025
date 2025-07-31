@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { useSession } from "next-auth/react";
 import BranchForm from "@/app/components/forms/BranchForm"; // Import BranchForm
 import CancelButton from "@/app/components/buttons/CancelButton";
+import { OuterContainer } from "@/app/components/layout/PageContainers";
 
 // Represents the address structure as sent to/from the API
 interface AddressData {
@@ -160,20 +161,19 @@ const EditBranch = () => {
 
 
   return (
-    <div className='max-w-xl mx-auto p-6 mt-8 font-inter'>
-      <h1 className='text-3xl font-bold mb-6 text-gray-800 text-center'>Edit Branch</h1>
+    <OuterContainer>
+      <h1 className="text-3xl font-bold mb-6 text-gray-800 dark:text-gray-100 text-center">Edit Branch</h1>
       <form className='flex flex-col gap-6' onSubmit={handleSubmit}>
-        {/* Pass initialData to BranchForm */}
         <BranchForm index={0} getData={handleData} initialData={formState} />
-        <CancelButton/>
         <button
           type='submit'
           className='bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition duration-300 ease-in-out shadow-md font-semibold mt-4'
         >
           Save Changes
         </button>
+        <CancelButton/>
       </form>
-    </div>
+    </OuterContainer>
   );
 };
 

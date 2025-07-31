@@ -3,6 +3,7 @@ import React from 'react';
 import Link from 'next/link';
 import { useRouter, useParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
+import { InnerSection } from './layout/PageContainers';
 
 interface Template{
   offerTemplateId: string;
@@ -26,7 +27,8 @@ const OfferTemplatesList = ({
     <>
       <ul>
         {templates.map((t) => (
-          <li key={t.offerTemplateId} className="border p-2 rounded my-2 max-w-md">
+          <li key={t.offerTemplateId}>
+            <InnerSection className="border p-2 my-2 max-w-md">
             <div className="flex justify-between items-center">
             
             <Link href={`/companies/${id}/templates/${t.offerTemplateId}`}>
@@ -60,6 +62,7 @@ const OfferTemplatesList = ({
               </button>
             </div>
             </div>
+            </InnerSection>
           </li>
         ))}
       </ul>

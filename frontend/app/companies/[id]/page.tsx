@@ -13,6 +13,7 @@ import CreateContractConditionButton from '@/app/components/buttons/CreateContra
 import EditCompanyForm from '@/app/components/forms/EditCompanyForm';
 import SelectItemsPerPage from '@/app/components/SelectItemsPerPage';
 import Pagination from '@/app/components/Pagination';
+import { InnerSection, OuterContainer } from '@/app/components/layout/PageContainers';
 
 interface OfferTemplate {
   offerTemplateId: string;
@@ -110,8 +111,9 @@ const CompanyDetails = () => {
   }, [session, id, branchPage,branchPerPage,templatePage,templatePerPage, conditionPage,conditionPerPage]);
 
   return (
-    <div>
-      <h1>Company Details</h1>
+    <OuterContainer>
+      <h1 className="text-2xl font-bold">Company Details</h1>
+      <InnerSection>
       <CompanyInfo company={company} />
 
       {company && (
@@ -135,8 +137,9 @@ const CompanyDetails = () => {
           )}
         </>
       )}
+      </InnerSection>
       <br/>
-      <br/>
+      
       <div className="flex space-x-4 border-b pb-2 mb-4">
       <button
         onClick={() => setActiveTab('branches')}
@@ -161,7 +164,6 @@ const CompanyDetails = () => {
       {activeTab === 'branches' && (
         <div className="shadow-md rounded p-4">
           <div className="mt-2"><CreateBranchButton /></div>
-          <h2 className="text-lg font-semibold">Branches</h2>
           <p className="mt-2 text-sm text-gray-600">
             Showing {branches.length} of {branchTotal} branches
           </p>
@@ -182,7 +184,6 @@ const CompanyDetails = () => {
       {activeTab === 'contracts' && (
         <div className="shadow-md rounded p-4">
           <div className="mt-2"><CreateContractConditionButton /></div>
-          <h2 className="text-lg font-semibold">Contract Conditions</h2>
           <p className="mt-2 text-sm text-gray-600">
             Showing {conditions.length} of {conditionTotal} conditions
           </p>
@@ -204,7 +205,6 @@ const CompanyDetails = () => {
       {activeTab === 'templates' && (
         <div className="shadow-md rounded p-4">
           <div className="mt-2"><CreateOfferTemplateButton /></div>
-          <h2 className="text-lg font-semibold">Offer Templates</h2>
           <h2 className="mt-2 text-sm text-gray-600">
             Showing {templates.length} of {templateTotal} templates
           </h2>
@@ -221,7 +221,7 @@ const CompanyDetails = () => {
           />
         </div>
       )}
-    </div>
+    </OuterContainer>
   );
 };
 

@@ -1,10 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import CancelButton from '../buttons/CancelButton';
+import { InnerSection } from '../layout/PageContainers';
 
-// Interface for parameters like Currency, Salary Term, Work Mode, Employment Type
-// as they are received from /api/Dictionaries/contractParameters
 export interface ContractParameter {
   contractParameterId: number;
   name: string;
@@ -14,46 +12,45 @@ export interface ContractParameter {
   };
 }
 
-// Interface for the data structure submitted by the form
 export interface ContractConditionFormData {
   salaryMin: number;
   salaryMax: number;
   hoursPerTerm: number;
   isNegotiable: boolean;
+  isPaid: boolean;
   salaryTermId: number;
   currencyId: number;
   workModeIds: number[];
   employmentTypeIds: number[];
 }
 
-// Props interface for the ContractConditionForm component
 interface ContractConditionFormProps {
   onSubmit: (form: ContractConditionFormData) => Promise<void>;
-  initialData?: ContractConditionFormData | null; // Can be null if no initial data
-  parameters: ContractParameter[]; // This component expects an array of ContractParameter
+  initialData?: ContractConditionFormData | null;
+  parameters: ContractParameter[]; 
   submitText?: string;
 }
 
 const ContractConditionForm = ({ onSubmit, parameters, initialData, submitText = "Submit" }: ContractConditionFormProps) => {
-  // Initialize form state with initialData or default values
+
   const [form, setForm] = useState<ContractConditionFormData>(
-    initialData ?? { // Use nullish coalescing operator (??) for default values
+    initialData ?? { 
       salaryMin: 0,
       salaryMax: 0,
       hoursPerTerm: 0,
       isNegotiable: false,
-      salaryTermId: 3001, // Default to a known ID, adjust if necessary
-      currencyId: 1,      // Default to a known ID, adjust if necessary
+      isPaid: false,
+      salaryTermId: 3001, 
+      currencyId: 1,
       workModeIds: [],
       employmentTypeIds: [],
     }
   );
 
-  // Debugging: Log initial form state and parameters
-  React.useEffect(() => {
-    console.log('ContractConditionForm Initialized with Form:', form);
-    console.log('ContractConditionForm Parameters:', parameters);
-  }, [form, parameters]);
+  // React.useEffect(() => {
+  //   console.log('ContractConditionForm Initialized with Form:', form);
+  //   console.log('ContractConditionForm Parameters:', parameters);
+  // }, [form, parameters]);
 
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -61,11 +58,11 @@ const ContractConditionForm = ({ onSubmit, parameters, initialData, submitText =
     const name = target.name;
 
     let value: string | number | boolean;
-    if (target.type === 'checkbox') { // For checkbox inputs
+    if (target.type === 'checkbox') {
       value = (target as HTMLInputElement).checked;
     } else if (target.type === 'number') { // For number inputs (salaryMin, salaryMax, hoursPerTerm)
       let numValue = Number(target.value);
-      // Ensure number is not negative
+
       if (numValue < 0) {
         numValue = 0; // Set to 0 if negative
       }
@@ -130,56 +127,56 @@ const ContractConditionForm = ({ onSubmit, parameters, initialData, submitText =
 
 
   return (
-    <div className="flex flex-col gap-4 p-4 border rounded-lg">
-      <h3 className="text-xl font-semibold text-gray-800 mb-2">Contract Details</h3>
+    <InnerSection className="flex flex-col gap-4 p-4 border rounded-lg">
+      <h3 className="font-bold mb-2">Contract Details</h3>
       
-      <label className="font-semibold text-gray-700 dark:text-gray-300">Min Salary: 
+      <label className="font-semibold text-gray-700 dark:text-gray-300">Min Salary:  </label>
       <input 
           type="number" 
           name="salaryMin" 
           value={form.salaryMin} 
           onChange={handleChange} 
           placeholder="Salary Min" 
-          className="border border-gray-300 rounded-md p-1"
+          className="global-field-style"
           min="0" // Added for browser-level validation
       />
-      </label>
+      
 
-      <label className="font-semibold text-gray-700 dark:text-gray-300">Max Salary: 
+      <label className="font-semibold text-gray-700 dark:text-gray-300">Max Salary: </label>
       <input 
           type="number" 
           name="salaryMax" 
           value={form.salaryMax} 
           onChange={handleChange} 
           placeholder="Salary Max" 
-          className="border border-gray-300 rounded-md p-1"
-          min="0" // Added for browser-level validation
+          className="global-field-style"
+          min="0"
       />
-      </label>
+      
 
-      <label className="font-semibold text-gray-700 dark:text-gray-300">
+      <label className="font-semibold text-gray-700 dark:text-gray-300"></label>
         Salary Term:
         <select 
             name="salaryTermId" 
             value={form.salaryTermId} 
             onChange={handleChange}
-            className="border border-gray-300 rounded-md p-1"
+            className="global-field-style"
         >
           {getOptions('Salary Term')}
         </select>
-      </label>
 
-      <label className="font-semibold text-gray-700 dark:text-gray-300">Hours per term:
+
+      <label className="font-semibold text-gray-700 dark:text-gray-300">Hours per term: </label>
       <input 
           type="number" 
           name="hoursPerTerm" 
           value={form.hoursPerTerm} 
           onChange={handleChange} 
           placeholder="Hours" 
-          className="border border-gray-300 rounded-md p-2"
-          min="0" // Added for browser-level validation
+          className="global-field-style"
+          min="0"
       />
-      </label>
+      
 
       <label className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
         <input 
@@ -198,7 +195,7 @@ const ContractConditionForm = ({ onSubmit, parameters, initialData, submitText =
             name="currencyId" 
             value={form.currencyId} 
             onChange={handleChange}
-            className="border border-gray-300 rounded-md p-1"
+            className="global-field-style"
         >
           {getOptions('Currency')}
         </select>
@@ -216,14 +213,13 @@ const ContractConditionForm = ({ onSubmit, parameters, initialData, submitText =
 
       
       <button
-        type="button" // Use type="button" to prevent default form submission
+        type="button"
         className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition duration-300 ease-in-out shadow-md font-semibold mt-4"
-        onClick={() => onSubmit(form)} // Call onSubmit with the current form state
+        onClick={() => onSubmit(form)}
       >
         {submitText}
       </button>
-      <CancelButton/>
-    </div>
+    </InnerSection>
   );
 }
 

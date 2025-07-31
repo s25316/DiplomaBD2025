@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react'
 import BranchCreateForm from '@/app/components/forms/BranchForm'
 import BranchForm from '@/app/components/forms/BranchForm'
 import CancelButton from '@/app/components/buttons/CancelButton'
+import { OuterContainer } from '@/app/components/layout/PageContainers'
 
 interface SendData {
   name: string,
@@ -75,8 +76,8 @@ const createBranch = () => {
   }
 
   return (
-    <div className='max-w-xl mx-auto p-6 mt-8 font-inter'>
-      <h1 className='text-3xl font-bold mb-6 text-gray-800 text-center'>Create Branch</h1>
+    <OuterContainer className='max-w-xl mx-auto p-6 mt-8 font-inter'>
+      <h1 className='text-3xl font-bold mb-6 text-center'>Create Branch</h1>
       <form className='flex flex-col gap-6' onSubmit={handleSubmit}>
         <ul>
           {forms.map((value) => (
@@ -104,7 +105,7 @@ const createBranch = () => {
           className='bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition duration-300 ease-in-out shadow-md font-semibold mt-4'
           type='submit'>Create</button>
       </form>
-    </div>
+    </OuterContainer>
   )
 }
 

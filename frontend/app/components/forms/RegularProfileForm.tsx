@@ -4,52 +4,56 @@ import { useRouter } from 'next/navigation';
 import { GeocoderAutocomplete } from '@geoapify/geocoder-autocomplete';
 import '@geoapify/geocoder-autocomplete/styles/round-borders.css';
 import { UserProfile } from '@/app/profile/edit/page';
+import { InnerSection } from '../layout/PageContainers';
+
+interface Skill {
+  skillId: number;
+  name: string;
+  skillType: {
+    skillTypeId: number;
+    name: string;
+  };
+}
+
+interface UrlTypeOption {
+  urlTypeId: number;
+  name: string;
+}
+
+interface FormUrl {
+  value: string;
+  urlTypeId: number;
+}
+
+interface ProfileUpdatePayload {
+  description: string;
+  contactEmail: string;
+  contactPhoneNumber: string;
+  birthDate: string;
+  isTwoFactorAuthentication: boolean;
+  isStudent: boolean;
+  skillsIds: number[];
+  urls: FormUrl[];
+  address: {
+    countryName: string;
+    stateName: string;
+    cityName: string;
+    streetName: string;
+    houseNumber: string;
+    apartmentNumber: string | null;
+    postCode: string;
+    lon: number;
+    lat: number;
+  } | null;
+}
 
 interface RegularProfileFormProps {
   initialData: UserProfile;
   token: string;
 }
 
-interface SkillOption {
-    skillId: number;
-    name: string;
-}
-
-interface UrlTypeOption {
-    urlTypeId: number;
-    name: string;
-}
-
-interface FormUrl {
-    value: string;
-    urlTypeId: number;
-}
-
-interface ProfileUpdatePayload {
-    description: string;
-    contactEmail: string;
-    contactPhoneNumber: string;
-    birthDate: string;
-    isTwoFactorAuthentication: boolean;
-    isStudent: boolean;
-    skillsIds: number[];
-    urls: FormUrl[];
-    address: {
-        countryName: string;
-        stateName: string;
-        cityName: string;
-        streetName: string;
-        houseNumber: string;
-        apartmentNumber: string | null;
-        postCode: string;
-        lon: number;
-        lat: number;
-    } | null;
-}
-
 const RegularProfileForm = ({ initialData, token }: RegularProfileFormProps) => {
-
-  const [skills, setSkills] = useState<SkillOption[]>([]);
+  const [skills, setSkills] = useState<Skill[]>([]);
   const [urlTypes, setUrlTypes] = useState<UrlTypeOption[]>([]);
   const router = useRouter();
 
@@ -72,9 +76,12 @@ const RegularProfileForm = ({ initialData, token }: RegularProfileFormProps) => 
       postCode: initialData.address?.postCode || '',
       lon: initialData.address?.lon || 0,
       lat: initialData.address?.lat || 0,
-    }: null,
+    } : null,
   });
-const setAddress = (newAddressPart: Partial<ProfileUpdatePayload['address']>) => {
+
+  const [groupedSkills, setGroupedSkills] = useState<Record<string, Skill[]>>({});
+
+  const setAddress = (newAddressPart: Partial<ProfileUpdatePayload['address']>) => {
     setForm(prevForm => {
       const currentAddress = prevForm.address || {
         countryName: '',
@@ -91,8 +98,8 @@ const setAddress = (newAddressPart: Partial<ProfileUpdatePayload['address']>) =>
       return {
         ...prevForm,
         address: {
-          ...currentAddress, // keep existing address
-          ...newAddressPart, // override/add new address part
+          ...currentAddress, 
+          ...newAddressPart,
         },
       };
     });
@@ -101,11 +108,24 @@ const setAddress = (newAddressPart: Partial<ProfileUpdatePayload['address']>) =>
   useEffect(() => {
     const headers = { Authorization: `Bearer ${token}` };
     Promise.all([
-      fetch('http://localhost:8080/api/Dictionaries/skills', { headers }),
-      fetch('http://localhost:8080/api/Dictionaries/urlTypes', { headers }),
+      fetch('http://localhost:8080/api/Dictionaries/skills', { headers, cache: 'no-store' }), // Dodano cache: no-store
+      fetch('http://localhost:8080/api/Dictionaries/urlTypes', { headers, cache: 'no-store' }), // Dodano cache: no-store
     ]).then(async ([skillsRes, urlTypesRes]) => {
-      setSkills(await skillsRes.json());
+      const skillsData: Skill[] = await skillsRes.json();
+      setSkills(skillsData);
       setUrlTypes(await urlTypesRes.json());
+
+      const grouped = skillsData.reduce((acc, skill) => {
+        const typeName = skill.skillType?.name || 'Other';
+        if (!acc[typeName]) {
+          acc[typeName] = [];
+        }
+        acc[typeName].push(skill);
+        return acc;
+      }, {} as Record<string, Skill[]>);
+      setGroupedSkills(grouped);
+    }).catch(error => {
+      console.error("Error fetching dictionary data:", error);
     });
 
     const apiKey = process.env.GEOAPIFY_API!;
@@ -166,115 +186,174 @@ const setAddress = (newAddressPart: Partial<ProfileUpdatePayload['address']>) =>
 
     const fullPayload: ProfileUpdatePayload = { ...form, urls: deduplicatedUrls };
 
-    const res = await fetch('http://localhost:8080/api/User/regularData', {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(fullPayload),
-    });
+    try {
+      const res = await fetch('http://localhost:8080/api/User/regularData', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(fullPayload),
+      });
 
-
-    if (res.ok){
-      alert('Profile updated!');
-      router.push('/profile');
+      if (res.ok){
+        alert('Profile updated!');
+        router.push('/profile');
+      } else {
+        const errorText = await res.text();
+        alert(`Failed to update profile: ${errorText}`);
+      }
+    } catch (error: any) {
+      console.error("Error updating profile:", error);
+      alert(`An unexpected error occurred: ${error.message}`);
     }
-    else alert('Failed to update profile');
   };
 
   return (
-    <div className="flex flex-col gap-4 mt-4 max-w-2xl border rounded-lg">
-      <label><b>Description</b></label>
-      <textarea className='border border-gray-300' value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
+    <InnerSection className="flex flex-col gap-4 mt-4 max-w-2xl">
+      <label className="font-semibold text-gray-700 dark:text-gray-300"><b>Description</b></label>
+      <textarea 
+        className='global-field-style' 
+        value={form.description} 
+        onChange={(e) => setForm({ ...form, description: e.target.value })} 
+      />
 
-      <label><b>Contact Email</b></label>
-      <input className='border border-gray-300 rounded-md p-1' value={form.contactEmail} onChange={(e) => setForm({ ...form, contactEmail: e.target.value })} />
+      <label className="font-semibold text-gray-700 dark:text-gray-300"><b>Contact Email</b></label>
+      <input 
+        className='global-field-style' 
+        value={form.contactEmail} 
+        onChange={(e) => setForm({ ...form, contactEmail: e.target.value })} 
+        type="email"
+     />
 
-      <label><b>Phone Number</b></label>
-      <input className='border border-gray-300 rounded-md p-1' value={form.contactPhoneNumber} onChange={(e) => setForm({ ...form, contactPhoneNumber: e.target.value })} />
+      <label className="font-semibold text-gray-700 dark:text-gray-300"><b>Phone Number</b></label>
+      <input 
+        className='global-field-style' 
+        value={form.contactPhoneNumber} 
+        onChange={(e) => setForm({ ...form, contactPhoneNumber: e.target.value })} 
+        type="tel" // Upewnij się, że to jest typ tel
+      />
 
-      <label><b>Birth Date</b></label>
-      <input className='border border-gray-300 rounded-md p-1' type="date" value={form.birthDate} onChange={(e) => setForm({ ...form, birthDate: e.target.value })} />
+      <label className="font-semibold text-gray-700 dark:text-gray-300"><b>Birth Date</b></label>
+      <input 
+        className='global-field-style' 
+        type="date" 
+        value={form.birthDate} 
+        onChange={(e) => setForm({ ...form, birthDate: e.target.value })} 
+      />
+
       {(form.address?.countryName != "") && (
-        <div className="text-sm text-gray-700 italic mb-2">
+        <div className="text-sm text-gray-700 dark:text-gray-300 italic mb-2">
           <b>Current address:</b><br />
-
-        {[
-          "ul.",
-          form.address?.streetName,
-          form.address?.houseNumber, "/",
-          form.address?.apartmentNumber,",",
-          form.address?.postCode, ",",
-          form.address?.cityName,
-          form.address?.countryName,
-        ]
-          .filter(Boolean)
-          .join(' ')}
-      </div>
+          {[
+            "ul.",
+            form.address?.streetName,
+            form.address?.houseNumber, "/",
+            form.address?.apartmentNumber,",",
+            form.address?.postCode, ",",
+            form.address?.cityName,
+            form.address?.countryName,
+          ]
+            .filter(Boolean)
+            .join(' ')}
+        </div>
       )}
 
-      <div id="autocomplete-container" style={{ position: 'relative' }} />
-      <label>Apartment Number</label>
+      <div id="autocomplete-container" style={{ position: 'relative' }} className="mb-4" /> {/* Dodano mb-4 */}
+      <label className="font-semibold text-gray-700 dark:text-gray-300">Apartment Number</label>
       <input
         type="text"
-        className='border border-gray-300 rounded-md p-1'
+        className='global-field-style'
         value={form.address?.apartmentNumber || ''}
         onChange={(e) => setAddress({ ...form.address, apartmentNumber: e.target.value })}
       />
       
-      <label>
+      <label className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
         <input
           type="checkbox"
           checked={form.isTwoFactorAuthentication}
           onChange={(e) => setForm({ ...form, isTwoFactorAuthentication: e.target.checked })}
-        /> Two-Factor Authentication
+          className="form-checkbox h-4 w-4 text-blue-600 transition duration-150 ease-in-out rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700"
+        /> 
+        Two-Factor Authentication
       </label>
 
-      <label>
+      <label className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
         <input
           type="checkbox"
           checked={form.isStudent}
           onChange={(e) => setForm({ ...form, isStudent: e.target.checked })}
-        /> Are you a student?
+          className="form-checkbox h-4 w-4 text-blue-600 transition duration-150 ease-in-out rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700"
+        /> 
+        Are you a student?
       </label>
 
-       <label><b>Skills</b></label>
-       <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-         {skills.map(skill => (
-          <label key={skill.skillId} className="text-sm flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={form.skillsIds.includes(skill.skillId)}
-              onChange={(e) => handleSkillChange(skill.skillId, e.target.checked)}
-            />
-            {skill.name}
-          </label>
-        ))}
-      </div>
+      {/* Sekcja wyboru umiejętności */}
+      <h3 className='text-xl font-semibold text-gray-800 dark:text-gray-100 mt-4 mb-2'>Select Skills</h3>
+      {Object.entries(groupedSkills).length > 0 ? (
+        Object.entries(groupedSkills).map(([type, group]) => (
+          <div key={type} className='mb-4'> {/* Key for the skill type group div */}
+            <fieldset className='border border-gray-400 dark:border-gray-700 p-3 rounded-md'>
+              <legend className='text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2'>{type}</legend>
+              <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-3'>
+                {group.map((skill: Skill) => { // 'skill' here is of type 'Skill'
+                  const isSelected = form.skillsIds.includes(skill.skillId); // Sprawdzenie, czy umiejętność jest wybrana
+                  
+                  return (
+                    <div key={skill.skillId} className='flex items-center justify-between'> {/* Usunięto border-gray-100, bo nie jest potrzebne */}
+                      <label className='flex items-center gap-2 text-gray-700 dark:text-gray-300 cursor-pointer'>
+                        <input
+                          type='checkbox'
+                          checked={isSelected}
+                          onChange={(e) => handleSkillChange(skill.skillId, e.target.checked)}
+                          className='form-checkbox h-5 w-5 text-blue-600 rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700'
+                        />
+                        <span className='font-medium'>{skill.name}</span>
+                      </label>
+                    </div>
+                  );
+                })}
+              </div>
+            </fieldset>
+          </div>
+        ))
+      ) : (
+        <p className='text-gray-600 dark:text-gray-400 italic'>No skills available to select.</p>
+      )}
 
-      <label><b>Links</b></label>
+      <label className="font-semibold text-gray-700 dark:text-gray-300"><b>Links</b></label>
       {form.urls.map((url, index) => (
         <div key={index} className="flex gap-2 items-center">
-          <input className='border border-gray-300 rounded-md p-1' type="text" value={url.value} onChange={(e) => updateUrl(index, 'value', e.target.value)} />
-          <select className='border border-gray-300 rounded-md p-2' value={url.urlTypeId} onChange={(e) => updateUrl(index, 'urlTypeId', Number(e.target.value))}>
+          <input 
+            className='global-field-style flex-grow' 
+            type="text" 
+            value={url.value} 
+            onChange={(e) => updateUrl(index, 'value', e.target.value)} 
+          />
+          <select 
+            className='global-field-style' 
+            value={url.urlTypeId} 
+            onChange={(e) => updateUrl(index, 'urlTypeId', Number(e.target.value))}
+          >
             {urlTypes.map(t => <option key={t.urlTypeId} value={t.urlTypeId}>{t.name}</option>)}
           </select>
           <button
-            className = 'bg-red-600 text-white rounded-lg hover:bg-red-700'
+            className='bg-red-600 text-white px-3 py-2 rounded-lg hover:bg-red-700 transition duration-300 ease-in-out shadow-md font-semibold'
             type="button" onClick={() => removeUrl(index)}>Remove</button>
         </div>
       ))}
       <button
-        className = 'bg-green-600 text-white py-2 px-4 rounded mt-4'
+        className='inline-block bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition duration-300 ease-in-out shadow-md font-semibold self-start mt-2' // Dodano self-start i mt-2
         type="button" onClick={addUrl}>Add Link
       </button>
 
       <button
         onClick={handleSubmit}
-        className="bg-blue-600 text-white py-2 px-4 rounded mt-4" > Update Profile
+        className="inline-block bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-300 ease-in-out shadow-md font-semibold self-start mt-4" // Dodano self-start i mt-4
+      > 
+        Update Profile
       </button>
-    </div>
+    </InnerSection>
   );
 };
 

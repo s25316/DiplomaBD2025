@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
+import { InnerSection, OuterContainer } from '@/app/components/layout/PageContainers';
 
 interface Company {
   name: string;
@@ -142,8 +143,9 @@ const OfferDetails = () => {
   const { company, branch, offer, offerTemplate, contractConditions } = offerDetails;
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">Offer Details</h1>
+    <OuterContainer>
+      <h1 className="text-2xl font-bold mb-4 text-center">Offer Details</h1>
+      <InnerSection>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <p>
@@ -164,10 +166,11 @@ const OfferDetails = () => {
         <p className="md:col-span-2"><span className="font-semibold">Website:</span> <a href={offer.websiteUrl} className="text-blue-600 underline" target="_blank" rel="noopener noreferrer">{offer.websiteUrl}</a></p>
       </div>
 
-      <hr className="my-6" />
+      </InnerSection>
 
       <div>
-        <h2 className="text-2xl font-semibold mb-3 text-gray-700">Template Details</h2>
+        <h2 className="text-2xl font-bold mb-4">Template Details</h2>
+        <InnerSection>
         <p><span className="font-semibold">Name:</span> {offerTemplate.name}</p>
         <p><span className="font-semibold">Description:</span> {offerTemplate.description}</p>
         <h3 className="font-semibold mt-4 mb-2">Required Skills:</h3>
@@ -178,21 +181,22 @@ const OfferDetails = () => {
             </li>
           ))}
         </ul>
+        </InnerSection>
       </div>
 
-      <hr className="my-6" />
-
       <div>
-        <h2 className="text-2xl font-semibold mb-3 text-gray-700">Contract Conditions</h2>
+        <h2 className="text-2xl font-bold mb-4">Contract Conditions</h2>
         {contractConditions?.length > 0 ? (
           <div className="space-y-4">
             {contractConditions.map((cond, index) => (
-              <div key={index} className="mb-4 border p-4 rounded-md">
+              <div key={index} >
+                <InnerSection>
                 <p><span className="font-semibold">Salary:</span> {cond.salaryMin} – {cond.salaryMax} {cond.currency?.name} ({cond.salaryTerm?.name})</p>
                 <p><span className="font-semibold">Hours/Term:</span> {cond.hoursPerTerm}</p>
                 <p><span className="font-semibold">Negotiable:</span> {cond.isNegotiable ? 'Yes' : 'No'}</p>
                 <p><span className="font-semibold">Work Modes:</span> {cond.workModes?.map((w) => w.name).join(', ')}</p>
                 <p><span className="font-semibold">Employment Types:</span> {cond.employmentTypes?.map((e) => e.name).join(', ')}</p>
+                </InnerSection>
               </div>
             ))}
           </div>
@@ -218,7 +222,8 @@ const OfferDetails = () => {
           </button>
         </div>
       )}
-    </div>
+      
+    </OuterContainer>
   );
 };
 

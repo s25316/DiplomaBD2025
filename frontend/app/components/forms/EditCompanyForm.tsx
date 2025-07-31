@@ -1,6 +1,7 @@
 'use client';
 import React, { useState } from 'react';
 import { useSession } from 'next-auth/react';
+import { InnerSection } from '../layout/PageContainers';
 
 const EditCompanyForm = ({ company, companyId, onUpdated }: { company: any, companyId: string, onUpdated: (data: any) => void }) => {
   const { data: session } = useSession();
@@ -39,36 +40,38 @@ const EditCompanyForm = ({ company, companyId, onUpdated }: { company: any, comp
   };
 
   return (
-    <form onSubmit={handleSubmit} className="border p-4 mt-6 rounded">
-      <h2 className="text-lg font-semibold mb-4">Edit Company</h2>
+    <form onSubmit={handleSubmit} >
+      <InnerSection className="border p-4 mt-6 rounded">
+        <h2 className="text-lg font-bold mb-4">Edit Company</h2>
 
-      <div className="mb-4">
-        <label className="block text-sm font-medium mb-1">Description:</label>
-        <input
-          type="text"
-          className="border rounded px-2 py-1 w-full"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
-      </div>
+        <div className="mb-4">
+          <label className="block text-sm font-semibold mb-1">Description:</label>
+          <input
+            type="text"
+            className="global-field-style"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+          />
+        </div>
 
-      <div className="mb-4">
-        <label className="block text-sm font-medium mb-1">Website URL:</label>
-        <input
-          type="text"
-          className="border rounded px-2 py-1 w-full"
-          value={websiteUrl}
-          onChange={(e) => setWebsiteUrl(e.target.value)}
-        />
-      </div>
+        <div className="mb-4">
+          <label className="block text-sm font-semibold mb-1">Website URL:</label>
+          <input
+            type="text"
+            className="global-field-style"
+            value={websiteUrl}
+            onChange={(e) => setWebsiteUrl(e.target.value)}
+          />
+        </div>
 
-      <button
-        type="submit"
-        className="inline-block mt-2 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-        disabled={loading}
-      >
-        {loading ? 'Saving...' : 'Save Changes'}
-      </button>
+        <button
+          type="submit"
+          className="inline-block mt-2 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+          disabled={loading}
+        >
+          {loading ? 'Saving...' : 'Save Changes'}
+        </button>
+      </InnerSection>
     </form>
   );
 };

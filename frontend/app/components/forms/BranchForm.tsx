@@ -2,6 +2,7 @@
 import React, { useState, useEffect} from 'react'
 import { GeocoderAutocomplete } from '@geoapify/geocoder-autocomplete'
 import '@geoapify/geocoder-autocomplete/styles/round-borders.css'
+import { InnerSection } from '../layout/PageContainers';
 
 interface Props {
   index: number,
@@ -78,11 +79,11 @@ const BranchForm = (props: Props) => {
   }
 
   return (
-    <div className='flex flex-col gap-4 p-4 border rounded-lg'>
+    <InnerSection className='flex flex-col gap-4 p-4 border rounded-lg'>
       <label htmlFor='name'>Branch name:</label>
-      <input className='border border-gray-300 rounded-md p-1' type='text' name='name' placeholder='Branch name' value={form.name} onChange={handleChange} required />
+      <input className='global-field-style' type='text' name='name' placeholder='Branch name' value={form.name} onChange={handleChange} required />
       <label htmlFor='description'>Description:</label>
-      <input className='border border-gray-300 rounded-md p-1' type='text' name='description' placeholder='Description' value={form.description ?? ""} onChange={handleChange} />
+      <input className='global-field-style' type='text' name='description' placeholder='Description' value={form.description ?? ""} onChange={handleChange} />
       <label  htmlFor='address'>Address:</label>
       {(props.initialData?.address && props.initialData.address.streetName) && (
         <div className='text-sm text-gray-700 italic mb-2'>
@@ -104,8 +105,8 @@ const BranchForm = (props: Props) => {
 
       <div id={`autocomplete-${props.index}`} className='autocomplete-container' style={{ position: 'relative' }}></div>
       <label htmlFor='apartmentNumber'>Apartment number:</label>
-      <input className='border border-gray-300 rounded-md p-1' type='text' name='apartmentNumber' placeholder='123' value={form.address.apartmentNumber ?? ""} onChange={handleAddressChange} />
-    </div>
+      <input className='global-field-style' type='text' name='apartmentNumber' placeholder='123' value={form.address.apartmentNumber ?? ""} onChange={handleAddressChange} />
+    </InnerSection>
   )
 }
 

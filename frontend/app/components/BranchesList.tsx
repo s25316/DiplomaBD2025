@@ -3,6 +3,7 @@ import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import DeleteBranchButton from './buttons/DeleteBranchButton';
+import { InnerSection } from './layout/PageContainers';
 
 interface Branch {
   branchId: string;
@@ -30,7 +31,8 @@ const BranchesList = ({
   return (
     <ul>
       {branches.map((branch) => (
-        <li key={branch.branchId} className="border p-2 rounded my-2 max-w-md">
+        <li key={branch.branchId} >
+          <InnerSection className="my-2 max-w-md">
           {/* Flex container for horizontal layout */}
           {/* <div className="flex justify-between items-center"> */}
             <Link href={`/companies/${companyId}/${branch.branchId}`}>
@@ -56,7 +58,9 @@ const BranchesList = ({
               />
 
           </div>
+          </InnerSection>
         </li>
+        
       ))}
     </ul>
   );

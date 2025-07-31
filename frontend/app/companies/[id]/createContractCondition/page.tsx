@@ -4,6 +4,7 @@ import { useSession } from 'next-auth/react';
 import { useParams, useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import ContractConditionForm from '@/app/components/forms/ContractConditionForm'; // Import the form component
+import { OuterContainer } from '@/app/components/layout/PageContainers';
 
 // Interface for parameters like Currency, Salary Term, Work Mode, Employment Type
 // as they are received from /api/Dictionaries/contractParameters
@@ -103,10 +104,10 @@ const CreateContractConditionPage = () => {
   if (parameters.length === 0 && session.user.token) return <div className="text-center py-4 text-blue-600">Loading contract parameters...</div>;
 
   return (
-    <div className="max-w-xl mx-auto p-6 mt-8 font-inter">
-      <h1 className="text-3xl font-bold mb-6 text-gray-800 text-center">Create Contract Condition</h1>
+    <OuterContainer className="max-w-xl mx-auto p-6 mt-8 font-inter">
+      <h1 className="text-3xl font-bold mb-6 text-center">Create Contract Condition</h1>
       <ContractConditionForm onSubmit={handleSubmit} parameters={parameters} submitText="Create" />
-    </div>
+    </OuterContainer>
   );
 };
 

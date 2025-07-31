@@ -4,6 +4,7 @@ import { useSession } from 'next-auth/react';
 import { useParams, useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import ContractConditionForm from '@/app/components/forms/ContractConditionForm'; // Import the form component
+import { OuterContainer } from '@/app/components/layout/PageContainers';
 
 // Interface for parameters like Currency, Salary Term, Work Mode, Employment Type
 // as they are received from /api/Dictionaries/contractParameters
@@ -95,7 +96,7 @@ const EditContractConditionPage = () => {
         }
         const paramData: ContractParameter[] = await paramRes.json();
         setParameters(paramData);
-        console.log("Fetched contract parameters (Edit):", paramData); // Debug log
+        // console.log("Fetched contract parameters (Edit):", paramData); // Debug log
 
         if (!condRes.ok) {
           const errorText = await condRes.text();
@@ -121,7 +122,7 @@ const EditContractConditionPage = () => {
           workModeIds: item.workModes.map((w: ArrayNestedContractParameter) => w.contractParameterId), // Extract IDs
           employmentTypeIds: item.employmentTypes.map((e: ArrayNestedContractParameter) => e.contractParameterId), // Extract IDs
         });
-        console.log("Fetched and set initial form data (Edit):", { ...item, mappedToForm: true }); // Debug log
+        // console.log("Fetched and set initial form data (Edit):", { ...item, mappedToForm: true }); // Debug log
 
       } catch (error: any) {
         console.error("Error fetching data:", error);
@@ -169,8 +170,8 @@ const EditContractConditionPage = () => {
   if (parameters.length === 0 || initialData === null) return <div className="text-center py-4 text-blue-600">Loading contract condition data...</div>;
 
   return (
-    <div className="max-w-xl mx-auto p-6 mt-8 font-inter">
-      <h1 className="text-3xl font-bold mb-6 text-gray-800 text-center">Edit Contract Condition</h1>
+    <OuterContainer className="max-w-xl mx-auto p-6 mt-8 font-inter">
+      <h1 className="text-3xl font-bold mb-6 text-center">Edit Contract Condition</h1>
       {/* Render form only when initialData is available */}
       <ContractConditionForm
         initialData={initialData}
@@ -178,7 +179,7 @@ const EditContractConditionPage = () => {
         parameters={parameters}
         submitText="Save Changes"
       />
-    </div>
+    </OuterContainer>
   );
 };
 

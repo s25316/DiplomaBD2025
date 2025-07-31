@@ -4,6 +4,8 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import OfferForm from '@/app/components/forms/OfferForm';
+import { InnerSection, OuterContainer } from '@/app/components/layout/PageContainers';
+import CancelButton from '@/app/components/buttons/CancelButton';
 
 interface OfferFormData {
   offerTemplateId: string;
@@ -153,8 +155,9 @@ const EditOfferPage = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">Edit Offer</h1>
+    <OuterContainer maxWidth="max-w-4xl">
+      <h1 className="text-2xl font-bold mb-4 text-center">Edit Offer</h1>
+      <div>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <OfferForm
           form={form}
@@ -178,8 +181,10 @@ const EditOfferPage = () => {
         <button type="submit" className="inline-block mt-6 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
           Update Offer
         </button>
+        <CancelButton/>
       </form>
     </div>
+    </OuterContainer>
   );
 };
 

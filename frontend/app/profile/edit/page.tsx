@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import RegularProfileForm from '@/app/components/forms/RegularProfileForm';
+import { OuterContainer } from '@/app/components/layout/PageContainers';
 
 interface SkillType {
   skillTypeId: number;
@@ -101,10 +102,10 @@ const EditProfilePage = () => {
   if (!userData) return <p>No data found.</p>;
 
   return (
-    <div className="max-w-xl mx-auto p-4">
+    <OuterContainer className="max-w-xl mx-auto p-4">
       <h1 className="text-3xl font-bold mb-6 text-center">Edit Profile</h1>
       <RegularProfileForm token={session.user.token} initialData={userData} />
-    </div>
+    </OuterContainer>
   );
 };
 

@@ -4,6 +4,7 @@ import { useSession } from 'next-auth/react';
 import { useParams, useRouter } from 'next/navigation';
 import OfferForm from '@/app/components/forms/OfferForm';
 import {  ContractConditionFormData } from '@/app/components/forms/ContractConditionForm';
+import { OuterContainer } from '@/app/components/layout/PageContainers';
 
 
 const PublishOffer = () => {
@@ -161,8 +162,8 @@ const refreshConditions = async () => {
 
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">Publish Offer</h1>
+    <OuterContainer>
+      <h1 className="text-2xl font-bold mb-4 text-center">Publish Offer</h1>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <OfferForm
           form={form}
@@ -185,7 +186,7 @@ const refreshConditions = async () => {
         />
         <button type="submit" className="bg-blue-600 text-white p-2 rounded mt-4">Publish Offer</button>
       </form>
-    </div>
+    </OuterContainer>
   );
 };
 

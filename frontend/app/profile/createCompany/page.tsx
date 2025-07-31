@@ -2,6 +2,8 @@
 import React, { useState } from "react";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
+import { InnerSection, OuterContainer } from "@/app/components/layout/PageContainers";
+import CancelButton from "@/app/components/buttons/CancelButton";
 
 const CreateCompany = () => {
   const { data: session } = useSession();
@@ -77,9 +79,9 @@ const CreateCompany = () => {
   };
 
   return (
-    <div className="max-w-xl mx-auto">
-      <h1>Create Company</h1>
-
+    <OuterContainer className="max-w-xl mx-auto">
+      <h1 className="text-3xl font-bold mb-6 text-center">Create Company</h1>
+      <InnerSection>
       {/* Błędy walidacji */}
       {errors.length > 0 && (
         <div className= "text-red-500">
@@ -91,42 +93,43 @@ const CreateCompany = () => {
         </div>
       )}
 
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4 mt-4">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4 mt-4">
 
-    <div className="flex items-center gap-2">
-      <label htmlFor="name" className="w-32">Name:</label>
-      <input type="text" id="name" name="name" onChange={handleChange} required className="flex-1 p-1 border rounded" />
-    </div>
+      <div className="flex items-center gap-2">
+        <label htmlFor="name" className="w-32">Name:</label>
+        <input type="text" id="name" name="name" onChange={handleChange} required className='global-field-style' />
+      </div>
 
-    <div className="flex items-center gap-2">
-      <label htmlFor="description" className="w-32">Description:</label>
-      <input type="text" id="description" name="description" onChange={handleChange} required className="flex-1 p-1 border rounded" />
-    </div>
+      <div className="flex items-center gap-2">
+        <label htmlFor="description" className="w-32">Description:</label>
+        <input type="text" id="description" name="description" onChange={handleChange} required className='global-field-style' />
+      </div>
 
-    <div className="flex items-center gap-2">
-      <label htmlFor="regon" className="w-32">REGON:</label>
-      <input type="text" id="regon" name="regon" onChange={handleChange} required className="flex-1 p-1 border rounded" />
-    </div>
+      <div className="flex items-center gap-2">
+        <label htmlFor="regon" className="w-32">REGON:</label>
+        <input type="text" id="regon" name="regon" onChange={handleChange} required className='global-field-style' />
+      </div>
 
-    <div className="flex items-center gap-2">
-      <label htmlFor="nip" className="w-32">NIP:</label>
-      <input type="text" id="nip" name="nip" onChange={handleChange} required className="flex-1 p-1 border rounded" />
-    </div>
+      <div className="flex items-center gap-2">
+        <label htmlFor="nip" className="w-32">NIP:</label>
+        <input type="text" id="nip" name="nip" onChange={handleChange} required className='global-field-style' />
+      </div>
 
-    <div className="flex items-center gap-2">
-      <label htmlFor="krs" className="w-32">KRS:</label>
-      <input type="text" id="krs" name="krs" onChange={handleChange} required className="flex-1 p-1 border rounded" />
-    </div>
+      <div className="flex items-center gap-2">
+        <label htmlFor="krs" className="w-32">KRS:</label>
+        <input type="text" id="krs" name="krs" onChange={handleChange} required className='global-field-style' />
+      </div>
 
-    <div className="flex items-center gap-2">
-      <label htmlFor="websiteUrl" className="w-32">Website:</label>
-      <input type="text" id="websiteUrl" name="websiteUrl" onChange={handleChange} required className="flex-1 p-1 border rounded" />
-    </div>
+      <div className="flex items-center gap-2">
+        <label htmlFor="websiteUrl" className="w-32">Website:</label>
+        <input type="text" id="websiteUrl" name="websiteUrl" onChange={handleChange} required className='global-field-style' />
+      </div>
 
-    <button type="submit" className="mt-4 p-2 bg-blue-600 text-white rounded">Create</button>
-    </form>
-
-    </div>
+      <button type="submit" className="mt-4 p-2 bg-blue-600 text-white rounded">Create</button>
+      </form>
+      </InnerSection>
+      
+    </OuterContainer>
   );
 };
 

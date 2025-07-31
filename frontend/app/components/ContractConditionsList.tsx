@@ -3,6 +3,7 @@
 import React from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
+import { InnerSection } from './layout/PageContainers';
 
 interface ContractCondition {
     contractConditionId: string;
@@ -33,7 +34,8 @@ interface ContractCondition {
     <>
       <ul>
         {contractConditions.map((cond) => (
-          <li key={cond.contractConditionId} className="border p-2 rounded my-2 max-w-md">
+          <li key={cond.contractConditionId} >
+            <InnerSection className="my-2 max-w-md">
             <p><b>Hours/Term:</b> {cond.hoursPerTerm}</p>
             <p><b>Salary:</b> {cond.salaryMin} – {cond.salaryMax} {cond.currency.name} ({cond.salaryTerm.name})</p>
             <p><b>Negotiable:</b> {cond.isNegotiable ? "Yes" : "No"}</p>
@@ -66,6 +68,7 @@ interface ContractCondition {
                 className="bg-red-500 text-white px-2 py-1 rounded"
               >Delete</button>
             </div>
+            </InnerSection>
           </li>
         ))}
       </ul>
