@@ -24,6 +24,7 @@ declare module "next-auth" {
     refreshToken?: string;
     jwtValidTo?: Date;
     refreshTokenValidTo?: string;
+    isIndividual: boolean;
   }
 
   interface Session extends DefaultSession {
@@ -37,5 +38,6 @@ declare module "next-auth/jwt" {
     refreshToken?: string;
     jwtValidTo?: Date;
     refreshTokenValidTo?: string;
+    isIndividual: boolean;
   }
 }

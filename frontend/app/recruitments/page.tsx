@@ -215,7 +215,6 @@ const RecruitmentsPage = () => {
       let apiUrl = 'http://localhost:8080/api/CompanyUser/recruitments';
       const queryParams = new URLSearchParams();
 
-      // Prioritize filters: Offer > Branch > Company > General
       if (selectedOfferId) {
         apiUrl = `http://localhost:8080/api/CompanyUser/offers/${selectedOfferId}/recruitments`;
       } else if (selectedBranchId) {

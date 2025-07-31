@@ -113,7 +113,7 @@ const RecruitmentDetailsPage = () => {
   const fetchRecruitmentDetails = useCallback(async () => {
     if (status !== 'authenticated' || !session?.user?.token) {
       setLoading(false);
-      return;
+      return; 
     }
 
     setLoading(true);

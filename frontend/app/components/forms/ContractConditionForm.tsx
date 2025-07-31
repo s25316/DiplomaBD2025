@@ -214,7 +214,7 @@ const ContractConditionForm = ({ onSubmit, parameters, initialData, submitText =
         {getCheckboxes('Employment Type', 'employmentTypeIds')}
       </fieldset>
 
-      <CancelButton/>
+      
       <button
         type="button" // Use type="button" to prevent default form submission
         className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition duration-300 ease-in-out shadow-md font-semibold mt-4"
@@ -222,6 +222,7 @@ const ContractConditionForm = ({ onSubmit, parameters, initialData, submitText =
       >
         {submitText}
       </button>
+      <CancelButton/>
     </div>
   );
 }

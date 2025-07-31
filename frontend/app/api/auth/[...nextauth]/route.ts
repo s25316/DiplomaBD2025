@@ -67,7 +67,7 @@
 import NextAuth, { AuthOptions } from "next-auth";
 import { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { permanentRedirect, useRouter, redirect } from "next/navigation";
+import { permanentRedirect, redirect } from "next/navigation";
 
 const refreshToken = async (token: JWT) => {
   const res = await fetch(`http://localhost:8080/api/User/refreshToken`, {
@@ -123,6 +123,7 @@ export const authOptions: AuthOptions = {
             jwtValidTo: user.authorizationData.jwtValidTo,
             isNeed2Stage: user.isNeed2Stage,
             user2StageData: null,
+            isIndividual: user.isIndividual,
           };
         }
         
@@ -135,6 +136,7 @@ export const authOptions: AuthOptions = {
             jwtValidTo: null,
             isNeed2Stage: user.isNeed2Stage,
             user2StageData: user.user2StageData,
+            isIndividual: user.isIndividual,
           }
         }
 
@@ -152,6 +154,7 @@ export const authOptions: AuthOptions = {
         token.accessToken = user.token;
         token.jwtValidTo = user.jwtValidTo;
         token.refreshToken = user.refreshToken;
+        token.isIndividual = (user as any).isIndividual;
       }
 
       if (token.jwtValidTo && Date.now() < Date.parse(token.jwtValidTo)){

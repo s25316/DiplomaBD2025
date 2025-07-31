@@ -44,7 +44,7 @@ const BranchesList = ({
               onClick={() => router.push(`/companies/${companyId}/${branch.branchId}`)}
               className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
             >
-              To Create Offer
+              Create/See Offers
             </button>
             
             <DeleteBranchButton
