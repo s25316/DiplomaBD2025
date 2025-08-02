@@ -111,20 +111,10 @@ const Offers = () => {
     &employmentLengthFrom=${filters.employmentLengthFrom ? filters.employmentLengthFrom : ""}
     &employmentLengthTo=${filters.employmentLengthTo ? filters.employmentLengthTo : ""}&page=${filters.page}&itemsPerPage=${filters.itemsPerPage}
     ${filters.skillsIds.map(x => `&skillIds=${x}`)}${filters.contractParameterIds.map(x => `&contractParameterIds=${x}`)}`
-    // if (!session) {
-      fetch('http://localhost:8080/api/GuestQueries/offers' + filterQuery)
-        .then(res => res.json())
-        .then(setApiData)
-    // }
-    // else {
-    //   fetch('http://localhost:8080/api/CompanyUser/offers' + filterQuery, {
-    //     headers: {
-    //       Authorization: `Bearer ${session.user.token}`,
-    //     }
-    //   })
-    //     .then(res => res.json())
-    //     .then(setApiData)
-    // }
+
+    fetch('http://localhost:8080/api/GuestQueries/offers' + filterQuery)
+      .then(res => res.json())
+      .then(setApiData)
   }, [session, filters]);
 
   useEffect(() => {
@@ -218,9 +208,9 @@ const Offers = () => {
               <input type='checkbox' value={x.contractParameterId} onChange={x => setFilters(
                 {
                   ...filters, contractParameterIds: x.target.checked ?
-                  [...filters.contractParameterIds, Number(x.target.value)] : filters.contractParameterIds.filter(y => y !== Number(x.target.value))
+                    [...filters.contractParameterIds, Number(x.target.value)] : filters.contractParameterIds.filter(y => y !== Number(x.target.value))
                 })} />
-                <label className='pl-[3px]'>{x.name}</label><br />
+              <label className='pl-[3px]'>{x.name}</label><br />
             </li>
           ))}
         </ul>
@@ -231,9 +221,9 @@ const Offers = () => {
               <input type='checkbox' value={x.skillId} onChange={x => setFilters(
                 {
                   ...filters, skillsIds: x.target.checked ?
-                  [...filters.skillsIds, Number(x.target.value)] : filters.skillsIds.filter(y => y !== Number(x.target.value))
+                    [...filters.skillsIds, Number(x.target.value)] : filters.skillsIds.filter(y => y !== Number(x.target.value))
                 })} />
-                <label className='pl-[3px]'>{x.name}</label><br />
+              <label className='pl-[3px]'>{x.name}</label><br />
             </li>
           ))}
         </ul>
