@@ -72,16 +72,29 @@ const OfferDetails = () => {
   const [error, setError] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  const [isOwnOffer, setIsOwnOffer] = useState(true);
+
   useEffect(() => {
-    if (!session?.user?.token || !offerId) return;
+    if (!offerId) return;
 
     const fetchOfferDetails = async () => {
       try {
-        const res = await fetch(`http://localhost:8080/api/CompanyUser/offers/${offerId}`, {
-          headers: {
-            'Authorization': `Bearer ${session.user.token}`,
-          },
-        });
+        let res;
+
+        if (!session?.user?.token || !isOwnOffer) {
+          res = await fetch(`http://localhost:8080/api/GuestQueries/offers/${offerId}`);
+        }
+        else {
+          res = await fetch(`http://localhost:8080/api/CompanyUser/offers/${offerId}`, {
+            headers: {
+              'Authorization': `Bearer ${session.user.token}`,
+            },
+          });
+          if (!res.ok) {
+            setIsOwnOffer(false)
+            return;
+          }
+        }
 
         if (!res.ok) {
           throw new Error('Failed to fetch offer details');
@@ -101,12 +114,13 @@ const OfferDetails = () => {
     };
 
     fetchOfferDetails();
-  }, [session, offerId]);
+  }, [session, offerId, isOwnOffer]);
 
-  if (!session?.user?.token) return <div>Unauthorized</div>;
+  // if (!session?.user?.token) return <div>Unauthorized</div>;
   if (error) return <div>Error: {error}</div>;
 
   const handleDelete = async () => {
+    if (!session?.user?.token) return;
     if (!window.confirm('Are you sure you want to delete this offer?')) {
       return;
     }
@@ -136,7 +150,7 @@ const OfferDetails = () => {
     }
   };
 
-  if (!session?.user?.token) return <div className="text-center p-4">Unauthorized</div>;
+  // if (!session?.user?.token) return <div className="text-center p-4">Unauthorized</div>;
   if (error) return <div className="text-center p-4 text-red-600">Error: {error}</div>;
   if (!offerDetails) return <div className="text-center p-4">Loading...</div>;
 
@@ -147,40 +161,40 @@ const OfferDetails = () => {
       <h1 className="text-2xl font-bold mb-4 text-center">Offer Details</h1>
       <InnerSection>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        <p>
-          <span className="font-semibold">Company:</span>{' '}
-          <Link href={`/companies/${id}`}>
-            {company?.name || 'N/A'}
-          </Link>
-        </p>
-        <p>
-          <span className="font-semibold">Branch:</span>{' '}
-          <Link href={`/companies/${id}/${branchId}`}>
-            {branch?.name || 'N/A'}
-          </Link>
-        </p>
-        <p><span className="font-semibold">Status:</span> {offer.status}</p>
-        <p><span className="font-semibold">Employment Length:</span> {offer.employmentLength} months</p>
-        <p className="md:col-span-2"><span className="font-semibold">Publication:</span> {new Date(offer.publicationStart).toLocaleString()} – {new Date(offer.publicationEnd).toLocaleString()}</p>
-        <p className="md:col-span-2"><span className="font-semibold">Website:</span> <a href={offer.websiteUrl} className="text-blue-600 underline" target="_blank" rel="noopener noreferrer">{offer.websiteUrl}</a></p>
-      </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <p>
+            <span className="font-semibold">Company:</span>{' '}
+            <Link href={`/companies/${id}`}>
+              {company?.name || 'N/A'}
+            </Link>
+          </p>
+          <p>
+            <span className="font-semibold">Branch:</span>{' '}
+            <Link href={`/companies/${id}/${branchId}`}>
+              {branch?.name || 'N/A'}
+            </Link>
+          </p>
+          <p><span className="font-semibold">Status:</span> {offer.status}</p>
+          <p><span className="font-semibold">Employment Length:</span> {offer.employmentLength} months</p>
+          <p className="md:col-span-2"><span className="font-semibold">Publication:</span> {new Date(offer.publicationStart).toLocaleString()} – {new Date(offer.publicationEnd).toLocaleString()}</p>
+          <p className="md:col-span-2"><span className="font-semibold">Website:</span> <a href={offer.websiteUrl} className="text-blue-600 underline" target="_blank" rel="noopener noreferrer">{offer.websiteUrl}</a></p>
+        </div>
 
       </InnerSection>
 
       <div>
         <h2 className="text-2xl font-bold mb-4">Template Details</h2>
         <InnerSection>
-        <p><span className="font-semibold">Name:</span> {offerTemplate.name}</p>
-        <p><span className="font-semibold">Description:</span> {offerTemplate.description}</p>
-        <h3 className="font-semibold mt-4 mb-2">Required Skills:</h3>
-        <ul className="list-disc list-inside space-y-1">
-          {offerTemplate.skills.map((s, i) => (
-            <li key={i}>
-              {s.skill.name} ({s.skill.skillType.name}) {s.isRequired && <span className="font-bold text-sm"> (required)</span>}
-            </li>
-          ))}
-        </ul>
+          <p><span className="font-semibold">Name:</span> {offerTemplate.name}</p>
+          <p><span className="font-semibold">Description:</span> {offerTemplate.description}</p>
+          <h3 className="font-semibold mt-4 mb-2">Required Skills:</h3>
+          <ul className="list-disc list-inside space-y-1">
+            {offerTemplate.skills.map((s, i) => (
+              <li key={i}>
+                {s.skill.name} ({s.skill.skillType.name}) {s.isRequired && <span className="font-bold text-sm"> (required)</span>}
+              </li>
+            ))}
+          </ul>
         </InnerSection>
       </div>
 
@@ -191,11 +205,11 @@ const OfferDetails = () => {
             {contractConditions.map((cond, index) => (
               <div key={index} >
                 <InnerSection>
-                <p><span className="font-semibold">Salary:</span> {cond.salaryMin} – {cond.salaryMax} {cond.currency?.name} ({cond.salaryTerm?.name})</p>
-                <p><span className="font-semibold">Hours/Term:</span> {cond.hoursPerTerm}</p>
-                <p><span className="font-semibold">Negotiable:</span> {cond.isNegotiable ? 'Yes' : 'No'}</p>
-                <p><span className="font-semibold">Work Modes:</span> {cond.workModes?.map((w) => w.name).join(', ')}</p>
-                <p><span className="font-semibold">Employment Types:</span> {cond.employmentTypes?.map((e) => e.name).join(', ')}</p>
+                  <p><span className="font-semibold">Salary:</span> {cond.salaryMin} – {cond.salaryMax} {cond.currency?.name} ({cond.salaryTerm?.name})</p>
+                  <p><span className="font-semibold">Hours/Term:</span> {cond.hoursPerTerm}</p>
+                  <p><span className="font-semibold">Negotiable:</span> {cond.isNegotiable ? 'Yes' : 'No'}</p>
+                  <p><span className="font-semibold">Work Modes:</span> {cond.workModes?.map((w) => w.name).join(', ')}</p>
+                  <p><span className="font-semibold">Employment Types:</span> {cond.employmentTypes?.map((e) => e.name).join(', ')}</p>
                 </InnerSection>
               </div>
             ))}
@@ -205,11 +219,11 @@ const OfferDetails = () => {
         )}
       </div>
 
-      {offer.statusId !== 1 && (
+      {isOwnOffer && offer.statusId !== 1 && (
         <div className="mt-8 flex items-center gap-4">
           <Link
             href={`/companies/${id}/${branchId}/offer/${offerId}/edit`}
-            className="inline-block bg-blue-600  py-2 rounded-md hover:bg-blue-700 transition-colors"
+            className="inline-block bg-blue-600  p-2 rounded-md hover:bg-blue-700 transition-colors"
           >
             Edit Offer
           </Link>
@@ -222,7 +236,17 @@ const OfferDetails = () => {
           </button>
         </div>
       )}
-      
+
+      {!isOwnOffer && session?.user?.token && (
+        <div className="mt-8 flex items-center gap-4">
+          <Link
+          href={`/companies/${id}/${branchId}/offer/${offerId}/recruite`}
+          className="inline-block bg-green-600  p-2 rounded-md hover:bg-green-700 transition-colors">
+            Apply
+          </Link>
+        </div>
+      )}
+
     </OuterContainer>
   );
 };

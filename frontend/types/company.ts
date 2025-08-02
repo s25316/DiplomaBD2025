@@ -1,4 +1,4 @@
 interface Company{
+    companyId: string,
     name: string,
-    companyId: string
 }

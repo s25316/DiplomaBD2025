@@ -111,20 +111,20 @@ const Offers = () => {
     &employmentLengthFrom=${filters.employmentLengthFrom ? filters.employmentLengthFrom : ""}
     &employmentLengthTo=${filters.employmentLengthTo ? filters.employmentLengthTo : ""}&page=${filters.page}&itemsPerPage=${filters.itemsPerPage}
     ${filters.skillsIds.map(x => `&skillIds=${x}`)}${filters.contractParameterIds.map(x => `&contractParameterIds=${x}`)}`
-    if (!session) {
+    // if (!session) {
       fetch('http://localhost:8080/api/GuestQueries/offers' + filterQuery)
         .then(res => res.json())
         .then(setApiData)
-    }
-    else {
-      fetch('http://localhost:8080/api/CompanyUser/offers' + filterQuery, {
-        headers: {
-          Authorization: `Bearer ${session.user.token}`,
-        }
-      })
-        .then(res => res.json())
-        .then(setApiData)
-    }
+    // }
+    // else {
+    //   fetch('http://localhost:8080/api/CompanyUser/offers' + filterQuery, {
+    //     headers: {
+    //       Authorization: `Bearer ${session.user.token}`,
+    //     }
+    //   })
+    //     .then(res => res.json())
+    //     .then(setApiData)
+    // }
   }, [session, filters]);
 
   useEffect(() => {
@@ -244,10 +244,10 @@ const Offers = () => {
           <ul>
             {apiData && apiData.totalCount > 0 ? (
               apiData.items.map(x => (
-                <li key={x.offer.offerId} className='border 1px rounded-md p-4 text-left m-2'>
-                  <Link href={`/offers/${x.offer.offerId}`}>
-                    <p className='font-bold'>
-                      {x.offerTemplate.name}
+                <li key={x.offer.offerId} className='border 1px rounded-md p-4 text-left m-2 w-fit'>
+                  <Link href={`/companies/${x.company.companyId}/${x.branch.branchId}/offer/${x.offer.offerId}`}>
+                    <p className='font-bold flex items-center justify-between'>
+                      <span className='pr-[5px]'>{x.offerTemplate.name}</span>{x.contractConditions && x.contractConditions.length > 0 && <span className='pl-[5px]'>{x.contractConditions[0].salaryMin}-{x.contractConditions[0].salaryMax}{x.contractConditions[0].currency.name}/{x.contractConditions[0].salaryTerm.name}</span>}
                     </p>
                     <p>
                       {x.company.name}
