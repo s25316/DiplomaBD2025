@@ -35,8 +35,18 @@ interface RecruitmentData {
     age: number;
     isStudent: boolean;
     created: string;
-    skills: { isRequired: boolean; skill: { skillId: number; name: string; skillType: { skillTypeId: number; name: string } } }[];
-    urls: { urlId: string; url: string }[];
+    skills: {
+      skillId: number;
+      name: string;
+      skillType: {
+        skillTypeId: number;
+        name: string
+      }
+    }[];
+    urls: {
+      urlId: string;
+      url: string
+    }[];
     address: any;
   };
   company: {
@@ -378,7 +388,7 @@ const RecruitmentDetailsPage = () => {
             <p className="font-semibold">Skills:</p>
             <ul className="list-disc ml-6">
               {person.skills.map((s, idx) => (
-                <li key={idx}>{s.skill.name} ({s.skill.skillType.name}) {s.isRequired ? '(Required)' : ''}</li>
+                <li key={idx}>{s.name} ({s.skillType.name})</li>
               ))}
             </ul>
           </div>
