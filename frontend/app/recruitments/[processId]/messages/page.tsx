@@ -34,6 +34,13 @@ const RecruitmentMessagesPage = () => {
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [totalCount, setTotalCount] = useState(0);
 
+  const [isIndividual, setIsIndividual] = useState(true);
+  useEffect(() => {
+    fetch('http://localhost:8080/api/User')
+      .then(res => res.json())
+      .then(res => setIsIndividual(res.personPerspective.isIndividual))
+  }, [])
+
   const showCustomAlert = (message: string, isError: boolean = false) => {
     let alertMessage = message;
     if (isError) {
@@ -63,9 +70,17 @@ const RecruitmentMessagesPage = () => {
     setLoading(true);
     setError(null);
 
+    let apiUrl = 'http://localhost:8080/api/'
+    if(!isIndividual){
+      apiUrl += `CompanyUser/recruitments/${processId}/messages?Page=${page}&ItemsPerPage=${itemsPerPage}`
+    }
+    else{
+      apiUrl += `User/recruitments/${processId}/messages?Page=${page}&ItemsPerPage=${itemsPerPage}`
+    }
+
     try {
       const res = await fetch(
-        `http://localhost:8080/api/CompanyUser/recruitments/${processId}/messages?Page=${page}&ItemsPerPage=${itemsPerPage}`,
+        apiUrl,
         {
           headers: {
             Authorization: `Bearer ${session.user.token}`,
@@ -91,7 +106,7 @@ const RecruitmentMessagesPage = () => {
     } finally {
       setLoading(false);
     }
-  }, [session, status, processId, page, itemsPerPage]);
+  }, [session, status, processId, page, itemsPerPage, isIndividual]);
 
   useEffect(() => {
     fetchMessages();
@@ -108,10 +123,18 @@ const RecruitmentMessagesPage = () => {
       return;
     }
 
+    let apiUrl = 'http://localhost:8080/api/'
+    if(!isIndividual){
+      apiUrl += `CompanyUser/recruitments/${processId}/messages`
+    }
+    else{
+      apiUrl += `User/recruitments/${processId}/messages`
+    }
+
     try {
       const payload: SendMessagePayload = { message: newMessageText };
       const res = await fetch(
-        `http://localhost:8080/api/CompanyUser/companies/recruitments/${processId}/messages`,
+        apiUrl,
         {
           method: 'POST',
           headers: {
@@ -182,8 +205,8 @@ const RecruitmentMessagesPage = () => {
       {messages.length > 0 ? (
         <ul className="space-y-4 mt-6">
           {messages.map((msg) => (
-            <li key={msg.messageId} className={`p-4 rounded-lg shadow-sm ${msg.isPersonSend ? 'bg-blue-100 dark:bg-gray-700 text-left' : 'bg-gray-100 dark:bg-blue-800 text-right'}`}>
-              <p className="font-semibold">{msg.isPersonSend ? 'Candidate' : 'Me'}:</p>
+            <li key={msg.messageId} className={`p-4 rounded-lg shadow-sm ${msg.isPersonSend !== isIndividual ? 'bg-blue-100 dark:bg-gray-700 text-left' : 'bg-gray-100 dark:bg-blue-800 text-right'}`}>
+              <p className="font-semibold">{msg.isPersonSend !== isIndividual ? !isIndividual ? 'Candidate' : "Company" : 'Me'}:</p>
               <p className="mt-1">{msg.message}</p>
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
                 {new Date(msg.created).toLocaleString()}

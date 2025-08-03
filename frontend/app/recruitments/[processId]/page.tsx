@@ -97,7 +97,15 @@ const RecruitmentDetailsPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [newMessage, setNewMessage] = useState<string>('');
-  const [newProcessType, setNewProcessType] = useState<number | ''>(''); 
+  const [newProcessType, setNewProcessType] = useState<number | ''>('');
+
+  // Account type
+  const [isIndividual, setIsIndividual] = useState(true);
+  useEffect(() => {
+    fetch('http://localhost:8080/api/User')
+      .then(res => res.json())
+      .then(res => setIsIndividual(res.personPerspective.isIndividual))
+  }, [])
 
   // Custom alert function
   const showCustomAlert = (message: string, isError: boolean = false) => {
@@ -123,15 +131,23 @@ const RecruitmentDetailsPage = () => {
   const fetchRecruitmentDetails = useCallback(async () => {
     if (status !== 'authenticated' || !session?.user?.token) {
       setLoading(false);
-      return; 
+      return;
     }
 
     setLoading(true);
     setError(null);
 
+    let apiUrl = 'http://localhost:8080/api/'
+    if(!isIndividual){
+      apiUrl += `CompanyUser/recruitments/${processId}`
+    }
+    else{
+      apiUrl += `User/recruitments/${processId}`
+    }
+
     try {
       const res = await fetch(
-        `http://localhost:8080/api/CompanyUser/recruitments/${processId}`,
+        apiUrl,
         {
           headers: {
             Authorization: `Bearer ${session.user.token}`,
@@ -149,7 +165,7 @@ const RecruitmentDetailsPage = () => {
       const data = await res.json();
       const recruitmentData = data.items[0];
       setRecruitmentDetails(recruitmentData);
-      setNewProcessType(recruitmentData.recruitment.processTypeId); 
+      setNewProcessType(recruitmentData.recruitment.processTypeId);
 
     } catch (err: any) {
       console.error("Error fetching recruitment details:", err);
@@ -158,7 +174,7 @@ const RecruitmentDetailsPage = () => {
     } finally {
       setLoading(false);
     }
-  }, [session, status, processId]);
+  }, [session, status, processId, isIndividual]);
 
   useEffect(() => {
     fetchRecruitmentDetails();
@@ -170,9 +186,17 @@ const RecruitmentDetailsPage = () => {
       return;
     }
 
+    let apiUrl = 'http://localhost:8080/api/'
+    if(!isIndividual){
+      apiUrl += `CompanyUser/recruitments/${processId}/file`
+    }
+    else{
+      apiUrl += `User/recruitments/${processId}/file`
+    }
+
     try {
       const res = await fetch(
-        `http://localhost:8080/api/CompanyUser/recruitments/${processId}/file`,
+        apiUrl,
         {
           headers: {
             Authorization: `Bearer ${session.user.token}`,
@@ -210,7 +234,7 @@ const RecruitmentDetailsPage = () => {
           }
         }
       }
-      
+
       console.log("Final filename to save:", filename);
       const blob = await res.blob();
 
@@ -243,10 +267,18 @@ const RecruitmentDetailsPage = () => {
       return;
     }
 
+    let apiUrl = 'http://localhost:8080/api/'
+    if(!isIndividual){
+      apiUrl += `CompanyUser/recruitments/${processId}/messages`
+    }
+    else{
+      apiUrl += `User/recruitments/${processId}/messages`
+    }
+
     try {
       const payload: SendMessagePayload = { message: newMessage };
       const res = await fetch(
-        `http://localhost:8080/api/CompanyUser/companies/recruitments/${processId}/messages`,
+        apiUrl,
         {
           method: 'POST',
           headers: {
@@ -278,7 +310,7 @@ const RecruitmentDetailsPage = () => {
       showCustomAlert("Authentication required to change process type.", true);
       return;
     }
-    
+
     if (newProcessType === '' || newProcessType === null) {
       showCustomAlert("Please select a valid process type.", true);
       return;
@@ -304,11 +336,11 @@ const RecruitmentDetailsPage = () => {
     } else {
       const selectedTypeName = AVAILABLE_PROCESS_TYPES.find(t => t.processTypeId === newProcessType)?.name || newProcessType;
       showCustomAlert(`Changing to "${selectedTypeName}" status is not supported by this API endpoint. This endpoint is for 'Passed' or 'Rejected' actions only.`, true);
-      return; 
+      return;
     }
 
     if (!isSupportedAction) {
-        return;
+      return;
     }
 
     try {
@@ -358,7 +390,7 @@ const RecruitmentDetailsPage = () => {
   const { recruitment, person, company, branch, offerTemplate, offer } = recruitmentDetails;
 
   const isFinalStatus = recruitment.processTypeId === 11 || recruitment.processTypeId === 12;
-  const finalStatusMessage = isFinalStatus 
+  const finalStatusMessage = isFinalStatus
     ? `Cannot change process type. Recruitment is already ${recruitment.processType.name}.`
     : '';
 
@@ -374,7 +406,7 @@ const RecruitmentDetailsPage = () => {
         <p><strong>Created:</strong> {new Date(recruitment.created).toLocaleDateString()} {new Date(recruitment.created).toLocaleTimeString()}</p>
       </div>
 
-      <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg shadow-inner mb-6">
+      {!isIndividual && <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg shadow-inner mb-6">
         <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-gray-100">Candidate Details</h2>
         <p><strong>Name:</strong> {person.name} {person.surname}</p>
         <p><strong>Email:</strong> {person.contactEmail}</p>
@@ -403,7 +435,7 @@ const RecruitmentDetailsPage = () => {
             </ul>
           </div>
         )}
-      </div>
+      </div>}
 
       <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg shadow-inner mb-6">
         <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-gray-100">Offer Details</h2>
@@ -444,7 +476,7 @@ const RecruitmentDetailsPage = () => {
       </div>
 
       {/* Sekcja zmiany typu procesu */}
-      <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg shadow-inner mb-6">
+      {!isIndividual && <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg shadow-inner mb-6">
         <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-gray-100">Change Process Type</h2>
         {isFinalStatus && (
           <p className="text-red-600 dark:text-red-400 mb-4 font-semibold">
@@ -475,11 +507,11 @@ const RecruitmentDetailsPage = () => {
             Update Process Type
           </button>
         </form>
-      </div>
+      </div>}
 
       {/* Sekcja wysyłania wiadomości */}
       <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg shadow-inner">
-        <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-gray-100">Send Message to Candidate</h2>
+        <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-gray-100">Send Message to {!isIndividual ? "Candidate" : "Company"}</h2>
         <form onSubmit={handleSendMessage} className="flex flex-col gap-4">
           <label htmlFor="messageTextarea" className="font-semibold text-gray-700 dark:text-gray-300">Message:</label>
           <textarea

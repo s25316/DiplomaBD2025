@@ -81,7 +81,7 @@ const RecruitmentsPage = () => {
   const [companiesOptions, setCompaniesOptions] = useState<CompanyOption[]>([]);
   const [branchesOptions, setBranchesOptions] = useState<BranchOption[]>([]);
   const [offersOptions, setOffersOptions] = useState<OfferOption[]>([]);
-  
+
   // State for selected filter values
   const [selectedCompanyId, setSelectedCompanyId] = useState<string>('');
   const [selectedBranchId, setSelectedBranchId] = useState<string>('');
@@ -93,6 +93,14 @@ const RecruitmentsPage = () => {
   const [page, setPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [totalCount, setTotalCount] = useState(0);
+
+  // Account type
+  const [isIndividual, setIsIndividual] = useState(true);
+  useEffect(() => {
+    fetch('http://localhost:8080/api/User')
+      .then(res => res.json())
+      .then(res => setIsIndividual(res.personPerspective.isIndividual))
+  }, [])
 
   // Custom alert function
   const showCustomAlert = (message: string, isError: boolean = false) => {
@@ -117,6 +125,7 @@ const RecruitmentsPage = () => {
 
   // Fetch companies on component mount
   useEffect(() => {
+    if(isIndividual) return;
     const fetchCompanies = async () => {
       if (status !== 'authenticated' || !session?.user?.token) return;
       try {
@@ -136,10 +145,11 @@ const RecruitmentsPage = () => {
       }
     };
     fetchCompanies();
-  }, [session, status]);
+  }, [session, status, isIndividual]);
 
   // Fetch branches when selectedCompanyId changes
   useEffect(() => {
+    if(isIndividual) return;
     const fetchBranches = async () => {
       if (status !== 'authenticated' || !session?.user?.token || !selectedCompanyId) {
         setBranchesOptions([]);
@@ -168,10 +178,11 @@ const RecruitmentsPage = () => {
       }
     };
     fetchBranches();
-  }, [session, status, selectedCompanyId]);
+  }, [session, status, selectedCompanyId, isIndividual]);
 
   // Fetch offers when selectedBranchId changes
   useEffect(() => {
+    if(isIndividual) return
     const fetchOffers = async () => {
       if (status !== 'authenticated' || !session?.user?.token || !selectedBranchId) {
         setOffersOptions([]);
@@ -198,7 +209,7 @@ const RecruitmentsPage = () => {
       }
     };
     fetchOffers();
-  }, [session, status, selectedBranchId]);
+  }, [session, status, selectedBranchId, isIndividual]);
 
 
   // --- Main recruitment data fetching ---
@@ -212,15 +223,21 @@ const RecruitmentsPage = () => {
     setError(null);
 
     try {
-      let apiUrl = 'http://localhost:8080/api/CompanyUser/recruitments';
+      let apiUrl = 'http://localhost:8080/api/'
+      if (!isIndividual) {
+        apiUrl += 'CompanyUser/recruitments';
+      }
+      else {
+        apiUrl += 'User/recruitments'
+      }
       const queryParams = new URLSearchParams();
 
-      if (selectedOfferId) {
+      if (!isIndividual && selectedOfferId) {
         apiUrl = `http://localhost:8080/api/CompanyUser/offers/${selectedOfferId}/recruitments`;
-      } else if (selectedBranchId) {
+      } else if (!isIndividual && selectedBranchId) {
         apiUrl = `http://localhost:8080/api/CompanyUser/branches/${selectedBranchId}/recruitments`;
-    //   } else if (selectedCompanyId) {
-    //     apiUrl = `http://localhost:8080/api/CompanyUser/companies/${selectedCompanyId}/recruitments`; //nie działa
+        //   } else if (selectedCompanyId) {
+        //     apiUrl = `http://localhost:8080/api/CompanyUser/companies/${selectedCompanyId}/recruitments`; //nie działa
       }
 
       // Add common query parameters
@@ -257,7 +274,7 @@ const RecruitmentsPage = () => {
     } finally {
       setLoading(false);
     }
-  }, [session, status, page, itemsPerPage, selectedCompanyId, selectedBranchId, selectedOfferId, searchText, selectedProcessType]);
+  }, [session, status, page, itemsPerPage, selectedCompanyId, selectedBranchId, selectedOfferId, searchText, selectedProcessType, isIndividual]);
 
   useEffect(() => {
     fetchRecruitments();
@@ -310,7 +327,7 @@ const RecruitmentsPage = () => {
       <h1 className="text-3xl font-bold mb-6 text-gray-800 dark:text-gray-100 text-center">All Recruitments</h1>
 
       {/* Filter Section */}
-      <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg mb-6 shadow-inner grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {!isIndividual && <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg mb-6 shadow-inner grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {/* Company Filter */}
         <div>
           <label htmlFor="companyFilter" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Filter by Company:</label>
@@ -397,7 +414,7 @@ const RecruitmentsPage = () => {
             {/* Add more process types as defined by your API */}
           </select>
         </div>
-      </div>
+      </div>}
 
       <p className="mb-4 text-sm text-gray-600 dark:text-gray-400">
         Showing {recruitments.length} of {totalCount} recruitments
@@ -433,7 +450,7 @@ const RecruitmentsPage = () => {
               <p><strong>Created:</strong> {new Date(recruitment.created).toLocaleDateString()} {new Date(recruitment.created).toLocaleTimeString()}</p>
               <p><strong>Offer Status:</strong> {offer.status}</p>
               <p><strong>Offer Publication:</strong> {new Date(offer.publicationStart).toLocaleDateString()} - {new Date(offer.publicationEnd).toLocaleDateString()}</p>
-              
+
               <div className="mt-4 flex gap-2">
                 <Link href={`/recruitments/${recruitment.processId}`} className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 transition duration-200 shadow-sm">
                   View Details
