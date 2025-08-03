@@ -3,6 +3,19 @@
 import React, { useState } from 'react';
 import { InnerSection } from '../layout/PageContainers';
 
+export interface Skill {
+  isRequired: boolean,
+  skill: {
+    skillId: number,
+    name: string,
+    skillType: {
+      skillTypeId: number,
+      name: string
+    }
+  }
+
+}
+
 export interface ContractParameter {
   contractParameterId: number;
   name: string;
@@ -27,20 +40,20 @@ export interface ContractConditionFormData {
 interface ContractConditionFormProps {
   onSubmit: (form: ContractConditionFormData) => Promise<void>;
   initialData?: ContractConditionFormData | null;
-  parameters: ContractParameter[]; 
+  parameters: ContractParameter[];
   submitText?: string;
 }
 
 const ContractConditionForm = ({ onSubmit, parameters, initialData, submitText = "Submit" }: ContractConditionFormProps) => {
 
   const [form, setForm] = useState<ContractConditionFormData>(
-    initialData ?? { 
+    initialData ?? {
       salaryMin: 0,
       salaryMax: 0,
       hoursPerTerm: 0,
       isNegotiable: false,
       isPaid: false,
-      salaryTermId: 3001, 
+      salaryTermId: 3001,
       currencyId: 1,
       workModeIds: [],
       employmentTypeIds: [],
@@ -106,22 +119,22 @@ const ContractConditionForm = ({ onSubmit, parameters, initialData, submitText =
     const filtered = parameters.filter(p => p.contractParameterType.name === type);
 
     return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
         {filtered.map(p => (
-            <label key={p.contractParameterId} className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+          <label key={p.contractParameterId} className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
             <input
-                type="checkbox"
-                // Check if the current parameter's ID is included in the form's selected IDs for this field
-                checked={form[field].includes(p.contractParameterId)}
-                onChange={(e) =>
+              type="checkbox"
+              // Check if the current parameter's ID is included in the form's selected IDs for this field
+              checked={form[field].includes(p.contractParameterId)}
+              onChange={(e) =>
                 handleMultiCheckbox(field, p.contractParameterId, e.target.checked)
-                }
-                className="form-checkbox h-4 w-4 text-blue-600 rounded"
+              }
+              className="form-checkbox h-4 w-4 text-blue-600 rounded"
             />
             <span>{p.name}</span>
-            </label>
+          </label>
         ))}
-        </div>
+      </div>
     );
   };
 
@@ -129,73 +142,73 @@ const ContractConditionForm = ({ onSubmit, parameters, initialData, submitText =
   return (
     <InnerSection className="flex flex-col gap-4 p-4 border rounded-lg">
       <h3 className="font-bold mb-2">Contract Details</h3>
-      
+
       <label className="font-semibold text-gray-700 dark:text-gray-300">Min Salary:  </label>
-      <input 
-          type="number" 
-          name="salaryMin" 
-          value={form.salaryMin} 
-          onChange={handleChange} 
-          placeholder="Salary Min" 
-          className="global-field-style"
-          min="0" // Added for browser-level validation
+      <input
+        type="number"
+        name="salaryMin"
+        value={form.salaryMin}
+        onChange={handleChange}
+        placeholder="Salary Min"
+        className="global-field-style"
+        min="0" // Added for browser-level validation
       />
-      
+
 
       <label className="font-semibold text-gray-700 dark:text-gray-300">Max Salary: </label>
-      <input 
-          type="number" 
-          name="salaryMax" 
-          value={form.salaryMax} 
-          onChange={handleChange} 
-          placeholder="Salary Max" 
-          className="global-field-style"
-          min="0"
+      <input
+        type="number"
+        name="salaryMax"
+        value={form.salaryMax}
+        onChange={handleChange}
+        placeholder="Salary Max"
+        className="global-field-style"
+        min="0"
       />
-      
+
 
       <label className="font-semibold text-gray-700 dark:text-gray-300"></label>
-        Salary Term:
-        <select 
-            name="salaryTermId" 
-            value={form.salaryTermId} 
-            onChange={handleChange}
-            className="global-field-style"
-        >
-          {getOptions('Salary Term')}
-        </select>
+      Salary Term:
+      <select
+        name="salaryTermId"
+        value={form.salaryTermId}
+        onChange={handleChange}
+        className="global-field-style"
+      >
+        {getOptions('Salary Term')}
+      </select>
 
 
       <label className="font-semibold text-gray-700 dark:text-gray-300">Hours per term: </label>
-      <input 
-          type="number" 
-          name="hoursPerTerm" 
-          value={form.hoursPerTerm} 
-          onChange={handleChange} 
-          placeholder="Hours" 
-          className="global-field-style"
-          min="0"
+      <input
+        type="number"
+        name="hoursPerTerm"
+        value={form.hoursPerTerm}
+        onChange={handleChange}
+        placeholder="Hours"
+        className="global-field-style"
+        min="0"
       />
-      
+
 
       <label className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-        <input 
-            type="checkbox" 
-            name="isNegotiable" 
-            checked={form.isNegotiable} 
-            onChange={handleChange} 
-            className="form-checkbox h-5 w-5 text-blue-600 rounded"
-        /> 
+        <input
+          type="checkbox"
+          name="isNegotiable"
+          checked={form.isNegotiable}
+          onChange={handleChange}
+          className="form-checkbox h-5 w-5 text-blue-600 rounded"
+        />
         <span>Negotiable</span>
       </label>
 
       <label className="font-semibold text-gray-700 dark:text-gray-300">
         Currency:
-        <select 
-            name="currencyId" 
-            value={form.currencyId} 
-            onChange={handleChange}
-            className="global-field-style"
+        <select
+          name="currencyId"
+          value={form.currencyId}
+          onChange={handleChange}
+          className="global-field-style"
         >
           {getOptions('Currency')}
         </select>
@@ -211,7 +224,7 @@ const ContractConditionForm = ({ onSubmit, parameters, initialData, submitText =
         {getCheckboxes('Employment Type', 'employmentTypeIds')}
       </fieldset>
 
-      
+
       <button
         type="button"
         className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition duration-300 ease-in-out shadow-md font-semibold mt-4"

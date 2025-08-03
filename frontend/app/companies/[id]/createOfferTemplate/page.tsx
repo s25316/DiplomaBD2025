@@ -4,16 +4,17 @@ import { useRouter, useParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import OfferTemplateForm from '@/app/components/forms/OfferTemplateForm';
 import { OuterContainer } from '@/app/components/layout/PageContainers';
+import { SkillWithRequired } from '@/app/components/forms/OfferForm';
 
 // This interface defines the structure of a single skill object as received from the API
-interface Skill {
-  skillId: number; // Unique identifier for the skill (from API)
-  name: string;
-  skillType: {
-    skillTypeId: number;
-    name: string;
-  };
-}
+// interface Skill {
+//   skillId: number; // Unique identifier for the skill (from API)
+//   name: string;
+//   skillType: {
+//     skillTypeId: number;
+//     name: string;
+//   };
+// }
 
 // This interface defines how a selected skill is stored in the form's state
 interface SkillSelection {
@@ -36,7 +37,7 @@ export default function CreateOfferTemplate() {
   const { data: session } = useSession();
 
   // type the 'skills' state as an array of Skill
-  const [skills, setSkills] = useState<Skill[]>([]);
+  const [skills, setSkills] = useState<SkillWithRequired[]>([]);
   // type the 'form' state using NewTemplateFormState
   const [form, setForm] = useState<NewTemplateFormState>({
     name: '',
@@ -64,7 +65,7 @@ export default function CreateOfferTemplate() {
           throw new Error(`Failed to fetch skills: ${errorText}`);
         }
 
-        const data: Skill[] = await res.json(); // Explicitly type the API response
+        const data: SkillWithRequired[] = await res.json(); // Explicitly type the API response
         
         // Ensure unique skills based on skillId. This helps prevent "Each child in a list should have a unique 'key' prop"
         // if the API happens to return duplicate skillId's, and also ensures `selectedSkills.find` works correctly.
@@ -77,8 +78,9 @@ export default function CreateOfferTemplate() {
 
         setSkills(uniqueSkills);
         console.log("Fetched and set unique skills:", uniqueSkills); // Debug log
-      } catch (error: any) {
+      } catch (error) {
         console.error("Error fetching skills:", error);
+        if(error instanceof Error)
         showCustomAlert(`Failed to load skills: ${error.message}`);
       }
     };
@@ -140,8 +142,9 @@ export default function CreateOfferTemplate() {
         console.error("Failed to create offer template:", errorText);
         showCustomAlert(`Failed to create offer template: ${errorText}`);
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error submitting offer template:", error);
+      if(error instanceof Error)
       showCustomAlert(`An error occurred while creating template: ${error.message}`);
     }
   };

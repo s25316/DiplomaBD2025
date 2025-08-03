@@ -6,9 +6,29 @@ import { InnerSection } from '../layout/PageContainers';
 
 interface Props {
   index: number,
-  getData: Function,
-  initialData?: any;
+  getData: (data: BranchFormData) => void;
+  initialData?: Partial<BranchFormData>; 
 }
+
+interface BranchAddress {
+  apartmentNumber: string | null;
+  countryName: string;
+  stateName: string;
+  cityName: string;
+  streetName: string | null;
+  houseNumber: string;
+  postCode: string;
+  lon: number;
+  lat: number;
+}
+
+interface BranchFormData {
+  index: number;
+  name: string;
+  description: string | null;
+  address: BranchAddress;
+}
+
 
 const BranchForm = (props: Props) => {
   const [autocomplete, setAutocomplete] = useState<GeocoderAutocomplete>()
@@ -32,11 +52,11 @@ const BranchForm = (props: Props) => {
   })
 
   useEffect(() => {
-    let api = process.env.GEOAPIFY_API;
-    let elem = document.getElementById(`autocomplete-${props.index}`);
+    const api = process.env.GEOAPIFY_API;
+    const elem = document.getElementById(`autocomplete-${props.index}`);
     if (!autocomplete && elem && api) {
       if (elem.children.length === 0) {
-        let tmpAutocomplete = new GeocoderAutocomplete(
+        const tmpAutocomplete = new GeocoderAutocomplete(
           elem,
           api,
           {
@@ -69,7 +89,7 @@ const BranchForm = (props: Props) => {
       ...form.address,
       ...address,
     }})
-  }, [form, address])
+  }, [form, address, autocomplete, props])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value })

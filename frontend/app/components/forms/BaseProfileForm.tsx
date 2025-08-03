@@ -32,6 +32,8 @@ const BaseProfileForm = ({ onSuccess, token }: Props) => {
           alertMessage = message;
         }
       } catch (e) {
+        if (e instanceof Error)
+          console.error(e.message)
         alertMessage = message;
       }
     }
@@ -47,7 +49,7 @@ const BaseProfileForm = ({ onSuccess, token }: Props) => {
     if (name === 'birthDate') {
       const selectedDate = new Date(value);
       const today = new Date();
-      today.setHours(0, 0, 0, 0); 
+      today.setHours(0, 0, 0, 0);
 
       if (selectedDate > today) {
         setDateError('Birth date cannot be in the future.');
@@ -62,7 +64,7 @@ const BaseProfileForm = ({ onSuccess, token }: Props) => {
     }
 
     setForm({ ...form, [name]: newValue });
-    setApiError(null); 
+    setApiError(null);
   };
 
   const submitConfirmed = async () => {
@@ -96,16 +98,20 @@ const BaseProfileForm = ({ onSuccess, token }: Props) => {
               showCustomAlert('Failed to save base profile: An unknown error occurred.', true);
             }
           } catch (parseError) {
+            if (parseError instanceof Error)
+              console.error(parseError.message)
             setApiError('Failed to save base profile. Please try again.');
             showCustomAlert(`Failed to save base profile: ${errorText}`, true);
           }
         }
         setConfirming(false);
       }
-    } catch (err: any) {
+    } catch (err) {
       console.error("Error saving base profile:", err);
-      setApiError(`An unexpected error occurred: ${err.message}`);
-      showCustomAlert(`An unexpected error occurred: ${err.message}`, true);
+      if (err instanceof Error) {
+        setApiError(`An unexpected error occurred: ${err.message}`);
+        showCustomAlert(`An unexpected error occurred: ${err.message}`, true);
+      }
       setConfirming(false);
     }
   };
@@ -119,7 +125,7 @@ const BaseProfileForm = ({ onSuccess, token }: Props) => {
       showCustomAlert(`Please correct the birth date: ${dateError}`, true);
       return;
     }
-    if (apiError) { 
+    if (apiError) {
       showCustomAlert(`Please correct the previous error: ${apiError}`, true);
       return;
     }
@@ -129,57 +135,57 @@ const BaseProfileForm = ({ onSuccess, token }: Props) => {
   return (
     <div className="max-w-md p-4 border rounded shadow bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
       <h2 className="text-lg font-bold mb-4 text-gray-800 dark:text-gray-100">Complete your basic profile</h2>
-      
+
       <label className="flex items-center gap-2 mb-4 text-gray-700 dark:text-gray-300">
-        <input 
-          type="checkbox" 
-          name="isIndividual" 
-          checked={form.isIndividual} 
+        <input
+          type="checkbox"
+          name="isIndividual"
+          checked={form.isIndividual}
           onChange={handleChange}
           className='global-field-style'
         />
         Create an individual profile
       </label>
 
-      <input 
-        name="name" 
-        placeholder="Name" 
-        onChange={handleChange} 
-        value={form.name} 
+      <input
+        name="name"
+        placeholder="Name"
+        onChange={handleChange}
+        value={form.name}
         className='global-field-style'
         required
       />
-      <input 
-        name="surname" 
-        placeholder="Surname" 
-        onChange={handleChange} 
-        value={form.surname} 
+      <input
+        name="surname"
+        placeholder="Surname"
+        onChange={handleChange}
+        value={form.surname}
         className='global-field-style'
         required
       />
-      <input 
-        name="contactEmail" 
+      <input
+        name="contactEmail"
         type="email"
-        placeholder="Email" 
-        onChange={handleChange} 
-        value={form.contactEmail} 
+        placeholder="Email"
+        onChange={handleChange}
+        value={form.contactEmail}
         className='global-field-style'
         required
       />
-      <input 
-        type="date" 
-        name="birthDate" 
-        onChange={handleChange} 
-        value={form.birthDate} 
+      <input
+        type="date"
+        name="birthDate"
+        onChange={handleChange}
+        value={form.birthDate}
         className='global-field-style'
         required
       />
       {dateError && <p className="text-red-500 text-sm mb-2">{dateError}</p>}
       {apiError && <p className="text-red-500 text-sm mb-2">{apiError}</p>}
-      
+
       {!confirming ? (
-        <button 
-          onClick={handleSubmit} 
+        <button
+          onClick={handleSubmit}
           className="inline-block bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition duration-300 ease-in-out shadow-md font-semibold mt-4"
         >
           Submit
@@ -192,18 +198,18 @@ const BaseProfileForm = ({ onSuccess, token }: Props) => {
           <ul className="list-disc ml-5 text-sm text-yellow-700 dark:text-yellow-300">
             <li><b>Name:</b> {form.name || <i>(empty)</i>}</li>
             <li><b>Surname:</b> {form.surname || <i>(empty)</i>}</li>
-            <br/>
+            <br />
             <li><b> {form.isIndividual ? 'Individual account' : 'Company account'}</b></li>
           </ul>
           <div className="mt-4 flex gap-3">
-            <button 
-              onClick={submitConfirmed} 
-              className="inline-block bg-green-600 text-white px-5 py-2 rounded-lg hover:bg-green-700 transition duration-300 ease-in-out shadow-md font-semibold" 
+            <button
+              onClick={submitConfirmed}
+              className="inline-block bg-green-600 text-white px-5 py-2 rounded-lg hover:bg-green-700 transition duration-300 ease-in-out shadow-md font-semibold"
             >
               Yes, Save
             </button>
             <button
-              onClick={() => setConfirming(false)} 
+              onClick={() => setConfirming(false)}
               className="inline-block bg-gray-300 text-gray-800 px-5 py-2 rounded-lg hover:bg-gray-400 transition duration-300 ease-in-out shadow-md font-semibold"
             >
               No, Go Back

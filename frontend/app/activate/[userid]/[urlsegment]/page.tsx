@@ -3,7 +3,7 @@
 import React from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 
-const page = () => {
+const AccountActivation = () => {
     const pathname = usePathname()
     const pathnames = pathname.split("/")
     
@@ -33,4 +33,4 @@ const page = () => {
   )
 }
 
-export default page
+export default AccountActivation

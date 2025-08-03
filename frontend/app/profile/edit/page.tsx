@@ -64,7 +64,7 @@ export interface UserProfile {
 
 interface UserApiResponse {
     personPerspective: UserProfile;
-    companyPerspective: any; 
+    // companyPerspective: any; 
 }
 const EditProfilePage = () => {
   const { data: session } = useSession();
@@ -86,7 +86,8 @@ const EditProfilePage = () => {
       });
       const data: UserApiResponse = await res.json();
       setUserData(data.personPerspective);
-      }catch (err: any) {
+      }catch (err) {
+        if(err instanceof Error)
           setError(err.message);
       } finally {
           setLoading(false);

@@ -15,15 +15,15 @@ import NextAuth, { DefaultSession, DefaultUser } from "next-auth";
 declare module "next-auth" {
   interface User extends DefaultUser {
     isNeed2Stage: boolean;
-    user2StageData?: {
+    user2StageData: {
       urlSegmentPart1: string;
       urlSegmentPart2: string;
       validTo: Date;
-    };
-    token?: string;
-    refreshToken?: string;
-    jwtValidTo?: Date;
-    refreshTokenValidTo?: string;
+    } | null;
+    token: string | null;
+    refreshToken: string | null;
+    jwtValidTo: string | null;
+    refreshTokenValidTo: string | null;
     isIndividual: boolean;
   }
 
@@ -35,9 +35,9 @@ declare module "next-auth" {
 declare module "next-auth/jwt" {
   interface JWT {
     accessToken: string;
-    refreshToken?: string;
-    jwtValidTo?: Date;
-    refreshTokenValidTo?: string;
+    refreshToken: string | null;
+    jwtValidTo: string | null;
+    refreshTokenValidTo: string | null;
     isIndividual: boolean;
   }
 }

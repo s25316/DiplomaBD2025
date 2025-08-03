@@ -27,16 +27,17 @@ interface Branch {
     streetName: string | null;
   }
 }
-interface Company{
-  name: string;
-  description: string;
-  regon: string;
-  nip: string;
-  krs: string;
-  created: string;
-  websiteUrl: string;
-}
+// interface Company{
+//   name: string;
+//   description: string;
+//   regon: string;
+//   nip: string;
+//   krs: string;
+//   created: string;
+//   websiteUrl: string;
+// }
 interface ContractCondition {
+  companyId: string;
   contractConditionId: string;
   hoursPerTerm: number;
   salaryMin: number;
@@ -91,18 +92,18 @@ const CompanyDetails = () => {
       if (c.ok) setCompany((await c.json()).items[0]);
       if (b.ok){
         const data =await b.json()
-        setBranches((data).items.map((item: any) => item.branch));
+        setBranches((data).items.map((item: {branch : Branch}) => item.branch));
         setBranchTotal(data.totalCount);
       }
       if (t.ok){
         const data =await t.json();
-        setTemplates((data).items.map((item: any) => item.offerTemplate));
+        setTemplates((data).items.map((item: { offerTemplate : OfferTemplate}) => item.offerTemplate));
         setTemplateTotal (data.totalCount);
       }
       if (cond.ok) {
         const data = await cond.json();
-        const all = (data).items.map((item: any) => item.contractCondition);
-        setConditions(all.filter((cc: any) => cc.companyId === id));
+        const all = (data).items.map((item: { contractCondition : ContractCondition}) => item.contractCondition);
+        setConditions(all.filter((cc: ContractCondition) => cc.companyId === id));
         setConditionTotal(data.totalCount);
       }
     };

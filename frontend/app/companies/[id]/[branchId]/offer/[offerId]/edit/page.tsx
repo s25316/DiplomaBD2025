@@ -3,11 +3,13 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import OfferForm from '@/app/components/forms/OfferForm';
-import { InnerSection, OuterContainer } from '@/app/components/layout/PageContainers';
+import OfferForm, { SkillWithRequired } from '@/app/components/forms/OfferForm';
+import { OuterContainer } from '@/app/components/layout/PageContainers';
 import CancelButton from '@/app/components/buttons/CancelButton';
+import { ContractConditionFormData } from '@/app/components/forms/ContractConditionForm';
+import { OfferTemplate } from '@/types/offerTemplate';
 
-interface OfferFormData {
+export interface OfferFormData {
   offerTemplateId: string;
   publicationStart: string;
   publicationEnd: string;
@@ -43,7 +45,7 @@ const EditOfferPage = () => {
   const [newTemplateForm, setNewTemplateForm] = useState({
     name: '',
     description: '',
-    skills: [],
+    skills: [] as SkillWithRequired[],
   });
 
   useEffect(() => {
@@ -80,15 +82,15 @@ const EditOfferPage = () => {
         publicationEnd: offer.publicationEnd,
         employmentLength: offer.employmentLength,
         websiteUrl: offer.websiteUrl,
-        conditionIds: offerData.items?.[0]?.contractConditions?.map((c: any) => c.contractConditionId) || [],
+        conditionIds: offerData.items?.[0]?.contractConditions?.map((c: ContractConditions) => c.contractConditionId) || [],
         });
 
         setSelectedConditionId(offerData.items?.[0]?.contractConditions?.[0]?.contractConditionId || '');
 
 
-        setTemplates((await tplRes.json()).items.map((i: any) => i.offerTemplate));
+        setTemplates((await tplRes.json()).items.map((i: { offerTemplate : OfferTemplate}) => i.offerTemplate));
         setParameters(await paramRes.json());
-        setExistingConditions((await condRes.json()).items.map((i: any) => i.contractCondition));
+        setExistingConditions((await condRes.json()).items.map((i: { contractCondition : ContractConditions}) => i.contractCondition));
         setSkills(await skillsRes.json());
         setOfferStatusId(offerData.items?.[0]?.offer.statusId);
     };
@@ -96,7 +98,7 @@ const EditOfferPage = () => {
     fetchAll();
   }, [session, id, offerId]);
 
-  const handleConditionCreate = async (formData: any) => {
+  const handleConditionCreate = async (formData: ContractConditionFormData) => {
     const res = await fetch(`http://localhost:8080/api/CompanyUser/companies/${id}/contractConditions`, {
       method: 'POST',
       headers: {

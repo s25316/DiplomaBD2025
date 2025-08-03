@@ -47,7 +47,7 @@ interface RecruitmentData {
       urlId: string;
       url: string
     }[];
-    address: any;
+    address: Address;
   };
   company: {
     companyId: string;
@@ -77,7 +77,7 @@ interface RecruitmentData {
     statusId: number;
     status: string;
   };
-  contractConditions: any[];
+  contractConditions: ContractConditions[];
 }
 
 interface UpdateRecruitmentPayload {
@@ -102,10 +102,13 @@ const RecruitmentDetailsPage = () => {
   // Account type
   const [isIndividual, setIsIndividual] = useState(true);
   useEffect(() => {
-    fetch('http://localhost:8080/api/User')
-      .then(res => res.json())
-      .then(res => setIsIndividual(res.personPerspective.isIndividual))
-  }, [])
+    if(session)
+      fetch('http://localhost:8080/api/User', {
+        headers: { Authorization: `Bearer ${session.user.token}` }
+      })
+        .then(res => res.json())
+        .then(res => setIsIndividual(res.personPerspective.isIndividual))
+    }, [session])
 
   // Custom alert function
   const showCustomAlert = (message: string, isError: boolean = false) => {
@@ -121,6 +124,8 @@ const RecruitmentDetailsPage = () => {
           alertMessage = message;
         }
       } catch (e) {
+        if (e instanceof Error)
+          console.error(e.message)
         alertMessage = message;
       }
     }
@@ -138,10 +143,10 @@ const RecruitmentDetailsPage = () => {
     setError(null);
 
     let apiUrl = 'http://localhost:8080/api/'
-    if(!isIndividual){
+    if (!isIndividual) {
       apiUrl += `CompanyUser/recruitments/${processId}`
     }
-    else{
+    else {
       apiUrl += `User/recruitments/${processId}`
     }
 
@@ -167,10 +172,12 @@ const RecruitmentDetailsPage = () => {
       setRecruitmentDetails(recruitmentData);
       setNewProcessType(recruitmentData.recruitment.processTypeId);
 
-    } catch (err: any) {
+    } catch (err) {
       console.error("Error fetching recruitment details:", err);
-      setError(err.message);
-      showCustomAlert(`Error loading recruitment details: ${err.message}`, true);
+      if (err instanceof Error) {
+        setError(err.message);
+        showCustomAlert(`Error loading recruitment details: ${err.message}`, true);
+      }
     } finally {
       setLoading(false);
     }
@@ -187,10 +194,10 @@ const RecruitmentDetailsPage = () => {
     }
 
     let apiUrl = 'http://localhost:8080/api/'
-    if(!isIndividual){
+    if (!isIndividual) {
       apiUrl += `CompanyUser/recruitments/${processId}/file`
     }
-    else{
+    else {
       apiUrl += `User/recruitments/${processId}/file`
     }
 
@@ -250,9 +257,10 @@ const RecruitmentDetailsPage = () => {
 
       showCustomAlert("File downloaded successfully!");
 
-    } catch (err: any) {
+    } catch (err) {
       console.error("Error downloading file:", err);
-      showCustomAlert(`Error downloading file: ${err.message}`, true);
+      if (err instanceof Error)
+        showCustomAlert(`Error downloading file: ${err.message}`, true);
     }
   };
 
@@ -268,10 +276,10 @@ const RecruitmentDetailsPage = () => {
     }
 
     let apiUrl = 'http://localhost:8080/api/'
-    if(!isIndividual){
+    if (!isIndividual) {
       apiUrl += `CompanyUser/recruitments/${processId}/messages`
     }
-    else{
+    else {
       apiUrl += `User/recruitments/${processId}/messages`
     }
 
@@ -298,9 +306,10 @@ const RecruitmentDetailsPage = () => {
         console.error("Failed to send message:", errorText);
         showCustomAlert(`Failed to send message: ${errorText}`, true);
       }
-    } catch (err: any) {
+    } catch (err) {
       console.error("Error sending message:", err);
-      showCustomAlert(`An unexpected error occurred while sending message: ${err.message}`, true);
+      if (err instanceof Error)
+        showCustomAlert(`An unexpected error occurred while sending message: ${err.message}`, true);
     }
   };
 
@@ -364,9 +373,10 @@ const RecruitmentDetailsPage = () => {
         console.error("Failed to update process type:", errorText);
         showCustomAlert(`Failed to update process type: ${errorText}`, true);
       }
-    } catch (err: any) {
+    } catch (err) {
       console.error("Error updating process type:", err);
-      showCustomAlert(`An unexpected error occurred while updating process type: ${err.message}`, true);
+      if (err instanceof Error)
+        showCustomAlert(`An unexpected error occurred while updating process type: ${err.message}`, true);
     }
   };
 
@@ -390,9 +400,6 @@ const RecruitmentDetailsPage = () => {
   const { recruitment, person, company, branch, offerTemplate, offer } = recruitmentDetails;
 
   const isFinalStatus = recruitment.processTypeId === 11 || recruitment.processTypeId === 12;
-  const finalStatusMessage = isFinalStatus
-    ? `Cannot change process type. Recruitment is already ${recruitment.processType.name}.`
-    : '';
 
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white dark:bg-gray-900 rounded-lg shadow-xl mt-8 font-inter text-gray-900 dark:text-gray-100">
@@ -454,8 +461,8 @@ const RecruitmentDetailsPage = () => {
               {recruitmentDetails.contractConditions.map((cc, idx) => (
                 <li key={idx}>
                   {cc.hoursPerTerm} hours/term, {cc.salaryMin}-{cc.salaryMax} {cc.currency?.name} {cc.salaryTerm?.name} ({cc.isNegotiable ? 'Negotiable' : 'Fixed'})
-                  {cc.workModes?.length > 0 && ` - Work Modes: ${cc.workModes.map((wm: any) => wm.name).join(', ')}`}
-                  {cc.employmentTypes?.length > 0 && ` - Employment Types: ${cc.employmentTypes.map((et: any) => et.name).join(', ')}`}
+                  {cc.workModes?.length > 0 && ` - Work Modes: ${cc.workModes.map((wm: { name : string }) => wm.name).join(', ')}`}
+                  {cc.employmentTypes?.length > 0 && ` - Employment Types: ${cc.employmentTypes.map((et: { name : string }) => et.name).join(', ')}`}
                 </li>
               ))}
             </ul>

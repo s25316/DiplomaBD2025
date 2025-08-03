@@ -1,5 +1,6 @@
 'use client';
 import React from 'react';
+import Image from 'next/image';
 
 const GeoMap = ({ lon, lat }: { lon: number; lat: number }) => {
   const apiKey = process.env.GEOAPIFY_API;
@@ -9,7 +10,7 @@ const GeoMap = ({ lon, lat }: { lon: number; lat: number }) => {
 
   return (
     <div className="my-4">
-      <img src={mapUrl} alt="Map location" width={600} height={400} className="rounded shadow" />
+      <Image src={mapUrl} alt="Map location" width={600} height={400} className="rounded shadow" />
     </div>
   );
 };

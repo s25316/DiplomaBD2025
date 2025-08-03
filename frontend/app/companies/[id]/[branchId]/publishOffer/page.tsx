@@ -2,16 +2,17 @@
 import React, { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useParams, useRouter } from 'next/navigation';
-import OfferForm from '@/app/components/forms/OfferForm';
+import OfferForm, { SkillWithRequired } from '@/app/components/forms/OfferForm';
 import {  ContractConditionFormData } from '@/app/components/forms/ContractConditionForm';
 import { OuterContainer } from '@/app/components/layout/PageContainers';
+import { OfferTemplate } from '@/types/offerTemplate';
 
 
 const PublishOffer = () => {
   const { id, branchId } = useParams();
   const router = useRouter();
   const { data: session } = useSession();
-  const [offerStatusId, setOfferStatusId] = useState<null | null>(null);;
+  // const [offerStatusId, setOfferStatusId] = useState<null | null>(null);;
   const [templates, setTemplates] = useState([]);
   const [parameters, setParameters] = useState([]);
   const [skills, setSkills] = useState([]);
@@ -32,7 +33,7 @@ const PublishOffer = () => {
   
 
   const [newTemplateForm, setNewTemplateForm] = useState({
-    name: '', description: '', skills: [],
+    name: '', description: '', skills: [] as SkillWithRequired[],
   });
 
   useEffect(() => {
@@ -48,9 +49,9 @@ const PublishOffer = () => {
       const [tplData, paramData, condData, skillData] = await Promise.all([
         tplRes.json(), paramRes.json(), condRes.json(), skillsRes.json(),
       ]);
-      setTemplates(tplData.items.map((i: any) => i.offerTemplate));
+      setTemplates(tplData.items.map((i: { offerTemplate : OfferTemplate}) => i.offerTemplate));
       setParameters(paramData);
-      setExistingConditions(condData.items.map((i: any) => i.contractCondition));
+      setExistingConditions(condData.items.map((i: { contractCondition : ContractConditions}) => i.contractCondition));
       setSkills(skillData);
     });
   }, [session, id]);
@@ -68,7 +69,7 @@ const PublishOffer = () => {
     if (!res.ok) return alert("Failed to create contract condition");
 
     const all = await refreshConditions();
-    const match = all.find((c : any) =>
+    const match = all.find((c : ContractConditions) =>
       c.salaryMin === formData.salaryMin &&
       c.salaryMax === formData.salaryMax &&
       c.hoursPerTerm === formData.hoursPerTerm
@@ -98,7 +99,7 @@ const PublishOffer = () => {
 
   const allTemplates = await refreshTemplates();
 
-  const newest = allTemplates.find((t:any) =>
+  const newest = allTemplates.find((t: OfferTemplate) =>
     t.name === newTemplateForm.name &&
     t.description === newTemplateForm.description
   );
@@ -145,7 +146,7 @@ const PublishOffer = () => {
     headers: { Authorization: `Bearer ${session?.user.token}` },
   });
   const data = await res.json();
-  const all = data.items.map((i: any) => i.offerTemplate).filter((tpl: any) => !!tpl.offerTemplateId);
+  const all = data.items.map((i: { offerTemplate : OfferTemplate}) => i.offerTemplate).filter((tpl : OfferTemplate) => !!tpl.offerTemplateId);
   setTemplates(all);
   return all;
 };
@@ -155,7 +156,7 @@ const refreshConditions = async () => {
     headers: { Authorization: `Bearer ${session?.user.token}` },
   });
   const data = await res.json();
-  const all = data.items.map((i: any) => i.contractCondition).filter((c: any) => c.companyId === id);
+  const all = data.items.map((i: { contractCondition : ContractConditions}) => i.contractCondition).filter((c: ContractConditions) => c.companyId === id);
   setExistingConditions(all);
   return all;
 };
@@ -182,7 +183,7 @@ const refreshConditions = async () => {
           newTemplateForm={newTemplateForm}
           setNewTemplateForm={setNewTemplateForm}
           onTemplateCreate={handleTemplateCreate}
-          statusId= {offerStatusId}
+          statusId= {null}
         />
         <button type="submit" className="bg-blue-600 text-white p-2 rounded mt-4">Publish Offer</button>
       </form>

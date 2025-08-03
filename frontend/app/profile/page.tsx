@@ -8,13 +8,14 @@ import CreateCompanyButton from '@/app/components/buttons/CreateCompanyButton';
 import BaseProfileForm from '../components/forms/BaseProfileForm';
 import { InnerSection, OuterContainer } from '../components/layout/PageContainers';
 
-interface Company{
+interface Company {
   companyId: string;
   name: string;
   description: string;
   websiteUrl?: string;
 }
 interface SkillInfo {
+  skillId: number;
   name: string;
   skillType: {
     name: string;
@@ -52,14 +53,14 @@ interface User {
 }
 
 const Profile = () => {
-  const { data: session, status } = useSession(); 
+  const { data: session, status } = useSession();
   const router = useRouter();
 
   const [user, setUserDetails] = useState<User | null>(null);
   const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null); 
-  const [isDeleting, setIsDeleting] = useState(false); 
+  const [error, setError] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const showCustomAlert = (message: string, isError: boolean = false) => {
     let alertMessage = message;
@@ -74,6 +75,8 @@ const Profile = () => {
           alertMessage = message;
         }
       } catch (e) {
+        if (e instanceof Error)
+          console.error(e.message)
         alertMessage = message;
       }
     }
@@ -122,10 +125,12 @@ const Profile = () => {
 
         setUserDetails(userJson.personPerspective);
         setCompanies(companiesJson.items || []);
-      } catch (err: any) {
+      } catch (err) {
         console.error('Error loading profile:', err);
-        setError(err.message);
-        showCustomAlert(`Error loading profile: ${err.message}`, true);
+        if (err instanceof Error) {
+          setError(err.message);
+          showCustomAlert(`Error loading profile: ${err.message}`, true);
+        }
       } finally {
         setLoading(false);
       }
@@ -163,10 +168,12 @@ const Profile = () => {
 
       showCustomAlert('Your account has been marked for deletion. You have 30 days to restore it. You will now be logged out.');
       await signOut({ callbackUrl: '/' }); // Wyloguj użytkownika po usunięciu konta
-    } catch (err: any) {
+    } catch (err) {
       console.error("Error deleting account:", err);
-      setError(err.message);
-      showCustomAlert(`Error deleting account: ${err.message}`, true);
+      if (err instanceof Error) {
+        setError(err.message);
+        showCustomAlert(`Error deleting account: ${err.message}`, true);
+      }
     } finally {
       setIsDeleting(false);
     }
@@ -185,18 +192,18 @@ const Profile = () => {
     return <div className="text-center py-4 text-gray-600">Profile data not found.</div>;
   }
 
-  const {skills, urls, address} = user;
+  const { skills, urls, address } = user;
   const isFirstTime = !user?.name;
-  
+
   return (
     <OuterContainer maxWidth="max-w-4xl">
       <h1 className="text-3xl font-bold mb-6 text-gray-800 dark:text-gray-100 text-center">My Profile</h1>
-      
+
       <InnerSection className="mb-6">
         {isFirstTime ? (
           <BaseProfileForm
-            token={session?.user.token!}
-            onSuccess={() => window.location.reload()} 
+            token={session!.user.token!}
+            onSuccess={() => window.location.reload()}
           />
         ) : (
           <div className="space-y-2 text-gray-700 dark:text-gray-300">
@@ -209,8 +216,8 @@ const Profile = () => {
             <p><b>Phone:</b> {user.phoneNum}</p>
             <p><b>Birth Date:</b> {user.birthDate?.substring(0, 10)}</p>
 
-            {(address !=null) && (
-              <p><b>Address:</b> 
+            {(address != null) && (
+              <p><b>Address:</b>
                 {[
                   " ul.",
                   address.streetName,
@@ -228,7 +235,7 @@ const Profile = () => {
             <p className="mt-4"><b>Skills:</b></p>
             <ul className="list-disc ml-5">
               {skills?.length > 0 ? (
-                skills.map((s: any) => (
+                skills.map((s: SkillInfo) => (
                   <li key={s.skillId}>{s.name} ({s.skillType?.name})</li>
                 ))
               ) : (
@@ -239,7 +246,11 @@ const Profile = () => {
             <p className="mt-4"><b>Links:</b></p>
             <ul className="list-disc ml-5">
               {urls?.length > 0 ? (
-                urls.map((u: any, i: number) => (
+                urls.map((u: { value : string
+                  urlType?: {
+                    name : string
+                  }
+                }, i: number) => (
                   <li key={i}><a href={u.value} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline dark:text-blue-400">{u.value}</a> ({u.urlType?.name})</li>
                 ))
               ) : (
@@ -258,7 +269,7 @@ const Profile = () => {
       </InnerSection>
 
       {(user.isIndividual === false && user.name != null) && (
-        <InnerSection className="mb-6"> 
+        <InnerSection className="mb-6">
           <h2 className="text-2xl font-semibold mt-4 mb-2 text-gray-800 dark:text-gray-100">Companies</h2> {/* Zmieniono nagłówek */}
           {companies.length > 0 ? (
             <ul className="space-y-4">
@@ -266,7 +277,7 @@ const Profile = () => {
                 <li key={company.companyId} >
                   <div className="border border-gray-300 dark:border-gray-700 p-4 rounded-lg shadow-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"> {/* Dodano style dla pojedynczej firmy */}
                     <Link href={`/companies/${company.companyId}`} className="text-blue-600 hover:underline dark:text-blue-400">
-                      <b className="text-lg font-bold">{company.name}</b> 
+                      <b className="text-lg font-bold">{company.name}</b>
                     </Link>
                     {company.websiteUrl && <p className="text-sm text-gray-700 dark:text-gray-300">Website: <a href={company.websiteUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline dark:text-blue-400">{company.websiteUrl}</a></p>}
                   </div>
@@ -274,7 +285,7 @@ const Profile = () => {
               ))}
             </ul>
           ) : (
-            <p className="text-gray-600 dark:text-gray-400">You did not register any company yet.</p> 
+            <p className="text-gray-600 dark:text-gray-400">You did not register any company yet.</p>
           )}
           <div className="mt-6">
             <CreateCompanyButton />

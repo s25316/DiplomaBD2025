@@ -49,7 +49,7 @@ const EditBranch = () => {
   const router = useRouter();
 
   // State to hold the fetched branch data (optional, can be directly mapped to formState)
-  const [branch, setBranch] = useState<BranchApiData | null>(null);
+  // const [branch, setBranch] = useState<BranchApiData | null>(null);
   // State to hold the data that will be passed as initialData to BranchForm
   const [formState, setFormState] = useState<BranchFormInitialData | null>(null);
   // useRef to store the data from BranchForm for submission
@@ -87,7 +87,7 @@ const EditBranch = () => {
           return;
         }
 
-        setBranch(b); // Store the raw API branch data
+        // setBranch(b); // Store the raw API branch data
 
         // Prepare data for BranchForm's initialData prop
         const initialForm: BranchFormInitialData = {
@@ -100,8 +100,9 @@ const EditBranch = () => {
         sendData.current = initialForm; // Also initialize ref with the same data
         console.log("Fetched branch and set formState/sendData:", initialForm); // Debug log
 
-      } catch (error: any) {
+      } catch (error) {
         console.error("Error fetching branch:", error);
+        if(error instanceof Error)
         showCustomAlert(`Failed to load branch details: ${error.message}`);
       }
     };
@@ -149,8 +150,9 @@ const EditBranch = () => {
         console.error("Failed to update branch:", errorText);
         showCustomAlert(`Failed to update branch: ${errorText}`);
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error updating branch:", error);
+      if(error instanceof Error)
       showCustomAlert(`An error occurred while updating the branch: ${error.message}`);
     }
   };

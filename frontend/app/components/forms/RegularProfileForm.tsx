@@ -53,7 +53,7 @@ interface RegularProfileFormProps {
 }
 
 const RegularProfileForm = ({ initialData, token }: RegularProfileFormProps) => {
-  const [skills, setSkills] = useState<Skill[]>([]);
+  // const [skills, setSkills] = useState<Skill[]>([]);
   const [urlTypes, setUrlTypes] = useState<UrlTypeOption[]>([]);
   const router = useRouter();
 
@@ -112,7 +112,7 @@ const RegularProfileForm = ({ initialData, token }: RegularProfileFormProps) => 
       fetch('http://localhost:8080/api/Dictionaries/urlTypes', { headers, cache: 'no-store' }), // Dodano cache: no-store
     ]).then(async ([skillsRes, urlTypesRes]) => {
       const skillsData: Skill[] = await skillsRes.json();
-      setSkills(skillsData);
+      // setSkills(skillsData);
       setUrlTypes(await urlTypesRes.json());
 
       const grouped = skillsData.reduce((acc, skill) => {
@@ -203,8 +203,9 @@ const RegularProfileForm = ({ initialData, token }: RegularProfileFormProps) => 
         const errorText = await res.text();
         alert(`Failed to update profile: ${errorText}`);
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error updating profile:", error);
+      if(error instanceof Error)
       alert(`An unexpected error occurred: ${error.message}`);
     }
   };

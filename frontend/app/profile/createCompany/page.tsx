@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
 import { InnerSection, OuterContainer } from "@/app/components/layout/PageContainers";
-import CancelButton from "@/app/components/buttons/CancelButton";
 
 const CreateCompany = () => {
   const { data: session } = useSession();

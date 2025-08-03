@@ -1,7 +1,6 @@
 'use client'
-import { useSession } from 'next-auth/react';
 import Link from 'next/link';
-import { useParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import DeleteBranchButton from './buttons/DeleteBranchButton';
 import { InnerSection } from './layout/PageContainers';
 
@@ -22,7 +21,6 @@ interface BranchesListProps {
 const BranchesList = ({ 
   branches, companyId, onDelete,
 }: BranchesListProps) => {
-  const { data: session } = useSession();
   const router = useRouter();
 
 

@@ -1,5 +1,4 @@
 'use client';
-import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import React from 'react';
 
@@ -19,7 +18,6 @@ const DeleteOfferButton = ({
   confirmationMessage = 'Are you sure you want to delete this offer?',
 }: DeleteOfferButtonProps) => {
   const { data: session } = useSession();
-  const router = useRouter();
 
   const showCustomAlert = (message: string, isError: boolean = false) => {
     let alertMessage = message;
@@ -34,6 +32,8 @@ const DeleteOfferButton = ({
           alertMessage = message;
         }
       } catch (e) {
+        if(e instanceof Error)
+          console.error(e.message)
         alertMessage = message;
       }
     }
@@ -65,8 +65,9 @@ const DeleteOfferButton = ({
         console.error('Failed to delete offer:', errorText);
         showCustomAlert(`Failed to delete offer: ${errorText}`, true);
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error during offer deletion:', error);
+      if(error instanceof Error)
       showCustomAlert(`An unexpected error occurred: ${error.message}`, true);
     }
   };

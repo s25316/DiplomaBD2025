@@ -3,10 +3,19 @@
 import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useSession } from 'next-auth/react';
+import { OfferTemplate } from '@/types/offerTemplate';
 
 interface Response {
   items: Item[],
   totalCount: number
+}
+
+interface Item {
+  offer: Offer,
+  offerTemplate: OfferTemplate,
+  company: Company,
+  branch: Branch,
+  contractConditions: ContractConditions[] | null,
 }
 
 interface Filter {
@@ -97,22 +106,42 @@ const Offers = () => {
   const [contractParametersDictinary, setContractParametersDictinary] = useState<ContractParameter[]>([]);
   const [skillDictinary, setSkillDictinary] = useState<Skill[]>([]);
 
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
 
   useEffect(() => {
-    const filterQuery = `?search=${filters.searchText}&status=${filters.status}&ascending=${filters.ascending}&orderBy=${filters.orderBy ? filters.orderBy : ""}
-    &regon=${filters.regon}&nip=${filters.nip}&krs=${filters.krs}&isNegotiable=${filters.isNegotiable ? filters.isNegotiable : ""}&isPaid=${filters.isPaid ? filters.isPaid : ""}
-    &salaryPerHourMin=${filters.salaryPerHourMin ? filters.salaryPerHourMin : ""}&salaryPerHourMax=${filters.salaryPerHourMax ? filters.salaryPerHourMax : ""}
-    &salaryMin=${filters.salaryMin ? filters.salaryMin : ""}
-    &salaryMax=${filters.salaryMax ? filters.salaryMax : ""}&hoursMin=${filters.hoursMin ? filters.hoursMin : ""}&hoursMax=${filters.hoursMax ? filters.hoursMax : ""}
-    &lon=${filters.lon ? filters.lon : ""}&lat=${filters.lat ? filters.lat : ""}
-    &publicationStartFrom=${filters.publicationStartFrom ? filters.publicationStartFrom : ""}&publicationStartTo=${filters.publicationStartTo ? filters.publicationStartTo : ""}
-    &publicationEndFrom=${filters.publicationEndFrom ? filters.publicationEndFrom : ""}&publicationEndTo=${filters.publicationEndTo ? filters.publicationEndTo : ""}
-    &employmentLengthFrom=${filters.employmentLengthFrom ? filters.employmentLengthFrom : ""}
-    &employmentLengthTo=${filters.employmentLengthTo ? filters.employmentLengthTo : ""}&page=${filters.page}&itemsPerPage=${filters.itemsPerPage}
-    ${filters.skillsIds.map(x => `&skillIds=${x}`)}${filters.contractParameterIds.map(x => `&contractParameterIds=${x}`)}`
+    const filterQuery =
+  `?search=${filters.searchText}` +
+  `&status=${filters.status}` +
+  `&ascending=${filters.ascending}` +
+  `&orderBy=${filters.orderBy || ""}` +
+  `&regon=${filters.regon}` +
+  `&nip=${filters.nip}` +
+  `&krs=${filters.krs}` +
+  `&isNegotiable=${filters.isNegotiable || ""}` +
+  `&isPaid=${filters.isPaid || ""}` +
+  `&salaryPerHourMin=${filters.salaryPerHourMin || ""}` +
+  `&salaryPerHourMax=${filters.salaryPerHourMax || ""}` +
+  `&salaryMin=${filters.salaryMin || ""}` +
+  `&salaryMax=${filters.salaryMax || ""}` +
+  `&hoursMin=${filters.hoursMin || ""}` +
+  `&hoursMax=${filters.hoursMax || ""}` +
+  `&lon=${filters.lon || ""}` +
+  `&lat=${filters.lat || ""}` +
+  `&publicationStartFrom=${filters.publicationStartFrom || ""}` +
+  `&publicationStartTo=${filters.publicationStartTo || ""}` +
+  `&publicationEndFrom=${filters.publicationEndFrom || ""}` +
+  `&publicationEndTo=${filters.publicationEndTo || ""}` +
+  `&employmentLengthFrom=${filters.employmentLengthFrom || ""}` +
+  `&employmentLengthTo=${filters.employmentLengthTo || ""}` +
+  `&page=${filters.page}` +
+  `&itemsPerPage=${filters.itemsPerPage}`;
 
-    fetch('http://localhost:8080/api/GuestQueries/offers' + filterQuery)
+    fetch('http://localhost:8080/api/GuestQueries/offers' + filterQuery, {
+      headers: {
+        contractParameterIds: filters.contractParameterIds.map(x => `${x}`).join(","),
+        skillsIds: filters.skillsIds.map(x => `${x}`).join(",")
+      }
+    })
       .then(res => res.json())
       .then(setApiData)
   }, [session, filters]);

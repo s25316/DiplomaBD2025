@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { InnerSection } from '../layout/PageContainers';
 
-const EditCompanyForm = ({ company, companyId, onUpdated }: { company: any, companyId: string, onUpdated: (data: any) => void }) => {
+const EditCompanyForm = ({ company, companyId, onUpdated }: { company: Company, companyId: string, onUpdated: (data: Company) => void }) => {
   const { data: session } = useSession();
   const [description, setDescription] = useState(company?.description || '');
   const [websiteUrl, setWebsiteUrl] = useState(company?.websiteUrl || '');

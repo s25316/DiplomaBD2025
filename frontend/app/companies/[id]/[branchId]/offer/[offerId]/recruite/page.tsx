@@ -6,7 +6,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 
 const Recruite = () => {
-    const { id, branchId, offerId } = useParams() as {
+    const { offerId } = useParams() as {
         id: string;
         branchId: string;
         offerId: string;

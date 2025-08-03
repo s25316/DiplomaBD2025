@@ -8,6 +8,7 @@ import Link from 'next/link';
 
 const AppBar = () => {
   const { data: session } = useSession();
+  const router = useRouter()
 
   return (
     <div className="flex justify-between items-center px-4 py-3 bg-white dark:bg-gray-800 shadow-md">
@@ -30,7 +31,6 @@ const AppBar = () => {
             Profile
           </button>
           <button onClick={() => { signOut()
-            let router = useRouter()
             router.push("/") }} 
             className="px-4 py-2 rounded-md bg-red-500 text-white hover:bg-red-600 transition duration-200">
               Sign Out

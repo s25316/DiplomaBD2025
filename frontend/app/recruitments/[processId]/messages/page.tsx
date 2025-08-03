@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useCallback } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import SelectItemsPerPage from '@/app/components/SelectItemsPerPage';
@@ -23,7 +23,6 @@ interface SendMessagePayload {
 const RecruitmentMessagesPage = () => {
   const { processId } = useParams() as { processId: string };
   const { data: session, status } = useSession();
-  const router = useRouter();
 
   const [messages, setMessages] = useState<RecruitmentMessage[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -36,10 +35,13 @@ const RecruitmentMessagesPage = () => {
 
   const [isIndividual, setIsIndividual] = useState(true);
   useEffect(() => {
-    fetch('http://localhost:8080/api/User')
-      .then(res => res.json())
-      .then(res => setIsIndividual(res.personPerspective.isIndividual))
-  }, [])
+    if(session)
+      fetch('http://localhost:8080/api/User', {
+        headers: { Authorization: `Bearer ${session.user.token}` }
+      })
+        .then(res => res.json())
+        .then(res => setIsIndividual(res.personPerspective.isIndividual))
+    }, [session])
 
   const showCustomAlert = (message: string, isError: boolean = false) => {
     let alertMessage = message;
@@ -54,6 +56,8 @@ const RecruitmentMessagesPage = () => {
           alertMessage = message;
         }
       } catch (e) {
+        if (e instanceof Error)
+          console.error(e.message)
         alertMessage = message;
       }
     }
@@ -71,10 +75,10 @@ const RecruitmentMessagesPage = () => {
     setError(null);
 
     let apiUrl = 'http://localhost:8080/api/'
-    if(!isIndividual){
+    if (!isIndividual) {
       apiUrl += `CompanyUser/recruitments/${processId}/messages?Page=${page}&ItemsPerPage=${itemsPerPage}`
     }
-    else{
+    else {
       apiUrl += `User/recruitments/${processId}/messages?Page=${page}&ItemsPerPage=${itemsPerPage}`
     }
 
@@ -99,10 +103,12 @@ const RecruitmentMessagesPage = () => {
       setMessages(data.items || []);
       setTotalCount(data.totalCount || 0);
 
-    } catch (err: any) {
+    } catch (err) {
       console.error("Error fetching messages:", err);
-      setError(err.message);
-      showCustomAlert(`Error loading messages: ${err.message}`, true);
+      if (err instanceof Error) {
+        setError(err.message);
+        showCustomAlert(`Error loading messages: ${err.message}`, true);
+      }
     } finally {
       setLoading(false);
     }
@@ -124,10 +130,10 @@ const RecruitmentMessagesPage = () => {
     }
 
     let apiUrl = 'http://localhost:8080/api/'
-    if(!isIndividual){
+    if (!isIndividual) {
       apiUrl += `CompanyUser/recruitments/${processId}/messages`
     }
-    else{
+    else {
       apiUrl += `User/recruitments/${processId}/messages`
     }
 
@@ -147,15 +153,16 @@ const RecruitmentMessagesPage = () => {
 
       if (res.ok) {
         showCustomAlert("Message sent successfully!");
-        setNewMessageText(''); 
+        setNewMessageText('');
         fetchMessages();
       } else {
         const errorText = await res.text();
         console.error("Failed to send message:", errorText);
         showCustomAlert(`Failed to send message: ${errorText}`, true);
       }
-    } catch (err: any) {
+    } catch (err) {
       console.error("Error sending message:", err);
+      if(err instanceof Error)
       showCustomAlert(`An unexpected error occurred while sending message: ${err.message}`, true);
     }
   };
@@ -176,7 +183,7 @@ const RecruitmentMessagesPage = () => {
     <div className="max-w-4xl mx-auto p-6 bg-white dark:bg-gray-900 rounded-lg shadow-xl mt-8 font-inter text-gray-900 dark:text-gray-100">
       <ReturnButton />
       <h1 className="text-3xl font-bold mb-6 text-gray-800 dark:text-gray-100 text-center">Messages for Recruitment: {processId}</h1>
-      
+
       <div className="mb-4">
         <Link href={`/recruitments/${processId}`} className="text-blue-600 hover:underline">
           &larr; Back to Recruitment Details

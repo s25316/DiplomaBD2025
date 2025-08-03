@@ -1,9 +1,9 @@
 import React from "react";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import Link from "next/link";
 import DeleteTemplateButton from "@/app/components/buttons/DeleteTemplateButton";
 import { InnerSection, OuterContainer } from "@/app/components/layout/PageContainers";
+import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 
 interface Skill {
   skillId: number;
@@ -23,14 +23,15 @@ interface OfferTemplate {
   skills: Skill[];
 }
 
-const TemplateDetails = async ({
-  params,
-}: {
-  params: { id: string; offerTemplateId: string };
+const TemplateDetails = async ({ params }: {
+  params: Promise<{
+    id: string;
+    offerTemplateId: string;
+  }>
 }) => {
   const session = await getServerSession(authOptions);
-  const companyId = params.id;
-  const offerTemplateId = params.offerTemplateId;
+  const { id, offerTemplateId } = await params;
+  // const offerTemplateId = await params.offerTemplateId;
   // const { id, offerTemplateId } = params;
 
   let template: OfferTemplate | null = null;
@@ -56,7 +57,17 @@ const TemplateDetails = async ({
           name: templateData.name,
           description: templateData.description,
           created: templateData.created,
-          skills: templateData.skills.map((skillData: any) => ({
+          skills: templateData.skills.map((skillData: {
+            skill: {
+              skillId: string;
+              name: string;
+              skillType: {
+                skillTypeId: number;
+                name: string;
+              };
+            }
+            isRequired: boolean;
+          }) => ({
             skillId: skillData.skill.skillId,
             name: skillData.skill.name,
             skillType: skillData.skill.skillType,
@@ -94,7 +105,7 @@ const TemplateDetails = async ({
         )}
 
         <Link
-          href={`/companies/${companyId}/templates/${template.offerTemplateId}/edit`}
+          href={`/companies/${id}/templates/${template.offerTemplateId}/edit`}
           className="inline-block mt-4 bg-blue-500 text-white px-4 py-2 rounded"
         >
           Edit Template
@@ -103,7 +114,7 @@ const TemplateDetails = async ({
         {session?.user.token && (
           <DeleteTemplateButton
             offerTemplateId={template.offerTemplateId}
-            companyId={companyId}
+            companyId={id}
           />
         )}
       </InnerSection>

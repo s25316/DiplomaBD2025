@@ -4,16 +4,17 @@ import { useParams, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import OfferTemplateForm from '@/app/components/forms/OfferTemplateForm';
 import { OuterContainer } from '@/app/components/layout/PageContainers';
+import { SkillWithRequired } from '@/app/components/forms/OfferForm';
 
 // This interface defines the structure of a single skill object as received from the API
-interface Skill {
-  skillId: number; // Unique identifier for the skill (from API)
-  name: string;
-  skillType: {
-    skillTypeId: number;
-    name: string;
-  };
-}
+// interface Skill {
+//   skillId: number; // Unique identifier for the skill (from API)
+//   name: string;
+//   skillType: {
+//     skillTypeId: number;
+//     name: string;
+//   };
+// }
 
 // This interface defines how a selected skill is stored in the form's state
 interface SkillSelection {
@@ -45,7 +46,7 @@ interface OfferTemplateDataApi { // Naming convention 'Api' to show it's from AP
 // API response item for a single Offer Template (if nested like items[0]?.offerTemplate)
 interface OfferTemplateApiItem {
   offerTemplate: OfferTemplateDataApi;
-  company?: any;
+  company: Company;
 }
 
 // This interface defines the form's state structure for editing an offer template
@@ -63,7 +64,7 @@ export default function EditOfferTemplate() {
   const router = useRouter();
   const { data: session } = useSession();
 
-  const [skills, setSkills] = useState<Skill[]>([]); 
+  const [skills, setSkills] = useState<SkillWithRequired[]>([]); 
 
   const [form, setForm] = useState<EditTemplateFormState | null>(null);
 
@@ -89,7 +90,7 @@ export default function EditOfferTemplate() {
           const errorText = await skillsRes.text();
           throw new Error(`Failed to fetch skills: ${errorText}`);
         }
-        const skillsData: Skill[] = await skillsRes.json();
+        const skillsData: SkillWithRequired[] = await skillsRes.json();
 
         // Ensure unique skills based on skillId for available skills list
         const uniqueSkills = Array.from(new Map(skillsData.map(item => [item.skillId, item])).values());
@@ -127,14 +128,15 @@ export default function EditOfferTemplate() {
         });
         console.log("Fetched and set form data (Edit):", { ...offerTemplate, skills: initialSelectedSkills }); // Debug log
 
-      } catch (error: any) {
+      } catch (error) {
         console.error("Error fetching data:", error);
+        if(error instanceof Error)
         showCustomAlert(`Error loading offer template data: ${error.message}`);
       }
     };
 
     fetchAll();
-  }, [session, offerTemplateId, id]); // Added 'id' to dependencies for router.push
+  }, [session, offerTemplateId, id, router]); // Added 'id' to dependencies for router.push
 
   // Function to handle changes in name or description fields
   const onChange = (field: 'name' | 'description', value: string) =>
@@ -200,8 +202,9 @@ export default function EditOfferTemplate() {
         console.error("Failed to update offer template:", errorText);
         showCustomAlert(`Failed to update template: ${errorText}`);
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error submitting offer template update:", error);
+      if(error instanceof Error)
       showCustomAlert(`An error occurred while updating template: ${error.message}`);
     }
   };

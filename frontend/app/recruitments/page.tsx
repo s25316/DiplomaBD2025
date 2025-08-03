@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import SelectItemsPerPage from '@/app/components/SelectItemsPerPage';
 import Pagination from '@/app/components/Pagination';
+import { OfferTemplate } from '@/types/offerTemplate';
 
 interface ProcessType {
   processTypeId: number;
@@ -97,10 +98,13 @@ const RecruitmentsPage = () => {
   // Account type
   const [isIndividual, setIsIndividual] = useState(true);
   useEffect(() => {
-    fetch('http://localhost:8080/api/User')
+    if(session)
+    fetch('http://localhost:8080/api/User', {
+      headers: { Authorization: `Bearer ${session.user.token}` }
+    })
       .then(res => res.json())
       .then(res => setIsIndividual(res.personPerspective.isIndividual))
-  }, [])
+  }, [session])
 
   // Custom alert function
   const showCustomAlert = (message: string, isError: boolean = false) => {
@@ -116,6 +120,8 @@ const RecruitmentsPage = () => {
           alertMessage = message;
         }
       } catch (e) {
+        if (e instanceof Error)
+          console.error(e.message)
         alertMessage = message;
       }
     }
@@ -125,7 +131,7 @@ const RecruitmentsPage = () => {
 
   // Fetch companies on component mount
   useEffect(() => {
-    if(isIndividual) return;
+    if (isIndividual) return;
     const fetchCompanies = async () => {
       if (status !== 'authenticated' || !session?.user?.token) return;
       try {
@@ -136,7 +142,7 @@ const RecruitmentsPage = () => {
         if (res.ok) {
           const data = await res.json();
           // Mapowanie, aby upewnić się, że CompanyOption ma odpowiednie pola
-          setCompaniesOptions(data.items.map((c: any) => ({ companyId: c.companyId, name: c.name })) || []);
+          setCompaniesOptions(data.items.map((c: Company) => ({ companyId: c.companyId, name: c.name })) || []);
         } else {
           console.error('Failed to fetch companies:', await res.text());
         }
@@ -149,7 +155,7 @@ const RecruitmentsPage = () => {
 
   // Fetch branches when selectedCompanyId changes
   useEffect(() => {
-    if(isIndividual) return;
+    if (isIndividual) return;
     const fetchBranches = async () => {
       if (status !== 'authenticated' || !session?.user?.token || !selectedCompanyId) {
         setBranchesOptions([]);
@@ -165,7 +171,7 @@ const RecruitmentsPage = () => {
         if (res.ok) {
           const data = await res.json();
           // Mapowanie, aby upewnić się, że BranchOption ma odpowiednie pola
-          setBranchesOptions(data.items.map((item: any) => ({
+          setBranchesOptions(data.items.map((item: { branch: Branch }) => ({
             branchId: item.branch.branchId,
             name: item.branch.name,
             address: { cityName: item.branch.address.cityName }
@@ -182,7 +188,7 @@ const RecruitmentsPage = () => {
 
   // Fetch offers when selectedBranchId changes
   useEffect(() => {
-    if(isIndividual) return
+    if (isIndividual) return
     const fetchOffers = async () => {
       if (status !== 'authenticated' || !session?.user?.token || !selectedBranchId) {
         setOffersOptions([]);
@@ -197,7 +203,7 @@ const RecruitmentsPage = () => {
         if (res.ok) {
           const data = await res.json();
           // Mapowanie, aby upewnić się, że OfferOption ma odpowiednie pola
-          setOffersOptions(data.items.map((item: any) => ({
+          setOffersOptions(data.items.map((item: { offer: Offer; offerTemplate: OfferTemplate }) => ({
             offerId: item.offer.offerId,
             offerTemplate: { name: item.offerTemplate.name }
           })) || []);
@@ -267,14 +273,16 @@ const RecruitmentsPage = () => {
       setRecruitments(data.items || []);
       setTotalCount(data.totalCount || 0);
 
-    } catch (err: any) {
+    } catch (err) {
       console.error("Error fetching recruitments:", err);
-      setError(err.message);
-      showCustomAlert(`Error loading recruitments: ${err.message}`, true);
+      if (err instanceof Error) {
+        setError(err.message);
+        showCustomAlert(`Error loading recruitments: ${err.message}`, true);
+      }
     } finally {
       setLoading(false);
     }
-  }, [session, status, page, itemsPerPage, selectedCompanyId, selectedBranchId, selectedOfferId, searchText, selectedProcessType, isIndividual]);
+  }, [session, status, page, itemsPerPage, selectedBranchId, selectedOfferId, searchText, selectedProcessType, isIndividual]);
 
   useEffect(() => {
     fetchRecruitments();

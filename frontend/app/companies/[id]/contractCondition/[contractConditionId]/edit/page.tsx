@@ -41,13 +41,14 @@ interface ContractConditionDataApi {
   workModes: ArrayNestedContractParameter[]; // Array of nested objects from API
   employmentTypes: ArrayNestedContractParameter[]; // Array of nested objects from API
   companyId?: string; // Optional: if company ID is part of the API response
+  isPaid: boolean;
 }
 
 // API response item for a single Contract Condition (if nested like items[0]?.contractCondition)
 interface ContractConditionApiItem {
   contractCondition: ContractConditionDataApi;
   // Other potential fields from API, e.g., company data
-  company?: any;
+  company: Company;
 }
 
 // Interface for the data structure submitted by the form (simplified for payload)
@@ -60,6 +61,7 @@ interface ContractConditionFormData {
   currencyId: number;
   workModeIds: number[];
   employmentTypeIds: number[];
+  isPaid: boolean;
 }
 
 const EditContractConditionPage = () => {
@@ -121,17 +123,19 @@ const EditContractConditionPage = () => {
           currencyId: item.currency.contractParameterId,     // Extract ID
           workModeIds: item.workModes.map((w: ArrayNestedContractParameter) => w.contractParameterId), // Extract IDs
           employmentTypeIds: item.employmentTypes.map((e: ArrayNestedContractParameter) => e.contractParameterId), // Extract IDs
+          isPaid: item.isPaid
         });
         // console.log("Fetched and set initial form data (Edit):", { ...item, mappedToForm: true }); // Debug log
 
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error("Error fetching data:", error);
+        if(error instanceof Error)
         showCustomAlert(`Error loading data: ${error.message}`);
       }
     };
 
     fetchAll();
-  }, [session, contractConditionId, id]); // Added 'id' to dependencies for router.push
+  }, [session, contractConditionId, id, router]); // Added 'id' to dependencies for router.push
 
   const handleSubmit = async (form: ContractConditionFormData) => {
     if (!session?.user?.token) {
@@ -158,8 +162,9 @@ const EditContractConditionPage = () => {
         console.error("Failed to update contract condition:", errorText);
         showCustomAlert(`Failed to update contract condition: ${errorText}`);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error updating contract condition:", error);
+      if(error instanceof Error)
       showCustomAlert(`An error occurred while updating the contract condition: ${error.message}`);
     }
   };

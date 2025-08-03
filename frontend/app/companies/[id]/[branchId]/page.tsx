@@ -45,7 +45,7 @@ interface Offer {
   offerTemplate: {
     name: string;
   };
-  contractConditions: any[];
+  contractConditions: ContractConditions[];
 }
 interface BranchDetailsApi {
   company: Company;
@@ -111,8 +111,9 @@ const BranchDetails = () => {
 
       setError(null);
 
-    } catch (err: any) {
+    } catch (err) {
       console.error("Error fetching data in BranchDetails:", err);
+      if(err instanceof Error)
       setError(err.message);
     }
   }, [session, branchId, statusFilter, page, itemsPerPage, router, id]);

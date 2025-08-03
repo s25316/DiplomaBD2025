@@ -125,3 +125,18 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: "PLAINTEXT"
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: true
+      
+  Diploma_Frontend:
+    container_name: Diploma_Frontend
+    image: diploma_frontend:latest
+    build:
+      context: ./frontend
+      dockerfile: ./dockerfile
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    environment:
+        NEXTAUTH_SECRET:
+        NEXTAUTH_URL: http://127.0.0.1:3000
+        GEOAPIFY_API: "a61d5a8ff24e4f6e8081e48d428b5994"
+        AUTH_SECRET: "jbS7iRw63xG2u8GYTjZAODHySPFlrnr8ry7IMRoqQXM="

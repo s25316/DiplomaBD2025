@@ -108,7 +108,8 @@ const OfferDetails = () => {
         }
 
         setOfferDetails(item);
-      } catch (err: any) {
+      } catch (err) {
+        if(err instanceof Error)
         setError(err.message);
       }
     };
@@ -143,7 +144,8 @@ const OfferDetails = () => {
       alert('Offer deleted successfully!');
       router.push(`/companies/${id}/${branchId}`);
 
-    } catch (err: any) {
+    } catch (err) {
+      if(err instanceof Error)
       setError(err.message);
     } finally {
       setIsDeleting(false);

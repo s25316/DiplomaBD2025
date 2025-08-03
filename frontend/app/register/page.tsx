@@ -1,6 +1,7 @@
 "use client"
 import { redirect } from 'next/navigation'
-import React, { FormEventHandler, useState } from 'react'
+import React, { useState } from 'react'
+import { OuterContainer } from '../components/layout/PageContainers'
 
 const Register = () => {
   const [email, setEmail] = useState("")
@@ -26,15 +27,15 @@ const Register = () => {
     }
   }
   return (
-    <div>
+    <OuterContainer className='w-[500px]'>
       <form onSubmit={fetchPost} className="flex flex-col gap-4">
         <label htmlFor='email'>Email:</label>
-        <input name='email' type='email' required placeholder='example@gmail.com' onChange={e => setEmail(e.target.value)} />
+        <input className='w-full h-[25px] rounded-md p-[3px] pt-[3px]' name='email' type='email' required placeholder='example@gmail.com' onChange={e => setEmail(e.target.value)} />
         <label htmlFor='password'>Password:</label>
-        <input name='password' type='password' required placeholder='****' onChange={e => setPassword(e.target.value)} />
-        <button type='submit'>Sign Up</button>
+        <input className='w-full h-[25px] rounded-md p-[3px] pt-[3px]' name='password' type='password' required placeholder='****' onChange={e => setPassword(e.target.value)} />
+        <button className="inline-block bg-green-600  p-2 rounded-md hover:bg-green-700 transition-colors" type='submit'>Sign Up</button>
       </form>
-    </div>
+    </OuterContainer>
   )
 }
 

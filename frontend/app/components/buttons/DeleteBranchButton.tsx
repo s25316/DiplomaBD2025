@@ -35,6 +35,8 @@ const DeleteBranchButton = ({
           alertMessage = message;
         }
       } catch (e) {
+        if(e instanceof Error)
+          console.error(e.message)
         alertMessage = message;
       }
     }
@@ -67,8 +69,9 @@ const DeleteBranchButton = ({
         console.error('Failed to delete branch:', errorText);
         showCustomAlert(`Failed to delete branch: ${errorText}`, true);
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error during branch deletion:', error);
+      if(error instanceof Error)
       showCustomAlert(`An unexpected error occurred: ${error.message}`, true);
     }
   };

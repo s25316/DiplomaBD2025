@@ -1,5 +1,5 @@
 "use client"
-import { redirect, useParams, usePathname, useRouter } from 'next/navigation'
+import { redirect, useParams, useRouter } from 'next/navigation'
 import React, { useState, useRef } from 'react'
 import { useSession } from 'next-auth/react'
 import BranchCreateForm from '@/app/components/forms/BranchForm'
@@ -27,11 +27,11 @@ interface Data extends SendData {
   index: number,
 }
 
-const createBranch = () => {
+const CreateBranch = () => {
+  const router = useRouter()
   const { data: session } = useSession({
     required: true,
     onUnauthenticated() {
-      const router = useRouter()
       router.back()
     },
   });
@@ -46,14 +46,14 @@ const createBranch = () => {
 
   const { id } = useParams();
   const [counter, setCounter] = useState(1);
-  const [forms, setForms] = useState([<BranchCreateForm index={0} getData={handleData} />]);
+  const [forms, setForms] = useState([<BranchCreateForm key={0} index={0} getData={handleData} />]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
-    var sendArray: SendData[] = []
+    const sendArray: SendData[] = []
     sendData.current.sort((value) => value.index).map((value) => {
-      const { index, ...rest } = value
+      const { ...rest } = value
       sendArray.push(rest)
     })
 
@@ -99,7 +99,7 @@ const createBranch = () => {
         </ul>
         <button
           className='bg-green-600 text-white px-5 py-2 rounded-lg hover:bg-green-700 transition duration-300 ease-in-out shadow-md font-semibold mt-4'
-          onClick={() => { setForms([...forms, <BranchForm index={counter} getData={handleData} />]); setCounter(counter + 1) }}>Add branch</button>
+          onClick={() => { setForms([...forms, <BranchForm key={counter} index={counter} getData={handleData} />]); setCounter(counter + 1) }}>Add branch</button>
         <CancelButton/>
         <button
           className='bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition duration-300 ease-in-out shadow-md font-semibold mt-4'
@@ -109,4 +109,4 @@ const createBranch = () => {
   )
 }
 
-export default createBranch
+export default CreateBranch

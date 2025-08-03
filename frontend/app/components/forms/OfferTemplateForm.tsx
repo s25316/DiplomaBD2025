@@ -1,15 +1,16 @@
 'use client';
 import React from 'react';
 import { InnerSection } from '../layout/PageContainers';
+import { SkillWithRequired } from './OfferForm';
 
-interface Skill {
-  skillId: number;
-  name: string;
-  skillType: {
-    skillTypeId: number;
-    name: string;
-  };
-}
+// interface Skill {
+//   skillId: number;
+//   name: string;
+//   skillType: {
+//     skillTypeId: number;
+//     name: string;
+//   };
+// }
 
 interface SkillSelection {
   skillId: number; 
@@ -19,7 +20,7 @@ interface SkillSelection {
 interface OfferTemplateFormProps {
   name: string;
   description: string;
-  skills: Skill[];
+  skills: SkillWithRequired[];
   selectedSkills: SkillSelection[];
   onChange: (field: 'name' | 'description', value: string) => void;
   onSkillToggle: (skillId: number, isChecked: boolean) => void;
@@ -46,7 +47,7 @@ const OfferTemplateForm = ({
     if (!acc[group]) acc[group] = [];
     acc[group].push(skill);
     return acc;
-  }, {} as Record<string, Skill[]>); // Ensure the accumulator is correctly typed as Record<string, Skill[]>
+  }, {} as Record<string, SkillWithRequired[]>); // Ensure the accumulator is correctly typed as Record<string, Skill[]>
 
   return (
     <InnerSection className='flex flex-col gap-4 p-4 border rounded-lg'>
@@ -82,7 +83,7 @@ const OfferTemplateForm = ({
             <fieldset className='border border-gray-300 p-3 rounded-md'>
             <legend className='text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2'>{type}</legend>
             <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-3'>
-              {group.map((skill: Skill) => { // 'skill' here is of type 'Skill'
+              {group.map((skill: SkillWithRequired) => { // 'skill' here is of type 'Skill'
                 const selected = selectedSkills.find((s: SkillSelection) => s.skillId === skill.skillId);
                 
                 return (

@@ -60,8 +60,9 @@ const CreateContractConditionPage = () => {
         const paramData: ContractParameter[] = await res.json(); // Explicitly type the response
         setParameters(paramData);
         console.log("Fetched contract parameters:", paramData); // Debug log
-      } catch (error: any) {
+      } catch (error) {
         console.error("Error fetching parameters:", error);
+        if(error instanceof Error)
         showCustomAlert(`Error loading contract parameters: ${error.message}`);
       }
     };
@@ -93,8 +94,9 @@ const CreateContractConditionPage = () => {
         console.error("Failed to create contract condition:", errorText);
         showCustomAlert(`Failed to create contract condition: ${errorText}`);
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error submitting contract condition:", error);
+      if(error instanceof Error)
       showCustomAlert(`An error occurred: ${error.message}`);
     }
   };

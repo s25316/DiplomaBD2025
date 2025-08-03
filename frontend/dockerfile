@@ -1,0 +1,43 @@
+# 1. Base image
+FROM node:18-alpine AS deps
+
+# 2. Set working directory
+WORKDIR /app
+
+# 3. Copy package files and install only production dependencies
+COPY package.json package-lock.json* pnpm-lock.yaml* yarn.lock* ./
+
+RUN \
+  if [ -f package-lock.json ]; then npm ci --legacy-peer-deps; \
+  elif [ -f yarn.lock ]; then yarn install --frozen-lockfile; \
+  elif [ -f pnpm-lock.yaml ]; then \
+    npm install -g pnpm && pnpm install --frozen-lockfile; \
+  fi
+
+# 4. Copy the rest of the app and build
+FROM node:18-alpine AS builder
+
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+
+RUN npm run build
+
+# 5. Final image
+FROM node:18-alpine AS runner
+
+WORKDIR /app
+
+ENV NODE_ENV=production
+
+# Copy only necessary files for runtime
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package.json ./package.json
+
+# Expose port (default Next.js port)
+EXPOSE 3000
+
+# Run Next.js app
+CMD ["npm", "start"]

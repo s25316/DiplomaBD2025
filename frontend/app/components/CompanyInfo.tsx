@@ -1,14 +1,14 @@
 import React from 'react';
 
-interface Company{
-  name: string;
-  description: string;
-  regon: string;
-  nip: string;
-  krs: string;
-  created: string;
-  websiteUrl: string;
-}
+// interface Company{
+//   name: string;
+//   description: string;
+//   regon: string;
+//   nip: string;
+//   krs: string;
+//   created: string;
+//   websiteUrl: string;
+// }
 const CompanyInfo = ({ company }: { company: Company |null }) => {
   if (!company) return <p>Loading company details...</p>;
 
