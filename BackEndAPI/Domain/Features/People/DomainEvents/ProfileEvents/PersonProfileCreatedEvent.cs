@@ -9,7 +9,7 @@ namespace Domain.Features.People.DomainEvents.ProfileEvents
     {
         // Properties
         public required Guid UserId { get; init; }
-        public required string Login { get; init; } = null!;
+        public required string Email { get; init; } = null!;
         public required string Salt { get; init; } = null!;
         public required string Password { get; init; } = null!;
         public required DateTime Created { get; init; }
@@ -29,7 +29,7 @@ namespace Domain.Features.People.DomainEvents.ProfileEvents
                 UserId = person.Id?.Value ?? throw new PersonException(
                     Messages.Enitity_Person_NotInitializedId,
                     HttpCode.InternalServerError),
-                Login = person.Login.Value,
+                Email = person.Login.Value,
                 Salt = person.Salt,
                 Password = person.Password,
                 Created = person.Created,

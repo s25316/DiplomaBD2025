@@ -1,5 +1,6 @@
 ﻿// Ignore Spelling: Kafka, redis
 using Confluent.Kafka;
+using Infrastructure.Email;
 using Infrastructure.Exceptions;
 using Infrastructure.Kafka;
 using Infrastructure.MongoDb;
@@ -12,6 +13,7 @@ using StackExchange.Redis;
 using UseCase.MongoDb;
 using UseCase.RelationalDatabase;
 using UseCase.Shared.Interfaces;
+using UseCase.Shared.Services;
 
 namespace Infrastructure
 {
@@ -50,6 +52,7 @@ namespace Infrastructure
             services.AddTransient<IKafkaService, KafkaService>();
             services.AddTransient<IMongoDbService, MongoDbService>();
             services.AddSingleton<IMongoDbFileService, MongoDbFileService>();
+            services.AddSingleton<IEmailService, EmailService>();
 
             return services;
         }

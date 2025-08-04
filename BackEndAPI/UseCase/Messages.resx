@@ -192,4 +192,19 @@
   <data name="Entity_Person_Account_InvalidPassword" xml:space="preserve">
     <value>Invalid password</value>
   </data>
+  <data name="UserSecrets_NotFound_Email" xml:space="preserve">
+    <value>Not Found in secrets Email</value>
+  </data>
+  <data name="UserSecrets_NotFound_EmailPassword" xml:space="preserve">
+    <value>Not found in user secrets Email Password </value>
+  </data>
+  <data name="UserSecrets_NotFound_UrlProfileActivation" xml:space="preserve">
+    <value>Not found in UserSecret UrlProfileActivation</value>
+  </data>
+  <data name="UserSecrets_NotFound_UrlResetPassword" xml:space="preserve">
+    <value>Not found in UserSecrets UrlResetPassword</value>
+  </data>
+  <data name="UserSecrets_NotFound_UrlProfileRestore" xml:space="preserve">
+    <value>Not found in UserSecret UrlProfileRestore</value>
+  </data>
 </root>

@@ -10,6 +10,7 @@ namespace Domain.Features.People.DomainEvents.AuthorizationEvents
         // Properties
         public required Guid UserId { get; init; }
         public required string UrlSegment { get; init; }
+        public required string Email { get; init; }
         public required string Code { get; init; }
         public required DateTime CodeValidTo { get; init; }
 
@@ -26,6 +27,7 @@ namespace Domain.Features.People.DomainEvents.AuthorizationEvents
                 UserId = person.Id?.Value ?? throw new PersonException(
                     Messages.Enitity_Person_NotInitializedId,
                     HttpCode.InternalServerError),
+                Email = person.Login.Value,
                 UrlSegment = urlSegment,
                 Code = code,
                 CodeValidTo = codeValidTo,

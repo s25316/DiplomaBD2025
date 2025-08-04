@@ -214,6 +214,24 @@ namespace UseCase {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Not Found in secrets Email.
+        /// </summary>
+        internal static string UserSecrets_NotFound_Email {
+            get {
+                return ResourceManager.GetString("UserSecrets_NotFound_Email", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Not found in user secrets Email Password .
+        /// </summary>
+        internal static string UserSecrets_NotFound_EmailPassword {
+            get {
+                return ResourceManager.GetString("UserSecrets_NotFound_EmailPassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to NotFound Issuer.
         /// </summary>
         internal static string UserSecrets_NotFound_Issuer {
@@ -273,6 +291,33 @@ namespace UseCase {
         internal static string UserSecrets_NotFound_Secret {
             get {
                 return ResourceManager.GetString("UserSecrets_NotFound_Secret", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Not found in UserSecret UrlProfileActivation.
+        /// </summary>
+        internal static string UserSecrets_NotFound_UrlProfileActivation {
+            get {
+                return ResourceManager.GetString("UserSecrets_NotFound_UrlProfileActivation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Not found in UserSecret UrlProfileRestore.
+        /// </summary>
+        internal static string UserSecrets_NotFound_UrlProfileRestore {
+            get {
+                return ResourceManager.GetString("UserSecrets_NotFound_UrlProfileRestore", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Not found in UserSecrets UrlResetPassword.
+        /// </summary>
+        internal static string UserSecrets_NotFound_UrlResetPassword {
+            get {
+                return ResourceManager.GetString("UserSecrets_NotFound_UrlResetPassword", resourceCulture);
             }
         }
     }

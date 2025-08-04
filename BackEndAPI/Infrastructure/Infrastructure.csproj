@@ -11,10 +11,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Email\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Confluent.Kafka" Version="2.9.0" />
     <PackageReference Include="StackExchange.Redis" Version="2.8.24" />
   </ItemGroup>

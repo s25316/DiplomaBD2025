@@ -9,7 +9,7 @@ namespace Domain.Features.People.DomainEvents.ProfileEvents
     {
         // Properties
         public required Guid UserId { get; init; }
-
+        public required string Email { get; init; }
         private string _urlSegment = null!;
         public string UrlSegment
         {
@@ -33,6 +33,7 @@ namespace Domain.Features.People.DomainEvents.ProfileEvents
                 UserId = person.Id?.Value ?? throw new PersonException(
                     Messages.Enitity_Person_NotInitializedId,
                     HttpCode.InternalServerError),
+                Email = person.Login.Value,
             };
         }
     }

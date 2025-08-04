@@ -41,6 +41,11 @@ namespace UseCase
         public static string JwtAudience { get; private set; } = null!;
         public static string JwtSecret { get; private set; } = null!;
 
+        public static string Email { get; private set; } = null!;
+        public static string Password { get; private set; } = null!;
+        public static string UrlProfileActivation { get; private set; } = null!;
+        public static string UrlResetPassword { get; private set; } = null!;
+        public static string UrlProfileRestore { get; private set; } = null!;
 
         // Methods
         public static IServiceCollection AddCheckUserSecrets(
@@ -65,6 +70,18 @@ namespace UseCase
                 throw new UseCaseLayerException(Messages.UserSecrets_NotFound_Audience);
             JwtSecret = configuration.GetSection("Authentication")["Secret"] ??
                 throw new UseCaseLayerException(Messages.UserSecrets_NotFound_Secret);
+
+            Email = configuration.GetSection("Email")["email"] ??
+                throw new UseCaseLayerException(Messages.UserSecrets_NotFound_Email);
+            Password = configuration.GetSection("Email")["password"] ??
+                throw new UseCaseLayerException(Messages.UserSecrets_NotFound_EmailPassword);
+            UrlProfileActivation = configuration.GetSection("Email")["urlProfileActivation"] ??
+                throw new UseCaseLayerException(Messages.UserSecrets_NotFound_UrlProfileActivation);
+            UrlResetPassword = configuration.GetSection("Email")["urlResetPassword"] ??
+                throw new UseCaseLayerException(Messages.UserSecrets_NotFound_UrlResetPassword);
+            UrlProfileRestore = configuration.GetSection("Email")["urlProfileRestore"] ??
+                throw new UseCaseLayerException(Messages.UserSecrets_NotFound_UrlProfileRestore);
+
 
             return services;
         }
