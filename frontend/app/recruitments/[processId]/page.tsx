@@ -99,16 +99,8 @@ const RecruitmentDetailsPage = () => {
   const [newMessage, setNewMessage] = useState<string>('');
   const [newProcessType, setNewProcessType] = useState<number | ''>('');
 
-  // Account type
-  const [isIndividual, setIsIndividual] = useState(true);
-  useEffect(() => {
-    if(session)
-      fetch('http://localhost:8080/api/User', {
-        headers: { Authorization: `Bearer ${session.user.token}` }
-      })
-        .then(res => res.json())
-        .then(res => setIsIndividual(res.personPerspective.isIndividual))
-    }, [session])
+  // Account type - inicjalizujemy jako null, aby wskazać, że typ użytkownika nie został jeszcze załadowany
+  const [isIndividual, setIsIndividual] = useState<boolean | null>(null);
 
   // Custom alert function
   const showCustomAlert = (message: string, isError: boolean = false) => {
@@ -142,17 +134,32 @@ const RecruitmentDetailsPage = () => {
     setLoading(true);
     setError(null);
 
-    let apiUrl = 'http://localhost:8080/api/'
-    if (!isIndividual) {
-      apiUrl += `CompanyUser/recruitments/${processId}`
-    }
-    else {
-      apiUrl += `User/recruitments/${processId}`
-    }
-
     try {
+      // Krok 1: Pobierz typ użytkownika
+      const userRes = await fetch('http://localhost:8080/api/User', {
+        headers: { Authorization: `Bearer ${session.user.token}` }
+      });
+
+      if (!userRes.ok) {
+        throw new Error(`Failed to fetch user type: ${userRes.statusText}`);
+      }
+
+      const user = await userRes.json();
+      const isUserIndividual = user.personPerspective.isIndividual;
+      setIsIndividual(isUserIndividual);
+      
+      console.log(`isIndividual: ${isUserIndividual}`); // Zwraca wartość, którą widać w konsoli
+
+      // Krok 2: Użyj typu użytkownika, aby pobrać szczegóły rekrutacji
+      let recruitmentApiUrl = 'http://localhost:8080/api/';
+      if (!isUserIndividual) {
+        recruitmentApiUrl += `CompanyUser/recruitments/${processId}`;
+      } else {
+        recruitmentApiUrl += `User/recruitments/${processId}`;
+      }
+
       const res = await fetch(
-        apiUrl,
+        recruitmentApiUrl,
         {
           headers: {
             Authorization: `Bearer ${session.user.token}`,
@@ -164,7 +171,7 @@ const RecruitmentDetailsPage = () => {
 
       if (!res.ok) {
         const errorText = await res.text();
-        throw new Error(`Failed to fetch recruitment details: ${errorText}`);
+        throw new Error(`Failed to fetch recruitment details: ${errorText}. isIndividual: ${isUserIndividual}`);
       }
 
       const data = await res.json();
@@ -173,7 +180,7 @@ const RecruitmentDetailsPage = () => {
       setNewProcessType(recruitmentData.recruitment.processTypeId);
 
     } catch (err) {
-      console.error("Error fetching recruitment details:", err);
+      console.error("Error fetching data:", err);
       if (err instanceof Error) {
         setError(err.message);
         showCustomAlert(`Error loading recruitment details: ${err.message}`, true);
@@ -181,7 +188,7 @@ const RecruitmentDetailsPage = () => {
     } finally {
       setLoading(false);
     }
-  }, [session, status, processId, isIndividual]);
+  }, [session, status, processId]);
 
   useEffect(() => {
     fetchRecruitmentDetails();
@@ -405,6 +412,7 @@ const RecruitmentDetailsPage = () => {
     <div className="max-w-4xl mx-auto p-6 bg-white dark:bg-gray-900 rounded-lg shadow-xl mt-8 font-inter text-gray-900 dark:text-gray-100">
       <ReturnButton />
       <h1 className="text-3xl font-bold mb-6 text-gray-800 dark:text-gray-100 text-center">Recruitment Details</h1>
+      <h1>Is individual?: {isIndividual ? 'True' : 'False'}</h1>
 
       <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg shadow-inner mb-6">
         <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-gray-100">Recruitment: {recruitment.processId}</h2>

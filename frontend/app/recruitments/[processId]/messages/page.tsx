@@ -32,16 +32,8 @@ const RecruitmentMessagesPage = () => {
   const [page, setPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [totalCount, setTotalCount] = useState(0);
-
-  const [isIndividual, setIsIndividual] = useState(true);
-  useEffect(() => {
-    if(session)
-      fetch('http://localhost:8080/api/User', {
-        headers: { Authorization: `Bearer ${session.user.token}` }
-      })
-        .then(res => res.json())
-        .then(res => setIsIndividual(res.personPerspective.isIndividual))
-    }, [session])
+  
+  const [isIndividual, setIsIndividual] = useState<boolean | null>(null);
 
   const showCustomAlert = (message: string, isError: boolean = false) => {
     let alertMessage = message;
@@ -65,7 +57,9 @@ const RecruitmentMessagesPage = () => {
     alert(alertMessage);
   };
 
-  const fetchMessages = useCallback(async () => {
+  // Połączona funkcja do pobierania typu użytkownika i wiadomości
+  const fetchUserDataAndMessages = useCallback(async () => {
+    // Sprawdź stan sesji, zanim cokolwiek zrobisz
     if (status !== 'authenticated' || !session?.user?.token) {
       setLoading(false);
       return;
@@ -74,15 +68,28 @@ const RecruitmentMessagesPage = () => {
     setLoading(true);
     setError(null);
 
-    let apiUrl = 'http://localhost:8080/api/'
-    if (!isIndividual) {
-      apiUrl += `CompanyUser/recruitments/${processId}/messages?Page=${page}&ItemsPerPage=${itemsPerPage}`
-    }
-    else {
-      apiUrl += `User/recruitments/${processId}/messages?Page=${page}&ItemsPerPage=${itemsPerPage}`
-    }
-
     try {
+      // Krok 1: Pobierz typ użytkownika
+      const userRes = await fetch('http://localhost:8080/api/User', {
+        headers: { Authorization: `Bearer ${session.user.token}` },
+      });
+
+      if (!userRes.ok) {
+        throw new Error(`Failed to fetch user type: ${userRes.statusText}`);
+      }
+
+      const user = await userRes.json();
+      const isUserIndividual = user.personPerspective.isIndividual;
+      setIsIndividual(isUserIndividual);
+
+      // Krok 2: Użyj pobranego typu użytkownika do pobrania wiadomości
+      let apiUrl = 'http://localhost:8080/api/';
+      if (!isUserIndividual) {
+        apiUrl += `CompanyUser/recruitments/${processId}/messages?Page=${page}&ItemsPerPage=${itemsPerPage}&ascending=true`;
+      } else {
+        apiUrl += `User/recruitments/${processId}/messages?Page=${page}&ItemsPerPage=${itemsPerPage}&ascending=true`;
+      }
+
       const res = await fetch(
         apiUrl,
         {
@@ -104,7 +111,7 @@ const RecruitmentMessagesPage = () => {
       setTotalCount(data.totalCount || 0);
 
     } catch (err) {
-      console.error("Error fetching messages:", err);
+      console.error("Error fetching data:", err);
       if (err instanceof Error) {
         setError(err.message);
         showCustomAlert(`Error loading messages: ${err.message}`, true);
@@ -112,11 +119,11 @@ const RecruitmentMessagesPage = () => {
     } finally {
       setLoading(false);
     }
-  }, [session, status, processId, page, itemsPerPage, isIndividual]);
+  }, [session, status, processId, page, itemsPerPage]);
 
   useEffect(() => {
-    fetchMessages();
-  }, [fetchMessages]);
+    fetchUserDataAndMessages();
+  }, [fetchUserDataAndMessages]);
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -129,9 +136,14 @@ const RecruitmentMessagesPage = () => {
       return;
     }
 
+    if (isIndividual === null) {
+      showCustomAlert("User type not yet determined. Please wait a moment.", true);
+      return;
+    }
+
     let apiUrl = 'http://localhost:8080/api/'
     if (!isIndividual) {
-      apiUrl += `CompanyUser/recruitments/${processId}/messages`
+      apiUrl += `CompanyUser/companies/recruitments/${processId}/messages`
     }
     else {
       apiUrl += `User/recruitments/${processId}/messages`
@@ -154,7 +166,7 @@ const RecruitmentMessagesPage = () => {
       if (res.ok) {
         showCustomAlert("Message sent successfully!");
         setNewMessageText('');
-        fetchMessages();
+        fetchUserDataAndMessages();
       } else {
         const errorText = await res.text();
         console.error("Failed to send message:", errorText);

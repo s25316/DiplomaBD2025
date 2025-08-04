@@ -242,8 +242,6 @@ const RecruitmentsPage = () => {
         apiUrl = `http://localhost:8080/api/CompanyUser/offers/${selectedOfferId}/recruitments`;
       } else if (!isIndividual && selectedBranchId) {
         apiUrl = `http://localhost:8080/api/CompanyUser/branches/${selectedBranchId}/recruitments`;
-        //   } else if (selectedCompanyId) {
-        //     apiUrl = `http://localhost:8080/api/CompanyUser/companies/${selectedCompanyId}/recruitments`; //nie działa
       }
 
       // Add common query parameters

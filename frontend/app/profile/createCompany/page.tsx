@@ -12,7 +12,7 @@ const CreateCompany = () => {
     regon: "",
     nip: "",
     krs: "",
-    websiteUrl: "",
+    websiteUrl: "https://",
   });
 
   const [errors, setErrors] = useState<string[]>([]);

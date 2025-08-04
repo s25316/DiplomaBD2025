@@ -7,12 +7,10 @@ import {  ContractConditionFormData } from '@/app/components/forms/ContractCondi
 import { OuterContainer } from '@/app/components/layout/PageContainers';
 import { OfferTemplate } from '@/types/offerTemplate';
 
-
 const PublishOffer = () => {
   const { id, branchId } = useParams();
   const router = useRouter();
   const { data: session } = useSession();
-  // const [offerStatusId, setOfferStatusId] = useState<null | null>(null);;
   const [templates, setTemplates] = useState([]);
   const [parameters, setParameters] = useState([]);
   const [skills, setSkills] = useState([]);
