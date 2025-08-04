@@ -1,5 +1,5 @@
 "use client"
-import { signIn, signOut, useSession } from 'next-auth/react'
+import { signOut, useSession } from 'next-auth/react'
 import React from 'react'
 import ThemeToggle from './buttons/ThemeToggle';
 import ReturnButton from './buttons/ReturnButton';
@@ -38,7 +38,7 @@ const AppBar = () => {
           </>
         ) : (
           <>
-            <button onClick={() => signIn()} className="px-4 py-2 rounded-md bg-green-500 text-white hover:bg-green-600 transition duration-200">
+            <button onClick={() => router.push('/login')} className="px-4 py-2 rounded-md bg-green-500 text-white hover:bg-green-600 transition duration-200">
               Sign In
             </button>
             <button onClick={() => { window.location.href = '/register' }}  className="px-4 py-2 rounded-md bg-indigo-500 text-white hover:bg-indigo-600 transition duration-200">

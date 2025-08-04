@@ -1,6 +1,4 @@
-#version: '3.8'
-#docker-compose up --build
-
+version: '3'
 services:
   Diploma_Kafka_To_Mongo_Broker:
     container_name: Diploma_Kafka_To_Mongo_Broker
@@ -137,6 +135,9 @@ services:
     restart: unless-stopped
     environment:
         NEXTAUTH_SECRET:
-        NEXTAUTH_URL: http://127.0.0.1:3000
+        NEXTAUTH_URL: http://host.docker.internal:3000
         GEOAPIFY_API: "a61d5a8ff24e4f6e8081e48d428b5994"
         AUTH_SECRET: "jbS7iRw63xG2u8GYTjZAODHySPFlrnr8ry7IMRoqQXM="
+    depends_on:
+      - Diploma_BackEnd_Api
+

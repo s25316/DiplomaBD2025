@@ -39,7 +39,7 @@ export const authOptions: AuthOptions = {
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
-        const res = await fetch("http://localhost:8080/api/User/login", {
+        const res = await fetch("http://Diploma_BackEnd_Api:8080/api/User/login", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -52,6 +52,7 @@ export const authOptions: AuthOptions = {
 
         if(!res.ok){
           console.log(res.status)
+          console.log(credentials )
         }
 
         const user = await res.json();
@@ -86,9 +87,8 @@ export const authOptions: AuthOptions = {
       },
     })
   ],
-  debug:true,
+  debug: true,
   callbacks: {
-
     async jwt({ token, user }) {
       if(user?.isNeed2Stage){
         redirect(`/2stage/${user.user2StageData?.urlSegmentPart1}/${user.user2StageData?.urlSegmentPart2}`)
