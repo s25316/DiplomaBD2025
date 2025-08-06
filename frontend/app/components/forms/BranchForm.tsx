@@ -52,7 +52,7 @@ const BranchForm = (props: Props) => {
   })
 
   useEffect(() => {
-    const api = process.env.GEOAPIFY_API;
+    const api = process.env.NEXT_PUBLIC_GEOAPIFY_API;
     const elem = document.getElementById(`autocomplete-${props.index}`);
     if (!autocomplete && elem && api) {
       if (elem.children.length === 0) {

@@ -128,7 +128,7 @@ const RegularProfileForm = ({ initialData, token }: RegularProfileFormProps) => 
       console.error("Error fetching dictionary data:", error);
     });
 
-    const apiKey = process.env.GEOAPIFY_API!;
+    const apiKey = process.env.NEXT_PUBLIC_GEOAPIFY_API!;
     const container = document.getElementById('autocomplete-container');
 
     if (container && !container.children.length) {

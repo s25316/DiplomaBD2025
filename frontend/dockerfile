@@ -14,17 +14,24 @@ RUN \
     npm install -g pnpm && pnpm install --frozen-lockfile; \
   fi
 
-# 4. Copy the rest of the app and build
-FROM node:18-alpine AS builder
-
+# 4. Build stage for the Next.js application
+FROM node:22-alpine AS builder
+#Copy the rest of the app and build
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+# WAŻNE: Przekazanie zmiennej środowiskowej do etapu budowania
+# ARG pobiera wartość z komendy docker build --build-arg lub z docker-compose.yml
+ARG NEXT_PUBLIC_GEOAPIFY_API
+# ENV ustawia tę wartość jako zmienną środowiskową dostępną podczas RUN npm run build
+ENV NEXT_PUBLIC_GEOAPIFY_API=${NEXT_PUBLIC_GEOAPIFY_API}
+
+# Zbuduj aplikację Next.js
 RUN npm run build
 
-# 5. Final image
-FROM node:18-alpine AS runner
+# 5. Final image for running the application
+FROM node:22-alpine AS runner
 
 WORKDIR /app
 

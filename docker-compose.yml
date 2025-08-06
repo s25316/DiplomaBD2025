@@ -137,6 +137,8 @@ services:
     build:
       context: ./frontend
       dockerfile: ./dockerfile
+      args: 
+        NEXT_PUBLIC_GEOAPIFY_API: "a61d5a8ff24e4f6e8081e48d428b5994"
     ports:
       - "3000:3000"
     restart: unless-stopped
