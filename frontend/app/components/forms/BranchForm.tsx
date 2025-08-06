@@ -106,7 +106,7 @@ const BranchForm = (props: Props) => {
       <input className='global-field-style' type='text' name='description' placeholder='Description' value={form.description ?? ""} onChange={handleChange} />
       <label  htmlFor='address'>Address:</label>
       {(props.initialData?.address && props.initialData.address.streetName) && (
-        <div className='text-sm text-gray-700 italic mb-2'>
+        <div className="text-sm text-gray-700 dark:text-gray-300 italic mb-2">
           <b>Current address:</b><br />
           {[
             'ul.',

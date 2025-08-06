@@ -2,6 +2,7 @@
 import React from 'react';
 import { InnerSection } from '../layout/PageContainers';
 import { SkillWithRequired } from './OfferForm';
+import CancelButton from '../buttons/CancelButton';
 
 // interface Skill {
 //   skillId: number;
@@ -127,6 +128,7 @@ const OfferTemplateForm = ({
       >
         {submitText}
       </button>
+      <CancelButton/>
     </InnerSection>
   );
 };

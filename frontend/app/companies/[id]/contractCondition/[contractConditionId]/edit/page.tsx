@@ -109,7 +109,7 @@ const EditContractConditionPage = () => {
 
         if (!item) {
           showCustomAlert("Contract condition not found or malformed data.");
-          router.push(`/companies/${id}`); // Redirect if not found
+          router.replace(`/companies/${id}`); // Redirect if not found
           return;
         }
 
@@ -156,7 +156,7 @@ const EditContractConditionPage = () => {
 
       if (res.ok) {
         showCustomAlert('Contract Condition Updated Successfully!');
-        router.push(`/companies/${id}`); // Redirect to company details page
+        router.replace(`/companies/${id}`);
       } else {
         const errorText = await res.text();
         console.error("Failed to update contract condition:", errorText);

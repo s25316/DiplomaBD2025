@@ -136,7 +136,7 @@ export default function CreateOfferTemplate() {
 
       if (res.ok) {
         showCustomAlert("Offer Template created successfully!");
-        router.push(`/companies/${id}`);
+        router.replace(`/companies/${id}`);
       } else {
         const errorText = await res.text();
         console.error("Failed to create offer template:", errorText);

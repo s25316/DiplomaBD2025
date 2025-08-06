@@ -6,6 +6,7 @@ import OfferForm, { SkillWithRequired } from '@/app/components/forms/OfferForm';
 import {  ContractConditionFormData } from '@/app/components/forms/ContractConditionForm';
 import { OuterContainer } from '@/app/components/layout/PageContainers';
 import { OfferTemplate } from '@/types/offerTemplate';
+import CancelButton from '@/app/components/buttons/CancelButton';
 
 const PublishOffer = () => {
   const { id, branchId } = useParams();
@@ -134,7 +135,7 @@ const PublishOffer = () => {
 
     if (res.ok) {
       alert('Offer published!');
-      router.push(`/companies/${id}/${branchId}`);
+      router.replace(`/companies/${id}/${branchId}`);
     } else {
       alert('Failed to publish offer.');
     }
@@ -185,6 +186,7 @@ const refreshConditions = async () => {
         />
         <button type="submit" className="bg-blue-600 text-white p-2 rounded mt-4">Publish Offer</button>
       </form>
+      <CancelButton/>
     </OuterContainer>
   );
 };

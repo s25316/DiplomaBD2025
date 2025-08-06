@@ -88,7 +88,7 @@ const CreateContractConditionPage = () => {
 
       if (res.ok) {
         showCustomAlert('Contract Condition Created Successfully!');
-        router.push(`/companies/${id}`); // Redirect to company details page
+        router.replace(`/companies/${id}`); // Redirect to company details page
       } else {
         const errorText = await res.text();
         console.error("Failed to create contract condition:", errorText);

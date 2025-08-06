@@ -5,6 +5,7 @@ import { GeocoderAutocomplete } from '@geoapify/geocoder-autocomplete';
 import '@geoapify/geocoder-autocomplete/styles/round-borders.css';
 import { UserProfile } from '@/app/profile/edit/page';
 import { InnerSection } from '../layout/PageContainers';
+import CancelButton from '../buttons/CancelButton';
 
 interface Skill {
   skillId: number;
@@ -198,7 +199,7 @@ const RegularProfileForm = ({ initialData, token }: RegularProfileFormProps) => 
 
       if (res.ok){
         alert('Profile updated!');
-        router.push('/profile');
+        router.replace('/profile');
       } else {
         const errorText = await res.text();
         alert(`Failed to update profile: ${errorText}`);
@@ -339,21 +340,22 @@ const RegularProfileForm = ({ initialData, token }: RegularProfileFormProps) => 
             {urlTypes.map(t => <option key={t.urlTypeId} value={t.urlTypeId}>{t.name}</option>)}
           </select>
           <button
-            className='bg-red-600 text-white px-3 py-2 rounded-lg hover:bg-red-700 transition duration-300 ease-in-out shadow-md font-semibold'
+            className="bg-red-600 text-white px-3 py-2 rounded-lg hover:bg-red-700 transition duration-300 ease-in-out shadow-md font-semibold"
             type="button" onClick={() => removeUrl(index)}>Remove</button>
         </div>
       ))}
       <button
-        className='inline-block bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition duration-300 ease-in-out shadow-md font-semibold self-start mt-2' // Dodano self-start i mt-2
+        className="inline-block bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition duration-300 ease-in-out shadow-md font-semibold self-start w-full"
         type="button" onClick={addUrl}>Add Link
       </button>
 
       <button
         onClick={handleSubmit}
-        className="inline-block bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-300 ease-in-out shadow-md font-semibold self-start mt-4" // Dodano self-start i mt-4
+        className="inline-block bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-300 ease-in-out shadow-md font-semibold self-start w-full"
       > 
         Update Profile
       </button>
+      <CancelButton/>
     </InnerSection>
   );
 };

@@ -1,5 +1,5 @@
 "use client"
-import { redirect, useParams, useRouter } from 'next/navigation'
+import {useParams, useRouter } from 'next/navigation'
 import React, { useState, useRef } from 'react'
 import { useSession } from 'next-auth/react'
 import BranchCreateForm from '@/app/components/forms/BranchForm'
@@ -68,7 +68,7 @@ const CreateBranch = () => {
 
     if (res.ok) {
       alert("Branch(es) created")
-      redirect(`/companies/${id}`)
+      router.replace(`/companies/${id}`)
     }
     else {
       alert("Failed to create branch(es)")

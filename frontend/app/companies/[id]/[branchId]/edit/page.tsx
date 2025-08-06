@@ -144,7 +144,7 @@ const EditBranch = () => {
 
       if (res.ok) {
         showCustomAlert("Branch updated successfully!");
-        router.push(`/companies/${id}/${branchId}`); // Redirect to the branch details page
+        router.replace(`/companies/${id}/${branchId}`); // Redirect to the branch details page
       } else {
         const errorText = await res.text();
         console.error("Failed to update branch:", errorText);

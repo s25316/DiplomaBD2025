@@ -110,7 +110,7 @@ export default function EditOfferTemplate() {
 
         if (!offerTemplate) {
           showCustomAlert("Offer template not found.");
-          router.push(`/companies/${id}`); // Redirect if template not found
+          router.replace(`/companies/${id}`); // Redirect if template not found
           return;
         }
 
@@ -196,7 +196,7 @@ export default function EditOfferTemplate() {
 
       if (res.ok) {
         showCustomAlert("Offer Template updated successfully!");
-        router.push(`/companies/${id}/templates/${offerTemplateId}`); // Redirect to company details page after update
+        router.replace(`/companies/${id}/templates/${offerTemplateId}`); // Redirect to company details page after update
       } else {
         const errorText = await res.text();
         console.error("Failed to update offer template:", errorText);

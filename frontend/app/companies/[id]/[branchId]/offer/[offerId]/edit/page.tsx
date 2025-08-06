@@ -150,7 +150,7 @@ const EditOfferPage = () => {
 
     if (res.ok) {
       alert('Offer updated!');
-      router.push(`/companies/${id}/${branchId}/offer/${offerId}`);
+      router.replace(`/companies/${id}/${branchId}/offer/${offerId}`);
     } else {
       alert('Failed to update offer.');
     }

@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { InnerSection } from '../layout/PageContainers';
+import CancelButton from '../buttons/CancelButton';
 
 export interface Skill {
   isRequired: boolean,
@@ -232,6 +233,7 @@ const ContractConditionForm = ({ onSubmit, parameters, initialData, submitText =
       >
         {submitText}
       </button>
+      <CancelButton/>
     </InnerSection>
   );
 }
