@@ -13,9 +13,11 @@ interface Template{
 const OfferTemplatesList = ({
     templates,
     onDelete,
+    isOwner,
   }: {
     templates: Template[];
     onDelete: (id: string) => void;
+    isOwner: boolean;
   }) => {
   const { data: session } = useSession();
   const router = useRouter();
@@ -34,7 +36,7 @@ const OfferTemplatesList = ({
             <Link href={`/companies/${id}/templates/${t.offerTemplateId}`}>
               <b>{t.name}</b>
             </Link>
-            <div className="flex gap">
+            {isOwner && <div className="flex gap">
               <button
                 onClick={() => router.push(`/companies/${id}/templates/${t.offerTemplateId}/edit`)}
                 className="bg-blue-500 text-white px-2 py-1 rounded"
@@ -60,7 +62,7 @@ const OfferTemplatesList = ({
               }}
                 className="ml-4 bg-red-500 text-white px-2 py-1 rounded"> Delete
               </button>
-            </div>
+            </div>}
             </div>
             </InnerSection>
           </li>

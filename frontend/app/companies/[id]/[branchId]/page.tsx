@@ -73,21 +73,37 @@ const BranchDetails = () => {
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [totalCount, setTotalCount] = useState(0);
 
+  const [isOwner, setIsOwner] = useState(Boolean(session))
+
   // Memoized function to fetch all data for this branch
   const fetchBranchAndOffers = useCallback(async () => {
-    if (!session?.user?.token || !branchId) return;
+    if (!branchId) return;
 
-    const headers = {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${session.user.token}`,
-    };
+    let headers = {}
+    let apiUrl = ''
+
+    if(session?.user.token && isOwner){
+      headers = {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${session.user.token}`,
+      };
+      apiUrl = 'http://localhost:8080/api/CompanyUser/'
+    }
+    else{
+      apiUrl = 'http://localhost:8080/api/GuestQueries/'
+    }
 
     try {
       console.log("Fetching branch details and offers...");
       const [branchRes, offersRes] = await Promise.all([
-        fetch(`http://localhost:8080/api/CompanyUser/branches/${branchId}`, { headers, cache: 'no-store' }),
-        fetch(`http://localhost:8080/api/CompanyUser/branches/${branchId}/offers?${statusFilter !== null ? `status=${statusFilter}&` : ''}Page=${page}&ItemsPerPage=${itemsPerPage}`, { headers, cache: 'no-store' }),
+        fetch(`${apiUrl}branches/${branchId}`, { headers, cache: 'no-store' }),
+        fetch(`${apiUrl}branches/${branchId}/offers?${statusFilter !== null ? `status=${statusFilter}&` : ''}Page=${page}&ItemsPerPage=${itemsPerPage}`, { headers, cache: 'no-store' }),
       ]);
+
+      if(!branchRes.ok && session && isOwner){
+        setIsOwner(false)
+        return
+      }
 
       if (!branchRes.ok) {
         if (branchRes.status === 404) {
@@ -116,7 +132,7 @@ const BranchDetails = () => {
       if(err instanceof Error)
       setError(err.message);
     }
-  }, [session, branchId, statusFilter, page, itemsPerPage, router, id]);
+  }, [session, branchId, statusFilter, page, itemsPerPage, router, id, isOwner]);
 
   useEffect(() => {
     fetchBranchAndOffers();
@@ -126,7 +142,6 @@ const BranchDetails = () => {
     fetchBranchAndOffers(); // refresh list after delete
   }, [fetchBranchAndOffers]);
 
-  if (!session?.user?.token) return <div className="text-center py-4 text-red-600">Unauthorized. Please log in.</div>;
   if (error) return <div className="text-center py-4 text-red-600">Error: {error}</div>;
   if (!branchDetails) return <div className="text-center py-4 text-blue-600">Loading branch details...</div>;
 
@@ -159,7 +174,7 @@ const BranchDetails = () => {
           <GeoMap lat={branch.address.lat} lon={branch.address.lon} />
         )}
       <br/>
-      <div className="flex flex-wrap gap-4 mb-8">
+      {isOwner && <div className="flex flex-wrap gap-4 mb-8">
         <Link href={`/companies/${id}/${branchId}/edit`} className="inline-block bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition duration-300">
           Edit Branch
         </Link>
@@ -169,13 +184,13 @@ const BranchDetails = () => {
           buttonText="Delete Branch"
           className="inline-block bg-red-600 text-white px-5 py-2 rounded-lg hover:bg-red-700 transition duration-300"
         />
-      </div>
+      </div>}
       </InnerSection>
 
       <InnerSection>
-      <Link href={`/companies/${id}/${branchId}/publishOffer`} className="inline-block bg-green-600 text-white px-5 py-2 rounded-lg hover:bg-green-700 transition duration-300">
+      {isOwner && <Link href={`/companies/${id}/${branchId}/publishOffer`} className="inline-block bg-green-600 text-white px-5 py-2 rounded-lg hover:bg-green-700 transition duration-300">
         Publish Offer
-      </Link>
+      </Link>}
       <OuterContainer>
 
       <h2 className="mt-6 mb-4 text-2xl font-bold text-gray-800 dark:text-gray-100">Offers in this Branch:</h2>
@@ -236,7 +251,7 @@ const BranchDetails = () => {
                 </a>
               </p>
 
-              {offer.statusId !== 1 ? (
+              {isOwner && (offer.statusId !== 1 ? (
                 <DeleteOfferButton
                   offerId={offer.offerId}
                   onSuccess={handleOfferDeleted} //refresh list
@@ -246,7 +261,7 @@ const BranchDetails = () => {
                 />
               ) : (
                 <p className="text-gray-500 dark:text-gray-400 mt-3 italic">Expired (cannot delete)</p>
-              )}
+              ))}
               </InnerSection>
             </li>
           ))}
@@ -262,9 +277,9 @@ const BranchDetails = () => {
       />
       <br/>
       </OuterContainer>
-      <Link href={`/companies/${id}/${branchId}/publishOffer`} className="inline-block bg-green-600 text-white px-5 py-2 rounded-lg hover:bg-green-700 transition duration-300 ease-in-out shadow-md font-semibold">
+      {isOwner && <Link href={`/companies/${id}/${branchId}/publishOffer`} className="inline-block bg-green-600 text-white px-5 py-2 rounded-lg hover:bg-green-700 transition duration-300 ease-in-out shadow-md font-semibold">
         Publish Offer
-      </Link>
+      </Link>}
       </InnerSection>
     </OuterContainer>
     

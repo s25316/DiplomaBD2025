@@ -20,9 +20,11 @@ interface ContractCondition {
   const ContractConditionsList = ({
     contractConditions,
     onDelete,
+    isOwner,
   }: {
     contractConditions: ContractCondition[];
     onDelete: (id: string) => void;
+    isOwner: boolean;
   }) => {
   const { data: session } = useSession();
   const router = useRouter();
@@ -42,7 +44,7 @@ interface ContractCondition {
             <p><b>Work Modes:</b> {cond.workModes?.map(w => w.name).join(", ") ?? "N/A"}</p>
             <p><b>Employment Types:</b> {cond.employmentTypes?.map(e => e.name).join(", ") ?? "N/A"}</p>
 
-            <div className="mt-2 flex gap-2">
+            {isOwner && <div className="mt-2 flex gap-2">
               <button
                 onClick={() => router.push(`/companies/${id}/contractCondition/${cond.contractConditionId}/edit`)}
                 className="bg-blue-500 text-white px-2 py-1 rounded"
@@ -67,7 +69,7 @@ interface ContractCondition {
               }}
                 className="bg-red-500 text-white px-2 py-1 rounded"
               >Delete</button>
-            </div>
+            </div>}
             </InnerSection>
           </li>
         ))}

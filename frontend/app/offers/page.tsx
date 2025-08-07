@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useSession } from 'next-auth/react';
 import { OfferTemplate } from '@/types/offerTemplate';
+import { InnerSection } from '../components/layout/PageContainers';
 
 interface Response {
   items: Item[],
@@ -110,31 +111,31 @@ const Offers = () => {
 
   useEffect(() => {
     const filterQuery =
-  `?search=${filters.searchText}` +
-  `&status=${filters.status}` +
-  `&ascending=${filters.ascending}` +
-  `&orderBy=${filters.orderBy || ""}` +
-  `&regon=${filters.regon}` +
-  `&nip=${filters.nip}` +
-  `&krs=${filters.krs}` +
-  `&isNegotiable=${filters.isNegotiable || ""}` +
-  `&isPaid=${filters.isPaid || ""}` +
-  `&salaryPerHourMin=${filters.salaryPerHourMin || ""}` +
-  `&salaryPerHourMax=${filters.salaryPerHourMax || ""}` +
-  `&salaryMin=${filters.salaryMin || ""}` +
-  `&salaryMax=${filters.salaryMax || ""}` +
-  `&hoursMin=${filters.hoursMin || ""}` +
-  `&hoursMax=${filters.hoursMax || ""}` +
-  `&lon=${filters.lon || ""}` +
-  `&lat=${filters.lat || ""}` +
-  `&publicationStartFrom=${filters.publicationStartFrom || ""}` +
-  `&publicationStartTo=${filters.publicationStartTo || ""}` +
-  `&publicationEndFrom=${filters.publicationEndFrom || ""}` +
-  `&publicationEndTo=${filters.publicationEndTo || ""}` +
-  `&employmentLengthFrom=${filters.employmentLengthFrom || ""}` +
-  `&employmentLengthTo=${filters.employmentLengthTo || ""}` +
-  `&page=${filters.page}` +
-  `&itemsPerPage=${filters.itemsPerPage}`;
+      `?search=${filters.searchText}` +
+      `&status=${filters.status}` +
+      `&ascending=${filters.ascending}` +
+      `&orderBy=${filters.orderBy || ""}` +
+      `&regon=${filters.regon}` +
+      `&nip=${filters.nip}` +
+      `&krs=${filters.krs}` +
+      `&isNegotiable=${filters.isNegotiable || ""}` +
+      `&isPaid=${filters.isPaid || ""}` +
+      `&salaryPerHourMin=${filters.salaryPerHourMin || ""}` +
+      `&salaryPerHourMax=${filters.salaryPerHourMax || ""}` +
+      `&salaryMin=${filters.salaryMin || ""}` +
+      `&salaryMax=${filters.salaryMax || ""}` +
+      `&hoursMin=${filters.hoursMin || ""}` +
+      `&hoursMax=${filters.hoursMax || ""}` +
+      `&lon=${filters.lon || ""}` +
+      `&lat=${filters.lat || ""}` +
+      `&publicationStartFrom=${filters.publicationStartFrom || ""}` +
+      `&publicationStartTo=${filters.publicationStartTo || ""}` +
+      `&publicationEndFrom=${filters.publicationEndFrom || ""}` +
+      `&publicationEndTo=${filters.publicationEndTo || ""}` +
+      `&employmentLengthFrom=${filters.employmentLengthFrom || ""}` +
+      `&employmentLengthTo=${filters.employmentLengthTo || ""}` +
+      `&page=${filters.page}` +
+      `&itemsPerPage=${filters.itemsPerPage}`;
 
     fetch('http://localhost:8080/api/GuestQueries/offers' + filterQuery, {
       headers: {
@@ -263,17 +264,19 @@ const Offers = () => {
           <ul>
             {apiData && apiData.totalCount > 0 ? (
               apiData.items.map(x => (
-                <li key={x.offer.offerId} className='border 1px rounded-md p-4 text-left m-2 w-fit'>
+                <li key={x.offer.offerId}>
                   <Link href={`/companies/${x.company.companyId}/${x.branch.branchId}/offer/${x.offer.offerId}`}>
-                    <p className='font-bold flex items-center justify-between'>
-                      <span className='pr-[5px]'>{x.offerTemplate.name}</span>{x.contractConditions && x.contractConditions.length > 0 && <span className='pl-[5px]'>{x.contractConditions[0].salaryMin}-{x.contractConditions[0].salaryMax}{x.contractConditions[0].currency.name}/{x.contractConditions[0].salaryTerm.name}</span>}
-                    </p>
-                    <p>
-                      {x.company.name}
-                    </p>
-                    <p>
-                      {x.branch.address.countryName}, {x.branch.address.stateName}, {x.branch.address.cityName}, {x.branch.address.streetName}
-                    </p>
+                    <InnerSection className='p-4 text-left m-2 w-[700px]'>
+                      <p className='font-bold flex items-center justify-between'>
+                        <span className='pr-[5px] truncate'>{x.offerTemplate.name}</span>{x.contractConditions && x.contractConditions.length > 0 && <span className='pl-[5px]'>{x.contractConditions[0].salaryMin}-{x.contractConditions[0].salaryMax}{x.contractConditions[0].currency.name}/{x.contractConditions[0].salaryTerm.name}</span>}
+                      </p>
+                      <p>
+                        {x.company.name}
+                      </p>
+                      <p>
+                        {x.branch.address.countryName}, {x.branch.address.stateName}, {x.branch.address.cityName}, {x.branch.address.streetName}
+                      </p>
+                    </InnerSection>
                   </Link>
                 </li>
               ))) : (<>No offers</>)

@@ -16,10 +16,11 @@ interface BranchesListProps {
   branches: Branch[];
   companyId: string;
   onDelete: (id: string) => void;
+  isOwner: boolean;
 }
 
 const BranchesList = ({ 
-  branches, companyId, onDelete,
+  branches, companyId, onDelete, isOwner
 }: BranchesListProps) => {
   const router = useRouter();
 
@@ -38,7 +39,7 @@ const BranchesList = ({
             </Link>
             <p><b>City: {branch.address.cityName}</b></p>
             <p><b>street: {branch.address.streetName}</b></p>
-          <div className="mt-2 flex gap-2">
+          {isOwner && <div className="mt-2 flex gap-2">
 
             <button
               onClick={() => router.push(`/companies/${companyId}/${branch.branchId}`)}
@@ -55,7 +56,7 @@ const BranchesList = ({
                 className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition duration-200 shadow-sm"
               />
 
-          </div>
+          </div>}
           </InnerSection>
         </li>
         

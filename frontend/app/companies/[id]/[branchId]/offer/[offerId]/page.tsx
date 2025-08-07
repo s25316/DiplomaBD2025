@@ -72,7 +72,7 @@ const OfferDetails = () => {
   const [error, setError] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const [isOwnOffer, setIsOwnOffer] = useState(true);
+  const [isOwnOffer, setIsOwnOffer] = useState(Boolean(session));
 
   useEffect(() => {
     if (!offerId) return;
@@ -81,10 +81,7 @@ const OfferDetails = () => {
       try {
         let res;
 
-        if (!session?.user?.token || !isOwnOffer) {
-          res = await fetch(`http://localhost:8080/api/GuestQueries/offers/${offerId}`);
-        }
-        else {
+        if (session?.user?.token && isOwnOffer) {
           res = await fetch(`http://localhost:8080/api/CompanyUser/offers/${offerId}`, {
             headers: {
               'Authorization': `Bearer ${session.user.token}`,
@@ -94,6 +91,10 @@ const OfferDetails = () => {
             setIsOwnOffer(false)
             return;
           }
+          res = await fetch(`http://localhost:8080/api/GuestQueries/offers/${offerId}`);
+        }
+        else {
+          res = await fetch(`http://localhost:8080/api/GuestQueries/offers/${offerId}`);
         }
 
         if (!res.ok) {
