@@ -264,6 +264,12 @@ const Profile = () => {
             >
               Edit Profile
             </button>
+            <button
+              onClick={() => router.push('/profile/changePassword')}
+              className="inline-block bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition duration-300 ease-in-out shadow-md font-semibold mt-6 ml-2"
+            >
+              Change Password
+            </button>
           </div>
         )}
       </InnerSection>

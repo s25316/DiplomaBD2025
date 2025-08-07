@@ -4,7 +4,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { redirect } from "next/navigation";
 
 const refreshToken = async (token: JWT) => {
-  const res = await fetch(`http://localhost:8080/api/User/refreshToken`, {
+  const res = await fetch(`http://Diploma_BackEnd_Api:8080/api/User/refreshToken`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

@@ -11,7 +11,7 @@ const AppBar = () => {
   const router = useRouter()
 
   return (
-    <div className="flex justify-between items-center px-4 py-3 bg-white dark:bg-gray-800 shadow-md">
+    <div className="flex justify-between items-center px-4 py-3 bg-white dark:bg-gray-800 shadow-md rounded-md">
       <div className="flex items-center space-x-4">
         <button onClick={() => { window.location.href = '/' }}>MainPage</button>
         <ReturnButton/>
@@ -43,6 +43,9 @@ const AppBar = () => {
             </button>
             <button onClick={() => { window.location.href = '/register' }}  className="px-4 py-2 rounded-md bg-indigo-500 text-white hover:bg-indigo-600 transition duration-200">
               Sign Up
+            </button>
+            <button onClick={() => { window.location.href = '/resetPassword' }}  className="px-4 py-2 rounded-md bg-orange-500 text-white hover:bg-orange-600 transition duration-200">
+              Reset Password
             </button>
           </>
         )}
