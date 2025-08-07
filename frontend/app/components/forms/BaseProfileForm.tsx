@@ -67,6 +67,10 @@ const BaseProfileForm = ({ onSuccess, token }: Props) => {
     setApiError(null);
   };
 
+  const handleProfileTypeChange = (isIndividualSelected: boolean) => {
+    setForm({ ...form, isIndividual: isIndividualSelected });
+  };
+
   const submitConfirmed = async () => {
     setApiError(null);
     try {
@@ -135,51 +139,84 @@ const BaseProfileForm = ({ onSuccess, token }: Props) => {
   return (
     <div className="max-w-md p-4 border rounded shadow bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
       <h2 className="text-lg font-bold mb-4 text-gray-800 dark:text-gray-100">Complete your basic profile</h2>
+      <div className="mb-6">
+        <label className="block text-lg font-semibold text-gray-700 dark:text-gray-300 mb-3 text-center">
+          Select Your Account Type:
+        </label>
+        <div className="flex flex-col sm:flex-row gap-4">
+          <label
+            className={`flex-1 p-6 border-2 rounded-lg cursor-pointer transition-all duration-200 ease-in-out
+              ${form.isIndividual === true ? 'border-blue-500 bg-blue-50 dark:bg-blue-900 shadow-lg' : 'border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 hover:border-blue-400'}
+              flex items-center justify-center flex-col text-center`}
+            onClick={() => handleProfileTypeChange(true)}
+          >
+            <input
+              type="radio"
+              name="isIndividual"
+              value="true"
+              checked={form.isIndividual === true}
+              onChange={() => {}} 
+              className="hidden" 
+            />
+            <span className="text-xl font-bold text-gray-800 dark:text-gray-100">Individual Profile</span>
+            <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">For job seekers and personal use.</p>
+          </label>
 
-      <label className="flex items-center gap-2 mb-4 text-gray-700 dark:text-gray-300">
+          {/* Karta dla konta firmowego */}
+          <label
+            className={`flex-1 p-6 border-2 rounded-lg cursor-pointer transition-all duration-200 ease-in-out
+              ${form.isIndividual === false ? 'border-blue-500 bg-blue-50 dark:bg-blue-900 shadow-lg' : 'border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 hover:border-blue-400'}
+              flex items-center justify-center flex-col text-center`}
+            onClick={() => handleProfileTypeChange(false)} // Użyj onClick na labelu
+          >
+            <input
+              type="radio"
+              name="isIndividual"
+              value="false"
+              checked={form.isIndividual === false}
+              onChange={() => {}} // Pusty onChange, bo obsługa jest na labelu
+              className="hidden" // Ukryj domyślny radio button
+            />
+            <span className="text-xl font-bold text-gray-800 dark:text-gray-100">Company Profile</span>
+            <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">For recruiters and businesses.</p>
+          </label>
+        </div>
+      </div>
+      <div className="space-y-4">
         <input
-          type="checkbox"
-          name="isIndividual"
-          checked={form.isIndividual}
+          name="name"
+          placeholder="Name"
           onChange={handleChange}
+          value={form.name}
           className='global-field-style'
+          required
         />
-        Create an individual profile
-      </label>
-
-      <input
-        name="name"
-        placeholder="Name"
-        onChange={handleChange}
-        value={form.name}
-        className='global-field-style'
-        required
-      />
-      <input
-        name="surname"
-        placeholder="Surname"
-        onChange={handleChange}
-        value={form.surname}
-        className='global-field-style'
-        required
-      />
-      <input
-        name="contactEmail"
-        type="email"
-        placeholder="Email"
-        onChange={handleChange}
-        value={form.contactEmail}
-        className='global-field-style'
-        required
-      />
-      <input
-        type="date"
-        name="birthDate"
-        onChange={handleChange}
-        value={form.birthDate}
-        className='global-field-style'
-        required
-      />
+        <input
+          name="surname"
+          placeholder="Surname"
+          onChange={handleChange}
+          value={form.surname}
+          className='global-field-style'
+          required
+        />
+        <input
+          name="contactEmail"
+          type="email"
+          placeholder="Email"
+          onChange={handleChange}
+          value={form.contactEmail}
+          className='global-field-style'
+          required
+        />
+        <input
+          type="date"
+          name="birthDate"
+          onChange={handleChange}
+          value={form.birthDate}
+          className='global-field-style'
+          required
+        />
+      </div>
       {dateError && <p className="text-red-500 text-sm mb-2">{dateError}</p>}
       {apiError && <p className="text-red-500 text-sm mb-2">{apiError}</p>}
 
