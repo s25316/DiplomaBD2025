@@ -2,9 +2,12 @@
 
 import React, { useState } from "react"
 import { OuterContainer } from "../components/layout/PageContainers"
+import { useRouter } from "next/navigation"
 
 const ResetPassword = () => {
     const [email, setEmail] = useState("")
+
+    const router = useRouter();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -19,7 +22,10 @@ const ResetPassword = () => {
             })
         })
 
-        console.log(await res.json())
+        if(res.ok){
+            alert("Reset password link sent to email")
+            router.push("/")
+        }
     }
 
     return (
