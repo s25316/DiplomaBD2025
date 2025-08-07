@@ -25,7 +25,7 @@ const ResetPasswordLink = () => {
         const res = await fetch(`http://localhost:8080/api/User/password/${userId}/${urlSegment}`, {
             method: "PUT",
             headers: {
-                'Content-Type': 'applicaton/json',
+                'Content-Type': 'application/json',
             },
             body: JSON.stringify({
                 newPassword
