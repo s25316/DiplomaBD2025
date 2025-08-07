@@ -199,7 +199,7 @@ const Profile = () => {
     <OuterContainer maxWidth="max-w-4xl">
       <h1 className="text-3xl font-bold mb-6 text-gray-800 dark:text-gray-100 text-center">My Profile</h1>
 
-      <InnerSection className="mb-6">
+      <InnerSection className="mb-6 mx-auto">
         {isFirstTime ? (
           <BaseProfileForm
             token={session!.user.token!}
