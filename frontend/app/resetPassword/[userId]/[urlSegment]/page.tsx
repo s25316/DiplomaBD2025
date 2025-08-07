@@ -22,7 +22,15 @@ const ResetPasswordLink = () => {
             return;
         }
 
-        const res = await fetch(`http://localhost:8080/api/User/password/${userId}/${urlSegment}`)
+        const res = await fetch(`http://localhost:8080/api/User/password/${userId}/${urlSegment}`, {
+            method: "PUT",
+            headers: {
+                'Content-Type': 'applicaton/json',
+            },
+            body: JSON.stringify({
+                newPassword
+            })
+        })
 
         if (res.ok) {
             alert("Your password has been changed")
