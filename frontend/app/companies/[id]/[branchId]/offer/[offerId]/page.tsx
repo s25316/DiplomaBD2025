@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { InnerSection, OuterContainer } from '@/app/components/layout/PageContainers';
+import GeoMap from '@/app/components/GeoMap';
 
 interface Company {
   name: string;
@@ -12,6 +13,17 @@ interface Company {
 
 interface Branch {
   name: string;
+  address: {
+    countryName: string;
+    stateName: string;
+    cityName: string;
+    streetName?: string | null;
+    houseNumber: string;
+    apartmentNumber?: string | null;
+    postCode: string;
+    lon: number;
+    lat: number;
+  };
 }
 
 interface Offer {
@@ -182,6 +194,19 @@ const OfferDetails = () => {
           <p className="md:col-span-2"><span className="font-semibold">Publication:</span> {new Date(offer.publicationStart).toLocaleString()} – {new Date(offer.publicationEnd).toLocaleString()}</p>
           <p className="md:col-span-2"><span className="font-semibold">Website:</span> <a href={offer.websiteUrl} className="text-blue-600 underline" target="_blank" rel="noopener noreferrer">{offer.websiteUrl}</a></p>
         </div>
+
+        <div className="mb-2 text-gray-700 dark:text-gray-300">
+          <p className="font-semibold">Address:</p>
+          <p>
+            {branch.address.countryName} ul. {branch?.address?.streetName} {branch.address.houseNumber}
+            {branch.address.apartmentNumber ? `/${branch.address.apartmentNumber}` : ''} {branch.address.cityName}
+          </p>
+          <p>Post Code: {branch.address.postCode}</p>
+
+        </div>
+        {branch.address.lat && branch.address.lon && (
+          <GeoMap lat={branch.address.lat} lon={branch.address.lon} />
+        )}
 
       </InnerSection>
 
