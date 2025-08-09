@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import { OuterContainer } from "@/app/components/layout/PageContainers"
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
+import CancelButton from '@/app/components/buttons/CancelButton'
 
 const PasswordChange = () => {
     const [oldPassword, setOldPassword] = useState("");
@@ -90,6 +91,7 @@ const PasswordChange = () => {
                 <button type='submit'
                     className="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed">
                     Change</button>
+                <CancelButton/>
             </form>
         </OuterContainer>
     )

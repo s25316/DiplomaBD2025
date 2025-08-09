@@ -27,15 +27,6 @@ interface Branch {
     streetName: string | null;
   }
 }
-// interface Company{
-//   name: string;
-//   description: string;
-//   regon: string;
-//   nip: string;
-//   krs: string;
-//   created: string;
-//   websiteUrl: string;
-// }
 interface ContractCondition {
   companyId: string;
   contractConditionId: string;
@@ -129,7 +120,7 @@ const CompanyDetails = () => {
 
   return (
     <OuterContainer>
-      <h1 className="text-2xl font-bold">Company Details</h1>
+      <h1 className="text-2xl font-bold text-center">Company Details</h1>
       <InnerSection>
         <CompanyInfo company={company} />
 

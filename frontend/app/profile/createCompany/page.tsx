@@ -18,9 +18,10 @@ const CreateCompany = () => {
 
   const [errors, setErrors] = useState<string[]>([]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
+
 
   const validateFields = () => {
     const errs: string[] = [];
@@ -102,7 +103,7 @@ const CreateCompany = () => {
 
         <div className="flex items-center gap-2">
           <label htmlFor="description" className="w-32">Description:</label>
-          <input type="text" id="description" name="description" onChange={handleChange} required className='global-field-style' />
+          <textarea id="description" name="description" rows={8} onChange={handleChange} required className='global-field-style' />
         </div>
 
         <div className="flex items-center gap-2">
@@ -127,6 +128,7 @@ const CreateCompany = () => {
 
         <button type="submit" className="mt-4 p-2 bg-blue-600 text-white rounded">Create</button>
         </form>
+        <br/>
         <CancelButton/>
       </InnerSection>
     </OuterContainer>

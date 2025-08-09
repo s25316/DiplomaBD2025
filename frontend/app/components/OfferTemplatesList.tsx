@@ -33,7 +33,7 @@ const OfferTemplatesList = ({
             <InnerSection className="border p-2 my-2 max-w-md">
             <div className="flex justify-between items-center">
             
-            <Link href={`/companies/${id}/templates/${t.offerTemplateId}`}>
+            <Link href={`/companies/${id}/templates/${t.offerTemplateId}`} className="text-blue-600 dark:text-blue-400">
               <b>{t.name}</b>
             </Link>
             {isOwner && <div className="flex gap">

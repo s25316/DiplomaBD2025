@@ -91,19 +91,20 @@ const BranchForm = (props: Props) => {
     }})
   }, [form, address, autocomplete, props])
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value })
   }
+
   const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, address: { ...form.address, [e.target.name]: e.target.value } })
   }
 
   return (
-    <InnerSection className='flex flex-col gap-4 p-4 border rounded-lg'>
+    <InnerSection className='flex flex-col gap-5 p-6 border rounded-lg'>
       <label htmlFor='name'>Branch name:</label>
       <input className='global-field-style' type='text' name='name' placeholder='Branch name' value={form.name} onChange={handleChange} required />
       <label htmlFor='description'>Description:</label>
-      <input className='global-field-style' type='text' name='description' placeholder='Description' value={form.description ?? ""} onChange={handleChange} />
+      <textarea className='global-field-style' name='description' rows={8} placeholder='Description' value={form.description ?? ""} onChange={handleChange} />
       <label  htmlFor='address'>Address:</label>
       {(props.initialData?.address && props.initialData.address.streetName) && (
         <div className="text-sm text-gray-700 dark:text-gray-300 italic mb-2">

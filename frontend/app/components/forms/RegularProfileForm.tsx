@@ -233,7 +233,7 @@ const RegularProfileForm = ({ initialData, token }: RegularProfileFormProps) => 
         className='global-field-style' 
         value={form.contactPhoneNumber} 
         onChange={(e) => setForm({ ...form, contactPhoneNumber: e.target.value })} 
-        type="tel" // Upewnij się, że to jest typ tel
+        type="tel"
       />
 
       <label className="font-semibold text-gray-700 dark:text-gray-300"><b>Birth Date</b></label>

@@ -32,10 +32,8 @@ const BranchesList = ({
       {branches.map((branch) => (
         <li key={branch.branchId} >
           <InnerSection className="my-2 max-w-md">
-          {/* Flex container for horizontal layout */}
-          {/* <div className="flex justify-between items-center"> */}
-            <Link href={`/companies/${companyId}/${branch.branchId}`}>
-              <b>Name: {branch.name}</b>
+            <Link href={`/companies/${companyId}/${branch.branchId}`} className="text-blue-600 dark:text-blue-400">
+              <b>Branch name: {branch.name}</b>
             </Link>
             <p><b>City: {branch.address.cityName}</b></p>
             <p><b>street: {branch.address.streetName}</b></p>

@@ -76,35 +76,56 @@ const CreateBranch = () => {
   }
 
   return (
-    <OuterContainer className='max-w-xl mx-auto p-6 mt-8 font-inter'>
-      <h1 className='text-3xl font-bold mb-6 text-center'>Create Branch</h1>
-      <form className='flex flex-col gap-6' onSubmit={handleSubmit}>
-        <ul>
-          {forms.map((value) => (
-            <li key={value.props.index} className='flex flex-col gap-4'>
-              {value}
-              <button className='bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition duration-300 ease-in-out shadow-md font-semibold self-end mt-2'
-              onClick={() => {
-                setForms(forms.filter((val) => {
-                  if (val.props.index === value.props.index) {
-                    sendData.current = sendData.current.filter((v) => v.index !== val.props.index)
-                    return false
-                  }
-                  return true
-                }))
-              }}
-              >Remove branch</button>
-            </li>
-          ))}
-        </ul>
-        <button
-          className='bg-green-600 text-white px-5 py-2 rounded-lg hover:bg-green-700 transition duration-300 ease-in-out shadow-md font-semibold mt-4'
-          onClick={() => { setForms([...forms, <BranchForm key={counter} index={counter} getData={handleData} />]); setCounter(counter + 1) }}>Add branch</button>
-        <CancelButton/>
-        <button
-          className='bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition duration-300 ease-in-out shadow-md font-semibold mt-4'
-          type='submit'>Create</button>
-      </form>
+    <OuterContainer className='max-w-3xl mx-auto p-6 mt-8 font-inter bg-white dark:bg-gray-800 rounded-xl shadow-2xl'>
+          <h1 className='text-4xl font-extrabold mb-8 text-center text-gray-900 dark:text-gray-100'>Create New Branch(es)</h1>
+          <form className='flex flex-col gap-8' onSubmit={handleSubmit}>
+            <div className='space-y-6'>
+              {forms.length === 0 && (
+                <p className="text-center text-gray-600 dark:text-gray-400 text-lg">
+                  No branches added yet. Click +` to add branch.
+                </p>
+              )}
+              {forms.map((value) => (
+
+                <li key={value.props.index} className='list-none bg-gray-50 dark:bg-gray-700 p-6 rounded-lg shadow-lg border border-gray-200 dark:border-gray-600 relative'>
+                  <h2 className='text-2xl font-semibold mb-6 text-gray-800 dark:text-gray-200'>Branch #{value.props.index + 1}</h2>
+                  {value}
+                  {forms.length > 1 && (
+                    <button
+                      type="button"
+                      className='absolute top-4 right-4 bg-red-600 text-white p-2 rounded-full hover:bg-red-700 transition duration-300 ease-in-out shadow-md font-bold text-lg w-8 h-8 flex items-center justify-center'
+                      title="Remove this branch"
+                      onClick={() => {
+                        setForms(forms.filter((val) => {
+                          if (val.props.index === value.props.index) {
+                            sendData.current = sendData.current.filter((v) => v.index !== val.props.index)
+                            return false
+                          }
+                          return true
+                        }))
+                      }}
+                    >
+                      {"X"}
+                    </button>
+                  )}
+                </li>
+              ))}
+            </div>
+
+            <div className="flex justify-end mb-4">
+              <button
+                type="button"
+                className='bg-green-600 text-white p-3 rounded-full hover:bg-green-700 transition duration-300 ease-in-out shadow-lg font-bold text-2xl w-12 h-12 flex items-center justify-center'
+                onClick={() => { setForms([...forms, <BranchForm key={counter} index={counter} getData={handleData} />]); setCounter(counter + 1) }}
+                title="Add new branch"> Next branch
+              </button>
+            </div>
+            <button
+              className='bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition duration-300 ease-in-out shadow-md font-semibold mt-4'
+              type='submit'> Create all
+            </button>
+            <CancelButton/>
+          </form>
     </OuterContainer>
   )
 }
