@@ -76,7 +76,7 @@ const CreateBranch = () => {
   }
 
   return (
-    <OuterContainer className='max-w-3xl mx-auto p-6 mt-8 font-inter bg-white dark:bg-gray-800 rounded-xl shadow-2xl'>
+    <OuterContainer className='max-w-xl mx-auto'>
           <h1 className='text-4xl font-extrabold mb-8 text-center text-gray-900 dark:text-gray-100'>Create New Branch(es)</h1>
           <form className='flex flex-col gap-8' onSubmit={handleSubmit}>
             <div className='space-y-6'>
@@ -115,9 +115,9 @@ const CreateBranch = () => {
             <div className="flex justify-end mb-4">
               <button
                 type="button"
-                className='bg-green-600 text-white p-3 rounded-full hover:bg-green-700 transition duration-300 ease-in-out shadow-lg font-bold text-2xl w-12 h-12 flex items-center justify-center'
+                className='bg-green-600 text-white p-3 rounded-lg hover:bg-green-700 transition duration-300 ease-in-out shadow-md font-semibold flex items-center justify-center'
                 onClick={() => { setForms([...forms, <BranchForm key={counter} index={counter} getData={handleData} />]); setCounter(counter + 1) }}
-                title="Add new branch"> Next branch
+                title="Add new branch"> Next branch {/* or just rounded-full and  '+' */ }
               </button>
             </div>
             <button

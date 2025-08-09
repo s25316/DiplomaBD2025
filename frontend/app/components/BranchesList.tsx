@@ -35,8 +35,8 @@ const BranchesList = ({
             <Link href={`/companies/${companyId}/${branch.branchId}`} className="text-blue-600 dark:text-blue-400">
               <b>Branch name: {branch.name}</b>
             </Link>
-            <p><b>City: {branch.address.cityName}</b></p>
-            <p><b>street: {branch.address.streetName}</b></p>
+            <p><b>City:</b> {branch.address.cityName}</p>
+            <p><b>street:</b> {branch.address.streetName}</p>
           {isOwner && <div className="mt-2 flex gap-2">
 
             <button
