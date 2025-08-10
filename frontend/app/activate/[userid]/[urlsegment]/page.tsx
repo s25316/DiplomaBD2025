@@ -19,7 +19,7 @@ const AccountActivation = () => {
         })
 
         if (res.ok){        
-            router.push("/api/auth/signin")
+            router.push("/login")
         }
         else{
             alert("There is problem activating your account")
