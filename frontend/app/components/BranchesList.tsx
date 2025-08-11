@@ -10,6 +10,7 @@ interface Branch {
   address: {
     cityName: string;
     streetName: string | null;
+    houseNumber: string | null;
   }
 }
 interface BranchesListProps {
@@ -36,7 +37,7 @@ const BranchesList = ({
               <b>Branch name: {branch.name}</b>
             </Link>
             <p><b>City:</b> {branch.address.cityName}</p>
-            <p><b>street:</b> {branch.address.streetName}</p>
+            <p><b>street:</b> {branch.address.streetName} {branch.address.houseNumber}</p>
           {isOwner && <div className="mt-2 flex gap-2">
 
             <button
@@ -57,7 +58,6 @@ const BranchesList = ({
           </div>}
           </InnerSection>
         </li>
-        
       ))}
     </ul>
   );

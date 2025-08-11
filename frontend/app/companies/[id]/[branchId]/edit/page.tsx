@@ -163,7 +163,7 @@ const EditBranch = () => {
 
 
   return (
-    <OuterContainer>
+    <OuterContainer className="max-w-xl mx-auto p-4">
       <h1 className="text-3xl font-bold mb-6 text-gray-800 dark:text-gray-100 text-center">Edit Branch</h1>
       <form className='flex flex-col gap-6' onSubmit={handleSubmit}>
         <BranchForm index={0} getData={handleData} initialData={formState} />

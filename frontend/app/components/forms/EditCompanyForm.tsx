@@ -48,7 +48,7 @@ const EditCompanyForm = ({ company, companyId, onUpdated }: { company: Company, 
           <label className="block text-sm font-semibold mb-1">Description:</label>
           <textarea
             className="global-field-style"
-            rows={8}
+            rows={4}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
           />

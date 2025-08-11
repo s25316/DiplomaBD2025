@@ -18,6 +18,7 @@ interface SkillInfo {
   skillId: number;
   name: string;
   skillType: {
+    skillTypeId: number 
     name: string;
   };
 }
@@ -102,7 +103,7 @@ const Profile = () => {
             },
             cache: 'no-store',
           }),
-          fetch('http://localhost:8080/api/CompanyUser/companies', {
+          fetch('http://localhost:8080/api/CompanyUser/companies?ascending=true&orderBy=1', {
             headers: {
               Authorization: `Bearer ${session.user.token}`,
               'Content-Type': 'application/json',
@@ -195,11 +196,26 @@ const Profile = () => {
   const { skills, urls, address } = user;
   const isFirstTime = !user?.name;
 
+
+  const groupedSkills = skills.reduce((acc, skillInfo) => {
+    const typeName = skillInfo.skillType.name;
+    if (!acc[typeName]) {
+      acc[typeName] = [];
+    }
+    acc[typeName].push(skillInfo);
+    return acc;
+  }, {} as Record<string, SkillInfo[]>);
+
+  const sortedSkillTypes = Object.keys(groupedSkills).sort((a, b) => a.localeCompare(b));
+  const sortedGroupedSkills: Record<string, SkillInfo[]> = {};
+  sortedSkillTypes.forEach(type => {
+    sortedGroupedSkills[type] = groupedSkills[type].sort((a, b) => a.name.localeCompare(b.name));
+  });
   return (
     <OuterContainer maxWidth="max-w-4xl">
       <h1 className="text-3xl font-bold mb-6 text-gray-800 dark:text-gray-100 text-center">My Profile</h1>
 
-      <InnerSection className="mb-6 mx-auto">
+      <div className="mb-6 mx-auto">
         {isFirstTime ? (
           <BaseProfileForm
             token={session!.user.token!}
@@ -207,72 +223,95 @@ const Profile = () => {
           />
         ) : (
           <div className="space-y-2 text-gray-700 dark:text-gray-300">
-            <h2 className="text-xl font-semibold mb-2 text-gray-800 dark:text-gray-100">
-              <b> {user.isIndividual ? 'Individual account' : 'Company account'} </b>
-            </h2>
-            <p><b>Name:</b> {user.name}</p>
-            <p><b>Surname:</b> {user.surname}</p>
-            <p><b>Email:</b> {user.contactEmail}</p>
-            <p><b>Phone:</b> {user.phoneNum}</p>
-            <p><b>Birth Date:</b> {user.birthDate?.substring(0, 10)}</p>
+            <InnerSection>
+              <h2 className="text-xl font-semibold mb-2 text-gray-800 dark:text-gray-100">
+                <b> {user.isIndividual ? 'Individual account' : 'Company account'} </b>
+              </h2>
+              <p><b>Name:</b> {user.name}</p>
+              <p><b>Surname:</b> {user.surname}</p>
+              <p><b>Email:</b> {user.contactEmail}</p>
+              <p><b>Phone:</b> {user.phoneNum}</p>
+              <p><b>Birth Date:</b> {user.birthDate?.substring(0, 10)}</p>
 
-            {(address != null) && (
-              <p><b>Address:</b>
-                {[
-                  " ul.",
-                  address.streetName,
-                  address.houseNumber, "/",
-                  address.apartmentNumber, ",",
-                  address.postCode, ",",
-                  address.cityName,
-                  address.countryName,
-                ]
-                  .filter(Boolean)
-                  .join(' ')}
-              </p>
-            )}
-
-            <p className="mt-4"><b>Skills:</b></p>
-            <ul className="list-disc ml-5">
-              {skills?.length > 0 ? (
-                skills.map((s: SkillInfo) => (
-                  <li key={s.skillId}>{s.name} ({s.skillType?.name})</li>
-                ))
-              ) : (
-                <li>No skills added.</li>
+              {(address != null) && (
+                <p><b>Address:</b>
+                  {[
+                    " ul.",
+                    address.streetName,
+                    address.houseNumber, "/",
+                    address.apartmentNumber, ",",
+                    address.postCode, ",",
+                    address.cityName,
+                    address.countryName,
+                  ]
+                    .filter(Boolean)
+                    .join(' ')}
+                </p>
               )}
-            </ul>
+            </InnerSection>
+            <InnerSection>
+            <h2 className="text-xl font-semibold mb-2 text-gray-800 dark:text-gray-100">Skills:</h2>
 
-            <p className="mt-4"><b>Links:</b></p>
-            <ul className="list-disc ml-5">
+              {Object.keys(sortedGroupedSkills).length > 0 ? (
+                <div className="space-y-4">
+                  {sortedSkillTypes.map(skillType => (
+                    <div key={skillType} className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600">
+                      <h4 className="font-semibold text-lg mb-2 text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                        {skillType}:
+                      </h4>
+                      <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 ml-4 space-y-1">
+                        {sortedGroupedSkills[skillType].map((s) => (
+                          <li key={s.skillId}>
+                            {s.name}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <ul className="list-disc ml-5">
+                  <li> No skills added.</li>
+                </ul>
+              )}
+
+              <h2 className="text-xl mt-5 font-semibold mb-2 text-gray-800 dark:text-gray-100">Links:</h2>
+ 
+                
               {urls?.length > 0 ? (
-                urls.map((u: { value : string
-                  urlType?: {
-                    name : string
-                  }
-                }, i: number) => (
-                  <li key={i}><a href={u.value} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline dark:text-blue-400">{u.value}</a> ({u.urlType?.name})</li>
-                ))
-              ) : (
-                <li>No links added.</li>
-              )}
-            </ul>
-
-            <button
-              onClick={() => router.push('/profile/edit')}
-              className="inline-block bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition duration-300 ease-in-out shadow-md font-semibold mt-6"
-            >
-              Edit Profile
-            </button>
-            <button
-              onClick={() => router.push('/profile/changePassword')}
-              className="inline-block bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition duration-300 ease-in-out shadow-md font-semibold mt-6 ml-2"
-            >
-              Change Password
-            </button>
+                <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600">
+                  <ul className="list-disc ml-5">
+                    {urls.map((u: { value : string
+                      urlType?: { name : string } }, i: number) => (
+                      <li key={i}>
+                        <a href={u.value} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline dark:text-blue-400">{u.value}</a> ({u.urlType?.name})
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                ) : (
+                  <ul className="list-disc ml-5">
+                    <li>No links added.</li>
+                  </ul>
+                )
+              }
+              
+              <button
+                onClick={() => router.push('/profile/edit')}
+                className="inline-block bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition duration-300 ease-in-out shadow-md font-semibold mt-6"
+              >
+                Edit Profile
+              </button>
+              <button
+                onClick={() => router.push('/profile/changePassword')}
+                className="inline-block bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition duration-300 ease-in-out shadow-md font-semibold mt-6 ml-2"
+              >
+                Change Password
+              </button>
+            </InnerSection>
           </div>
         )}
-      </InnerSection>
+      </div>
 
       {(user.isIndividual === false && user.name != null) && (
         <InnerSection className="mb-6">

@@ -109,11 +109,10 @@ const RegularProfileForm = ({ initialData, token }: RegularProfileFormProps) => 
   useEffect(() => {
     const headers = { Authorization: `Bearer ${token}` };
     Promise.all([
-      fetch('http://localhost:8080/api/Dictionaries/skills', { headers, cache: 'no-store' }), // Dodano cache: no-store
-      fetch('http://localhost:8080/api/Dictionaries/urlTypes', { headers, cache: 'no-store' }), // Dodano cache: no-store
+      fetch('http://localhost:8080/api/Dictionaries/skills', { headers, cache: 'no-store' }), 
+      fetch('http://localhost:8080/api/Dictionaries/urlTypes', { headers, cache: 'no-store' }),
     ]).then(async ([skillsRes, urlTypesRes]) => {
       const skillsData: Skill[] = await skillsRes.json();
-      // setSkills(skillsData);
       setUrlTypes(await urlTypesRes.json());
 
       const grouped = skillsData.reduce((acc, skill) => {
@@ -215,7 +214,8 @@ const RegularProfileForm = ({ initialData, token }: RegularProfileFormProps) => 
     <InnerSection className="flex flex-col gap-4 mt-4 max-w-2xl">
       <label className="font-semibold text-gray-700 dark:text-gray-300"><b>Description</b></label>
       <textarea 
-        className='global-field-style' 
+        className='global-field-style'
+        rows={4}
         value={form.description} 
         onChange={(e) => setForm({ ...form, description: e.target.value })} 
       />

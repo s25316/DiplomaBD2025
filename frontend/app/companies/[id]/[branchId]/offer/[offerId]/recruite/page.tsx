@@ -64,12 +64,12 @@ const Recruite = () => {
     if (!session?.user?.token) return <div className="text-center p-4">Unauthorized</div>;
 
     return (
-        <OuterContainer>
+        <OuterContainer className="max-w-xl mx-auto p-4">
             <form className="flex flex-col space-y-4" onSubmit={handleSubmit}>
                 <label htmlFor='fileInput'>CV:</label>
                 <input name="fileInput" type='file' accept="application/pdf" required onChange={handleFileChange} />
                 <label htmlFor="description">Description:</label>
-                <input name="description" type="text" onChange={x => setDescription(x.target.value)} />
+                <textarea className='global-field-style' name="description" rows={4} onChange={x => setDescription(x.target.value)} />
                 <button className="inline-block bg-green-600  p-2 rounded-md hover:bg-green-700 transition-colors" type="submit">Apply</button>
             </form>
         </OuterContainer>

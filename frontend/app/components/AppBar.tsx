@@ -18,7 +18,7 @@ const AppBar = () => {
         <ThemeToggle/>
       </div>
       <div className="flex items-center space-x-4">
-        {session?.user && ( // Pokaż przycisk tylko, jeśli użytkownik jest zalogowany, trzeba bedzie sprawdzac jakoś potem czy ma company czy nie dla dalszych czynności
+        {session?.user && (
           <Link href="/recruitments" passHref>
             <button className="px-4 py-2 rounded-md bg-purple-500 text-white hover:bg-purple-600 transition duration-200">
               Recruitments
@@ -31,14 +31,14 @@ const AppBar = () => {
             Profile
           </button>
           <button onClick={() => { signOut()
-            router.push("/") }} 
+            router.replace("/") }} 
             className="px-4 py-2 rounded-md bg-red-500 text-white hover:bg-red-600 transition duration-200">
               Sign Out
             </button>
           </>
         ) : (
           <>
-            <button onClick={() => router.push('/login')} className="px-4 py-2 rounded-md bg-green-500 text-white hover:bg-green-600 transition duration-200">
+            <button onClick={() => router.replace('/login')} className="px-4 py-2 rounded-md bg-green-500 text-white hover:bg-green-600 transition duration-200">
               Sign In
             </button>
             <button onClick={() => { window.location.href = '/register' }}  className="px-4 py-2 rounded-md bg-indigo-500 text-white hover:bg-indigo-600 transition duration-200">

@@ -29,7 +29,7 @@ const LoginPage = () => {
                 console.error('Sign in error:', result?.error)
                 setError('Invalid email or password')
             } else {
-                router.push('/profile')
+                router.replace('/profile')
                 router.refresh()
             }
         } catch (err) {

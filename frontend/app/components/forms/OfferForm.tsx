@@ -134,7 +134,7 @@ const OfferForm = ({
                                                 const cond = existingConditions.find(c => c.contractConditionId === selectedConditionId);
                                                 if (!cond) return <p className="text-gray-500">Loading...</p>;
                                                 return (
-                                                    <ul className="text-sm list-disc list-inside text-gray-700">
+                                                    <ul className="text-sm list-disc list-inside text-gray-700 dark:text-gray-400">
                                                         <li><b>Hours/Term:</b> {cond.hoursPerTerm}</li>
                                                         <li><b>Salary:</b> {cond.salaryMin} – {cond.salaryMax} {cond.currency?.name}</li>
                                                         <li><b>Negotiable:</b> {cond.isNegotiable ? 'Yes' : 'No'}</li>
@@ -196,7 +196,7 @@ const OfferForm = ({
                                                 if (!tpl) return <p className="text-red-500">Template not found</p>;
 
                                                 return (
-                                                    <ul className="text-sm list-disc list-inside text-gray-700">
+                                                    <ul className="text-sm list-disc list-inside text-gray-700 dark:text-gray-400">
                                                         <li><b>Name:</b> {tpl.name}</li>
                                                         <li><b>Description:</b> {tpl.description}</li>
                                                         <li><b>Skills:</b>

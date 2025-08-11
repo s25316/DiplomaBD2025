@@ -37,8 +37,10 @@ interface Offer {
 
 interface SkillInfo {
   skill: {
+    skillId: number;
     name: string;
     skillType: {
+      skillTypeId: number 
       name: string;
     };
   };
@@ -171,6 +173,24 @@ const OfferDetails = () => {
 
   const { company, branch, offer, offerTemplate, contractConditions } = offerDetails;
 
+  // Logika grupowania i sortowania umiejętności
+  const groupedSkills = offerTemplate.skills.reduce((acc, skillInfo) => {
+    const typeName = skillInfo.skill.skillType.name;
+    if (!acc[typeName]) {
+      acc[typeName] = [];
+    }
+    acc[typeName].push(skillInfo);
+    return acc;
+  }, {} as Record<string, SkillInfo[]>);
+
+  // Posortowanie typów umiejętności alfabetycznie
+  const sortedSkillTypes = Object.keys(groupedSkills).sort((a, b) => a.localeCompare(b));
+  // Posortowanie umiejętności w każdej grupie alfabetycznie
+  const sortedGroupedSkills: Record<string, SkillInfo[]> = {};
+  sortedSkillTypes.forEach(type => {
+    sortedGroupedSkills[type] = groupedSkills[type].sort((a, b) => a.skill.name.localeCompare(b.skill.name));
+  });
+
   return (
     <OuterContainer>
       <h1 className="text-2xl font-bold mb-4 text-center">Offer Details</h1>
@@ -213,16 +233,26 @@ const OfferDetails = () => {
       <div>
         <h2 className="text-2xl font-bold mb-4">Template Details</h2>
         <InnerSection>
-          <p><span className="font-semibold">Name:</span> {offerTemplate.name}</p>
-          <p><span className="font-semibold">Description:</span> {offerTemplate.description}</p>
-          <h3 className="font-semibold mt-4 mb-2">Required Skills:</h3>
-          <ul className="list-disc list-inside space-y-1">
-            {offerTemplate.skills.map((s, i) => (
-              <li key={i}>
-                {s.skill.name} ({s.skill.skillType.name}) {s.isRequired && <span className="font-bold text-sm"> (required)</span>}
-              </li>
-            ))}
-          </ul>
+          {Object.keys(sortedGroupedSkills).length > 0 ? (
+            <div className="space-y-4">
+              {sortedSkillTypes.map(skillType => (
+                <div key={skillType} className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600">
+                  <h4 className="font-semibold text-lg mb-2 text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                    {skillType}:
+                  </h4>
+                  <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 ml-4 space-y-1">
+                    {sortedGroupedSkills[skillType].map((s) => (
+                      <li key={s.skill.skillId}>
+                        {s.skill.name} {s.isRequired && <span className="font-bold text-blue-600 dark:text-blue-400 text-xs">(required)</span>}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-500 italic">No skills specified for this offer template.</p>
+          )}
         </InnerSection>
       </div>
 

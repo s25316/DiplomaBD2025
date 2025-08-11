@@ -25,6 +25,7 @@ interface Branch {
   address: {
     cityName: string;
     streetName: string | null;
+    houseNumber: string | null;
   }
 }
 interface ContractCondition {
@@ -40,6 +41,10 @@ interface ContractCondition {
   employmentTypes?: { name: string }[];
 }
 
+interface OrderByOption {
+  id: number;
+  name: string;
+}
 
 const CompanyDetails = () => {
   const { data: session } = useSession();
@@ -67,6 +72,10 @@ const CompanyDetails = () => {
 
   const [isOwner, setIsOwner] = useState(Boolean(session))
 
+  const [orderByOptions, setOrderByOptions] = useState<OrderByOption[]>([]);
+  const [selectedOrderBy, setSelectedOrderBy] = useState<number>(3);
+  const [isAscending, setIsAscending] = useState<boolean>(true);
+
   useEffect(() => {
     if (!id) return;
 
@@ -83,9 +92,31 @@ const CompanyDetails = () => {
     }
 
     const fetchAll = async () => {
+      try {
+        const orderByRes = await fetch('http://localhost:8080/api/QueryParameters/CompanyUser/branches/orderBy', { headers });
+        if (orderByRes.ok) {
+          const allOptions: OrderByOption[] = await orderByRes.json();
+          
+          const filteredOptions = allOptions.filter(option => option.id !== 1 && option.id !== 6);
+          setOrderByOptions(filteredOptions);
+
+          if (!filteredOptions.some(option => option.id === selectedOrderBy)) {
+            setSelectedOrderBy(filteredOptions.length > 0 ? filteredOptions[0].id : 0);
+          }
+
+        } else {
+          console.error("Failed to fetch order by options:", await orderByRes.text());
+        }
+      } catch (err) {
+        console.error("Error fetching order by options:", err);
+      }
+
+      // Modify branches fetch to include orderBy and ascending
+      const branchesUrl = `${apiUrl}companies/${id}/branches?Page=${branchPage}&ItemsPerPage=${branchPerPage}&orderBy=${selectedOrderBy}&ascending=${isAscending}`;
+
       const [c, b, t, cond] = await Promise.all([
         fetch(`${apiUrl}companies/${id}`, { headers }),
-        fetch(`${apiUrl}companies/${id}/branches?Page=${branchPage}&ItemsPerPage=${branchPerPage}`, { headers }),
+        fetch(branchesUrl, { headers }),
         fetch(`${apiUrl}companies/${id}/offerTemplates?Page=${branchPage}&ItemsPerPage=${branchPerPage}`, { headers }),
         fetch(`${apiUrl}companies/${id}/contractConditions?Page=${branchPage}&ItemsPerPage=${branchPerPage}`, { headers }),
       ]);
@@ -116,7 +147,7 @@ const CompanyDetails = () => {
 
 
     fetchAll();
-  }, [session, id, branchPage, branchPerPage, templatePage, templatePerPage, conditionPage, conditionPerPage, isOwner]);
+  }, [session, id, branchPage, branchPerPage, templatePage, templatePerPage, conditionPage, conditionPerPage, isOwner, selectedOrderBy, isAscending]);
 
   return (
     <OuterContainer>
@@ -171,6 +202,33 @@ const CompanyDetails = () => {
 
       {activeTab === 'branches' && (
         <div className="shadow-md rounded p-4">
+          <div className="flex flex-col sm:flex-row items-center gap-4 my-4 p-3 bg-gray-100 dark:bg-gray-700 rounded-lg">
+            <label htmlFor="orderBy" className="text-gray-700 dark:text-gray-300 font-medium">Sort by:</label>
+            <select
+              id="orderBy"
+              value={selectedOrderBy}
+              onChange={(e) => setSelectedOrderBy(Number(e.target.value))}
+              className="global-field-style p-2 border border-gray-300 rounded-md shadow-sm dark:bg-gray-600 dark:border-gray-500 dark:text-gray-100"
+            >
+              {orderByOptions.map(option => (
+                <option key={option.id} value={option.id}>
+                  {option.name}
+                </option>
+              ))}
+            </select>
+
+            <label htmlFor="isAscending" className="text-gray-700 dark:text-gray-300 font-medium ml-4">Order:</label>
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="isAscending"
+                checked={isAscending}
+                onChange={(e) => setIsAscending(e.target.checked)}
+                className="form-checkbox h-5 w-5 text-blue-600 rounded dark:bg-gray-600 dark:border-gray-500"
+              />
+              <span className="text-gray-700 dark:text-gray-300">{isAscending ? 'Ascending' : 'Descending'}</span>
+            </div>
+          </div>
           {isOwner && <div className="mt-2"><CreateBranchButton /></div>}
           <p className="mt-2 text-sm text-gray-600">
             Showing {branches.length} of {branchTotal} branches

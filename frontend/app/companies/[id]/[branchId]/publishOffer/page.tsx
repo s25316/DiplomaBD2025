@@ -186,6 +186,7 @@ const refreshConditions = async () => {
         />
         <button type="submit" className="bg-blue-600 text-white p-2 rounded mt-4">Publish Offer</button>
       </form>
+      <br/>
       <CancelButton/>
     </OuterContainer>
   );
