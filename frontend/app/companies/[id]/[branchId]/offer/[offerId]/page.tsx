@@ -87,6 +87,7 @@ const OfferDetails = () => {
   const [isDeleting, setIsDeleting] = useState(false);
 
   const [isOwnOffer, setIsOwnOffer] = useState(Boolean(session));
+  const [isIndividual, setIsIndividual] = useState(true);
 
   useEffect(() => {
     if (!offerId) return;
@@ -105,9 +106,18 @@ const OfferDetails = () => {
             setIsOwnOffer(false)
             return;
           }
-          res = await fetch(`http://localhost:8080/api/GuestQueries/offers/${offerId}`);
         }
         else {
+          if(session?.user?.token){
+            const userRes = await fetch('http://localhost:8080/api/User', {
+              method: "GET",
+              headers:{
+                'Authorization': `Bearer ${session.user.token}`,
+              }
+            })
+            const json = await userRes.json()
+            setIsIndividual(json.personPerspective.isIndividual)
+          }
           res = await fetch(`http://localhost:8080/api/GuestQueries/offers/${offerId}`);
         }
 
@@ -130,7 +140,7 @@ const OfferDetails = () => {
     };
 
     fetchOfferDetails();
-  }, [session, offerId, isOwnOffer]);
+  }, [session, offerId, isOwnOffer, isIndividual]);
 
   // if (!session?.user?.token) return <div>Unauthorized</div>;
   if (error) return <div>Error: {error}</div>;
@@ -295,7 +305,7 @@ const OfferDetails = () => {
         </div>
       )}
 
-      {!isOwnOffer && (
+      {isIndividual && !isOwnOffer && (
         <div className="mt-8 flex items-center gap-4">
           {session?.user.token ? <Link
           href={`/companies/${id}/${branchId}/offer/${offerId}/recruite`}

@@ -3,7 +3,7 @@
 import { OuterContainer } from "@/app/components/layout/PageContainers";
 import { useSession } from "next-auth/react";
 import { useParams, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const Recruite = () => {
     const { offerId } = useParams() as {
@@ -17,6 +17,27 @@ const Recruite = () => {
 
     const [file, setFile] = useState<File | null>(null)
     const [description, setDescription] = useState<string>("")
+
+    useEffect(() => {
+        const check = async () => {
+            if (session?.user?.token) {
+                const res = await fetch('http://localhost:8080/api/User', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${session.user.token}`,
+                    }
+                })
+                const json = await res.json()
+                if(!json.personPerspective.isIndividual){
+                    return (<div>Unauthorized</div>)
+                }
+            }else{
+                return (<div>Unauthorized</div>)
+            }
+        }
+
+        check();
+    }, [])
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const funcFile = event.target.files?.[0];
