@@ -97,7 +97,7 @@ const BranchDetails = () => {
       console.log("Fetching branch details and offers...");
       const [branchRes, offersRes] = await Promise.all([
         fetch(`${apiUrl}branches/${branchId}`, { headers, cache: 'no-store' }),
-        fetch(`${apiUrl}branches/${branchId}/offers?${statusFilter !== null ? `status=${statusFilter}&` : ''}Page=${page}&ItemsPerPage=${itemsPerPage}`, { headers, cache: 'no-store' }),
+        fetch(`${apiUrl}branches/${branchId}/offers?${statusFilter !== null ? `status=${statusFilter}&` : ''}Page=${page}&ItemsPerPage=${itemsPerPage}`, { headers}),
       ]);
 
       if(!branchRes.ok && session && isOwner){

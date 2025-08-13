@@ -86,67 +86,161 @@ const OfferDetails = () => {
   const [error, setError] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const [isOwnOffer, setIsOwnOffer] = useState(Boolean(session));
-  const [isIndividual, setIsIndividual] = useState(true);
+  const [isOwnOffer, setIsOwnOffer] = useState(false);
+  const [isIndividual, setIsIndividual] = useState(false);
 
-  useEffect(() => {
+  // useEffect(() => {
+  //   if (!offerId) return;
+
+  //   const fetchOfferDetails = async () => {
+  //     try {
+  //        let fetchedData: OfferDetailsData | null = null;
+  //       let isOwnerOfThisOffer = false;
+
+        
+  //       let res;
+
+  //       if (session?.user?.token && isOwnOffer) {
+  //         res = await fetch(`http://localhost:8080/api/CompanyUser/offers/${offerId}`, {
+  //           headers: {
+  //             'Authorization': `Bearer ${session.user.token}`,
+  //           },
+  //         });
+  //         if (!res.ok) {
+  //           setIsOwnOffer(false)
+  //           return;
+  //         }
+  //       }
+  //       else {
+  //         if(session?.user?.token){
+  //           const userRes = await fetch('http://localhost:8080/api/User', {
+  //             method: "GET",
+  //             headers:{
+  //               'Authorization': `Bearer ${session.user.token}`,
+  //             }
+  //           })
+  //           const json = await userRes.json()
+  //           setIsIndividual(json.personPerspective.isIndividual)
+  //         }
+  //         res = await fetch(`http://localhost:8080/api/GuestQueries/offers/${offerId}`);
+  //       }
+
+  //       if (!res.ok) {
+  //         throw new Error('Failed to fetch offer details');
+  //       }
+
+  //       const json = await res.json();
+  //       const item = json.items?.[0];
+
+  //       if (!item) {
+  //         throw new Error('No offer data found in the API response');
+  //       }
+
+  //       setOfferDetails(item);
+  //     } catch (err) {
+  //       if(err instanceof Error)
+  //       setError(err.message);
+  //     }
+  //   };
+
+  //   fetchOfferDetails();
+  // }, [session, offerId, isOwnOffer, isIndividual]);
+    useEffect(() => {
     if (!offerId) return;
 
     const fetchOfferDetails = async () => {
       try {
-        let res;
+        let fetchedData: OfferDetailsData | null = null;
+        let isOwnerOfThisOffer = false; // Flaga dla własności tej konkretnej oferty
 
-        if (session?.user?.token && isOwnOffer) {
-          res = await fetch(`http://localhost:8080/api/CompanyUser/offers/${offerId}`, {
-            headers: {
-              'Authorization': `Bearer ${session.user.token}`,
-            },
-          });
-          if (!res.ok) {
-            setIsOwnOffer(false)
-            return;
-          }
-        }
-        else {
-          if(session?.user?.token){
+        // 1. Zawsze próbuj pobrać dane użytkownika, jeśli istnieje sesja, aby ustalić isIndividual
+        if (session?.user?.token) {
+          try {
             const userRes = await fetch('http://localhost:8080/api/User', {
               method: "GET",
-              headers:{
-                'Authorization': `Bearer ${session.user.token}`,
-              }
-            })
-            const json = await userRes.json()
-            setIsIndividual(json.personPerspective.isIndividual)
+              headers: { 'Authorization': `Bearer ${session.user.token}`, },
+              cache: 'no-store'
+            });
+            if (userRes.ok) {
+              const userJson = await userRes.json();
+              setIsIndividual(userJson.personPerspective.isIndividual);
+            }
+          } catch (userErr) {
+            console.warn("Nie udało się pobrać szczegółów użytkownika dla sprawdzenia isIndividual:", userErr);
           }
-          res = await fetch(`http://localhost:8080/api/GuestQueries/offers/${offerId}`);
+
+          // 2. Spróbuj pobrać ofertę jako CompanyUser, aby ustalić, czy jesteśmy jej właścicielem
+          try {
+            const companyUserRes = await fetch(`http://localhost:8080/api/CompanyUser/offers/${offerId}`, {
+              headers: { 'Authorization': `Bearer ${session.user.token}`, },
+              cache: 'no-store', // Ważne, aby pobierać najnowsze dane
+            });
+
+            if (companyUserRes.ok) {
+              const companyUserJson = await companyUserRes.json();
+              if (companyUserJson.items?.[0]) {
+                fetchedData = companyUserJson.items[0];
+                isOwnerOfThisOffer = true;
+              }
+            } else {
+              console.log(`Pobieranie oferty ${offerId} jako CompanyUser nie powiodło się (status: ${companyUserRes.status}), próbuję jako GuestQueries.`);
+            }
+          } catch (e) {
+            console.warn(`Błąd sieci podczas pobierania oferty ${offerId} jako CompanyUser, próbuję jako GuestQueries:`, e);
+          }
         }
 
-        if (!res.ok) {
-          throw new Error('Failed to fetch offer details');
+        // 3. Jeśli nie znaleziono danych przez CompanyUser (lub brak tokena), spróbuj jako GuestQueries
+        if (!fetchedData) {
+          try {
+            const guestRes = await fetch(`http://localhost:8080/api/GuestQueries/offers/${offerId}`, { cache: 'no-store' });
+            if (guestRes.ok) {
+              const guestJson = await guestRes.json();
+              if (guestJson.items?.[0]) {
+                fetchedData = guestJson.items[0];
+                isOwnerOfThisOffer = false; // Potwierdzone, że nie jest właścicielem, jeśli pobrano przez Guest
+              }
+            } else {
+              console.log(`Pobieranie oferty ${offerId} jako GuestQueries nie powiodło się (status: ${guestRes.status}).`);
+            }
+          } catch (e) {
+            console.warn(`Błąd sieci podczas pobierania oferty ${offerId} jako GuestQueries:`, e);
+          }
         }
 
-        const json = await res.json();
-        const item = json.items?.[0];
-
-        if (!item) {
-          throw new Error('No offer data found in the API response');
+        // 4. Ustaw stan na podstawie ostatecznie pobranych danych
+        if (fetchedData) {
+          setOfferDetails(fetchedData);
+          setIsOwnOffer(isOwnerOfThisOffer);
+          setError(null); // Wyczyść wszelkie poprzednie błędy
+        } else {
+          // Jeśli nie znaleziono danych z żadnego źródła, zgłoś błąd
+          throw new Error('Brak danych oferty lub oferta jest niedostępna dla tego ID.');
         }
-
-        setOfferDetails(item);
       } catch (err) {
-        if(err instanceof Error)
-        setError(err.message);
+        if (err instanceof Error) {
+          setError(err.message);
+          console.error("Błąd podczas pobierania szczegółów oferty:", err);
+        } else {
+          setError("Wystąpił nieznany błąd podczas pobierania szczegółów oferty.");
+          console.error("Wystąpił nieznany błąd:", err);
+        }
       }
     };
 
     fetchOfferDetails();
-  }, [session, offerId, isOwnOffer, isIndividual]);
+  }, [session, offerId]); // Zależności: session i offerId
+
 
   // if (!session?.user?.token) return <div>Unauthorized</div>;
   if (error) return <div>Error: {error}</div>;
-
+  if (!offerDetails) return <div className="text-center p-4 text-gray-600">Loading offer details...</div>;
+  
   const handleDelete = async () => {
-    if (!session?.user?.token) return;
+    if (!session?.user?.token) {
+      alert("Autorization needed!");
+      return;
+    }
     if (!window.confirm('Are you sure you want to delete this offer?')) {
       return;
     }
