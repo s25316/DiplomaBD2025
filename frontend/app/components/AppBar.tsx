@@ -31,7 +31,7 @@ const AppBar = () => {
             Profile
           </button>
           <button onClick={() => { signOut()
-            router.replace("/") }} 
+            router.push("/") }} 
             className="px-4 py-2 rounded-md bg-red-500 text-white hover:bg-red-600 transition duration-200">
               Sign Out
             </button>
