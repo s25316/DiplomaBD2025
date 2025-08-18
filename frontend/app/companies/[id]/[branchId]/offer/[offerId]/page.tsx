@@ -89,63 +89,7 @@ const OfferDetails = () => {
   const [isOwnOffer, setIsOwnOffer] = useState(false);
   const [isIndividual, setIsIndividual] = useState(false);
 
-  // useEffect(() => {
-  //   if (!offerId) return;
-
-  //   const fetchOfferDetails = async () => {
-  //     try {
-  //        let fetchedData: OfferDetailsData | null = null;
-  //       let isOwnerOfThisOffer = false;
-
-        
-  //       let res;
-
-  //       if (session?.user?.token && isOwnOffer) {
-  //         res = await fetch(`http://localhost:8080/api/CompanyUser/offers/${offerId}`, {
-  //           headers: {
-  //             'Authorization': `Bearer ${session.user.token}`,
-  //           },
-  //         });
-  //         if (!res.ok) {
-  //           setIsOwnOffer(false)
-  //           return;
-  //         }
-  //       }
-  //       else {
-  //         if(session?.user?.token){
-  //           const userRes = await fetch('http://localhost:8080/api/User', {
-  //             method: "GET",
-  //             headers:{
-  //               'Authorization': `Bearer ${session.user.token}`,
-  //             }
-  //           })
-  //           const json = await userRes.json()
-  //           setIsIndividual(json.personPerspective.isIndividual)
-  //         }
-  //         res = await fetch(`http://localhost:8080/api/GuestQueries/offers/${offerId}`);
-  //       }
-
-  //       if (!res.ok) {
-  //         throw new Error('Failed to fetch offer details');
-  //       }
-
-  //       const json = await res.json();
-  //       const item = json.items?.[0];
-
-  //       if (!item) {
-  //         throw new Error('No offer data found in the API response');
-  //       }
-
-  //       setOfferDetails(item);
-  //     } catch (err) {
-  //       if(err instanceof Error)
-  //       setError(err.message);
-  //     }
-  //   };
-
-  //   fetchOfferDetails();
-  // }, [session, offerId, isOwnOffer, isIndividual]);
-    useEffect(() => {
+  useEffect(() => {
     if (!offerId) return;
 
     const fetchOfferDetails = async () => {

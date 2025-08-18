@@ -82,6 +82,36 @@ const OfferForm = ({
         }));
     };
 
+
+    // Obsługa wyboru istniejącego szablonu
+    const handleSelectTemplate = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setForm(prev => ({ ...prev, offerTemplateId: e.target.value }));
+        // Jeśli wybrano istniejący szablon, ukryj formularz tworzenia nowego
+        if (e.target.value !== "") {
+            setIncludeNewTemplate(false);
+        }
+    };
+
+    const handleSelectCondition = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setSelectedConditionId(e.target.value);
+        if (e.target.value !== "") {
+            setIncludeNewCondition(false);
+        }
+    };
+
+
+
+    // Zmodyfikowana funkcja onSubmit, aby chować formularz po stworzeniu
+    const handleConditionCreateAndHide = async (formData: ContractConditionFormData) => {
+        await onConditionCreate(formData);
+        setIncludeNewCondition(false); // Ukryj formularz po stworzeniu
+    };
+
+    const handleTemplateCreateAndHide = async () => {
+        await onTemplateCreate();
+        setIncludeNewTemplate(false); 
+    };
+
     return (
         <div className="flex flex-col gap-4 p-4">
             <>
@@ -101,7 +131,8 @@ const OfferForm = ({
                                     <select
                                         className="global-field-style"
                                         value={selectedConditionId}
-                                        onChange={(e) => setSelectedConditionId(e.target.value)}>
+                                        onChange={handleSelectCondition}
+                                        >
                                         <option value="">-- None --</option>
                                         {existingConditions.map((c: ContractConditions) => (
                                             <option key={c.contractConditionId} value={c.contractConditionId}>
@@ -114,20 +145,25 @@ const OfferForm = ({
                                         <input
                                             type="checkbox"
                                             checked={includeNewCondition}
-                                            onChange={(e) => setIncludeNewCondition(e.target.checked)}
-                                            disabled={!!selectedConditionId}
+                                            onChange={(e) => {
+                                                setIncludeNewCondition(e.target.checked);
+                                                if (e.target.checked) {
+                                                    setSelectedConditionId("");
+                                                }
+                                                }}
+                                            disabled={!!selectedConditionId  && !includeNewCondition}
 
-                                        /> Create New Condition
+                                        /> Create New Contract
                                     </label>
 
                                     {includeNewCondition && (
                                         <ContractConditionForm
                                             parameters={parameters}
-                                            onSubmit={onConditionCreate}
+                                            onSubmit={handleConditionCreateAndHide}
                                             submitText="Create Condition"
                                         />
                                     )}
-                                    {selectedConditionId && (
+                                    {selectedConditionId && !includeNewCondition && (
                                         <div className="text-2xl font-bold mb-4">
                                             <h4>Selected Contract Details</h4>
                                             {(() => {
@@ -155,7 +191,7 @@ const OfferForm = ({
                                         className="global-field-style"
                                         required
                                         value={form.offerTemplateId}
-                                        onChange={(e) => setForm(prev => ({ ...prev, offerTemplateId: e.target.value }))}
+                                        onChange={handleSelectTemplate}
                                     >
                                         <option value="">-- Select Template --</option>
                                         {templates.map((tpl) => (
@@ -169,8 +205,13 @@ const OfferForm = ({
                                         <input
                                             type="checkbox"
                                             checked={includeNewTemplate}
-                                            onChange={(e) => setIncludeNewTemplate(e.target.checked)}
-                                            disabled={!!form.offerTemplateId}
+                                            onChange={(e) => {
+                                                setIncludeNewTemplate(e.target.checked);
+                                                if (e.target.checked) {
+                                                    setForm(prev => ({ ...prev, offerTemplateId: "" }));
+                                                }
+                                            }}
+                                            disabled={!!form.offerTemplateId  && !includeNewTemplate}
                                         /> Create New Offer Template
                                     </label>
 
@@ -183,11 +224,11 @@ const OfferForm = ({
                                             onChange={handleTemplateChange}
                                             onSkillToggle={handleSkillToggle}
                                             onSkillRequiredToggle={handleSkillRequiredToggle}
-                                            onSubmit={onTemplateCreate}
+                                            onSubmit={handleTemplateCreateAndHide}
                                             submitText="Create Template"
                                         />
                                     )}
-                                    {form.offerTemplateId && (
+                                    {form.offerTemplateId && !includeNewTemplate && (
                                         <div className="text-2xl font-bold mb-4">
                                             <h4>Selected Offer Template</h4>
                                             {(() => {
