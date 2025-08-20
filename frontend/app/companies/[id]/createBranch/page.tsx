@@ -48,6 +48,8 @@ const CreateBranch = () => {
   const [counter, setCounter] = useState(1);
   const [forms, setForms] = useState([<BranchCreateForm key={0} index={0} getData={handleData} />]);
 
+  const backUrl = process.env.NEXT_PUBLIC_API_URL
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
@@ -57,7 +59,7 @@ const CreateBranch = () => {
       sendArray.push(rest)
     })
 
-    const res = await fetch(`http://localhost:8080/api/CompanyUser/companies/${id}/branches`, {
+    const res = await fetch(`${backUrl}/api/CompanyUser/companies/${id}/branches`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

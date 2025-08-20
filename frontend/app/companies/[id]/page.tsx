@@ -76,6 +76,8 @@ const CompanyDetails = () => {
   const [selectedOrderBy, setSelectedOrderBy] = useState<number>(3);
   const [isAscending, setIsAscending] = useState<boolean>(true);
 
+  const backUrl = process.env.NEXT_PUBLIC_API_URL
+
   useEffect(() => {
     if (!id) return;
 
@@ -86,14 +88,14 @@ const CompanyDetails = () => {
       headers = {
         Authorization: `Bearer ${session.user.token}`,
       };
-      apiUrl = 'http://localhost:8080/api/CompanyUser/'
+      apiUrl = `${backUrl}/api/CompanyUser/`
     }else{
-      apiUrl = 'http://localhost:8080/api/GuestQueries/'
+      apiUrl = `${backUrl}/api/GuestQueries/`
     }
 
     const fetchAll = async () => {
       try {
-        const orderByRes = await fetch('http://localhost:8080/api/QueryParameters/CompanyUser/branches/orderBy', { headers });
+        const orderByRes = await fetch(`${backUrl}/api/QueryParameters/CompanyUser/branches/orderBy`, { headers });
         if (orderByRes.ok) {
           const allOptions: OrderByOption[] = await orderByRes.json();
           

@@ -63,6 +63,8 @@ const Profile = () => {
   const [error, setError] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  const backUrl = process.env.NEXT_PUBLIC_API_URL
+
   const showCustomAlert = (message: string, isError: boolean = false) => {
     let alertMessage = message;
     if (isError) {
@@ -97,13 +99,13 @@ const Profile = () => {
 
       try {
         const [userRes, companiesRes] = await Promise.all([
-          fetch('http://localhost:8080/api/User', {
+          fetch(`${backUrl}/api/User`, {
             headers: {
               Authorization: `Bearer ${session.user.token}`,
             },
             cache: 'no-store',
           }),
-          fetch('http://localhost:8080/api/CompanyUser/companies?ascending=true&orderBy=1', {
+          fetch(`${backUrl}/api/CompanyUser/companies?ascending=true&orderBy=1`, {
             headers: {
               Authorization: `Bearer ${session.user.token}`,
               'Content-Type': 'application/json',
@@ -155,7 +157,7 @@ const Profile = () => {
     setError(null);
 
     try {
-      const res = await fetch('http://localhost:8080/api/User', {
+      const res = await fetch(`${backUrl}/api/User`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${session.user.token}`,

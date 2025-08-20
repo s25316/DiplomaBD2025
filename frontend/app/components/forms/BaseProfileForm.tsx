@@ -19,6 +19,8 @@ const BaseProfileForm = ({ onSuccess, token }: Props) => {
   const [dateError, setDateError] = useState<string | null>(null);
   const [apiError, setApiError] = useState<string | null>(null);
 
+  const backUrl = process.env.NEXT_PUBLIC_API_URL
+
   const showCustomAlert = (message: string, isError: boolean = false) => {
     let alertMessage = message;
     if (isError) {
@@ -74,7 +76,7 @@ const BaseProfileForm = ({ onSuccess, token }: Props) => {
   const submitConfirmed = async () => {
     setApiError(null);
     try {
-      const res = await fetch('http://localhost:8080/api/User/baseData', {
+      const res = await fetch(`${backUrl}/api/User/baseData`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

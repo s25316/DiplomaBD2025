@@ -29,7 +29,8 @@ const PublishOffer = () => {
   const [selectedConditionId, setSelectedConditionId] = useState('');
   const [includeNewCondition, setIncludeNewCondition] = useState(false);
   const [includeNewTemplate, setIncludeNewTemplate] = useState(false);
-  
+
+  const backUrl = process.env.NEXT_PUBLIC_API_URL
 
   const [newTemplateForm, setNewTemplateForm] = useState({
     name: '', description: '', skills: [] as SkillWithRequired[],
@@ -40,10 +41,10 @@ const PublishOffer = () => {
     const headers = { Authorization: `Bearer ${session.user.token}` };
 
     Promise.all([
-      fetch(`http://localhost:8080/api/CompanyUser/companies/${id}/offerTemplates?Page=1&ItemsPerPage=100`, { headers }),
-      fetch(`http://localhost:8080/api/Dictionaries/contractParameters`, { headers }),
-      fetch(`http://localhost:8080/api/CompanyUser/companies/${id}/contractConditions`, { headers }),
-      fetch(`http://localhost:8080/api/Dictionaries/skills`, { headers }),
+      fetch(`${backUrl}/api/CompanyUser/companies/${id}/offerTemplates?Page=1&ItemsPerPage=100`, { headers }),
+      fetch(`${backUrl}/api/Dictionaries/contractParameters`, { headers }),
+      fetch(`${backUrl}/api/CompanyUser/companies/${id}/contractConditions`, { headers }),
+      fetch(`${backUrl}/api/Dictionaries/skills`, { headers }),
     ]).then(async ([tplRes, paramRes, condRes, skillsRes]) => {
       const [tplData, paramData, condData, skillData] = await Promise.all([
         tplRes.json(), paramRes.json(), condRes.json(), skillsRes.json(),
@@ -56,7 +57,7 @@ const PublishOffer = () => {
   }, [session, id]);
 
   const handleConditionCreate = async (formData: ContractConditionFormData) => {
-    const res = await fetch(`http://localhost:8080/api/CompanyUser/companies/${id}/contractConditions`, {
+    const res = await fetch(`${backUrl}/api/CompanyUser/companies/${id}/contractConditions`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -85,7 +86,7 @@ const PublishOffer = () => {
   };
 
   const handleTemplateCreate = async () => {
-  const res = await fetch(`http://localhost:8080/api/CompanyUser/companies/${id}/offerTemplates`, {
+  const res = await fetch(`${backUrl}/api/CompanyUser/companies/${id}/offerTemplates`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -124,7 +125,7 @@ const PublishOffer = () => {
       conditionIds: selectedConditionId ? [selectedConditionId] : [],
     }];
 
-    const res = await fetch(`http://localhost:8080/api/CompanyUser/companies/offers`, {
+    const res = await fetch(`${backUrl}/api/CompanyUser/companies/offers`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -141,7 +142,7 @@ const PublishOffer = () => {
     }
   };
   const refreshTemplates = async () => {
-  const res = await fetch(`http://localhost:8080/api/CompanyUser/companies/${id}/offerTemplates?Page=1&ItemsPerPage=100`, {
+  const res = await fetch(`${backUrl}/api/CompanyUser/companies/${id}/offerTemplates?Page=1&ItemsPerPage=100`, {
     headers: { Authorization: `Bearer ${session?.user.token}` },
   });
   const data = await res.json();
@@ -151,7 +152,7 @@ const PublishOffer = () => {
 };
 
 const refreshConditions = async () => {
-  const res = await fetch(`http://localhost:8080/api/CompanyUser/companies/${id}/contractConditions?Page=1&ItemsPerPage=100`, {
+  const res = await fetch(`${backUrl}/api/CompanyUser/companies/${id}/contractConditions?Page=1&ItemsPerPage=100`, {
     headers: { Authorization: `Bearer ${session?.user.token}` },
   });
   const data = await res.json();

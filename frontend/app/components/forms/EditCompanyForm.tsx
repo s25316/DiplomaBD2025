@@ -9,13 +9,15 @@ const EditCompanyForm = ({ company, companyId, onUpdated }: { company: Company, 
   const [websiteUrl, setWebsiteUrl] = useState(company?.websiteUrl || '');
   const [loading, setLoading] = useState(false);
 
+  const backUrl = process.env.NEXT_PUBLIC_API_URL
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!session?.user?.token) return;
 
     setLoading(true);
 
-    const res = await fetch(`http://localhost:8080/api/CompanyUser/companies/${companyId}`, {
+    const res = await fetch(`${backUrl}/api/CompanyUser/companies/${companyId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',

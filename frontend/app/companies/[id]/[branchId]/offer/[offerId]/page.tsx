@@ -89,6 +89,8 @@ const OfferDetails = () => {
   const [isOwnOffer, setIsOwnOffer] = useState(false);
   const [isIndividual, setIsIndividual] = useState(false);
 
+  const backUrl = process.env.NEXT_PUBLIC_API_URL
+
   useEffect(() => {
     if (!offerId) return;
 
@@ -100,7 +102,7 @@ const OfferDetails = () => {
         // 1. Zawsze próbuj pobrać dane użytkownika, jeśli istnieje sesja, aby ustalić isIndividual
         if (session?.user?.token) {
           try {
-            const userRes = await fetch('http://localhost:8080/api/User', {
+            const userRes = await fetch(`${backUrl}/api/User`, {
               method: "GET",
               headers: { 'Authorization': `Bearer ${session.user.token}`, },
               cache: 'no-store'
@@ -115,7 +117,7 @@ const OfferDetails = () => {
 
           // 2. Spróbuj pobrać ofertę jako CompanyUser, aby ustalić, czy jesteśmy jej właścicielem
           try {
-            const companyUserRes = await fetch(`http://localhost:8080/api/CompanyUser/offers/${offerId}`, {
+            const companyUserRes = await fetch(`${backUrl}/api/CompanyUser/offers/${offerId}`, {
               headers: { 'Authorization': `Bearer ${session.user.token}`, },
               cache: 'no-store', // Ważne, aby pobierać najnowsze dane
             });
@@ -137,7 +139,7 @@ const OfferDetails = () => {
         // 3. Jeśli nie znaleziono danych przez CompanyUser (lub brak tokena), spróbuj jako GuestQueries
         if (!fetchedData) {
           try {
-            const guestRes = await fetch(`http://localhost:8080/api/GuestQueries/offers/${offerId}`, { cache: 'no-store' });
+            const guestRes = await fetch(`${backUrl}/api/GuestQueries/offers/${offerId}`, { cache: 'no-store' });
             if (guestRes.ok) {
               const guestJson = await guestRes.json();
               if (guestJson.items?.[0]) {
@@ -193,7 +195,7 @@ const OfferDetails = () => {
     setError(null);
 
     try {
-      const res = await fetch(`http://localhost:8080/api/CompanyUser/companies/offers/${offerId}`, {
+      const res = await fetch(`${backUrl}/api/CompanyUser/companies/offers/${offerId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${session.user.token}`,

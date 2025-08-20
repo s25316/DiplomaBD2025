@@ -55,6 +55,8 @@ const EditBranch = () => {
   // useRef to store the data from BranchForm for submission
   const sendData = useRef<BranchFormInitialData | null>(null); // Type this ref correctly
 
+  const backUrl = process.env.NEXT_PUBLIC_API_URL
+
   // Custom alert function
   const showCustomAlert = (message: string) => {
     console.log("ALERT:", message);
@@ -67,7 +69,7 @@ const EditBranch = () => {
     const fetchBranch = async () => {
       try {
         console.log(`Fetching branch details for branchId: ${branchId}`); // Debug log
-        const res = await fetch(`http://localhost:8080/api/CompanyUser/branches/${branchId}`, {
+        const res = await fetch(`${backUrl}/api/CompanyUser/branches/${branchId}`, {
           headers: {
             Authorization: `Bearer ${session.user.token}`,
           },
@@ -133,7 +135,7 @@ const EditBranch = () => {
 
     try {
       console.log("handleSubmit: Submitting payload:", payload); // Debug log
-      const res = await fetch(`http://localhost:8080/api/CompanyUser/companies/branches/${branchId}`, {
+      const res = await fetch(`${backUrl}/api/CompanyUser/companies/branches/${branchId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

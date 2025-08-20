@@ -14,6 +14,8 @@ const ResetPasswordLink = () => {
 
     const router = useRouter()
 
+    const backUrl = process.env.NEXT_PUBLIC_API_URL
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError("");
@@ -22,7 +24,7 @@ const ResetPasswordLink = () => {
             return;
         }
 
-        const res = await fetch(`http://localhost:8080/api/User/password/${userId}/${urlSegment}`, {
+        const res = await fetch(`${backUrl}/api/User/password/${userId}/${urlSegment}`, {
             method: "PUT",
             headers: {
                 'Content-Type': 'application/json',

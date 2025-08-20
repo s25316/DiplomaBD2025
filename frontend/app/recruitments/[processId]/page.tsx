@@ -99,6 +99,8 @@ const RecruitmentDetailsPage = () => {
   const [newMessage, setNewMessage] = useState<string>('');
   const [newProcessType, setNewProcessType] = useState<number | ''>('');
 
+  const backUrl = process.env.NEXT_PUBLIC_API_URL
+
   // Account type - inicjalizujemy jako null, aby wskazać, że typ użytkownika nie został jeszcze załadowany
   const [isIndividual, setIsIndividual] = useState<boolean | null>(null);
 
@@ -136,7 +138,7 @@ const RecruitmentDetailsPage = () => {
 
     try {
       // Krok 1: Pobierz typ użytkownika
-      const userRes = await fetch('http://localhost:8080/api/User', {
+      const userRes = await fetch(`${backUrl}/api/User`, {
         headers: { Authorization: `Bearer ${session.user.token}` }
       });
 
@@ -151,7 +153,7 @@ const RecruitmentDetailsPage = () => {
       console.log(`isIndividual: ${isUserIndividual}`); // Zwraca wartość, którą widać w konsoli
 
       // Krok 2: Użyj typu użytkownika, aby pobrać szczegóły rekrutacji
-      let recruitmentApiUrl = 'http://localhost:8080/api/';
+      let recruitmentApiUrl = `${backUrl}/api/`;
       if (!isUserIndividual) {
         recruitmentApiUrl += `CompanyUser/recruitments/${processId}`;
       } else {
@@ -200,7 +202,7 @@ const RecruitmentDetailsPage = () => {
       return;
     }
 
-    let apiUrl = 'http://localhost:8080/api/'
+    let apiUrl = `${backUrl}/api/`
     if (!isIndividual) {
       apiUrl += `CompanyUser/recruitments/${processId}/file`
     }
@@ -282,7 +284,7 @@ const RecruitmentDetailsPage = () => {
       return;
     }
 
-    let apiUrl = 'http://localhost:8080/api/'
+    let apiUrl = `${backUrl}/api/`
     if (!isIndividual) {
       apiUrl += `CompanyUser/recruitments/${processId}/messages`
     }
@@ -361,7 +363,7 @@ const RecruitmentDetailsPage = () => {
 
     try {
       const res = await fetch(
-        `http://localhost:8080/api/CompanyUser/companies/recruitments/${processId}`,
+        `${backUrl}/api/CompanyUser/companies/recruitments/${processId}`,
         {
           method: 'POST',
           headers: {

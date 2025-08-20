@@ -38,7 +38,7 @@ const TemplateDetails = async ({ params }: {
 
   if (session?.user.token) {
     const res = await fetch(
-      `http://Diploma_BackEnd_Api:8080/api/CompanyUser/offerTemplates/${offerTemplateId}`,
+      `${process.env.API_URL}/api/CompanyUser/offerTemplates/${offerTemplateId}`,
       {
         headers: {
           Authorization: `Bearer ${session.user.token}`,

@@ -9,10 +9,12 @@ const ResetPassword = () => {
 
     const router = useRouter();
 
+    const backUrl = process.env.NEXT_PUBLIC_API_URL
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
-        const res = await fetch('http://localhost:8080/api/User/password/initiate', {
+        const res = await fetch(`${backUrl}/api/User/password/initiate`, {
             method: "PUT",
             headers: {
                 'Content-Type': 'application/json'

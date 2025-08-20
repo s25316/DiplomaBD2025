@@ -74,6 +74,8 @@ const EditContractConditionPage = () => {
   // State to store the initial data for the form, can be null initially
   const [initialData, setInitialData] = useState<ContractConditionFormData | null>(null);
 
+  const backUrl = process.env.NEXT_PUBLIC_API_URL
+
   // Custom alert function (replace with a proper UI modal in production)
   const showCustomAlert = (message: string) => {
     console.log("ALERT:", message);
@@ -88,8 +90,8 @@ const EditContractConditionPage = () => {
     const fetchAll = async () => {
       try {
         const [paramRes, condRes] = await Promise.all([
-          fetch('http://localhost:8080/api/Dictionaries/contractParameters', { headers }),
-          fetch(`http://localhost:8080/api/CompanyUser/contractConditions/${contractConditionId}`, { headers }),
+          fetch(`${backUrl}/api/Dictionaries/contractParameters`, { headers }),
+          fetch(`${backUrl}/api/CompanyUser/contractConditions/${contractConditionId}`, { headers }),
         ]);
 
         if (!paramRes.ok) {
@@ -145,7 +147,7 @@ const EditContractConditionPage = () => {
 
     try {
       console.log("Submitting form data (Edit):", form); // Debug log
-      const res = await fetch(`http://localhost:8080/api/CompanyUser/companies/contractConditions/${contractConditionId}`, {
+      const res = await fetch(`${backUrl}/api/CompanyUser/companies/contractConditions/${contractConditionId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

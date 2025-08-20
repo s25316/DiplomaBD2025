@@ -37,6 +37,8 @@ const CreateContractConditionPage = () => {
   // State to store the array of contract parameters
   const [parameters, setParameters] = useState<ContractParameter[]>([]);
 
+  const backUrl = process.env.NEXT_PUBLIC_API_URL
+
   // Custom alert function (replace with a proper UI modal in production)
   const showCustomAlert = (message: string) => {
     console.log("ALERT:", message);
@@ -48,7 +50,7 @@ const CreateContractConditionPage = () => {
       if (!session?.user?.token) return;
 
       try {
-        const res = await fetch('http://localhost:8080/api/Dictionaries/contractParameters', {
+        const res = await fetch(`${backUrl}/api/Dictionaries/contractParameters`, {
           headers: { Authorization: `Bearer ${session.user.token}` },
         });
 
@@ -77,7 +79,7 @@ const CreateContractConditionPage = () => {
 
     try {
       console.log("Submitting form data:", form); // Debug log
-      const res = await fetch(`http://localhost:8080/api/CompanyUser/companies/${id}/contractConditions`, {
+      const res = await fetch(`${backUrl}/api/CompanyUser/companies/${id}/contractConditions`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

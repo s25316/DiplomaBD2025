@@ -30,6 +30,8 @@ interface ContractCondition {
   const router = useRouter();
   const { id } = useParams();
 
+  const backUrl = process.env.NEXT_PUBLIC_API_URL
+
   if (!contractConditions.length) return <h2>No contract conditions available</h2>;
 
   return (
@@ -54,7 +56,7 @@ interface ContractCondition {
                 const confirmDelete = confirm("Are you sure you want to delete this contract condition?");
                 if (!confirmDelete || !session?.user.token) return;
 
-                const res = await fetch(`http://localhost:8080/api/CompanyUser/companies/contractConditions/${cond.contractConditionId}`, {
+                const res = await fetch(`${backUrl}/api/CompanyUser/companies/contractConditions/${cond.contractConditionId}`, {
                   method: "DELETE",
                   headers: {
                     Authorization: `Bearer ${session.user.token}`,

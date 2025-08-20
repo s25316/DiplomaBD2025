@@ -68,6 +68,7 @@ export default function EditOfferTemplate() {
 
   const [form, setForm] = useState<EditTemplateFormState | null>(null);
 
+  const backUrl = process.env.NEXT_PUBLIC_API_URL
 
   const showCustomAlert = (message: string) => {
     console.log("ALERT:", message);
@@ -82,8 +83,8 @@ export default function EditOfferTemplate() {
     const fetchAll = async () => {
       try {
         const [skillsRes, templateRes] = await Promise.all([
-          fetch(`http://localhost:8080/api/Dictionaries/skills`, { headers }),
-          fetch(`http://localhost:8080/api/CompanyUser/offerTemplates/${offerTemplateId}`, { headers }),
+          fetch(`${backUrl}/api/Dictionaries/skills`, { headers }),
+          fetch(`${backUrl}/api/CompanyUser/offerTemplates/${offerTemplateId}`, { headers }),
         ]);
 
         if (!skillsRes.ok) {
@@ -185,7 +186,7 @@ export default function EditOfferTemplate() {
       };
       console.log("Submitting form data (Edit):", payload); // Debug log
 
-      const res = await fetch(`http://localhost:8080/api/CompanyUser/companies/offerTemplates/${offerTemplateId}`, {
+      const res = await fetch(`${backUrl}/api/CompanyUser/companies/offerTemplates/${offerTemplateId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

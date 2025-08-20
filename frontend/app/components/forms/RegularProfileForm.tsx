@@ -58,6 +58,8 @@ const RegularProfileForm = ({ initialData, token }: RegularProfileFormProps) => 
   const [urlTypes, setUrlTypes] = useState<UrlTypeOption[]>([]);
   const router = useRouter();
 
+  const backUrl = process.env.NEXT_PUBLIC_API_URL
+
   const [form, setForm] = useState<ProfileUpdatePayload>({
     description: initialData.description || '',
     contactEmail: initialData.contactEmail || '',
@@ -109,8 +111,8 @@ const RegularProfileForm = ({ initialData, token }: RegularProfileFormProps) => 
   useEffect(() => {
     const headers = { Authorization: `Bearer ${token}` };
     Promise.all([
-      fetch('http://localhost:8080/api/Dictionaries/skills', { headers, cache: 'no-store' }), 
-      fetch('http://localhost:8080/api/Dictionaries/urlTypes', { headers, cache: 'no-store' }),
+      fetch(`${backUrl}/api/Dictionaries/skills`, { headers, cache: 'no-store' }), 
+      fetch(`${backUrl}/api/Dictionaries/urlTypes`, { headers, cache: 'no-store' }),
     ]).then(async ([skillsRes, urlTypesRes]) => {
       const skillsData: Skill[] = await skillsRes.json();
       setUrlTypes(await urlTypesRes.json());
@@ -187,7 +189,7 @@ const RegularProfileForm = ({ initialData, token }: RegularProfileFormProps) => 
     const fullPayload: ProfileUpdatePayload = { ...form, urls: deduplicatedUrls };
 
     try {
-      const res = await fetch('http://localhost:8080/api/User/regularData', {
+      const res = await fetch(`${backUrl}/api/User/regularData`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

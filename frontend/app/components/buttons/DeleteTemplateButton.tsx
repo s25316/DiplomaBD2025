@@ -12,12 +12,14 @@ const DeleteTemplateButton = ({
   const { data: session } = useSession();
   const router = useRouter();
 
+  const backUrl = process.env.NEXT_PUBLIC_API_URL
+
   const handleDelete = async () => {
     const confirmed = confirm('Are you sure you want to delete this template?');
     if (!confirmed || !session?.user?.token) return;
 
     const res = await fetch(
-      `http://localhost:8080/api/CompanyUser/companies/offerTemplates/${offerTemplateId}`,
+      `${backUrl}/api/CompanyUser/companies/offerTemplates/${offerTemplateId}`,
       {
         method: 'DELETE',
         headers: {

@@ -72,6 +72,8 @@ const EditProfilePage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const backUrl = process.env.NEXT_PUBLIC_API_URL
+
   useEffect(() => {
     const fetchUser = async () => {
       if (!session?.user?.token) {
@@ -79,7 +81,7 @@ const EditProfilePage = () => {
           return;
       }
       try {
-      const res = await fetch('http://localhost:8080/api/User', {
+      const res = await fetch(`${backUrl}/api/User`, {
         headers: {
           Authorization: `Bearer ${session.user.token}`,
         },

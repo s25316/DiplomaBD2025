@@ -6,9 +6,12 @@ import { OuterContainer } from '../components/layout/PageContainers'
 const Register = () => {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+
+  const backUrl = process.env.NEXT_PUBLIC_API_URL
+
   const fetchPost = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const res = await fetch("http://localhost:8080/api/User/registration", {
+    const res = await fetch(`${backUrl}/api/User/registration`, {
       method: "POST",
       headers: {
         "Access-Control-Allow-Origin": "*",

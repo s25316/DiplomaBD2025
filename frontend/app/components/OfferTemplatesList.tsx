@@ -23,6 +23,8 @@ const OfferTemplatesList = ({
   const router = useRouter();
   const { id } = useParams();
 
+  const backUrl = process.env.NEXT_PUBLIC_API_URL
+
   if (!templates.length) return <h2>No templates available</h2>;
 
   return (
@@ -47,7 +49,7 @@ const OfferTemplatesList = ({
                 const confirmDelete = confirm("Are you sure you want to delete this template?");
                 if (!confirmDelete || !session?.user.token) return;
                 
-                const res = await fetch(`http://localhost:8080/api/CompanyUser/companies/offerTemplates/${t.offerTemplateId}`, {
+                const res = await fetch(`${backUrl}/api/CompanyUser/companies/offerTemplates/${t.offerTemplateId}`, {
                   method: "DELETE",
                   headers: {
                     Authorization: `Bearer ${session.user.token}`,

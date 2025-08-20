@@ -10,10 +10,11 @@ const TwoFactorAuth = () => {
     const pathname = usePathname()
     const pathnames = pathname.split("/")
     const router = useRouter()
+    const backUrl = process.env.NEXT_PUBLIC_API_URL
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-        const res = await fetch(`http://localhost:8080/api/User/handPart/${pathnames.at(2)}/${pathnames.at(3)}`, {
+        const res = await fetch(`${backUrl}/api/User/handPart/${pathnames.at(2)}/${pathnames.at(3)}`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

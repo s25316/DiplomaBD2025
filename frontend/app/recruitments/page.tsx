@@ -88,6 +88,8 @@ const RecruitmentsPage = () => {
   const [totalCount, setTotalCount] = useState(0);
   const [isIndividual, setIsIndividual] = useState<boolean | null>(null);
 
+  const backUrl = process.env.NEXT_PUBLIC_API_URL
+
   // Main data fetching logic, now combined for a cleaner flow
   useEffect(() => {
     const fetchData = async () => {
@@ -101,7 +103,7 @@ const RecruitmentsPage = () => {
 
       try {
         // Fetch user data to determine account type (Individual or Company)
-        const userRes = await fetch('http://localhost:8080/api/User', {
+        const userRes = await fetch(`${backUrl}/api/User`, {
           headers: { Authorization: `Bearer ${session.user.token}` }
         });
 
@@ -114,8 +116,8 @@ const RecruitmentsPage = () => {
 
         // Based on the user type, fetch the correct recruitments data
         const apiUrl = isIndividualUser
-          ? 'http://localhost:8080/api/User/recruitments'
-          : 'http://localhost:8080/api/CompanyUser/recruitments';
+          ? `${backUrl}/api/User/recruitments`
+          : `${backUrl}/api/CompanyUser/recruitments`;
 
         const res = await fetch(apiUrl, {
           headers: {

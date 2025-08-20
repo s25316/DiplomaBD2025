@@ -21,6 +21,8 @@ const DeleteBranchButton = ({
   const { data: session } = useSession();
   const router = useRouter();
 
+  const backUrl = process.env.NEXT_PUBLIC_API_URL
+
   // Custom alert function (reused for consistency)
   const showCustomAlert = (message: string, isError: boolean = false) => {
     let alertMessage = message;
@@ -50,7 +52,7 @@ const DeleteBranchButton = ({
 
     try {
       const res = await fetch(
-        `http://localhost:8080/api/CompanyUser/companies/branches/${branchId}`,
+        `${backUrl}/api/CompanyUser/companies/branches/${branchId}`,
         {
           method: 'DELETE',
           headers: {

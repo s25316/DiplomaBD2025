@@ -36,6 +36,8 @@ export default function CreateOfferTemplate() {
   const router = useRouter();
   const { data: session } = useSession();
 
+  const backUrl = process.env.NEXT_PUBLIC_API_URL
+
   // type the 'skills' state as an array of Skill
   const [skills, setSkills] = useState<SkillWithRequired[]>([]);
   // type the 'form' state using NewTemplateFormState
@@ -56,7 +58,7 @@ export default function CreateOfferTemplate() {
       if (!session?.user?.token) return;
 
       try {
-        const res = await fetch("http://localhost:8080/api/Dictionaries/skills", {
+        const res = await fetch(`${backUrl}/api/Dictionaries/skills`, {
           headers: { Authorization: `Bearer ${session.user.token}` },
         });
 
@@ -125,7 +127,7 @@ export default function CreateOfferTemplate() {
 
     try {
       console.log("Submitting form data:", form); // Debug log
-      const res = await fetch(`http://localhost:8080/api/CompanyUser/companies/${id}/offerTemplates`, {
+      const res = await fetch(`${backUrl}/api/CompanyUser/companies/${id}/offerTemplates`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

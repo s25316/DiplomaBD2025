@@ -75,6 +75,8 @@ const BranchDetails = () => {
 
   const [isOwner, setIsOwner] = useState(Boolean(session))
 
+  const backUrl = process.env.NEXT_PUBLIC_API_URL
+
   // Memoized function to fetch all data for this branch
   const fetchBranchAndOffers = useCallback(async () => {
     if (!branchId) return;
@@ -87,10 +89,10 @@ const BranchDetails = () => {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${session.user.token}`,
       };
-      apiUrl = 'http://localhost:8080/api/CompanyUser/'
+      apiUrl = `${backUrl}/api/CompanyUser/`
     }
     else{
-      apiUrl = 'http://localhost:8080/api/GuestQueries/'
+      apiUrl = `${backUrl}/api/GuestQueries/`
     }
 
     try {

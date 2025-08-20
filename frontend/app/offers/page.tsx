@@ -109,6 +109,8 @@ const Offers = () => {
 
   const { data: session } = useSession();
 
+  const backUrl = process.env.NEXT_PUBLIC_API_URL
+
   useEffect(() => {
     const filterQuery =
       `?search=${filters.searchText}` +
@@ -137,7 +139,7 @@ const Offers = () => {
       `&page=${filters.page}` +
       `&itemsPerPage=${filters.itemsPerPage}`;
 
-    fetch('http://localhost:8080/api/GuestQueries/offers' + filterQuery, {
+    fetch(`${backUrl}/api/GuestQueries/offers` + filterQuery, {
       headers: {
         contractParameterIds: filters.contractParameterIds.map(x => `${x}`).join(","),
         skillsIds: filters.skillsIds.map(x => `${x}`).join(",")
@@ -148,16 +150,16 @@ const Offers = () => {
   }, [session, filters]);
 
   useEffect(() => {
-    fetch('http://localhost:8080/api/QueryParameters/offers/orderBy')
+    fetch(`${backUrl}/api/QueryParameters/offers/orderBy`)
       .then(res => res.json())
       .then(setOrderByDictinary)
-    fetch('http://localhost:8080/api/QueryParameters/offer/statuses')
+    fetch(`${backUrl}/api/QueryParameters/offer/statuses`)
       .then(res => res.json())
       .then(setStatusDictinary)
-    fetch('http://localhost:8080/api/Dictionaries/contractParameters')
+    fetch(`${backUrl}/api/Dictionaries/contractParameters`)
       .then(res => res.json())
       .then(setContractParametersDictinary)
-    fetch('http://localhost:8080/api/Dictionaries/skills')
+    fetch(`${backUrl}/api/Dictionaries/skills`)
       .then(res => res.json())
       .then(setSkillDictinary)
   }, [])

@@ -18,10 +18,12 @@ const Recruite = () => {
     const [file, setFile] = useState<File | null>(null)
     const [description, setDescription] = useState<string>("")
 
+    const backUrl = process.env.NEXT_PUBLIC_API_URL
+
     useEffect(() => {
         const check = async () => {
             if (session?.user?.token) {
-                const res = await fetch('http://localhost:8080/api/User', {
+                const res = await fetch(`${backUrl}/api/User`, {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${session.user.token}`,
@@ -64,7 +66,7 @@ const Recruite = () => {
         formData.append("File", file)
         formData.append("Description", description)
 
-        fetch(`http://localhost:8080/api/User/recruitments/${offerId}`, {
+        fetch(`${backUrl}/api/User/recruitments/${offerId}`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${session.user.token}`,

@@ -16,6 +16,8 @@ const PasswordChange = () => {
 
     const { data: session, status } = useSession()
 
+    const backUrl = process.env.NEXT_PUBLIC_API_URL
+
     const router = useRouter();
 
     if (status === "loading") {
@@ -35,7 +37,7 @@ const PasswordChange = () => {
             return
         }
 
-        const res = await fetch('http://localhost:8080/api/User/password', {
+        const res = await fetch(`${backUrl}/api/User/password`, {
             method: "PUT",
             headers: {
                 Authorization: `Bearer ${session?.user.token}`,

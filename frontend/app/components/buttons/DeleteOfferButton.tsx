@@ -18,6 +18,7 @@ const DeleteOfferButton = ({
   confirmationMessage = 'Are you sure you want to delete this offer?',
 }: DeleteOfferButtonProps) => {
   const { data: session } = useSession();
+  const backUrl = process.env.NEXT_PUBLIC_API_URL
 
   const showCustomAlert = (message: string, isError: boolean = false) => {
     let alertMessage = message;
@@ -47,7 +48,7 @@ const DeleteOfferButton = ({
 
     try {
       const res = await fetch(
-        `http://localhost:8080/api/CompanyUser/companies/offers/${offerId}`,
+        `${backUrl}/api/CompanyUser/companies/offers/${offerId}`,
         {
           method: 'DELETE',
           headers: {

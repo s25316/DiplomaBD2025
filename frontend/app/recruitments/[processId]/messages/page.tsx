@@ -35,6 +35,8 @@ const RecruitmentMessagesPage = () => {
   
   const [isIndividual, setIsIndividual] = useState<boolean | null>(null);
 
+  const backUrl = process.env.NEXT_PUBLIC_API_URL
+
   const showCustomAlert = (message: string, isError: boolean = false) => {
     let alertMessage = message;
     if (isError) {
@@ -70,7 +72,7 @@ const RecruitmentMessagesPage = () => {
 
     try {
       // Krok 1: Pobierz typ użytkownika
-      const userRes = await fetch('http://localhost:8080/api/User', {
+      const userRes = await fetch(`${backUrl}/api/User`, {
         headers: { Authorization: `Bearer ${session.user.token}` },
       });
 
@@ -83,7 +85,7 @@ const RecruitmentMessagesPage = () => {
       setIsIndividual(isUserIndividual);
 
       // Krok 2: Użyj pobranego typu użytkownika do pobrania wiadomości
-      let apiUrl = 'http://localhost:8080/api/';
+      let apiUrl = `${backUrl}/api/`;
       if (!isUserIndividual) {
         apiUrl += `CompanyUser/recruitments/${processId}/messages?Page=${page}&ItemsPerPage=${itemsPerPage}&ascending=true`;
       } else {
@@ -141,7 +143,7 @@ const RecruitmentMessagesPage = () => {
       return;
     }
 
-    let apiUrl = 'http://localhost:8080/api/'
+    let apiUrl = `${backUrl}/api/`
     if (!isIndividual) {
       apiUrl += `CompanyUser/companies/recruitments/${processId}/messages`
     }

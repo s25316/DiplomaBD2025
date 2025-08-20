@@ -19,6 +19,7 @@ const CreateCompany = () => {
   const [errors, setErrors] = useState<string[]>([]);
   const [apiError, setApiError] = useState<string | null>(null);
 
+  const backUrl = process.env.NEXT_PUBLIC_API_URL
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -68,7 +69,7 @@ const CreateCompany = () => {
       return;
     }
     try {
-      const res = await fetch("http://localhost:8080/api/CompanyUser/Companies", {
+      const res = await fetch(`${backUrl}/api/CompanyUser/Companies`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
