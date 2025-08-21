@@ -99,6 +99,9 @@ export default function EditOfferTemplate() {
             console.warn("WARNING: Duplicate skill IDs found in API response for Edit. Deduplicated list used.");
         }
         // --- END DEDUPLICATION ---
+
+        uniqueSkills.sort((a, b) => a.name.localeCompare(b.name));
+        
         setSkills(uniqueSkills);
         console.log("Fetched and set unique skills (Edit):", uniqueSkills); // Debug log
 

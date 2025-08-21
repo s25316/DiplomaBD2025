@@ -54,7 +54,6 @@ interface RegularProfileFormProps {
 }
 
 const RegularProfileForm = ({ initialData, token }: RegularProfileFormProps) => {
-  // const [skills, setSkills] = useState<Skill[]>([]);
   const [urlTypes, setUrlTypes] = useState<UrlTypeOption[]>([]);
   const router = useRouter();
 
@@ -83,6 +82,7 @@ const RegularProfileForm = ({ initialData, token }: RegularProfileFormProps) => 
   });
 
   const [groupedSkills, setGroupedSkills] = useState<Record<string, Skill[]>>({});
+  const [dateError, setDateError] = useState<string | null>(null);
 
   const setAddress = (newAddressPart: Partial<ProfileUpdatePayload['address']>) => {
     setForm(prevForm => {
@@ -116,6 +116,8 @@ const RegularProfileForm = ({ initialData, token }: RegularProfileFormProps) => 
     ]).then(async ([skillsRes, urlTypesRes]) => {
       const skillsData: Skill[] = await skillsRes.json();
       setUrlTypes(await urlTypesRes.json());
+
+      skillsData.sort((a, b) => a.name.localeCompare(b.name));
 
       const grouped = skillsData.reduce((acc, skill) => {
         const typeName = skill.skillType?.name || 'Other';
@@ -155,6 +157,31 @@ const RegularProfileForm = ({ initialData, token }: RegularProfileFormProps) => 
       });
     }
   }, [token]);
+
+  const handleBirthDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setForm(prev => ({ ...prev, birthDate: value }));
+
+    const selectedDate = new Date(value);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (!value) {
+      setDateError(null);
+      return;
+    }
+
+    if (selectedDate > today) {
+      setDateError('Birth date cannot be in the future.');
+    } else {
+      const ageDate = new Date(selectedDate.getFullYear() + 18, selectedDate.getMonth(), selectedDate.getDate());
+      if (ageDate > today) {
+        setDateError('You must be at least 18 years old.');
+      } else {
+        setDateError(null);
+      }
+    }
+  };
 
   const updateUrl = (index: number, field: keyof FormUrl, value: string | number) => {
     const updatedUrls = [...form.urls];
@@ -237,14 +264,15 @@ const RegularProfileForm = ({ initialData, token }: RegularProfileFormProps) => 
         onChange={(e) => setForm({ ...form, contactPhoneNumber: e.target.value })} 
         type="tel"
       />
-
+      
       <label className="font-semibold text-gray-700 dark:text-gray-300"><b>Birth Date</b></label>
-      <input 
-        className='global-field-style' 
-        type="date" 
-        value={form.birthDate} 
-        onChange={(e) => setForm({ ...form, birthDate: e.target.value })} 
+      <input
+        className='global-field-style'
+        type="date"
+        value={form.birthDate}
+        onChange={handleBirthDateChange}
       />
+      {dateError && <p className="text-red-500 text-sm mt-1">{dateError}</p>}
 
       {(form.address?.countryName != "") && (
         <div className="text-sm text-gray-700 dark:text-gray-300 italic mb-2">

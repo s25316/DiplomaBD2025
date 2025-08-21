@@ -1,5 +1,5 @@
 'use client';
-import React from 'react';
+import React, { useState } from 'react';
 import ContractConditionForm, { ContractConditionFormData, ContractParameter } from '@/app/components/forms/ContractConditionForm';
 import OfferTemplateForm from '@/app/components/forms/OfferTemplateForm';
 import { InnerSection } from '../layout/PageContainers';
@@ -65,6 +65,53 @@ const OfferForm = ({
     const isScheduled = statusId === 3;
     const isActive = statusId === 2;
     const isExpired = statusId === 1;
+
+    // Nowe stany dla błędów walidacji dat
+    const [publicationStartError, setPublicationStartError] = useState<string | null>(null);
+    const [publicationEndError, setPublicationEndError] = useState<string | null>(null);
+
+    // Funkcja do walidacji dat
+    const validateDates = (start: string, end: string) => {
+        let isValid = true;
+        const now = new Date();
+        // Dodajemy 1 minutę do obecnego czasu, aby zapewnić, że start jest w przyszłości
+        const minStartTime = new Date(now.getTime() + 60 * 1000); // 60 sekund * 1000 ms = 1 minuta
+
+        const startDate = new Date(start);
+        const endDate = new Date(end);
+
+        // Walidacja daty rozpoczęcia publikacji
+        if (start && startDate <= minStartTime) {
+        setPublicationStartError('Publication start must be at least 1 minute in the future.');
+        isValid = false;
+        } else {
+        setPublicationStartError(null);
+        }
+
+        // Walidacja daty zakończenia publikacji
+        if (end && start && endDate <= startDate) {
+        setPublicationEndError('Publication end must be after publication start.');
+        isValid = false;
+        } else {
+        setPublicationEndError(null);
+        }
+        return isValid;
+    };
+
+    const handlePublicationStartChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        setForm((prev) => ({ ...prev, publicationStart: value }));
+        // Walidujemy od razu po zmianie
+        validateDates(value, form.publicationEnd);
+    };
+
+    const handlePublicationEndChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        setForm((prev) => ({ ...prev, publicationEnd: value }));
+        // Walidujemy od razu po zmianie
+        validateDates(form.publicationStart, value);
+    };
+
     const handleTemplateChange = (field: 'name' | 'description', value: string) => {
         setNewTemplateForm(prev => ({ ...prev, [field]: value }));
     };
@@ -265,10 +312,11 @@ const OfferForm = ({
                                     <input
                                         type="datetime-local"
                                         value={form.publicationStart}
-                                        onChange={(e) => setForm((prev) => ({ ...prev, publicationStart: e.target.value }))}
+                                        onChange={handlePublicationStartChange}
                                         required
                                         className="global-field-style"
                                     />
+                                    {publicationStartError && <p className="text-red-500 text-sm mt-1">{publicationStartError}</p>}
                                 </>
                             )}
 
@@ -279,10 +327,11 @@ const OfferForm = ({
                                     <input
                                         type="datetime-local"
                                         value={form.publicationEnd}
-                                        onChange={(e) => setForm((prev) => ({ ...prev, publicationEnd: e.target.value }))}
+                                        onChange={handlePublicationEndChange}
                                         required
                                         className="global-field-style"
                                     />
+                                    {publicationEndError && <p className="text-red-500 text-sm mt-1">{publicationEndError}</p>}
 
                                     <label>Employment Length (months)</label>
                                     <input
