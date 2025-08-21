@@ -32,7 +32,7 @@ namespace UseCase.Shared.Services.Authentication.Generators
         public string GenerateUrlSegment()
         {
             var randomString = GenerateRandomString(_countUrlSegmentBytes);
-            return Uri.EscapeDataString(randomString);
+            return Uri.EscapeDataString(randomString).Replace("/", "");
         }
 
         public string GenerateCode()

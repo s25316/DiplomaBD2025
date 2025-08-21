@@ -9,7 +9,7 @@ namespace BackEndAPI
     public class Program
     {
         // Properties
-        private static string? _baseAdministratorId = "23e478b0-13cf-4038-8b89-3f307cd992e7";
+        private static string? _baseAdministratorId = "B6A28D91-9561-4837-9B11-BD21F65F8190";
         public static Guid BaseAdministrator => Guid.TryParse(_baseAdministratorId, out var id)
             ? id
             : Guid.Empty;
