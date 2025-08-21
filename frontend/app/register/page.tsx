@@ -23,7 +23,7 @@ const Register = () => {
       })
     })
     if(res.ok){
-      redirect("/api/auth/signin")
+      redirect("/login")
     }
     else{
       alert("Registration faild")
