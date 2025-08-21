@@ -27,6 +27,13 @@ ARG NEXT_PUBLIC_GEOAPIFY_API
 # ENV ustawia tę wartość jako zmienną środowiskową dostępną podczas RUN npm run build
 ENV NEXT_PUBLIC_GEOAPIFY_API=${NEXT_PUBLIC_GEOAPIFY_API}
 
+
+ARG API_URL
+ARG NEXT_PUBLIC_API_URL
+
+ENV API_URL=$API_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+
 # Zbuduj aplikację Next.js
 RUN npm run build
 
