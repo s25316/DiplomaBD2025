@@ -156,7 +156,7 @@ const BranchDetails = () => {
       <InnerSection>
         <p className="text-xl font-bold mb-2 text-gray-800 dark:text-gray-100">Name: {branch.name}</p>
         <p className="text-lg mb-2 text-gray-700 dark:text-gray-300">
-          <Link href={`/companies/${id}`}>
+          <Link href={`/companies/${id}`} className="text-blue-600 dark:text-blue-400">
             Company: {company?.name}
           </Link>
         </p>

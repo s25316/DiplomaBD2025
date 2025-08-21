@@ -77,6 +77,8 @@ export default function CreateOfferTemplate() {
             console.warn("WARNING: Duplicate skill IDs found in API response. Deduplicated list used.");
         }
         // --- END DEDUPLICATION ---
+        //sortowanie alfabetyczne po nazwie umiejetnosci
+        uniqueSkills.sort((a, b) => a.name.localeCompare(b.name));
 
         setSkills(uniqueSkills);
         console.log("Fetched and set unique skills:", uniqueSkills); // Debug log

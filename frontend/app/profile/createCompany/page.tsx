@@ -58,7 +58,7 @@ const CreateCompany = () => {
     setApiError(null); 
 
     if (!session?.user.token) {
-      alert("You must be logged in to create a company.");
+      console.warn("You must be logged in to create a company.");
       setApiError("Authentication required to create a company.");
       return;
     }
@@ -80,8 +80,9 @@ const CreateCompany = () => {
 
       if (res.ok) {
         const data = await res.json();
-        console.log(`Company created! ID: ${data.companyId}`);
-        redirect("/profile");
+        const newCompanyId = data.companyId || data.id;
+        console.log(`Company created! ID: ${newCompanyId || 'ID not found in response'}`);
+        redirect('/profile');
       } else {
         const errorText = await res.text();
         console.error("Failed to create company:", errorText);
@@ -104,6 +105,13 @@ const CreateCompany = () => {
         }
       }
     } catch (err) {
+      //Ignoruj błąd NEXT_REDIRECT
+      if (err instanceof Error && err.message === 'NEXT_REDIRECT') {
+        // To jest oczekiwany błąd, który Next.js wyrzuca, aby wykonać przekierowanie.
+        console.log('Redirecting to profile...');
+        return; // Zakończ funkcję, aby nie wyświetlać apiError
+      }
+
       console.error("Network error or unexpected issue:", err);
       if (err instanceof Error) {
         setApiError(`An unexpected error occurred: ${err.message}`);

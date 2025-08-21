@@ -50,6 +50,11 @@ const OfferTemplateForm = ({
     return acc;
   }, {} as Record<string, SkillWithRequired[]>); // Ensure the accumulator is correctly typed as Record<string, Skill[]>
 
+  // Posortuj tablice umiejętności w każdej grupie alfabetycznie po nazwie
+  Object.keys(groupedSkills).forEach(type => {
+      groupedSkills[type].sort((a, b) => a.name.localeCompare(b.name));
+  });
+
   return (
     <InnerSection className='flex flex-col gap-4 p-4 border rounded-lg'>
       <h3 className='text-xl font-semibold mb-2'>OfferTemplate Details</h3>
