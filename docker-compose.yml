@@ -139,16 +139,15 @@ services:
       dockerfile: ./dockerfile
       args: 
         NEXT_PUBLIC_GEOAPIFY_API: "a61d5a8ff24e4f6e8081e48d428b5994"
-        API_URL: http://Diploma_BackEnd_Api:8080
         NEXT_PUBLIC_API_URL: http://localhost:8080
+        GEOAPIFY_API: "a61d5a8ff24e4f6e8081e48d428b5994"
     ports:
       - "3000:3000"
     restart: unless-stopped
     environment:
-        NEXTAUTH_SECRET:
+        NEXTAUTH_SECRET: "jbS7iRw63xG2u8GYTjZAODHySPFlrnr8ry7IMRoqQXM="
         NEXTAUTH_URL: http://host.docker.internal:3000
-        GEOAPIFY_API: "a61d5a8ff24e4f6e8081e48d428b5994"
-        AUTH_SECRET: "jbS7iRw63xG2u8GYTjZAODHySPFlrnr8ry7IMRoqQXM="
+        API_URL: http://Diploma_BackEnd_Api:8080
     depends_on:
       - Diploma_BackEnd_Api
 
