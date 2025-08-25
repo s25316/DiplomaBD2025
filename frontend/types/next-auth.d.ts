@@ -25,7 +25,7 @@ declare module "next-auth" {
     refreshToken: string | null;
     jwtValidTo: string | null;
     refreshTokenValidTo: string | null;
-    isIndividual: boolean;
+    isIndividual: boolean | null;
   }
 
   interface Session extends DefaultSession {

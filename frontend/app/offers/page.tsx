@@ -60,15 +60,37 @@ interface Status {
   name: string
 }
 
-interface ContractParameter {
-  contractParameterId: number,
-  name: string
-}
+type ContractParameter = {
+  contractParameterId: number;
+  name: string;
+  contractParameterType: {
+    contractParameterTypeId: number;
+    name: string;
+  };
+};
 
-interface Skill {
+type GroupedContractParameters = {
+  [typeId: number]: {
+    typeName: string;
+    items: ContractParameter[];
+  };
+};
+
+type SkillParameter = {
   skillId: number,
-  name: string
-}
+    name: string,
+    skillType: {
+      skillTypeId: number,
+      name: string
+    }
+};
+
+type GroupedSkillParameters = {
+  [typeId: number]: {
+    typeName: string;
+    items: SkillParameter[];
+  };
+};
 
 const Offers = () => {
   const [apiData, setApiData] = useState<Response | null>();
@@ -104,8 +126,8 @@ const Offers = () => {
   });
   const [orderByDictinary, setOrderByDictinary] = useState<OrderBy[]>([]);
   const [statusDictinary, setStatusDictinary] = useState<Status[]>([]);
-  const [contractParametersDictinary, setContractParametersDictinary] = useState<ContractParameter[]>([]);
-  const [skillDictinary, setSkillDictinary] = useState<Skill[]>([]);
+  const [contractParametersDictinary, setContractParametersDictinary] = useState<GroupedContractParameters>([]);
+  const [skillDictinary, setSkillDictinary] = useState<GroupedSkillParameters>([]);
 
   const { data: session } = useSession();
 
@@ -138,6 +160,8 @@ const Offers = () => {
       `&employmentLengthTo=${filters.employmentLengthTo || ""}` +
       `&page=${filters.page}` +
       `&itemsPerPage=${filters.itemsPerPage}`;
+      
+      console.log(filters)
 
     fetch(`${backUrl}/api/GuestQueries/offers` + filterQuery, {
       headers: {
@@ -157,10 +181,40 @@ const Offers = () => {
       .then(res => res.json())
       .then(setStatusDictinary)
     fetch(`${backUrl}/api/Dictionaries/contractParameters`)
-      .then(res => res.json())
+      .then(res => res.json() as Promise<ContractParameter[]>)
+      .then(res => {
+        const grouped = res.reduce<GroupedContractParameters>((acc, item) => {
+          const typeId = item.contractParameterType.contractParameterTypeId;
+          const typeName = item.contractParameterType.name;
+
+          if (!acc[typeId]) {
+            acc[typeId] = { typeName, items: [] };
+          }
+
+          acc[typeId].items.push(item);
+
+          return acc;
+        }, {});
+        return grouped
+      })
       .then(setContractParametersDictinary)
     fetch(`${backUrl}/api/Dictionaries/skills`)
-      .then(res => res.json())
+      .then(res => res.json() as Promise<SkillParameter[]>)
+      .then(res => {
+        const grouped = res.reduce<GroupedSkillParameters>(
+          (acc, item) => {
+            const typeId = item.skillType.skillTypeId;
+            const typeName = item.skillType.name;
+
+            if (!acc[typeId]) {
+              acc[typeId] = { typeName, items: [] };
+            }
+
+            acc[typeId].items.push(item);
+            return acc;
+          }, {});
+        return grouped
+      })
       .then(setSkillDictinary)
   }, [])
 
@@ -235,29 +289,58 @@ const Offers = () => {
         <input className='w-full h-[25px] rounded-md p-[3px] pt-[3px]' type='number' onChange={x => setFilters({ ...filters, employmentLengthTo: Number(x.target.value) })} /><br />
         <label>Contract conditions:</label><br />
         <ul>
-          {contractParametersDictinary && contractParametersDictinary.map(x => (
-            <li key={x.contractParameterId}>
-              <input type='checkbox' value={x.contractParameterId} onChange={x => setFilters(
-                {
-                  ...filters, contractParameterIds: x.target.checked ?
-                    [...filters.contractParameterIds, Number(x.target.value)] : filters.contractParameterIds.filter(y => y !== Number(x.target.value))
-                })} />
-              <label className='pl-[3px]'>{x.name}</label><br />
-            </li>
+          {Object.values(contractParametersDictinary).map(group => (
+            <div key={group.typeName} className="mb-4">
+              <h3 className="font-bold">{group.typeName}</h3>
+              <ul>
+                {group.items.map(x => (
+                  <li key={x.contractParameterId}>
+                    <input
+                      type="checkbox"
+                      value={x.contractParameterId}
+                      onChange={e =>
+                        setFilters({
+                          ...filters,
+                          contractParameterIds: e.target.checked
+                            ? [...filters.contractParameterIds, Number(e.target.value)]
+                            : filters.contractParameterIds.filter(y => y !== Number(e.target.value))
+                        })
+                      }
+                    />
+                    <label className="pl-[3px]">{x.name}</label>
+                  </li>
+                ))}
+              </ul>
+            </div>
           ))}
         </ul>
         <label>Skills:</label><br />
         <ul>
-          {skillDictinary && skillDictinary.map(x => (
-            <li key={x.skillId}>
-              <input type='checkbox' value={x.skillId} onChange={x => setFilters(
-                {
-                  ...filters, skillsIds: x.target.checked ?
-                    [...filters.skillsIds, Number(x.target.value)] : filters.skillsIds.filter(y => y !== Number(x.target.value))
-                })} />
-              <label className='pl-[3px]'>{x.name}</label><br />
-            </li>
+          {Object.values(skillDictinary).map(group => (
+            <div key={group.typeName} className="mb-4">
+              <h3 className="font-bold">{group.typeName}</h3>
+              <ul>
+                {group.items.map(x => (
+                  <li key={x.skillId}>
+                    <input
+                      type="checkbox"
+                      value={x.skillId}
+                      onChange={e =>
+                        setFilters({
+                          ...filters,
+                          skillsIds: e.target.checked
+                            ? [...filters.skillsIds, Number(e.target.value)]
+                            : filters.skillsIds.filter(y => y !== Number(e.target.value))
+                        })
+                      }
+                    />
+                    <label className="pl-[3px]">{x.name}</label>
+                  </li>
+                ))}
+              </ul>
+            </div>
           ))}
+
         </ul>
       </div>
       <div className='flex-col ml-auto mr-auto text-center'>

@@ -1,7 +1,6 @@
 import { AuthOptions } from "next-auth";
 import { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { redirect } from "next/navigation";
 
 const refreshToken = async (token: JWT) => {
   const res = await fetch(`${process.env.API_URL}/api/User/refreshToken`, {
@@ -56,6 +55,10 @@ export const authOptions: AuthOptions = {
         }
 
         const user = await res.json();
+        
+        if(user?.isNeed2Stage){
+          return null
+        }
 
         if (user?.authorizationData?.jwt) {
           return {
@@ -69,19 +72,6 @@ export const authOptions: AuthOptions = {
             isIndividual: user.isIndividual,
           };
         }
-        
-        if(user?.isNeed2Stage){
-          return {
-            id: "2stage",
-            token: null,
-            refreshToken: null,
-            refreshTokenValidTo: null,
-            jwtValidTo: null,
-            isNeed2Stage: user.isNeed2Stage,
-            user2StageData: user.user2StageData,
-            isIndividual: user.isIndividual,
-          }
-        }
 
         return null;
       },
@@ -90,14 +80,11 @@ export const authOptions: AuthOptions = {
   debug: true,
   callbacks: {
     async jwt({ token, user }) {
-      if(user?.isNeed2Stage){
-        redirect(`/2stage/${user.user2StageData?.urlSegmentPart1}/${user.user2StageData?.urlSegmentPart2}`)
-      }
       if (user?.token) {
         token.accessToken = user.token;
         token.jwtValidTo = user.jwtValidTo;
         token.refreshToken = user.refreshToken;
-        token.isIndividual = user.isIndividual;
+        token.isIndividual = user.isIndividual!;
       }
 
       if (token.jwtValidTo && Date.now() < Date.parse(token.jwtValidTo)){

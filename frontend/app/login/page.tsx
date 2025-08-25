@@ -26,11 +26,29 @@ const LoginPage = () => {
             })
 
             if (!result || result.error) {
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/User/login`, {
+                    method: "POST",
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ login, password })
+                })
+                if (res.ok){
+                    const json = await res.json() as { 
+                        isNeed2Stage: boolean,
+                        user2StageData: {
+                            urlSegmentPart1: string,
+                            urlSegmentPart2: string,
+                        }
+                    }
+                    if(json.isNeed2Stage){
+                        router.push(`/2stage/${json.user2StageData.urlSegmentPart1}/${json.user2StageData.urlSegmentPart2}`)
+                    }
+                }
                 console.error('Sign in error:', result?.error)
                 setError('Invalid email or password')
             } else {
-                router.replace('/profile')
-                router.refresh()
+                router.push('/profile')
             }
         } catch (err) {
             console.error('Login error:', err)

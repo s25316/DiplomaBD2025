@@ -22,15 +22,16 @@ const Register = () => {
         password: password
       })
     })
-    if(res.ok){
+    if (res.ok) {
       redirect("/login")
     }
-    else{
+    else {
       alert("Registration faild")
     }
   }
   return (
     <OuterContainer className='w-[500px]'>
+      <h1 className="text-2xl font-bold mb-6 text-center">Register</h1>
       <form onSubmit={fetchPost} className="flex flex-col gap-4">
         <label htmlFor='email'>Email:</label>
         <input className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" name='email' type='email' required placeholder='example@gmail.com' onChange={e => setEmail(e.target.value)} />
