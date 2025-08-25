@@ -293,7 +293,7 @@ const Offers = () => {
             <div key={group.typeName} className="mb-4">
               <h3 className="font-bold">{group.typeName}</h3>
               <ul>
-                {group.items.map(x => (
+                {group.items.sort((a, b) => a.name.localeCompare(b.name)).map(x => (
                   <li key={x.contractParameterId}>
                     <input
                       type="checkbox"
@@ -320,7 +320,7 @@ const Offers = () => {
             <div key={group.typeName} className="mb-4">
               <h3 className="font-bold">{group.typeName}</h3>
               <ul>
-                {group.items.map(x => (
+                {group.items.sort((a, b) => a.name.localeCompare(b.name)).map(x => (
                   <li key={x.skillId}>
                     <input
                       type="checkbox"
