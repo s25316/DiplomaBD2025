@@ -1,10 +1,11 @@
 'use client';
 
 import React, { useEffect, useState, useCallback } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import ReturnButton from '@/app/components/buttons/ReturnButton';
+import RecruitmentMessagesSummary from '@/app/components/RecruitmentMessagesSummary';
 
 interface ProcessType {
   processTypeId: number;
@@ -79,33 +80,27 @@ interface RecruitmentData {
   };
   contractConditions: ContractConditions[];
 }
-
 interface UpdateRecruitmentPayload {
   accepted: boolean;
-}
-
-interface SendMessagePayload {
-  message: string;
 }
 
 const RecruitmentDetailsPage = () => {
   const { processId } = useParams() as { processId: string };
   const { data: session, status } = useSession();
-  const router = useRouter();
+  // const router = useRouter();
 
   const [recruitmentDetails, setRecruitmentDetails] = useState<RecruitmentData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [newMessage, setNewMessage] = useState<string>('');
   const [newProcessType, setNewProcessType] = useState<number | ''>('');
 
   const backUrl = process.env.NEXT_PUBLIC_API_URL
 
   // Account type - inicjalizujemy jako null, aby wskazać, że typ użytkownika nie został jeszcze załadowany
   const [isIndividual, setIsIndividual] = useState<boolean | null>(null);
+  // ... (reszta state'ów i funkcji, ale usuwamy `newMessage` i `handleSendMessage`)
 
-  // Custom alert function
-  const showCustomAlert = (message: string, isError: boolean = false) => {
+ const showCustomAlert = (message: string, isError: boolean = false) => {
     let alertMessage = message;
     if (isError) {
       try {
@@ -273,55 +268,6 @@ const RecruitmentDetailsPage = () => {
     }
   };
 
-  const handleSendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (status !== 'authenticated' || !session?.user?.token) {
-      showCustomAlert("Authentication required to send message.", true);
-      return;
-    }
-    if (!newMessage.trim()) {
-      showCustomAlert("Message cannot be empty.", true);
-      return;
-    }
-
-    let apiUrl = `${backUrl}/api/`
-    if (!isIndividual) {
-      apiUrl += `CompanyUser/recruitments/${processId}/messages`
-    }
-    else {
-      apiUrl += `User/recruitments/${processId}/messages`
-    }
-
-    try {
-      const payload: SendMessagePayload = { message: newMessage };
-      const res = await fetch(
-        apiUrl,
-        {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${session.user.token}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(payload),
-        }
-      );
-
-      if (res.ok) {
-        showCustomAlert("Message sent successfully!");
-        setNewMessage('');
-        router.push(`/recruitments/${processId}/messages`);
-      } else {
-        const errorText = await res.text();
-        console.error("Failed to send message:", errorText);
-        showCustomAlert(`Failed to send message: ${errorText}`, true);
-      }
-    } catch (err) {
-      console.error("Error sending message:", err);
-      if (err instanceof Error)
-        showCustomAlert(`An unexpected error occurred while sending message: ${err.message}`, true);
-    }
-  };
-
   const handleChangeProcessType = async (e: React.FormEvent) => {
     e.preventDefault();
     if (status !== 'authenticated' || !session?.user?.token) {
@@ -414,7 +360,6 @@ const RecruitmentDetailsPage = () => {
     <div className="max-w-4xl mx-auto p-6 bg-white dark:bg-gray-900 rounded-lg shadow-xl mt-8 font-inter text-gray-900 dark:text-gray-100">
       <ReturnButton />
       <h1 className="text-3xl font-bold mb-6 text-gray-800 dark:text-gray-100 text-center">Recruitment Details</h1>
-      <h1>Is individual?: {isIndividual ? 'True' : 'False'}</h1>
 
       <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg shadow-inner mb-6">
         <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-gray-100">Recruitment: {recruitment.processId}</h2>
@@ -487,10 +432,10 @@ const RecruitmentDetailsPage = () => {
         >
           Download File
         </button>
-        <Link href={`/recruitments/${processId}/messages`} className="bg-purple-600 text-white px-5 py-2 rounded-lg hover:bg-purple-700 transition duration-300 ease-in-out shadow-md font-semibold">
-          View Messages
-        </Link>
       </div>
+
+      {/* Zintegrowana sekcja wiadomości */}
+      <RecruitmentMessagesSummary processId={processId} />
 
       {/* Sekcja zmiany typu procesu */}
       {!isIndividual && <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg shadow-inner mb-6">
@@ -525,28 +470,6 @@ const RecruitmentDetailsPage = () => {
           </button>
         </form>
       </div>}
-
-      {/* Sekcja wysyłania wiadomości */}
-      <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg shadow-inner">
-        <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-gray-100">Send Message to {!isIndividual ? "Candidate" : "Company"}</h2>
-        <form onSubmit={handleSendMessage} className="flex flex-col gap-4">
-          <label htmlFor="messageTextarea" className="font-semibold text-gray-700 dark:text-gray-300">Message:</label>
-          <textarea
-            id="messageTextarea"
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
-            rows={5}
-            placeholder="Type your message here..."
-            className="border border-gray-300 dark:border-gray-600 rounded-md p-2 w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-blue-500 focus:border-blue-500"
-          ></textarea>
-          <button
-            type="submit"
-            className="bg-green-600 text-white px-5 py-2 rounded-lg hover:bg-green-700 transition duration-300 ease-in-out shadow-md font-semibold self-start"
-          >
-            Send Message
-          </button>
-        </form>
-      </div>
     </div>
   );
 };
