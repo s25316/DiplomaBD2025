@@ -1,5 +1,5 @@
 "use client"
-import { redirect } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import React, { useState } from 'react'
 import { OuterContainer } from '../components/layout/PageContainers'
 
@@ -8,6 +8,8 @@ const Register = () => {
   const [password, setPassword] = useState("")
 
   const backUrl = process.env.NEXT_PUBLIC_API_URL
+
+  const router = useRouter();
 
   const fetchPost = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -23,7 +25,7 @@ const Register = () => {
       })
     })
     if (res.ok) {
-      redirect("/login")
+      router.push("/login")
     }
     else {
       alert("Registration faild")
