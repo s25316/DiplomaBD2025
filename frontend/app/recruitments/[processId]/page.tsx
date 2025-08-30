@@ -6,7 +6,7 @@ import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import ReturnButton from '@/app/components/buttons/ReturnButton';
 import RecruitmentMessagesSummary from '@/app/components/ChatSummary';
-
+import { SkillWithRequired } from '@/app/components/forms/OfferForm';
 interface ProcessType {
   processTypeId: number;
   name: string;
@@ -36,7 +36,14 @@ interface RecruitmentData {
     age: number;
     isStudent: boolean;
     created: string;
-    skills: PersonSkill[];
+    skills: {
+      skillId: number;
+      name: string;
+      skillType: {
+        skillTypeId: number;
+        name: string
+      }
+    }[];
     urls: {
       urlId: string;
       url: string
@@ -61,6 +68,7 @@ interface RecruitmentData {
     offerTemplateId: string;
     name: string;
     description: string | null;
+    skills: SkillWithRequired[];
   };
   offer: {
     offerId: string;
@@ -75,17 +83,6 @@ interface RecruitmentData {
 }
 interface UpdateRecruitmentPayload {
   accepted: boolean;
-}
-interface PersonSkill {
-  isRequired: boolean;
-  skill: {
-    skillId: number;
-    name: string;
-    skillType: {
-      skillTypeId: number;
-      name: string;
-    };
-  };
 }
 
 const RecruitmentDetailsPage = () => {
@@ -339,6 +336,8 @@ const RecruitmentDetailsPage = () => {
     }
   };
 
+  
+
 
   if (status === 'loading' || loading) {
     return <div className="text-center py-4 text-blue-600">Loading recruitment details...</div>;
@@ -360,9 +359,29 @@ const RecruitmentDetailsPage = () => {
 
   const isFinalStatus = recruitment.processTypeId === 11 || recruitment.processTypeId === 12;
 
-  const statusColorClass = recruitment.processType.name === 'Passed'
-    ? 'text-green-600 dark:text-green-400'
-    : 'text-red-600 dark:text-red-400';
+  // Logika do grupowania i sortowania umiejętności kandydata
+  const groupedPersonSkills = person.skills.reduce((acc, skill) => {
+    const typeName = skill.skillType?.name;
+    if (typeName) {
+      if (!acc[typeName]) acc[typeName] = [];
+      acc[typeName].push(skill);
+    }
+    return acc;
+  }, {} as Record<string, typeof person.skills>);
+
+  const sortedPersonSkillTypes = Object.keys(groupedPersonSkills).sort((a, b) => a.localeCompare(b));
+
+
+  const groupedOfferSkills = offerTemplate.skills.reduce((acc, skillInfo) => {
+    const typeName = skillInfo.skill?.skillType?.name;
+    if (typeName) {
+      if (!acc[typeName]) acc[typeName] = [];
+      acc[typeName].push(skillInfo);
+    }
+    return acc;
+  }, {} as Record<string, typeof offerTemplate.skills>);
+
+  const sortedOfferSkillTypes = Object.keys(groupedOfferSkills).sort((a, b) => a.localeCompare(b));
 
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white dark:bg-gray-900 rounded-lg shadow-xl mt-8 font-inter text-gray-900 dark:text-gray-100">
@@ -385,42 +404,24 @@ const RecruitmentDetailsPage = () => {
         <p><strong>Age:</strong> {person.age}</p>
         <p><strong>Student:</strong> {person.isStudent ? 'Yes' : 'No'}</p>
         <p><strong>Created:</strong> {new Date(person.created).toLocaleDateString()}</p>
-        {person.skills.length > 0 && (
-          <div className="mt-2">
-            <p className="font-semibold">Skills:</p>
-            <ul className="list-disc ml-6">
-              {person.skills.map((s, idx) => (
-                <li key={idx}>{s.skill.name} ({s.skill.skillType.name})</li>
-              ))}
-            </ul>
-          </div>
-        )}
-        {person.skills.length > 0 && (
-          <div className="mt-2">
-            <p className="font-semibold">Skills:</p>
         
-            {/* Grupowanie umiejętności */}
-            {Object.entries(
-            person.skills.reduce((acc, skill) => {
-              const groupName = skill.skill.skillType.name;
-              if (!acc[groupName]) acc[groupName] = [];
-              acc[groupName].push(skill);
-              return acc;
-            }, {} as Record<string, PersonSkill[]>)
-            )
-            .sort(([a], [b]) => a.localeCompare(b)) // Sortowanie nagłówków alfabetycznie
-            .map(([type, group]) => (
-              <div key={type} className="mb-2">
-                <h4 className="font-bold mt-2">{type}</h4>
-                <ul className="list-disc ml-6">
-                  {group.sort((a, b) => a.skill.name.localeCompare(b.skill.name)).map(skillItem => (
-                    <li key={skillItem.skill.skillId}>
-                      {skillItem.skill.name} {skillItem.isRequired ? '(Required)' : ''}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+        {person.skills?.length > 0 && (
+          <div className="mt-2">
+            <p className="font-semibold">Skills:</p>
+            <div className="space-y-4">
+              {sortedPersonSkillTypes.map(skillType => (
+                <div key={skillType}>
+                  <h4 className="font-semibold text-md mb-1 text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                    {skillType}
+                  </h4>
+                  <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 ml-4 space-y-1">
+                    {groupedPersonSkills[skillType].sort((a, b) => a.name.localeCompare(b.name)).map(s => (
+                    <li key={s.skillId}>{s.name} ({s.skillType.name})</li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
           </div>
         )}
         {person.urls.length > 0 && (
@@ -459,6 +460,27 @@ const RecruitmentDetailsPage = () => {
             </ul>
           </div>
         )}
+        {recruitmentDetails?.offerTemplate?.skills?.length > 0 && (
+          <div className="mt-2">
+            <p className="font-semibold">Skills:</p>
+            <div className="space-y-4">
+              {sortedOfferSkillTypes.map(skillType => (
+                <div key={skillType}>
+                  <h4 className="font-semibold text-md mb-1 text-gray-900 dark:text-gray-100 flex items-center gap-2">
+                    {skillType}:
+                  </h4>
+                  <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 ml-4 space-y-1">
+                    {groupedOfferSkills[skillType].sort((a, b) => a.skill.name.localeCompare(b.skill.name)).map(s => (
+                      <li key={s.skill.skillId}>
+                        {s.skill.name} {s.isRequired && <span className="font-bold text-blue-600 dark:text-blue-400 text-xs">(required)</span>}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+      </div>
+          </div>
+        )}
       </div>
 
       <div className="flex flex-wrap gap-4 mb-8">
@@ -477,7 +499,7 @@ const RecruitmentDetailsPage = () => {
       {!isIndividual && <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg shadow-inner mb-6">
         <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-gray-100">Change Process Type</h2>
         {isFinalStatus && (
-          <p className= {`mb-4 font-semibold ${statusColorClass}`}>
+          <p className="text-red-600 dark:text-red-400 mb-4 font-semibold">
             Cannot change process type. Recruitment is already {recruitment.processType.name}.
           </p>
         )}

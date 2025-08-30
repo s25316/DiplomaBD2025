@@ -10,8 +10,11 @@ export interface SkillWithRequired {
     skillId: number;
     name: string,
     skill: {
+        skillId: number;
         name: string;
-        skillType: { name: string };
+        skillType: {
+            name: string 
+            };
     };
     isRequired: boolean;
     skillType: {
