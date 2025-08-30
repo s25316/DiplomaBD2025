@@ -4,15 +4,6 @@ import { InnerSection } from '../layout/PageContainers';
 import { SkillWithRequired } from './OfferForm';
 import CancelButton from '../buttons/CancelButton';
 
-// interface Skill {
-//   skillId: number;
-//   name: string;
-//   skillType: {
-//     skillTypeId: number;
-//     name: string;
-//   };
-// }
-
 interface SkillSelection {
   skillId: number; 
   isRequired: boolean;
@@ -20,7 +11,7 @@ interface SkillSelection {
 
 interface OfferTemplateFormProps {
   name: string;
-  description: string;
+  description: string | "";
   skills: SkillWithRequired[];
   selectedSkills: SkillSelection[];
   onChange: (field: 'name' | 'description', value: string) => void;
@@ -77,8 +68,8 @@ const OfferTemplateForm = ({
         value={description}
         placeholder="Detailed description of the offer template..."
         onChange={(e) => onChange('description', e.target.value)}
-        required
         rows={4}
+        required
         className='global-field-style'
       />
 

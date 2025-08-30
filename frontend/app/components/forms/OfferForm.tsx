@@ -74,7 +74,7 @@ const OfferForm = ({
     const validateDates = (start: string, end: string) => {
         let isValid = true;
         const now = new Date();
-        // Dodajemy 1 minutę do obecnego czasu, aby zapewnić, że start jest w przyszłości
+        // Dodaje 1 minutę do obecnego czasu, aby zapewnić, że start jest w przyszłości
         const minStartTime = new Date(now.getTime() + 60 * 1000); // 60 sekund * 1000 ms = 1 minuta
 
         const startDate = new Date(start);
@@ -177,6 +177,7 @@ const OfferForm = ({
                                     <h2 className="text-2xl font-bold mb-4">Contract Condition</h2>
                                     <select
                                         className="global-field-style"
+                                        required
                                         value={selectedConditionId}
                                         onChange={handleSelectCondition}
                                         >
@@ -339,6 +340,7 @@ const OfferForm = ({
                                         value={form.employmentLength}
                                         onChange={(e) => setForm((prev) => ({ ...prev, employmentLength: Number(e.target.value) }))}
                                         min="0"
+                                        required
                                         className="global-field-style"
                                     />
 

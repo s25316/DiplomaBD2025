@@ -361,6 +361,9 @@ const Offers = () => {
                       <p>
                         {x.branch.address.countryName}, {x.branch.address.stateName}, {x.branch.address.cityName}, {x.branch.address.streetName}
                       </p>
+                      <p>
+                        Ends: {new Date(x.offer.publicationEnd).toLocaleString()}
+                      </p>
                     </InnerSection>
                   </Link>
                 </li>

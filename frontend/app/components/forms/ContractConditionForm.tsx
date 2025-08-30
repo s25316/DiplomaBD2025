@@ -1,9 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { InnerSection } from '../layout/PageContainers';
 import CancelButton from '../buttons/CancelButton';
-
 export interface Skill {
   isRequired: boolean,
   skill: {
@@ -43,9 +42,10 @@ interface ContractConditionFormProps {
   initialData?: ContractConditionFormData | null;
   parameters: ContractParameter[];
   submitText?: string;
+  onFormChange?: () => void;
 }
 
-const ContractConditionForm = ({ onSubmit, parameters, initialData, submitText = "Submit" }: ContractConditionFormProps) => {
+const ContractConditionForm = ({ onSubmit, parameters, initialData, submitText = "Submit", onFormChange }: ContractConditionFormProps) => {
 
   const [form, setForm] = useState<ContractConditionFormData>(
     initialData ?? {
@@ -61,22 +61,25 @@ const ContractConditionForm = ({ onSubmit, parameters, initialData, submitText =
     }
   );
 
-  // React.useEffect(() => {
-  //   console.log('ContractConditionForm Initialized with Form:', form);
-  //   console.log('ContractConditionForm Parameters:', parameters);
-  // }, [form, parameters]);
-
-
+  useEffect(() => {
+    if (initialData) {
+      setForm(initialData);
+    }
+  }, [initialData]);
+  
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const target = e.target;
     const name = target.name;
 
     let value: string | number | boolean;
-    if (target.type === 'checkbox') {
+    if (name === 'salaryTermId' && target.value === "") {
+      value = 3001; // Ustaw domyślną wartość, jeśli nic nie wybrano
+    } else if (name === 'currencyId' && target.value === '') {
+    value = 1;
+    } else if (target.type === 'checkbox') {
       value = (target as HTMLInputElement).checked;
     } else if (target.type === 'number') { // For number inputs (salaryMin, salaryMax, hoursPerTerm)
       let numValue = Number(target.value);
-
       if (numValue < 0) {
         numValue = 0; // Set to 0 if negative
       }
@@ -91,7 +94,10 @@ const ContractConditionForm = ({ onSubmit, parameters, initialData, submitText =
       ...prev,
       [name]: value,
     }));
-    console.log(`handleChange - Field: ${name}, Value: ${value}`); // Debug log
+    if (onFormChange) {
+      onFormChange();
+    }
+    // console.log(`handleChange - Field: ${name}, Value: ${value}`); 
   };
 
 
@@ -100,7 +106,10 @@ const ContractConditionForm = ({ onSubmit, parameters, initialData, submitText =
       const updated = checked
         ? [...prev[field], id] // Add ID if checked
         : prev[field].filter(i => i !== id); // Remove ID if unchecked
-      console.log(`handleMultiCheckbox - Field: ${field}, ID: ${id}, Checked: ${checked}, Updated:`, updated); // Debug log
+      if (onFormChange) {
+        onFormChange();
+      }
+      // console.log(`handleMultiCheckbox - Field: ${field}, ID: ${id}, Checked: ${checked}, Updated:`, updated); 
       return { ...prev, [field]: updated };
     });
   };
@@ -138,7 +147,6 @@ const ContractConditionForm = ({ onSubmit, parameters, initialData, submitText =
       </div>
     );
   };
-
 
   return (
     <InnerSection className="flex flex-col gap-4 p-4 border rounded-lg">

@@ -2,12 +2,10 @@
 
 import { useSession } from 'next-auth/react';
 import { useParams, useRouter } from 'next/navigation';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import ContractConditionForm from '@/app/components/forms/ContractConditionForm'; // Import the form component
 import { OuterContainer } from '@/app/components/layout/PageContainers';
 
-// Interface for parameters like Currency, Salary Term, Work Mode, Employment Type
-// as they are received from /api/Dictionaries/contractParameters
 interface ContractParameter {
   contractParameterId: number;
   name: string;
@@ -17,7 +15,6 @@ interface ContractParameter {
   };
 }
 
-// Interface for the data structure submitted by the form
 interface ContractConditionFormData {
   salaryMin: number;
   salaryMax: number;
@@ -29,21 +26,35 @@ interface ContractConditionFormData {
   employmentTypeIds: number[];
 }
 
+interface ApiErrorItem {
+  item?: ContractConditionFormData;
+  isCorrect: boolean;
+  message: string;
+}
+
 const CreateContractConditionPage = () => {
   const { data: session } = useSession();
-  const { id } = useParams() as { id: string }; // Type 'id' as string
+  const { id } = useParams() as { id: string }; 
   const router = useRouter();
-
+  const topRef = useRef<HTMLDivElement>(null); // Ref do przewijania
   // State to store the array of contract parameters
   const [parameters, setParameters] = useState<ContractParameter[]>([]);
+  const [apiError, setApiError] = useState<string | null>(null);
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
   const backUrl = process.env.NEXT_PUBLIC_API_URL
 
-  // Custom alert function (replace with a proper UI modal in production)
-  const showCustomAlert = (message: string) => {
-    console.log("ALERT:", message);
-    alert(message); // Temporary: for Canvas environment demonstration
-  };
+
+  const resetErrors =useCallback(() => {
+    setApiError(null);
+    setValidationErrors([]);
+  }, []);
+  // Przewiń do góry, gdy pojawi się błąd
+  useEffect(() => {
+    if (apiError || validationErrors.length > 0) {
+      topRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [apiError, validationErrors]);
 
   useEffect(() => {
     const fetchParameters = async () => {
@@ -61,24 +72,29 @@ const CreateContractConditionPage = () => {
 
         const paramData: ContractParameter[] = await res.json(); // Explicitly type the response
         setParameters(paramData);
-        console.log("Fetched contract parameters:", paramData); // Debug log
+        // console.log("Fetched contract parameters:", paramData); 
       } catch (error) {
         console.error("Error fetching parameters:", error);
-        if(error instanceof Error)
-        showCustomAlert(`Error loading contract parameters: ${error.message}`);
+        if(error instanceof Error){
+          setApiError(`Parameter loading Error: ${error.message}`);
+        } else{
+          setApiError(`Parameter loading Error: Uknown error.`);
+        }
       }
     };
     fetchParameters();
-  }, [session]); // Depend on session to refetch when it changes
+  }, [session, backUrl]); // Depend on session to refetch when it changes
 
   const handleSubmit = async (form: ContractConditionFormData) => {
+    resetErrors();
+
     if (!session?.user?.token) {
-      showCustomAlert("Authentication required to create contract condition.");
+      setApiError("Authentication required to create contract condition.");
       return;
     }
 
     try {
-      console.log("Submitting form data:", form); // Debug log
+      // console.log("Submitting form data:", form); 
       const res = await fetch(`${backUrl}/api/CompanyUser/companies/${id}/contractConditions`, {
         method: 'POST',
         headers: {
@@ -89,17 +105,55 @@ const CreateContractConditionPage = () => {
       });
 
       if (res.ok) {
-        showCustomAlert('Contract Condition Created Successfully!');
+        window.alert('Contract Condition Created Successfully!');
         router.replace(`/companies/${id}`); // Redirect to company details page
       } else {
         const errorText = await res.text();
         console.error("Failed to create contract condition:", errorText);
-        showCustomAlert(`Failed to create contract condition: ${errorText}`);
+
+        try {
+          const parsedError = JSON.parse(errorText);
+          
+          // Handle array of errors like: [{"item":..., "isCorrect":false,"message":"..."}]
+          if (Array.isArray(parsedError) && parsedError.length > 0 && parsedError[0].message) {
+            setValidationErrors(parsedError.map((err: ApiErrorItem) => err.message));
+            setApiError("Please note:");
+          }
+          // Handle general errors with 'errors' object (like in CreateCompany)
+          else if (parsedError.errors) {
+            const errorsArray: string[] = [];
+            for (const key in parsedError.errors) {
+              if (Object.prototype.hasOwnProperty.call(parsedError.errors, key)) {
+                const messages = parsedError.errors[key];
+                if (Array.isArray(messages)) {
+                  messages.forEach(msg => errorsArray.push(`${key}: ${msg}`));
+                }
+              }
+            }
+            setValidationErrors(errorsArray);
+            setApiError("Please note:");
+          } 
+          // Handle single error messages (title or detail)
+          else if (parsedError.title || parsedError.detail) {
+            setApiError(parsedError.title || parsedError.detail);
+          } 
+          // Fallback for unexpected JSON error format
+          else {
+            setApiError(`Cannot create contract: ${errorText}`);
+          }
+        } catch (parseError) {
+          console.error("Error parsing API response:", parseError);
+          setApiError(`Cannot create contract: ${errorText}`);
+        }
+
       }
     } catch (error) {
       console.error("Error submitting contract condition:", error);
       if(error instanceof Error)
-      showCustomAlert(`An error occurred: ${error.message}`);
+      setApiError(`An error occurred: ${error.message}`);
+      else{
+          setApiError(`Uknown error.`);
+      }
     }
   };
 
@@ -109,8 +163,24 @@ const CreateContractConditionPage = () => {
 
   return (
     <OuterContainer className="max-w-xl mx-auto p-6 mt-8 font-inter">
+      <div ref={topRef} />
       <h1 className="text-3xl font-bold mb-6 text-center">Create Contract Condition</h1>
-      <ContractConditionForm onSubmit={handleSubmit} parameters={parameters} submitText="Create" />
+      
+      {(apiError || validationErrors.length > 0) && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-6 dark:bg-red-800 dark:border-red-700 dark:text-red-100">
+          <strong className="font-bold">Error:</strong>
+          {apiError && <p className="mt-2 text-sm">{apiError}</p>}
+          {validationErrors.length > 0 && (
+            <ul className="list-disc list-inside mt-3 text-sm">
+              {validationErrors.map((err, idx) => (
+                <li key={idx}>{err}</li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
+      
+      <ContractConditionForm onSubmit={handleSubmit} parameters={parameters} submitText="Create" onFormChange={resetErrors}/>
     </OuterContainer>
   );
 };

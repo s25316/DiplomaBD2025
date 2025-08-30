@@ -11,8 +11,8 @@ interface ContractCondition {
     salaryMin: number;
     salaryMax: number;
     isNegotiable: boolean;
-    salaryTerm: { name: string };
-    currency: { name: string };
+    salaryTerm: { name: string } | null;
+    currency: { name: string } | null;
     workModes?: { name: string }[];
     employmentTypes?: { name: string }[];
   }
@@ -41,7 +41,7 @@ interface ContractCondition {
           <li key={cond.contractConditionId} >
             <InnerSection className="my-2 max-w-md">
             <p><b>Hours/Term:</b> {cond.hoursPerTerm}</p>
-            <p><b>Salary:</b> {cond.salaryMin} – {cond.salaryMax} {cond.currency.name} ({cond.salaryTerm.name})</p>
+            <p><b>Salary:</b> {cond.salaryMin} – {cond.salaryMax} {cond.currency?.name ?? "Unkown currency"} ({cond.salaryTerm?.name ?? "Unkown salary term"})</p>
             <p><b>Negotiable:</b> {cond.isNegotiable ? "Yes" : "No"}</p>
             <p><b>Work Modes:</b> {cond.workModes?.map(w => w.name).join(", ") ?? "N/A"}</p>
             <p><b>Employment Types:</b> {cond.employmentTypes?.map(e => e.name).join(", ") ?? "N/A"}</p>

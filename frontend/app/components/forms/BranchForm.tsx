@@ -92,7 +92,14 @@ const BranchForm = (props: Props) => {
   }, [form, address, autocomplete, props])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value })
+    const { name, value } = e.target; 
+    let updatedValue = e.target.value;
+
+ // Check if the field is 'description' and the value is an empty string
+    if (name === 'description' && value === '') {
+      updatedValue = "";
+    }
+    setForm({ ...form, [e.target.name]: updatedValue })
   }
 
   const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {

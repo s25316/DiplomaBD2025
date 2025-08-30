@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { useSession } from "next-auth/react";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { InnerSection, OuterContainer } from "@/app/components/layout/PageContainers";
 import CancelButton from "@/app/components/buttons/CancelButton";
 
@@ -16,6 +16,7 @@ const CreateCompany = () => {
     websiteUrl: "",
   });
 
+  const router = useRouter();
   const [errors, setErrors] = useState<string[]>([]);
   const [apiError, setApiError] = useState<string | null>(null);
 
@@ -79,13 +80,11 @@ const CreateCompany = () => {
       });
 
       if (res.ok) {
-        const data = await res.json();
-        const newCompanyId = data.companyId || data.id;
-        console.log(`Company created! ID: ${newCompanyId || 'ID not found in response'}`);
-        redirect('/profile');
+        alert(`Company created!`);
+        router.replace('/profile');
       } else {
         const errorText = await res.text();
-        console.error("Failed to create company:", errorText);
+        alert(`Failed to create company: ${errorText}`);
         try {
           const parsedError = JSON.parse(errorText);
           if (Array.isArray(parsedError) && parsedError.length > 0 && parsedError[0].message) {
@@ -100,7 +99,7 @@ const CreateCompany = () => {
             setApiError("Failed to create company: An unexpected error occurred.");
           }
         } catch (parseError) {
-          console.error("Error parsing API response:", parseError);
+          console.log(`Error parsing API response: ${parseError}`);
           setApiError(`Failed to create company: ${errorText}`);
         }
       }
@@ -108,7 +107,6 @@ const CreateCompany = () => {
       //Ignoruj błąd NEXT_REDIRECT
       if (err instanceof Error && err.message === 'NEXT_REDIRECT') {
         // To jest oczekiwany błąd, który Next.js wyrzuca, aby wykonać przekierowanie.
-        console.log('Redirecting to profile...');
         return; // Zakończ funkcję, aby nie wyświetlać apiError
       }
 

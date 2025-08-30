@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import ReturnButton from '@/app/components/buttons/ReturnButton';
-import RecruitmentMessagesSummary from '@/app/components/RecruitmentMessagesSummary';
+import RecruitmentMessagesSummary from '@/app/components/ChatSummary';
 
 interface ProcessType {
   processTypeId: number;
@@ -36,14 +36,7 @@ interface RecruitmentData {
     age: number;
     isStudent: boolean;
     created: string;
-    skills: {
-      skillId: number;
-      name: string;
-      skillType: {
-        skillTypeId: number;
-        name: string
-      }
-    }[];
+    skills: PersonSkill[];
     urls: {
       urlId: string;
       url: string
@@ -82,6 +75,17 @@ interface RecruitmentData {
 }
 interface UpdateRecruitmentPayload {
   accepted: boolean;
+}
+interface PersonSkill {
+  isRequired: boolean;
+  skill: {
+    skillId: number;
+    name: string;
+    skillType: {
+      skillTypeId: number;
+      name: string;
+    };
+  };
 }
 
 const RecruitmentDetailsPage = () => {
@@ -356,6 +360,10 @@ const RecruitmentDetailsPage = () => {
 
   const isFinalStatus = recruitment.processTypeId === 11 || recruitment.processTypeId === 12;
 
+  const statusColorClass = recruitment.processType.name === 'Passed'
+    ? 'text-green-600 dark:text-green-400'
+    : 'text-red-600 dark:text-red-400';
+
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white dark:bg-gray-900 rounded-lg shadow-xl mt-8 font-inter text-gray-900 dark:text-gray-100">
       <ReturnButton />
@@ -382,9 +390,37 @@ const RecruitmentDetailsPage = () => {
             <p className="font-semibold">Skills:</p>
             <ul className="list-disc ml-6">
               {person.skills.map((s, idx) => (
-                <li key={idx}>{s.name} ({s.skillType.name})</li>
+                <li key={idx}>{s.skill.name} ({s.skill.skillType.name})</li>
               ))}
             </ul>
+          </div>
+        )}
+        {person.skills.length > 0 && (
+          <div className="mt-2">
+            <p className="font-semibold">Skills:</p>
+        
+            {/* Grupowanie umiejętności */}
+            {Object.entries(
+            person.skills.reduce((acc, skill) => {
+              const groupName = skill.skill.skillType.name;
+              if (!acc[groupName]) acc[groupName] = [];
+              acc[groupName].push(skill);
+              return acc;
+            }, {} as Record<string, PersonSkill[]>)
+            )
+            .sort(([a], [b]) => a.localeCompare(b)) // Sortowanie nagłówków alfabetycznie
+            .map(([type, group]) => (
+              <div key={type} className="mb-2">
+                <h4 className="font-bold mt-2">{type}</h4>
+                <ul className="list-disc ml-6">
+                  {group.sort((a, b) => a.skill.name.localeCompare(b.skill.name)).map(skillItem => (
+                    <li key={skillItem.skill.skillId}>
+                      {skillItem.skill.name} {skillItem.isRequired ? '(Required)' : ''}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </div>
         )}
         {person.urls.length > 0 && (
@@ -401,7 +437,7 @@ const RecruitmentDetailsPage = () => {
 
       <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg shadow-inner mb-6">
         <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-gray-100">Offer Details</h2>
-        <p><strong>Offer Template:</strong> <Link href={`/companies/${company.companyId}/offer-templates/${offerTemplate.offerTemplateId}`} className="text-blue-600 hover:underline">{offerTemplate.name}</Link></p>
+        <p><strong>Offer Template:</strong> <Link href={`/companies/${company.companyId}/templates/${offerTemplate.offerTemplateId}`} className="text-blue-600 hover:underline">{offerTemplate.name}</Link></p>
         <p><strong>Company:</strong> <Link href={`/companies/${company.companyId}`} className="text-blue-600 hover:underline">{company.name}</Link></p>
         <p><strong>Branch:</strong> <Link href={`/companies/${company.companyId}/${branch.branchId}`} className="text-blue-600 hover:underline">{branch.name}</Link> ({branch.address.cityName}, {branch.address.streetName || 'N/A'})</p>
         <p><strong>Publication Start:</strong> {new Date(offer.publicationStart).toLocaleDateString()}</p>
@@ -441,7 +477,7 @@ const RecruitmentDetailsPage = () => {
       {!isIndividual && <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg shadow-inner mb-6">
         <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-gray-100">Change Process Type</h2>
         {isFinalStatus && (
-          <p className="text-red-600 dark:text-red-400 mb-4 font-semibold">
+          <p className= {`mb-4 font-semibold ${statusColorClass}`}>
             Cannot change process type. Recruitment is already {recruitment.processType.name}.
           </p>
         )}

@@ -68,7 +68,7 @@ const EditBranch = () => {
 
     const fetchBranch = async () => {
       try {
-        console.log(`Fetching branch details for branchId: ${branchId}`); // Debug log
+        // console.log(`Fetching branch details for branchId: ${branchId}`); 
         const res = await fetch(`${backUrl}/api/CompanyUser/branches/${branchId}`, {
           headers: {
             Authorization: `Bearer ${session.user.token}`,
@@ -100,7 +100,7 @@ const EditBranch = () => {
         };
         setFormState(initialForm);
         sendData.current = initialForm; // Also initialize ref with the same data
-        console.log("Fetched branch and set formState/sendData:", initialForm); // Debug log
+        // console.log("Fetched branch and set formState/sendData:", initialForm); 
 
       } catch (error) {
         console.error("Error fetching branch:", error);
@@ -115,7 +115,7 @@ const EditBranch = () => {
   // Callback function to receive updated data from BranchForm
   const handleData = (data: BranchFormInitialData) => {
     sendData.current = data;
-    console.log("handleData: Received data from BranchForm:", data); // Debug log
+    // console.log("handleData: Received data from BranchForm:", data); 
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -134,7 +134,7 @@ const EditBranch = () => {
     };
 
     try {
-      console.log("handleSubmit: Submitting payload:", payload); // Debug log
+      // console.log("handleSubmit: Submitting payload:", payload); 
       const res = await fetch(`${backUrl}/api/CompanyUser/companies/branches/${branchId}`, {
         method: "PUT",
         headers: {

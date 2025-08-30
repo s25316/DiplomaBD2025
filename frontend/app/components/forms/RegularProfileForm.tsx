@@ -241,6 +241,15 @@ const RegularProfileForm = ({ initialData, token }: RegularProfileFormProps) => 
 
   return (
     <InnerSection className="flex flex-col gap-4 mt-4 max-w-2xl">
+      <label className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+        <input
+          type="checkbox"
+          checked={form.isTwoFactorAuthentication}
+          onChange={(e) => setForm({ ...form, isTwoFactorAuthentication: e.target.checked })}
+          className="form-checkbox h-4 w-4 text-blue-600 transition duration-150 ease-in-out rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700"
+        /> 
+        Lock account.
+      </label>
       <label className="font-semibold text-gray-700 dark:text-gray-300"><b>Description</b></label>
       <textarea 
         className='global-field-style'
@@ -300,15 +309,7 @@ const RegularProfileForm = ({ initialData, token }: RegularProfileFormProps) => 
         onChange={(e) => setAddress({ ...form.address, apartmentNumber: e.target.value })}
       />
       
-      <label className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-        <input
-          type="checkbox"
-          checked={form.isTwoFactorAuthentication}
-          onChange={(e) => setForm({ ...form, isTwoFactorAuthentication: e.target.checked })}
-          className="form-checkbox h-4 w-4 text-blue-600 transition duration-150 ease-in-out rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700"
-        /> 
-        Two-Factor Authentication
-      </label>
+
 
       <label className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
         <input

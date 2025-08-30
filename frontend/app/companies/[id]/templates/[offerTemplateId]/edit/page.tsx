@@ -39,7 +39,7 @@ interface SkillInTemplateApi { // Naming convention 'Api' to denote it's from AP
 interface OfferTemplateDataApi { // Naming convention 'Api' to show it's from API response
     offerTemplateId: string;
     name: string;
-    description: string;
+    description: string | "";
     skills: SkillInTemplateApi[]; 
 }
 
@@ -52,13 +52,13 @@ interface OfferTemplateApiItem {
 // This interface defines the form's state structure for editing an offer template
 interface EditTemplateFormState {
   name: string;
-  description: string;
+  description: string | "";
   skills: SkillSelection[]; 
 }
 
 
 
-export default function EditOfferTemplate() {
+const EditOfferTemplatePage = () => {
 
   const { id, offerTemplateId } = useParams() as { id: string; offerTemplateId: string };
   const router = useRouter();
@@ -103,7 +103,7 @@ export default function EditOfferTemplate() {
         uniqueSkills.sort((a, b) => a.name.localeCompare(b.name));
         
         setSkills(uniqueSkills);
-        console.log("Fetched and set unique skills (Edit):", uniqueSkills); // Debug log
+        // console.log("Fetched and set unique skills (Edit):", uniqueSkills); 
 
         if (!templateRes.ok) {
           const errorText = await templateRes.text();
@@ -130,7 +130,7 @@ export default function EditOfferTemplate() {
           description: offerTemplate.description,
           skills: initialSelectedSkills,
         });
-        console.log("Fetched and set form data (Edit):", { ...offerTemplate, skills: initialSelectedSkills }); // Debug log
+        // console.log("Fetched and set form data (Edit):", { ...offerTemplate, skills: initialSelectedSkills }); 
 
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -145,7 +145,7 @@ export default function EditOfferTemplate() {
   // Function to handle changes in name or description fields
   const onChange = (field: 'name' | 'description', value: string) =>
     setForm((prev) => {
-        console.log(`Form change (Edit) - Field: ${field}, Value: ${value}`); // Debug log
+        // console.log(`Form change (Edit) - Field: ${field}, Value: ${value}`); 
         return prev ? { ...prev, [field]: value } : null; // Ensure prev is not null
     });
 
@@ -156,7 +156,7 @@ export default function EditOfferTemplate() {
       const updatedSkills = isChecked
         ? [...prev.skills, { skillId, isRequired: true }]
         : prev.skills.filter((s) => s.skillId !== skillId);
-      console.log('Updated form.skills after toggle (Edit):', updatedSkills); // Debug log
+      // console.log('Updated form.skills after toggle (Edit):', updatedSkills); 
       return { ...prev, skills: updatedSkills };
     });
 
@@ -167,7 +167,7 @@ export default function EditOfferTemplate() {
       const updatedSkills = prev.skills.map((s) =>
         s.skillId === skillId ? { ...s, isRequired } : s
       );
-      console.log('Updated form.skills after required toggle (Edit):', updatedSkills); // Debug log
+      // console.log('Updated form.skills after required toggle (Edit):', updatedSkills); 
       return { ...prev, skills: updatedSkills };
     });
 
@@ -175,6 +175,16 @@ export default function EditOfferTemplate() {
     if (!session?.user?.token || !form) { // Check if form data is available
       showCustomAlert("Authentication required or form data missing.");
       return;
+    }
+    if (!form.name.trim() && !form.description.trim()) {
+        showCustomAlert("Offer Template name and description are required.");
+        return;
+    } else if (!form.description.trim()) {
+        showCustomAlert("Offer Template description is required.");
+        return;
+    } else if(!form.name.trim()){
+        showCustomAlert("Offer Template name is required.");
+        return;
     }
 
     try {
@@ -187,7 +197,7 @@ export default function EditOfferTemplate() {
           isRequired: s.isRequired,
         }))
       };
-      console.log("Submitting form data (Edit):", payload); // Debug log
+      // console.log("Submitting form data (Edit):", payload); 
 
       const res = await fetch(`${backUrl}/api/CompanyUser/companies/offerTemplates/${offerTemplateId}`, {
         method: "PUT",
@@ -235,3 +245,5 @@ export default function EditOfferTemplate() {
     </OuterContainer>
   );
 }
+
+export default EditOfferTemplatePage;
