@@ -353,7 +353,7 @@ const Offers = () => {
                   <Link href={`/companies/${x.company.companyId}/${x.branch.branchId}/offer/${x.offer.offerId}`}>
                     <InnerSection className='p-4 text-left m-2 w-[700px]'>
                       <p className='font-bold flex items-center justify-between'>
-                        <span className='pr-[5px] truncate'>{x.offerTemplate.name}</span>{x.contractConditions && x.contractConditions.length > 0 && <span className='pl-[5px]'>{x.contractConditions[0].salaryMin}-{x.contractConditions[0].salaryMax}{x.contractConditions[0].currency.name}/{x.contractConditions[0].salaryTerm.name}</span>}
+                        <span className='pr-[5px] truncate'>{x.offerTemplate.name}</span>{x.contractConditions && x.contractConditions.length > 0 && x.contractConditions[0].isPaid && <span className='pl-[5px]'>{x.contractConditions[0].salaryMin}-{x.contractConditions[0].salaryMax}{x.contractConditions[0].currency.name}/{x.contractConditions[0].salaryTerm.name}</span>}
                       </p>
                       <p>
                         {x.company.name}

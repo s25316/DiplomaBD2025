@@ -348,13 +348,18 @@ const OfferDetails = () => {
 
       {isIndividual && !isOwnOffer && (
         <div className="mt-8 flex items-center gap-4">
-          {session?.user.token ? <Link
+          {session?.user.token && <Link
           href={`/companies/${id}/${branchId}/offer/${offerId}/recruite`}
           className="inline-block bg-green-600  p-2 rounded-md hover:bg-green-700 transition-colors">
             Apply
-          </Link> : "Please sign in to apply"}
+          </Link>}
         </div>
       )}
+
+      {!session?.user.token && 
+      <p className='text-red-500'>
+        Please sign in to apply
+      </p>}
 
     </OuterContainer>
   );

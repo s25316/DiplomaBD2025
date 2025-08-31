@@ -30,8 +30,7 @@ const AppBar = () => {
           <button onClick={() => { window.location.href = '/profile' }} className="px-4 py-2 rounded-md text-gray-800 dark:text-white bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition duration-200">
             Profile
           </button>
-          <button onClick={() => { signOut()
-            router.replace("/") }} 
+          <button onClick={() => signOut({ callbackUrl: '/' })} 
             className="px-4 py-2 rounded-md bg-red-500 text-white hover:bg-red-600 transition duration-200">
               Sign Out
             </button>

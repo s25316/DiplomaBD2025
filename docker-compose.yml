@@ -146,7 +146,7 @@ services:
     restart: unless-stopped
     environment:
         NEXTAUTH_SECRET: "jbS7iRw63xG2u8GYTjZAODHySPFlrnr8ry7IMRoqQXM="
-        NEXTAUTH_URL: http://host.docker.internal:3000
+        NEXTAUTH_URL: http://localhost:3000
         API_URL: http://Diploma_BackEnd_Api:8080
     depends_on:
       - Diploma_BackEnd_Api

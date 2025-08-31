@@ -4,6 +4,7 @@ interface ContractConditions {
     salaryMin: number,
     salaryMax: number,
     isNegotiable: boolean,
+    isPaid: boolean,
     workModes: {
         contractParameterId: number,
         name: string,
