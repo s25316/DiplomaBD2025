@@ -47,7 +47,7 @@ interface OrderByOption {
 }
 
 const CompanyDetails = () => {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const { id } = useParams();
 
   const [company, setCompany] = useState<Company | null>(null);
@@ -71,6 +71,7 @@ const CompanyDetails = () => {
   const [activeTab, setActiveTab] = useState<'branches' | 'contracts' | 'templates'>('branches');
 
   const [isOwner, setIsOwner] = useState(Boolean(session))
+  const [hasFetched, setHasFetched] = useState(false);
 
   const [orderByOptions, setOrderByOptions] = useState<OrderByOption[]>([]);
   const [selectedOrderBy, setSelectedOrderBy] = useState<number>(3);
@@ -79,78 +80,139 @@ const CompanyDetails = () => {
   const backUrl = process.env.NEXT_PUBLIC_API_URL
 
   useEffect(() => {
-    if (!id) return;
-
-    let headers = {}
-    let apiUrl = ''
-
-    if (session?.user.token && isOwner) {
-      headers = {
-        Authorization: `Bearer ${session.user.token}`,
-      };
-      apiUrl = `${backUrl}/api/CompanyUser/`
-    }else{
-      apiUrl = `${backUrl}/api/GuestQueries/`
-    }
+    // Zapobiegaj wielokrotnemu uruchomieniu na początku
+    if (!id || (status === 'loading' && !hasFetched)) return;
+    // console.log("------------------------");
+    // console.log(`useEffect triggered. Session status: ${status}.`);
 
     const fetchAll = async () => {
+      let isUserOwner = false;
+      let headers: Record<string, string> = {};
+      let apiUrl = `${backUrl}/api/GuestQueries/`;
+      let companyData: Company | null = null;
+      
+      // 1. Sprawdź, czy użytkownik jest zalogowany
+      if (session?.user.token) {
+        headers = { 'Authorization': `Bearer ${session.user.token}` };
+        apiUrl = `${backUrl}/api/CompanyUser/`;
+        // console.log("Session token exists. Attempting to fetch as owner.");
+      //2. Sprobuj pobrać dane firmy jako wlasciciel
       try {
-        const orderByRes = await fetch(`${backUrl}/api/QueryParameters/CompanyUser/branches/orderBy`, { headers });
-        if (orderByRes.ok) {
-          const allOptions: OrderByOption[] = await orderByRes.json();
-          
-          const filteredOptions = allOptions.filter(option => option.id !== 1 && option.id !== 6);
-          setOrderByOptions(filteredOptions);
-
-          if (!filteredOptions.some(option => option.id === selectedOrderBy)) {
-            setSelectedOrderBy(filteredOptions.length > 0 ? filteredOptions[0].id : 0);
+        const companyRes = await fetch(`${apiUrl}companies/${id}`, { headers, cache: 'no-store' });
+        if (companyRes.ok){
+          const data = await companyRes.json();
+          if (data.items.length > 0){
+            companyData =data.items[0];
+            isUserOwner=true;
+            // console.log("Successfully fetched company data as owner. isOwner: true.");
           }
-
-        } else {
-          console.error("Failed to fetch order by options:", await orderByRes.text());
+          }else{
+            // console.log(`Failed to fetch as CompanyUser (status: ${companyRes.status}). Trying as Guest.`);
+            // Powrot do Guest, jeśli zapytanie jako CompanyUser się nie powiodło
+            apiUrl = `${backUrl}/api/GuestQueries/`;
+            isUserOwner=false;
+            headers ={};
+          }
+        } catch (e) {
+          console.error("Network error when fetching as CompanyUser. Trying as Guest.", e);
+          apiUrl = `${backUrl}/api/GuestQueries/`;
+          isUserOwner = false;
+          headers = {};
         }
-      } catch (err) {
-        console.error("Error fetching order by options:", err);
+      } else {
+        console.log("No session token. Fetching as Guest.");
       }
+      // 3. Jeśli nie udało się pobrać jako właściciel, spróbuj jako gość
+      if(!companyData) {
+        try{
+          const guestRes = await fetch(`${apiUrl}companies/${id}`, { headers, cache: 'no-store' });
+          if (guestRes.ok) {
+            const data = await guestRes.json();
+            companyData = data.items[0];
+            console.log("Successfully fetched company data as Guest.");
+          } else {
+            console.error(`Failed to fetch company data from both endpoints. Status: ${guestRes.status}`);
+          }
+        } catch (e) {
+          console.error("Network error when fetching as Guest.", e);
+        }
+      }
+
+      // 4. Ustaw stan komponentu na podstawie ustalonej roli i danych
+      setIsOwner(isUserOwner);
+      setCompany(companyData);
+
+      if (companyData) {
+//         console.log("Fetching additional company data (branches, etc.).");
+        if(isUserOwner){
+          try {
+            const orderByRes = await fetch(`${backUrl}/api/QueryParameters/CompanyUser/branches/orderBy`, { headers });
+            if (orderByRes.ok) {
+              const allOptions: OrderByOption[] = await orderByRes.json();
+              
+              const filteredOptions = allOptions.filter(option => option.id !== 1 && option.id !== 6);
+              setOrderByOptions(filteredOptions);
+
+              if (!filteredOptions.some(option => option.id === selectedOrderBy)) {
+                setSelectedOrderBy(filteredOptions.length > 0 ? filteredOptions[0].id : 0);
+              }
+              console.log("Successfully fetched orderBy options.");
+            } else {
+              console.error("Failed to fetch order by options:", await orderByRes.text());
+            }
+          } catch (err) {
+            console.error("Error fetching order by options:", err);
+          }
+        }else {
+            // Dla gościa resetuj opcje sortowania
+            setOrderByOptions([]);
+            setSelectedOrderBy(3); // Ustaw domyślną wartość dla gościa
+        }
 
       // Modify branches fetch to include orderBy and ascending
-      const branchesUrl = `${apiUrl}companies/${id}/branches?Page=${branchPage}&ItemsPerPage=${branchPerPage}&orderBy=${selectedOrderBy}&ascending=${isAscending}`;
 
-      const [c, b, t, cond] = await Promise.all([
-        fetch(`${apiUrl}companies/${id}`, { headers }),
-        fetch(branchesUrl, { headers }),
-        fetch(`${apiUrl}companies/${id}/offerTemplates?Page=${branchPage}&ItemsPerPage=${branchPerPage}`, { headers }),
-        fetch(`${apiUrl}companies/${id}/contractConditions?Page=${branchPage}&ItemsPerPage=${branchPerPage}`, { headers }),
+      const [b, t, cond] = await Promise.all([
+        fetch(`${apiUrl}companies/${id}/branches?Page=${branchPage}&ItemsPerPage=${branchPerPage}&orderBy=${selectedOrderBy}&ascending=${isAscending}`, { headers }),
+        fetch(`${apiUrl}companies/${id}/offerTemplates?Page=${templatePage}&ItemsPerPage=${templatePerPage}`, { headers }),
+        fetch(`${apiUrl}companies/${id}/contractConditions?Page=${conditionPage}&ItemsPerPage=${conditionPerPage}`, { headers }),
       ]);
 
-      if (!c.ok) {
-        setIsOwner(false);
-        return;
-      }
-
-      if (c.ok) setCompany((await c.json()).items[0]);
       if (b.ok) {
         const data = await b.json()
         setBranches((data).items.map((item: { branch: Branch }) => item.branch));
         setBranchTotal(data.totalCount);
+        // console.log(`Fetched ${data.totalCount} branches.`);
       }
       if (t.ok) {
         const data = await t.json();
         setTemplates((data).items.map((item: { offerTemplate: OfferTemplate }) => item.offerTemplate));
         setTemplateTotal(data.totalCount);
+        //console.log(`Fetched ${data.totalCount} offerTemplates.`);
       }
       if (cond.ok) {
         const data = await cond.json();
         const all = (data).items.map((item: { contractCondition: ContractCondition }) => item.contractCondition);
         setConditions(all.filter((cc: ContractCondition) => cc.companyId === id));
         setConditionTotal(data.totalCount);
+        //console.log(`Fetched ${data.totalCount} contract conditions.`);
       }
+    }else {
+        // Jeśli firma nie istnieje, zresetuj wszystkie dane
+        setBranches([]);
+        setTemplates([]);
+        setConditions([]);
+        setBranchTotal(0);
+        setTemplateTotal(0);
+        setConditionTotal(0);
+        console.error("Company data not found. All lists reset.");
+      }
+      setHasFetched(true);
     };
 
 
     fetchAll();
-  }, [session, id, branchPage, branchPerPage, templatePage, templatePerPage, conditionPage, conditionPerPage, isOwner, selectedOrderBy, isAscending]);
-
+  }, [session, id,status, branchPage, branchPerPage, templatePage, templatePerPage, conditionPage, conditionPerPage, selectedOrderBy, isAscending]);
+//   console.log(`Current render. isOwner: ${isOwner}`);
   return (
     <OuterContainer>
       <h1 className="text-2xl font-bold text-center">Company Details</h1>
@@ -205,6 +267,8 @@ const CompanyDetails = () => {
       {activeTab === 'branches' && (
         <div className="shadow-md rounded p-4">
           <div className="flex flex-col sm:flex-row items-center gap-4 my-4 p-3 bg-gray-100 dark:bg-gray-700 rounded-lg">
+            {isOwner && (
+              <>
             <label htmlFor="orderBy" className="text-gray-700 dark:text-gray-300 font-medium">Sort by:</label>
             <select
               id="orderBy"
@@ -230,6 +294,8 @@ const CompanyDetails = () => {
               />
               <span className="text-gray-700 dark:text-gray-300">{isAscending ? 'Ascending' : 'Descending'}</span>
             </div>
+            </>
+            )}
           </div>
           {isOwner && <div className="mt-2"><CreateBranchButton /></div>}
           <p className="mt-2 text-sm text-gray-600">
@@ -261,12 +327,11 @@ const CompanyDetails = () => {
             onDelete={(id: string) => setConditions(prev => prev.filter(c => c.contractConditionId !== id))}
           />
           <Pagination
-            page={branchPage}
+            page={conditionPage}
             onPrev={() => setConditionPage(p => Math.max(1, p - 1))}
             onNext={() => setConditionPage(p => p + 1)}
             isNextDisabled={conditions.length < conditionPerPage || conditionPerPage * conditionPage >= conditionTotal}
           />
-
         </div>
       )}
 

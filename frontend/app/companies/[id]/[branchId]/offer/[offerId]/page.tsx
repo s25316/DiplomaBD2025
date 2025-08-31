@@ -112,7 +112,8 @@ const OfferDetails = () => {
               setIsIndividual(userJson.personPerspective.isIndividual);
             }
           } catch (userErr) {
-            console.warn("Nie udało się pobrać szczegółów użytkownika dla sprawdzenia isIndividual:", userErr);
+            console.warn("Unable to check if it is an individual eccount or not :", userErr);
+            //Unable to check if it is an individual eccount or not 
           }
 
           // 2. Spróbuj pobrać ofertę jako CompanyUser, aby ustalić, czy jesteśmy jej właścicielem
@@ -129,10 +130,10 @@ const OfferDetails = () => {
                 isOwnerOfThisOffer = true;
               }
             } else {
-              console.log(`Pobieranie oferty ${offerId} jako CompanyUser nie powiodło się (status: ${companyUserRes.status}), próbuję jako GuestQueries.`);
+              console.log(`Fetching offer: ${offerId} as CompanyUser was unsuccesfull (status: ${companyUserRes.status}), trying as GuestQueries.`);
             }
           } catch (e) {
-            console.warn(`Błąd sieci podczas pobierania oferty ${offerId} jako CompanyUser, próbuję jako GuestQueries:`, e);
+            console.warn(`Web error during offer fetching: ${offerId} as CompanyUser, will try as GuestQueries:`, e);
           }
         }
 
