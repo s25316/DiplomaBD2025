@@ -383,6 +383,12 @@ const RecruitmentDetailsPage = () => {
 
   const sortedOfferSkillTypes = Object.keys(groupedOfferSkills).sort((a, b) => a.localeCompare(b));
 
+
+  const statusColorClass = recruitment.processType.name === 'Passed' ? 'text-green-600' :
+    recruitment.processType.name === 'Rejected' ? 'text-red-600' :
+    recruitment.processType.name === 'Seen' ? 'text-yellow-600' : '';
+
+
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white dark:bg-gray-900 rounded-lg shadow-xl mt-8 font-inter text-gray-900 dark:text-gray-100">
       <ReturnButton />
@@ -390,7 +396,7 @@ const RecruitmentDetailsPage = () => {
 
       <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg shadow-inner mb-6">
         <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-gray-100">Recruitment: {recruitment.processId}</h2>
-        <p><strong>Process Type:</strong> {recruitment.processType.name}</p>
+        <p ><strong >Process Type:</strong > <span className={`mb-4 font-semibold ${statusColorClass}`}> {recruitment.processType.name}</span> </p>
         {recruitment.message && <p><strong>Message:</strong> {recruitment.message}</p>}
         <p><strong>Created:</strong> {new Date(recruitment.created).toLocaleDateString()} {new Date(recruitment.created).toLocaleTimeString()}</p>
       </div>
@@ -499,7 +505,7 @@ const RecruitmentDetailsPage = () => {
       {!isIndividual && <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg shadow-inner mb-6">
         <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-gray-100">Change Process Type</h2>
         {isFinalStatus && (
-          <p className="text-red-600 dark:text-red-400 mb-4 font-semibold">
+          <p className={`mb-4 font-semibold ${statusColorClass}`}>
             Cannot change process type. Recruitment is already {recruitment.processType.name}.
           </p>
         )}

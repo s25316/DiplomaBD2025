@@ -399,7 +399,13 @@ const RecruitmentsPage = () => {
               <p><strong>Company:</strong> <Link href={`/companies/${company.companyId}`} className="text-blue-600 hover:underline">{company.name}</Link></p>
               <p><strong>Branch:</strong> <Link href={`/companies/${company.companyId}/${branch.branchId}`} className="text-blue-600 hover:underline">{branch.name}</Link></p>
               <p><strong>Candidate:</strong> {person.name} {person.surname} ({person.contactEmail})</p>
-              <p><strong>Process Type:</strong> {recruitment.processType.name}</p>
+              <p >
+                  <strong>Process Type:</strong>
+                  <span className={`${
+                recruitment.processType.name === 'Passed' ? 'text-green-600' :
+                recruitment.processType.name === 'Rejected' ? 'text-red-600' :
+                recruitment.processType.name === 'Seen' ? 'text-yellow-600' : ''}`}> {recruitment.processType.name} </span>
+              </p>
               {recruitment.message && <p><strong>Message:</strong> {recruitment.message}</p>}
               <p><strong>Created:</strong> {new Date(recruitment.created).toLocaleDateString()} {new Date(recruitment.created).toLocaleTimeString()}</p>
               <p><strong>Offer Status:</strong> {offer.status}</p>
